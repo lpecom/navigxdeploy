@@ -27,19 +27,19 @@ const StatsPanel = () => {
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="bg-white p-6 rounded-lg border border-gray-200 animate-fade-in"
+          className="bg-white p-6 rounded-lg border border-gray-200 animate-fade-in hover:border-primary/20 transition-colors"
         >
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm text-gray-500">{stat.label}</p>
-              <p className="text-2xl font-semibold mt-1">{stat.value}</p>
+              <p className="text-2xl font-semibold mt-1 text-gray-900">{stat.value}</p>
             </div>
             <div className="p-2 bg-primary/10 rounded-lg">
               <stat.icon className="w-5 h-5 text-primary" />
             </div>
           </div>
           <div className="mt-4 flex items-center">
-            <span className="text-sm font-medium text-green-600">
+            <span className="text-sm font-medium text-success">
               {stat.change}
             </span>
             <span className="text-sm text-gray-500 ml-2">vs last month</span>

@@ -23,17 +23,17 @@ const RentalsList = () => {
   return (
     <div className="bg-white rounded-lg border border-gray-200">
       <div className="p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold">Recent Rentals</h2>
+        <h2 className="text-lg font-semibold text-primary">Recent Rentals</h2>
       </div>
       <div className="divide-y divide-gray-200">
         {rentals.map((rental) => (
-          <div key={rental.id} className="p-4 flex items-center justify-between">
+          <div key={rental.id} className="p-4 flex items-center justify-between hover:bg-muted transition-colors">
             <div className="flex items-center gap-4">
-              <div className="p-2 bg-gray-100 rounded-lg">
-                <Car className="w-5 h-5 text-gray-600" />
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Car className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="font-medium">{rental.customer}</p>
+                <p className="font-medium text-gray-900">{rental.customer}</p>
                 <p className="text-sm text-gray-500">{rental.vehicle}</p>
               </div>
             </div>
@@ -45,8 +45,8 @@ const RentalsList = () => {
               <span
                 className={`px-3 py-1 rounded-full text-xs font-medium ${
                   rental.status === "active"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-blue-100 text-blue-800"
+                    ? "bg-success/10 text-success"
+                    : "bg-primary/10 text-primary"
                 }`}
               >
                 {rental.status}
