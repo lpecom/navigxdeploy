@@ -12,8 +12,10 @@ const Sidebar = () => {
   return (
     <div className="w-64 bg-white border-r border-gray-200 h-screen p-4">
       <div className="flex items-center gap-2 mb-8 px-2">
-        <div className="w-8 h-8 bg-primary rounded-lg" />
-        <span className="text-xl font-bold text-primary">Navig</span>
+        <div className="w-8 h-8 bg-navig rounded-lg flex items-center justify-center">
+          <span className="text-white font-bold text-xl">N</span>
+        </div>
+        <span className="text-xl font-bold text-navig">Navig</span>
       </div>
       
       <nav className="space-y-1">

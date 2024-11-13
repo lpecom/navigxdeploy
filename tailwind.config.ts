@@ -43,6 +43,10 @@ export default {
         success: {
           DEFAULT: "#10B981", // Green
           foreground: "#FFFFFF",
+        },
+        navig: {
+          DEFAULT: "#00B2FF", // Bright blue from the Navig logo
+          foreground: "#FFFFFF",
         }
       },
       borderRadius: {
