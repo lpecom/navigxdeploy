@@ -29,12 +29,20 @@ export const BoletoPayment = ({ amount, driverId, onSuccess }: BoletoPaymentProp
               driver_id: driverId,
               amount,
               payment_type: 'boleto',
-              description: 'Car rental payment'
+              description: 'Car rental payment',
+              customer_name: 'Test Customer', // This should come from driver details
+              customer_email: 'test@example.com',
+              customer_phone: '11999999999',
+              customer_cpf: '12345678909'
             }
           }
         })
 
         if (error) throw error
+
+        if (!data.boleto) {
+          throw new Error('Boleto data not received from payment provider')
+        }
 
         setBoletoData({
           barcode: data.boleto.barcode,

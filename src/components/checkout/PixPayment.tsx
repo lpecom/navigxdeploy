@@ -25,12 +25,20 @@ export const PixPayment = ({ amount, driverId, onSuccess }: PixPaymentProps) => 
               driver_id: driverId,
               amount,
               payment_type: 'pix',
-              description: 'Car rental payment'
+              description: 'Car rental payment',
+              customer_name: 'Test Customer', // This should come from driver details
+              customer_email: 'test@example.com',
+              customer_phone: '11999999999',
+              customer_cpf: '12345678909'
             }
           }
         })
 
         if (error) throw error
+
+        if (!data.pix?.qr_code) {
+          throw new Error('QR Code not received from payment provider')
+        }
 
         setQrCode(data.pix.qr_code)
         onSuccess(data.id)

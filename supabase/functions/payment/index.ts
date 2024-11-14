@@ -21,60 +21,45 @@ serve(async (req) => {
     )
 
     switch (action) {
-      case 'test_connection':
-        console.log('Testing Appmax API connection')
-        const testResponse = await fetch(`${APPMAX_API_URL}/test`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${Deno.env.get('APPMAX_API_KEY')}`
-          }
-        })
-        const testData = await testResponse.json()
-        console.log('Test response:', testData)
-        return new Response(JSON.stringify(testData), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
-
-      case 'tokenize':
-        const tokenizeResponse = await fetch(`${APPMAX_API_URL}/tokenize`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Deno.env.get('APPMAX_API_KEY')}`
-          },
-          body: JSON.stringify(payload)
-        })
-        const tokenData = await tokenizeResponse.json()
-        
-        if (tokenData.token) {
-          const { error } = await supabase
-            .from('payment_methods')
-            .insert({
-              driver_id: payload.driver_id,
-              card_token: tokenData.token,
-              card_brand: payload.card_brand,
-              last_four: payload.card_number.slice(-4),
-              holder_name: payload.holder_name
-            })
-          
-          if (error) throw error
-        }
-        
-        return new Response(JSON.stringify(tokenData), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
-
       case 'create_payment':
+        console.log('Creating payment:', payload)
+        let appmaxPayload = {
+          external_id: crypto.randomUUID(),
+          customer: {
+            name: payload.customer_name || 'Test Customer',
+            email: payload.customer_email || 'test@example.com',
+            phone: payload.customer_phone || '11999999999',
+            cpf: payload.customer_cpf || '12345678909'
+          },
+          payment: {
+            type: payload.payment_type,
+            amount: payload.amount,
+            installments: payload.installments || 1,
+            card_token: payload.card_token,
+            pix_expiration_date: payload.payment_type === 'pix' ? 
+              new Date(Date.now() + 30 * 60000).toISOString() : undefined, // 30 minutes
+            boleto_expiration_date: payload.payment_type === 'boleto' ? 
+              new Date(Date.now() + 3 * 24 * 60 * 60000).toISOString() : undefined // 3 days
+          }
+        }
+
+        console.log('Sending to Appmax:', appmaxPayload)
         const paymentResponse = await fetch(`${APPMAX_API_URL}/payments`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${Deno.env.get('APPMAX_API_KEY')}`
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(appmaxPayload)
         })
+
         const paymentData = await paymentResponse.json()
-        
+        console.log('Appmax response:', paymentData)
+
+        if (!paymentResponse.ok) {
+          throw new Error(`Appmax error: ${JSON.stringify(paymentData)}`)
+        }
+
         // Create payment record
         const { data: payment, error: paymentError } = await supabase
           .from('payments')
@@ -82,7 +67,7 @@ serve(async (req) => {
             driver_id: payload.driver_id,
             amount: payload.amount,
             payment_type: payload.payment_type,
-            installments: payload.installments,
+            installments: payload.installments || 1,
             appmax_transaction_id: paymentData.transaction_id,
             description: payload.description
           })
@@ -98,7 +83,7 @@ serve(async (req) => {
             .insert({
               payment_id: payment.id,
               barcode: paymentData.boleto.barcode,
-              due_date: paymentData.boleto.due_date,
+              due_date: new Date(paymentData.boleto.due_date),
               pdf_url: paymentData.boleto.pdf_url
             })
           
@@ -112,13 +97,16 @@ serve(async (req) => {
               payment_id: payment.id,
               qr_code: paymentData.pix.qr_code,
               qr_code_url: paymentData.pix.qr_code_url,
-              expiration_date: paymentData.pix.expiration_date
+              expiration_date: new Date(paymentData.pix.expiration_date)
             })
           
           if (pixError) throw pixError
         }
 
-        return new Response(JSON.stringify(paymentData), {
+        return new Response(JSON.stringify({
+          id: payment.id,
+          ...paymentData
+        }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         })
 
