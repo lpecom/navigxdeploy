@@ -5,21 +5,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { supabase } from "@/integrations/supabase/client";
+import { sendToCRM } from "@/utils/crmIntegration";
+import { DriverForm } from "@/components/driver/DriverForm";
 
-const driverSchema = z.object({
+export const driverSchema = z.object({
   fullName: z.string().min(3, "Nome completo é obrigatório"),
   birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida"),
   licenseNumber: z.string().min(3, "CNH é obrigatória"),
@@ -29,7 +23,7 @@ const driverSchema = z.object({
   email: z.string().email("Email inválido"),
 });
 
-type DriverFormValues = z.infer<typeof driverSchema>;
+export type DriverFormValues = z.infer<typeof driverSchema>;
 
 const DriverDetails = () => {
   const navigate = useNavigate();
@@ -63,6 +57,7 @@ const DriverDetails = () => {
             cpf: data.cpf,
             phone: data.phone,
             email: data.email,
+            crm_status: 'pending_payment',
           },
         ])
         .select()
@@ -70,10 +65,12 @@ const DriverDetails = () => {
 
       if (error) throw error;
 
-      // Get car and optionals data from session storage
+      // Send data to CRM
+      await sendToCRM(data);
+
       const selectedCar = JSON.parse(sessionStorage.getItem("selectedCar") || "{}");
       const selectedOptionals = JSON.parse(sessionStorage.getItem("selectedOptionals") || "[]");
-      
+
       // Calculate total amount (this is a simplified calculation)
       const totalAmount = parseFloat(selectedCar.price || "0") + 
         selectedOptionals.reduce((acc: number, opt: any) => acc + (opt.price || 0), 0);
@@ -115,103 +112,7 @@ const DriverDetails = () => {
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="fullName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome Completo</FormLabel>
-                  <FormControl>
-                    <Input placeholder="João da Silva" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="birthDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Data de Nascimento</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="licenseNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Número da CNH</FormLabel>
-                  <FormControl>
-                    <Input placeholder="00000000000" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="licenseExpiry"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Validade da CNH</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="cpf"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>CPF</FormLabel>
-                  <FormControl>
-                    <Input placeholder="000.000.000-00" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Telefone</FormLabel>
-                  <FormControl>
-                    <Input placeholder="(11) 99999-9999" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="joao@exemplo.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <DriverForm form={form} />
 
             <div className="flex justify-between pt-4">
               <Link to="/optionals">
