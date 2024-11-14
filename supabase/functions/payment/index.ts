@@ -1,5 +1,4 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,44 +12,39 @@ serve(async (req) => {
   }
 
   try {
-    // Ensure the request has a body
-    if (!req.body) {
+    // Parse request body
+    const text = await req.text()
+    console.log('Raw request body:', text) // Debug log
+    
+    if (!text) {
       throw new Error('Request body is required')
     }
 
-    let body
-    try {
-      const text = await req.text()
-      console.log('Raw request body:', text) // Debug log
-      body = JSON.parse(text)
-      console.log('Parsed request body:', body) // Debug log
-    } catch (e) {
-      console.error('Error parsing request body:', e)
-      return new Response(
-        JSON.stringify({
-          error: 'Invalid JSON in request body',
-          details: e.message
-        }),
-        { 
-          status: 400,
-          headers: { 
-            ...corsHeaders, 
-            'Content-Type': 'application/json'
-          }
-        }
-      )
-    }
+    const body = JSON.parse(text)
+    console.log('Parsed request body:', body) // Debug log
 
     const { action, payload } = body
 
     if (!action || !payload) {
+      throw new Error('Action and payload are required')
+    }
+
+    // Process payment based on action
+    if (action === 'create_payment') {
+      // Mock successful payment response
+      const response = {
+        success: true,
+        transaction_id: crypto.randomUUID(),
+        payment_details: {
+          status: 'approved',
+          method: payload.payment_type,
+          amount: payload.amount
+        }
+      }
+
       return new Response(
-        JSON.stringify({
-          error: 'Action and payload are required',
-          received: { action, payload }
-        }),
+        JSON.stringify(response),
         { 
-          status: 400,
           headers: { 
             ...corsHeaders, 
             'Content-Type': 'application/json'
@@ -59,37 +53,18 @@ serve(async (req) => {
       )
     }
 
-    // For now, we'll simulate a successful response
-    const mockResponse = {
-      success: true,
-      transaction_id: crypto.randomUUID(),
-      payment_details: {
-        status: 'approved',
-        method: payload.payment_type,
-        amount: payload.amount
-      }
-    }
-
-    return new Response(
-      JSON.stringify(mockResponse),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json'
-        }
-      }
-    )
+    throw new Error(`Invalid action: ${action}`)
 
   } catch (error) {
     console.error('Payment processing error:', error)
+    
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        details: error.toString(),
         timestamp: new Date().toISOString()
       }), 
       {
-        status: 500,
+        status: 400,
         headers: { 
           ...corsHeaders, 
           'Content-Type': 'application/json'
