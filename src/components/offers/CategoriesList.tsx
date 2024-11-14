@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit2, Eye, EyeOff, Trash2 } from "lucide-react";
+import { Edit2, Eye, EyeOff, Trash2, Type } from "lucide-react";
 import { useState } from "react";
 import { CategoryEditDialog } from "./CategoryEditDialog";
 import {
@@ -14,6 +14,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import type { Category } from "@/types/offers";
 
 interface CategoriesListProps {
@@ -33,8 +43,35 @@ export const CategoriesList = ({
   onDeleteCategory,
   isLoading,
 }: CategoriesListProps) => {
+  const { toast } = useToast();
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+  const [renamingCategory, setRenamingCategory] = useState<Category | null>(null);
+  const [newCategoryName, setNewCategoryName] = useState("");
+
+  const handleRename = async () => {
+    if (!renamingCategory || !newCategoryName.trim()) return;
+
+    const { error } = await supabase
+      .from("categories")
+      .update({ name: newCategoryName.trim() })
+      .eq("id", renamingCategory.id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to rename category",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Category renamed successfully",
+      });
+      setRenamingCategory(null);
+      setNewCategoryName("");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -106,6 +143,17 @@ export const CategoriesList = ({
                     size="icon"
                     onClick={(e) => {
                       e.stopPropagation();
+                      setRenamingCategory(category);
+                      setNewCategoryName(category.name);
+                    }}
+                  >
+                    <Type className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setCategoryToDelete(category);
                     }}
                   >
@@ -151,6 +199,27 @@ export const CategoriesList = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!renamingCategory} onOpenChange={() => setRenamingCategory(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rename Category</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              placeholder="Enter new category name"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRenamingCategory(null)}>
+              Cancel
+            </Button>
+            <Button onClick={handleRename}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
