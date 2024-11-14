@@ -4,7 +4,7 @@ import {
   FileText,
   TrendingUp,
   UserPlus,
-  Truck,
+  CalendarPlus,
   Calendar,
   History,
   Gift,
@@ -37,7 +37,7 @@ const Sidebar = () => {
       path: "/leads",
       active: location.pathname === "/leads",
       subItems: [
-        { label: "Agendamentos", icon: Truck },
+        { label: "Agendamentos", icon: CalendarPlus },
         { label: "Reservas", icon: Calendar, path: "/reservations" },
         { label: "Histórico", icon: History }
       ]
