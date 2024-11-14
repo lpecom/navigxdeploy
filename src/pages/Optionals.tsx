@@ -22,38 +22,39 @@ interface SelectedCar {
 const economyCars = [
   {
     id: '1',
-    name: 'Ford Ka SE',
-    image: 'https://raw.githubusercontent.com/navigcars/cars/main/ford-ka.png',
+    name: 'HB20 1.0',
+    image: 'https://www.kovi.com.br/hubfs/HB20%20Sense%20-%20Branco%20-%20Hatch_web.webp',
     year: '2021',
-    mileage: '25.000 km'
+    description: 'Hatch • *Carro com até 6 mil kms rodados.',
+    note: 'Aproveite! Restam poucas unidades para entrega imediata.'
   },
   {
     id: '2',
-    name: 'Fiat Uno',
-    image: 'https://raw.githubusercontent.com/navigcars/cars/main/uno.png',
-    year: '2020',
-    mileage: '30.000 km'
+    name: 'Ford Ka SE',
+    image: 'https://raw.githubusercontent.com/navigcars/cars/main/ford-ka.png',
+    year: '2021',
+    description: 'Equipado com pneus Remold.'
   },
   {
     id: '3',
     name: 'Onix Joy',
     image: 'https://raw.githubusercontent.com/navigcars/cars/main/onix.png',
     year: '2019',
-    mileage: '45.000 km'
+    description: 'Hatch • Completo'
   },
   {
     id: '4',
     name: 'Renault Kwid',
     image: 'https://raw.githubusercontent.com/navigcars/cars/main/kwid.png',
     year: '2020',
-    mileage: '35.000 km'
+    description: 'Compacto e econômico'
   },
   {
     id: '5',
     name: 'Hyundai HB20',
     image: 'https://raw.githubusercontent.com/navigcars/cars/main/hb20.png',
     year: '2021',
-    mileage: '28.000 km'
+    description: 'Hatch • Completo'
   }
 ];
 

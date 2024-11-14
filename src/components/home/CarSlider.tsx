@@ -7,7 +7,8 @@ interface Car {
   name: string;
   image: string;
   year: string;
-  mileage: string;
+  description?: string;
+  note?: string;
 }
 
 interface CarSliderProps {
@@ -52,7 +53,12 @@ export const CarSlider = ({ cars, category }: CarSliderProps) => {
               />
               <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/50 text-white">
                 <p className="text-sm font-medium">{car.name} {car.year}</p>
-                <p className="text-xs">{car.mileage}</p>
+                {car.description && (
+                  <p className="text-xs">{car.description}</p>
+                )}
+                {car.note && (
+                  <p className="text-xs text-yellow-300">{car.note}</p>
+                )}
               </div>
             </div>
           ))}
