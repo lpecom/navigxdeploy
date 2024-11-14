@@ -1,6 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
 import { CartItem } from "@/contexts/CartContext";
-import { CheckoutSession, JsonCartItem } from "@/types/checkout";
 
 interface CheckoutSessionHandlerProps {
   driverId: string;
@@ -8,17 +7,6 @@ interface CheckoutSessionHandlerProps {
   totalAmount: number;
   onSuccess: (sessionId: string) => void;
 }
-
-// Transform CartItem to a JSON-compatible format
-const transformCartItemToJson = (item: CartItem): JsonCartItem => {
-  return {
-    id: item.id,
-    type: item.type,
-    quantity: item.quantity,
-    unitPrice: item.unitPrice,
-    totalPrice: item.totalPrice,
-  };
-};
 
 export const createCheckoutSession = async ({
   driverId,
@@ -32,10 +20,10 @@ export const createCheckoutSession = async ({
 
     const sessionData = {
       driver_id: driverId,
-      selected_car: selectedCar ? transformCartItemToJson(selectedCar) : null,
-      selected_optionals: selectedOptionals.map(transformCartItemToJson),
+      selected_car: selectedCar ? JSON.parse(JSON.stringify(selectedCar)) : null,
+      selected_optionals: JSON.parse(JSON.stringify(selectedOptionals)),
       total_amount: totalAmount,
-      status: 'completed'
+      status: 'pending'
     };
 
     const { data: session, error: sessionError } = await supabase

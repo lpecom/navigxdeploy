@@ -1,5 +1,4 @@
 import { createContext, useContext, useReducer, ReactNode } from 'react';
-import { supabase } from "@/integrations/supabase/client";
 
 export interface CartItem {
   id: string;
@@ -7,19 +6,18 @@ export interface CartItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  name?: string;  // Added for better display
 }
 
 interface CartState {
   items: CartItem[];
   total: number;
-  checkoutSessionId: string | null;
 }
 
 type CartAction =
   | { type: 'ADD_ITEM'; payload: CartItem }
   | { type: 'REMOVE_ITEM'; payload: string }
   | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
-  | { type: 'SET_CHECKOUT_SESSION'; payload: string }
   | { type: 'CLEAR_CART' };
 
 const CartContext = createContext<{
@@ -29,7 +27,7 @@ const CartContext = createContext<{
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
-    case 'ADD_ITEM':
+    case 'ADD_ITEM': {
       const existingItem = state.items.find(item => item.id === action.payload.id);
       if (existingItem) {
         return {
@@ -47,16 +45,18 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         items: [...state.items, action.payload],
         total: state.total + action.payload.totalPrice
       };
+    }
 
-    case 'REMOVE_ITEM':
+    case 'REMOVE_ITEM': {
       const itemToRemove = state.items.find(item => item.id === action.payload);
       return {
         ...state,
         items: state.items.filter(item => item.id !== action.payload),
         total: state.total - (itemToRemove?.totalPrice || 0)
       };
+    }
 
-    case 'UPDATE_QUANTITY':
+    case 'UPDATE_QUANTITY': {
       return {
         ...state,
         items: state.items.map(item => {
@@ -76,18 +76,12 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
           return acc + item.totalPrice;
         }, 0)
       };
-
-    case 'SET_CHECKOUT_SESSION':
-      return {
-        ...state,
-        checkoutSessionId: action.payload
-      };
+    }
 
     case 'CLEAR_CART':
       return {
         items: [],
-        total: 0,
-        checkoutSessionId: null
+        total: 0
       };
 
     default:
@@ -98,8 +92,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(cartReducer, {
     items: [],
-    total: 0,
-    checkoutSessionId: null
+    total: 0
   });
 
   return (
@@ -115,25 +108,4 @@ export const useCart = () => {
     throw new Error('useCart must be used within a CartProvider');
   }
   return context;
-};
-
-export const syncCartWithDatabase = async (state: CartState) => {
-  if (!state.checkoutSessionId) return;
-
-  const { error } = await supabase
-    .from('cart_items')
-    .upsert(
-      state.items.map(item => ({
-        checkout_session_id: state.checkoutSessionId,
-        item_type: item.type,
-        item_id: item.id,
-        quantity: item.quantity,
-        unit_price: item.unitPrice,
-        total_price: item.totalPrice
-      }))
-    );
-
-  if (error) {
-    console.error('Error syncing cart:', error);
-  }
 };

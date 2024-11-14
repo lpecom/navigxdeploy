@@ -3,56 +3,33 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Plus, Minus } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Optional {
   id: string;
   name: string;
   description: string;
   price: number;
-  priceType: 'per_rental' | 'per_day';
+  price_period: string;
 }
-
-const optionals: Optional[] = [
-  {
-    id: "gps",
-    name: "GPS Navegação",
-    description: "Sistema de navegação por satélite com mapas atualizados.",
-    price: 15.00,
-    priceType: "per_rental"
-  },
-  {
-    id: "wifi",
-    name: "Acesso WiFi",
-    description: "Acesso à internet sem fio para notebooks, smartphones e tablets.",
-    price: 50.00,
-    priceType: "per_rental"
-  },
-  {
-    id: "winter",
-    name: "Pacote Inverno",
-    description: "Pneus de inverno, raspador de gelo e correntes de neve - recomendado para condições de inverno.",
-    price: 35.00,
-    priceType: "per_rental"
-  },
-  {
-    id: "ski",
-    name: "Suporte para Esqui",
-    description: "Porta-malas seguro para quatro conjuntos de esqui.",
-    price: 199.00,
-    priceType: "per_rental"
-  },
-  {
-    id: "insurance",
-    name: "Seguro Completo",
-    description: "O seguro completo cobre todas as partes exteriores e mecânicas do seu carro. Valor da franquia totalmente coberto.",
-    price: 7.00,
-    priceType: "per_day"
-  }
-];
 
 export const OptionalsList = () => {
   const { state, dispatch } = useCart();
   const { toast } = useToast();
+
+  const { data: optionals, isLoading } = useQuery({
+    queryKey: ['optionals'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('accessories')
+        .select('*')
+        .order('created_at', { ascending: true });
+      
+      if (error) throw error;
+      return data as Optional[];
+    }
+  });
 
   const updateQuantity = (optional: Optional, delta: number) => {
     const currentItem = state.items.find(item => item.id === optional.id);
@@ -69,7 +46,8 @@ export const OptionalsList = () => {
             type: 'optional',
             quantity: 1,
             unitPrice: optional.price,
-            totalPrice: optional.price
+            totalPrice: optional.price,
+            name: optional.name
           }
         });
       } else {
@@ -80,15 +58,23 @@ export const OptionalsList = () => {
       }
 
       toast({
-        title: "Optional Adicionado",
+        title: "Optional Atualizado",
         description: `${optional.name} foi ${delta > 0 ? 'adicionado ao' : 'atualizado no'} seu pedido.`
       });
     }
   };
 
+  if (isLoading) {
+    return <div className="animate-pulse space-y-4">
+      {[1, 2, 3].map(i => (
+        <div key={i} className="h-24 bg-slate-100 rounded-lg"></div>
+      ))}
+    </div>;
+  }
+
   return (
     <div className="space-y-6">
-      {optionals.map((optional) => {
+      {optionals?.map((optional) => {
         const currentQuantity = state.items.find(item => item.id === optional.id)?.quantity || 0;
 
         return (
@@ -97,7 +83,7 @@ export const OptionalsList = () => {
               <h3 className="font-medium">{optional.name}</h3>
               <p className="text-sm text-gray-600">{optional.description}</p>
               <p className="text-sm font-medium text-primary mt-1">
-                R$ {optional.price.toFixed(2)} {optional.priceType === 'per_rental' ? 'por aluguel' : 'por dia'}
+                R$ {optional.price.toFixed(2)} {optional.price_period === 'per_rental' ? 'por aluguel' : 'por dia'}
               </p>
             </div>
             
