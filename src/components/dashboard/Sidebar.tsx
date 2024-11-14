@@ -15,13 +15,17 @@ import {
   Shield
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link, useLocation } from "react-router-dom";
 
 const Sidebar = () => {
+  const location = useLocation();
+  
   const menuItems = [
     { 
       icon: LayoutDashboard, 
-      label: "Dashboard", 
-      active: true,
+      label: "Dashboard",
+      path: "/",
+      active: location.pathname === "/",
       subItems: [
         { label: "Analytics", icon: FileText },
         { label: "Reports", icon: FileText },
@@ -31,6 +35,8 @@ const Sidebar = () => {
     { 
       icon: Calendar, 
       label: "Bookings",
+      path: "/reservations",
+      active: location.pathname === "/reservations",
       subItems: [
         { label: "Active Rentals", icon: Clock },
         { label: "Reservations", icon: Calendar },
@@ -76,18 +82,33 @@ const Sidebar = () => {
       <nav className="space-y-1">
         {menuItems.map((item) => (
           <div key={item.label} className="space-y-1">
-            <a
-              href="#"
-              className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                item.active
-                  ? "bg-primary text-white"
-                  : "text-gray-600 hover:bg-accent hover:text-primary"
-              )}
-            >
-              <item.icon className="w-5 h-5" />
-              {item.label}
-            </a>
+            {item.path ? (
+              <Link
+                to={item.path}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                  item.active
+                    ? "bg-primary text-white"
+                    : "text-gray-600 hover:bg-accent hover:text-primary"
+                )}
+              >
+                <item.icon className="w-5 h-5" />
+                {item.label}
+              </Link>
+            ) : (
+              <a
+                href="#"
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                  item.active
+                    ? "bg-primary text-white"
+                    : "text-gray-600 hover:bg-accent hover:text-primary"
+                )}
+              >
+                <item.icon className="w-5 h-5" />
+                {item.label}
+              </a>
+            )}
             
             {item.subItems && (
               <div className="ml-9 space-y-1">
