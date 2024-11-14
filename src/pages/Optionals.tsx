@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Users, Car as CarIcon, Fuel, Gauge } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { OrderSummary } from "@/components/optionals/OrderSummary";
 import { OptionalsList } from "@/components/optionals/OptionalsList";
@@ -64,7 +64,7 @@ const Optionals = () => {
                       <span>{selectedCar.specs.passengers} passageiros</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <CarIcon className="w-4 h-4 text-navig" />
+                      <Car className="w-4 h-4 text-navig" />
                       <span>{selectedCar.specs.transmission}</span>
                     </div>
                     <div className="flex items-center gap-2">
