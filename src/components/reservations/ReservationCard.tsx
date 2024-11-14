@@ -1,10 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronDown, ChevronUp, Car } from "lucide-react";
-import { StatusBadges } from "./StatusBadges";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { ReservationExpandedContent } from "./ReservationExpandedContent";
 import type { Reservation } from "@/types/reservation";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 
 interface ReservationCardProps {
   reservation: Reservation;
@@ -13,52 +12,21 @@ interface ReservationCardProps {
 }
 
 export const ReservationCard = ({ reservation, isExpanded, onToggle }: ReservationCardProps) => {
-  const getCategoryColor = (category: Reservation['carCategory']) => {
-    const colors = {
-      Luxury: "text-purple-600",
-      SUV: "text-blue-600",
-      Economy: "text-green-600",
-      Sports: "text-red-600"
-    };
-    return colors[category];
-  };
-
   return (
-    <Card className="hover:shadow-lg transition-shadow">
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <CardTitle className="text-lg font-medium">
-              {reservation.customerName}
-            </CardTitle>
-            <div className="flex items-center gap-1 text-sm">
-              <Car className={`w-4 h-4 ${getCategoryColor(reservation.carCategory)}`} />
-              <span className={`${getCategoryColor(reservation.carCategory)}`}>
-                {reservation.carCategory}
-              </span>
-            </div>
+    <Card className="overflow-hidden">
+      <CardHeader className="p-4 pb-2">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="font-medium">{reservation.customerName}</h3>
+            <p className="text-sm text-muted-foreground">{reservation.email}</p>
           </div>
-          <button
-            onClick={onToggle}
-            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-            aria-label={isExpanded ? "Mostrar menos" : "Mostrar mais"}
-          >
-            {isExpanded ? (
-              <ChevronUp className="w-5 h-5" />
-            ) : (
-              <ChevronDown className="w-5 h-5" />
-            )}
-          </button>
+          <Button variant="ghost" size="sm" onClick={onToggle}>
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
         </div>
-        <p className="text-sm text-muted-foreground mt-1">
-          Retirada: {format(new Date(reservation.pickupDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-        </p>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <StatusBadges reservation={reservation} />
-          {isExpanded && <ReservationExpandedContent reservation={reservation} />}
-        </div>
+      <CardContent className="p-4 pt-0">
+        {isExpanded && <ReservationExpandedContent reservation={reservation} />}
       </CardContent>
     </Card>
   );
