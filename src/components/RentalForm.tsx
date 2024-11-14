@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
+import { Card, CardContent } from "@/components/ui/card";
 
 const formSchema = z.object({
   category: z.string().min(1, { message: "Por favor, selecione uma categoria" }),
@@ -30,12 +31,12 @@ const formSchema = z.object({
 });
 
 const categories = [
-  { value: "usadinho", label: "USADINHO" },
-  { value: "usadinho-comfort", label: "USADINHO Comfort" },
-  { value: "hatch-plus", label: "Hatch Plus" },
-  { value: "sedan-premium", label: "Sedan Premium" },
-  { value: "suv-black", label: "Suv Black" },
-  { value: "furgao-entregas", label: "Furgão Entregas" },
+  { value: "usadinho", label: "USADINHO", image: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=500&q=80" },
+  { value: "usadinho-comfort", label: "USADINHO Comfort", image: "https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?w=500&q=80" },
+  { value: "hatch-plus", label: "Hatch Plus", image: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=500&q=80" },
+  { value: "sedan-premium", label: "Sedan Premium", image: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=500&q=80" },
+  { value: "suv-black", label: "Suv Black", image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500&q=80" },
+  { value: "furgao-entregas", label: "Furgão Entregas", image: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=500&q=80" },
 ];
 
 const vehiclesByCategory = {
@@ -70,30 +71,33 @@ export function RentalForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Categoria</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione uma categoria" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.value} value={category.value}>
-                      {category.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {categories.map((category) => (
+            <Card key={category.value} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <img src={category.image} alt={category.label} className="w-full h-48 object-cover" />
+              <CardContent className="p-4">
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Button
+                          variant={field.value === category.value ? "default" : "outline"}
+                          className="w-full"
+                          onClick={() => field.onChange(category.value)}
+                        >
+                          {category.label}
+                        </Button>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
         <FormField
           control={form.control}
           name="vehicle"
@@ -118,6 +122,7 @@ export function RentalForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="name"
