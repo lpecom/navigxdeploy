@@ -2,6 +2,18 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { 
+  Users, 
+  Briefcase, 
+  Gauge, 
+  Fuel, 
+  MapPin, 
+  Calendar, 
+  DollarSign,
+  Shield,
+  Car,
+  Wifi
+} from 'lucide-react';
 
 const carCategories = [
   {
@@ -12,7 +24,17 @@ const carCategories = [
     period: '/semana',
     location: 'Porto Alegre',
     availability: 'Pronta Entrega',
-    badge: 'Usados'
+    badge: 'Usados',
+    specs: {
+      passengers: 4,
+      luggage: 1,
+      transmission: 'Manual',
+      fuel: 'Flex',
+      mileage: '10.000km',
+      insurance: 'Básico',
+      wifi: true,
+      consumption: '14.5 km/l'
+    }
   },
   {
     name: 'USADINHO Comfort',
@@ -22,7 +44,17 @@ const carCategories = [
     period: '/semana',
     location: 'São Paulo',
     availability: 'Pronta Entrega',
-    badge: 'Usados'
+    badge: 'Usados',
+    specs: {
+      passengers: 5,
+      luggage: 2,
+      transmission: 'Automático',
+      fuel: 'Gasolina',
+      mileage: '5.000km',
+      insurance: 'Completo',
+      wifi: false,
+      consumption: '12.0 km/l'
+    }
   },
   {
     name: 'Hatch Plus',
@@ -32,7 +64,17 @@ const carCategories = [
     period: '/semana',
     location: 'Rio de Janeiro',
     availability: 'Pronta Entrega',
-    badge: 'Novos'
+    badge: 'Novos',
+    specs: {
+      passengers: 5,
+      luggage: 2,
+      transmission: 'Automático',
+      fuel: 'Gasolina',
+      mileage: '8.000km',
+      insurance: 'Básico',
+      wifi: true,
+      consumption: '13.0 km/l'
+    }
   },
   {
     name: 'Sedan Premium',
@@ -42,7 +84,17 @@ const carCategories = [
     period: '/semana',
     location: 'Curitiba',
     availability: 'Pronta Entrega',
-    badge: 'Premium'
+    badge: 'Premium',
+    specs: {
+      passengers: 5,
+      luggage: 3,
+      transmission: 'CVT',
+      fuel: 'Gasolina',
+      mileage: '1.000km',
+      insurance: 'Completo',
+      wifi: true,
+      consumption: '15.0 km/l'
+    }
   },
 ];
 
@@ -62,7 +114,7 @@ const Home = () => {
                 <CardTitle className="text-2xl font-bold">{category.name}</CardTitle>
               </CardHeader>
               
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div className="h-48 flex items-center justify-center">
                   <img 
                     src={category.image} 
@@ -71,15 +123,56 @@ const Home = () => {
                   />
                 </div>
                 
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Users className="w-4 h-4" />
+                      <span>{category.specs.passengers} passageiros</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Briefcase className="w-4 h-4" />
+                      <span>{category.specs.luggage} mala grande</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Car className="w-4 h-4" />
+                      <span>{category.specs.transmission}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Fuel className="w-4 h-4" />
+                      <span>{category.specs.fuel}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Gauge className="w-4 h-4" />
+                      <span>{category.specs.consumption}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Shield className="w-4 h-4" />
+                      <span>{category.specs.insurance}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <MapPin className="w-4 h-4" />
+                      <span>{category.location}</span>
+                    </div>
+                    {category.specs.wifi && (
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Wifi className="w-4 h-4" />
+                        <span>Wi-Fi incluso</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <p className="text-navig font-semibold">{category.location}</p>
-                  <p className="text-gray-600">{category.availability}</p>
+                  <p className="text-navig font-semibold">{category.availability}</p>
                   <p className="font-medium">Modelos: <span className="text-gray-600">{category.models}</span></p>
                 </div>
                 
                 <div className="text-2xl font-bold text-gray-900">
                   A partir de
-                  <div className="text-red-500">
+                  <div className="flex items-center gap-2 text-red-500">
+                    <DollarSign className="w-6 h-6" />
                     {category.price}
                     <span className="text-base font-normal">{category.period}</span>
                   </div>
