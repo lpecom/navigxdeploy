@@ -2,7 +2,7 @@ export type CustomerStatus = 'new' | 'returning' | 'blocked';
 export type PaymentStatus = 'paid' | 'pending';
 export type ReservationStatus = 'pending' | 'approved' | 'rejected';
 export type CarCategory = 'SUV' | 'Luxury' | 'Economy' | 'Sports';
-export type LeadSource = 'facebook' | 'whatsapp';
+export type LeadSource = 'facebook' | 'whatsapp' | 'form';
 
 export interface Optional {
   name: string;

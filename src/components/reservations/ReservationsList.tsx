@@ -12,11 +12,12 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
 
   const { data: recentLeads, isLoading } = useQuery({
-    queryKey: ['recent-leads'],
+    queryKey: ['recent-leads', filter],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('driver_details')
         .select('*')
+        .eq('crm_status', 'pending_payment')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -28,15 +29,15 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
         email: lead.email,
         cpf: lead.cpf,
         phone: lead.phone,
-        address: "", // Not stored in driver_details
-        pickupDate: new Date().toISOString(), // Default to current date
+        address: "",
+        pickupDate: new Date().toISOString(),
         status: "pending",
         paymentStatus: "pending",
         customerStatus: "new",
-        riskScore: 25, // Default value
+        riskScore: 25,
         documentsSubmitted: false,
         createdAt: lead.created_at,
-        carCategory: "Economy", // Default value
+        carCategory: "Economy",
         leadSource: "form",
         weeklyFare: 0,
         optionals: [],
@@ -56,13 +57,13 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
     return <div className="text-center py-8">Loading recent leads...</div>;
   }
 
-  const filteredReservations = filter && recentLeads
-    ? recentLeads.filter((r) => r.status === filter)
-    : recentLeads;
+  if (!recentLeads?.length) {
+    return <div className="text-center py-8 text-muted-foreground">No pending reservations found.</div>;
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {filteredReservations?.map((reservation) => (
+      {recentLeads.map((reservation) => (
         <ReservationCard
           key={reservation.id}
           reservation={reservation}
