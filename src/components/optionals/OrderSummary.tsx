@@ -1,8 +1,26 @@
-import { Card } from "@/components/ui/card";
-import { useCart } from "@/contexts/CartContext";
+import { Card } from "@/components/ui/card"
+import { useCart } from "@/contexts/CartContext"
+import { useQuery } from "@tanstack/react-query"
+import { supabase } from "@/integrations/supabase/client"
 
 export const OrderSummary = () => {
-  const { state } = useCart();
+  const { state } = useCart()
+
+  const { data: accessories } = useQuery({
+    queryKey: ['accessories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('accessories')
+        .select('*')
+      if (error) throw error
+      return data
+    }
+  })
+
+  const getAccessoryName = (id: string) => {
+    const accessory = accessories?.find(acc => acc.id === id)
+    return accessory?.name || 'Optional'
+  }
 
   return (
     <Card className="p-6">
@@ -10,60 +28,30 @@ export const OrderSummary = () => {
       
       <div className="space-y-4">
         <div className="border-b pb-4">
-          <h3 className="font-medium mb-2">Detalhes do Aluguel</h3>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Retirada</span>
-              <span>21-11-2024, 8:00</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Devolução</span>
-              <span>29-11-2024, 2:00</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Duração</span>
-              <span>8 dias</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="border-b pb-4">
-          <h3 className="font-medium mb-2">Localização</h3>
-          <div className="text-sm space-y-1">
-            <p>São Paulo, SP</p>
-            <p>Av. Paulista, 1000</p>
-            <p>01310-100 São Paulo</p>
-            <p>Brasil</p>
-          </div>
-        </div>
-
-        <div className="border-b pb-4">
-          <h3 className="font-medium mb-2">Detalhamento do Preço</h3>
+          <h3 className="font-medium mb-2">Detalhes do Pedido</h3>
           <div className="space-y-2 text-sm">
             {state.items.map((item) => (
               <div key={item.id} className="flex justify-between">
-                <span>{item.type === 'car' ? 'Veículo selecionado' : 'Opcional'}</span>
+                <span className="text-gray-600">
+                  {item.type === 'car' ? 'Veículo' : getAccessoryName(item.id)}
+                  {item.quantity > 1 && ` (${item.quantity}x)`}
+                </span>
                 <span>R$ {item.totalPrice.toFixed(2)}</span>
               </div>
             ))}
-            <div className="flex justify-between">
-              <span>Caução</span>
-              <span>R$ 75,00</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Taxa de devolução fora do horário</span>
-              <span>R$ 50,00</span>
-            </div>
           </div>
         </div>
 
         <div className="pt-2">
           <div className="flex justify-between items-center font-semibold">
             <span>Total</span>
-            <span className="text-xl">R$ {(state.total + 125).toFixed(2)}</span>
+            <span className="text-xl">R$ {state.total.toFixed(2)}</span>
           </div>
+          <p className="text-xs text-gray-500 mt-2">
+            Todos os impostos inclusos
+          </p>
         </div>
       </div>
     </Card>
-  );
-};
+  )
+}
