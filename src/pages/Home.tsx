@@ -100,64 +100,75 @@ const carCategories = [
 
 const Home = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-2 text-navig">Alugue seu carro por assinatura</h1>
-        <p className="text-center text-gray-600 mb-8">Escolha o melhor plano para você</p>
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+      <div className="container mx-auto px-4 py-12">
+        <div className="space-y-6 max-w-4xl mx-auto text-center mb-12 animate-fade-in">
+          <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-navig to-blue-600">
+            Alugue seu carro por assinatura
+          </h1>
+          <p className="text-xl text-gray-600">
+            Escolha o melhor plano para você com nossa frota premium
+          </p>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
           {carCategories.map((category, index) => (
-            <Card key={index} className="relative overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white">
-              <Badge className="absolute top-4 right-4 bg-red-500 text-white">{category.badge}</Badge>
+            <Card key={index} className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm border-gray-100">
+              <Badge className="absolute top-4 right-4 bg-red-500/90 backdrop-blur-sm text-white font-medium px-3 py-1 rounded-full">
+                {category.badge}
+              </Badge>
               
-              <CardHeader>
-                <CardTitle className="text-2xl font-bold">{category.name}</CardTitle>
+              <CardHeader className="space-y-2">
+                <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
+                  {category.name}
+                </CardTitle>
+                <p className="text-gray-600 font-medium">{category.models}</p>
               </CardHeader>
               
-              <CardContent className="space-y-6">
-                <div className="h-48 flex items-center justify-center">
+              <CardContent className="space-y-8">
+                <div className="relative h-48 group-hover:scale-105 transition-transform duration-300">
                   <img 
                     src={category.image} 
                     alt={category.name} 
-                    className="h-full object-contain"
+                    className="h-full w-full object-contain"
                   />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Users className="w-4 h-4" />
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <Users className="w-4 h-4 text-navig" />
                       <span>{category.specs.passengers} passageiros</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Briefcase className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <Briefcase className="w-4 h-4 text-navig" />
                       <span>{category.specs.luggage} mala grande</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Car className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <Car className="w-4 h-4 text-navig" />
                       <span>{category.specs.transmission}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Fuel className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <Fuel className="w-4 h-4 text-navig" />
                       <span>{category.specs.fuel}</span>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Gauge className="w-4 h-4" />
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <Gauge className="w-4 h-4 text-navig" />
                       <span>{category.specs.consumption}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Shield className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <Shield className="w-4 h-4 text-navig" />
                       <span>{category.specs.insurance}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <MapPin className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <MapPin className="w-4 h-4 text-navig" />
                       <span>{category.location}</span>
                     </div>
                     {category.specs.wifi && (
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Wifi className="w-4 h-4" />
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <Wifi className="w-4 h-4 text-navig" />
                         <span>Wi-Fi incluso</span>
                       </div>
                     )}
@@ -165,22 +176,24 @@ const Home = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-navig font-semibold">{category.availability}</p>
-                  <p className="font-medium">Modelos: <span className="text-gray-600">{category.models}</span></p>
+                  <p className="text-navig font-semibold flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    {category.availability}
+                  </p>
                 </div>
                 
                 <div className="text-2xl font-bold text-gray-900">
-                  A partir de
-                  <div className="flex items-center gap-2 text-red-500">
+                  <p className="text-sm text-gray-600 mb-1">A partir de</p>
+                  <div className="flex items-center gap-2 text-navig">
                     <DollarSign className="w-6 h-6" />
                     {category.price}
-                    <span className="text-base font-normal">{category.period}</span>
+                    <span className="text-base font-normal text-gray-600">{category.period}</span>
                   </div>
                 </div>
               </CardContent>
               
               <CardFooter>
-                <Button className="w-full bg-navig hover:bg-navig/90">
+                <Button className="w-full bg-navig hover:bg-navig/90 text-white font-medium py-6 rounded-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
                   Quero esse
                 </Button>
               </CardFooter>
