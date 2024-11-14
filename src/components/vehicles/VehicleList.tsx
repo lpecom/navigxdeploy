@@ -5,7 +5,7 @@ import { EditVehicleDialog } from "./EditVehicleDialog";
 import { CarModel } from "./types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Car, Calendar, Settings } from "lucide-react";
+import { Car, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const fetchVehicles = async () => {
@@ -19,7 +19,7 @@ const fetchVehicles = async () => {
     `);
   
   if (error) throw error;
-  return data;
+  return data as CarModel[];
 };
 
 const VehicleList = () => {
@@ -46,8 +46,6 @@ const VehicleList = () => {
         .update({
           name: selectedVehicle.name,
           image_url: selectedVehicle.image_url,
-          year: selectedVehicle.year,
-          description: selectedVehicle.description,
         })
         .eq('id', selectedVehicle.id);
 
@@ -108,12 +106,6 @@ const VehicleList = () => {
                 <Car className="w-4 h-4 text-primary" />
                 <span>{vehicle.transmission}</span>
               </div>
-              {vehicle.year && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Calendar className="w-4 h-4 text-primary" />
-                  <span>{vehicle.year}</span>
-                </div>
-              )}
             </div>
 
             <div className="space-y-2">
