@@ -44,25 +44,21 @@ export const CreditCardForm = ({ amount, driverId, onSuccess }: CreditCardFormPr
   const onSubmit = async (values: z.infer<typeof creditCardSchema>) => {
     setIsSubmitting(true)
     try {
-      const requestBody = {
-        action: 'create_payment',
-        payload: {
-          driver_id: driverId,
-          amount,
-          payment_type: 'credit',
-          card_number: values.card_number.replace(/\s/g, ''),
-          holder_name: values.holder_name,
-          expiry: values.expiry,
-          cvv: values.cvv,
-          installments: parseInt(values.installments),
-          description: 'Car rental payment'
-        }
-      }
-
-      console.log('Sending payment request:', JSON.stringify(requestBody))
-
       const { data, error } = await supabase.functions.invoke('payment', {
-        body: JSON.stringify(requestBody)
+        body: {
+          action: 'create_payment',
+          payload: {
+            driver_id: driverId,
+            amount,
+            payment_type: 'credit',
+            card_number: values.card_number.replace(/\s/g, ''),
+            holder_name: values.holder_name,
+            expiry: values.expiry,
+            cvv: values.cvv,
+            installments: parseInt(values.installments),
+            description: 'Car rental payment'
+          }
+        }
       })
 
       if (error) throw error

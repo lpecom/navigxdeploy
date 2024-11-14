@@ -18,12 +18,10 @@ serve(async (req) => {
       throw new Error('Request body is required')
     }
 
-    const bodyText = await req.text()
-    console.log('Raw request body:', bodyText)
-
     let body
     try {
-      body = JSON.parse(bodyText)
+      body = await req.json()
+      console.log('Received request body:', JSON.stringify(body))
     } catch (e) {
       console.error('Error parsing request body:', e)
       throw new Error('Invalid JSON in request body')
@@ -35,7 +33,7 @@ serve(async (req) => {
       throw new Error('Action and payload are required')
     }
 
-    console.log('Parsed request:', { action, payload })
+    console.log('Processing request:', { action, payload })
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -57,7 +55,10 @@ serve(async (req) => {
             type: payload.payment_type,
             amount: payload.amount,
             installments: payload.installments || 1,
-            card_token: payload.card_token,
+            card_number: payload.card_number,
+            card_holder: payload.holder_name,
+            card_expiry: payload.expiry,
+            card_cvv: payload.cvv,
             pix_expiration_date: payload.payment_type === 'pix' ? 
               new Date(Date.now() + 30 * 60000).toISOString() : undefined,
             boleto_expiration_date: payload.payment_type === 'boleto' ? 
