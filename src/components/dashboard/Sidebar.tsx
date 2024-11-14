@@ -13,7 +13,7 @@ const Sidebar = () => {
   return (
     <div className="w-64 bg-white border-r border-gray-200 h-screen p-4">
       <div className="flex items-center gap-2 mb-8 px-2">
-        <img src={navigLogo} alt="Navig Logo" className="h-8" />
+        <img src={navigLogo} alt="Navig Logo" className="h-10 w-auto" />
       </div>
       
       <nav className="space-y-1">
