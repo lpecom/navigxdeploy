@@ -11,7 +11,10 @@ import {
   ClipboardList,
   Megaphone,
   LayoutTemplate,
-  Settings
+  Settings,
+  Mail,
+  MessageSquare,
+  PhoneCall
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
@@ -40,6 +43,17 @@ const Sidebar = () => {
         { label: "Agendamentos", icon: CarFront },
         { label: "Reservas", icon: Calendar, path: "/reservations" },
         { label: "Histórico", icon: History }
+      ]
+    },
+    {
+      icon: Settings,
+      label: "Automações",
+      path: "/automations",
+      active: location.pathname === "/automations",
+      subItems: [
+        { label: "E-mail e SMS", icon: Mail, path: "/automations/email-sms" },
+        { label: "WhatsApp", icon: MessageSquare, path: "/automations/whatsapp" },
+        { label: "Ligações", icon: PhoneCall, path: "/automations/calls" }
       ]
     },
     { 
