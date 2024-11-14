@@ -1,12 +1,11 @@
 import { Search } from "lucide-react";
-import navigLogo from "@/assets/navig-logo.png";
 
 const Header = () => {
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-3 sticky top-0 z-50">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         <div className="flex items-center gap-8">
-          <img src={navigLogo} alt="Navig Logo" className="h-10 w-auto" />
+          <img src="https://i.imghippo.com/files/uafE3798xA.png" alt="Navig Logo" className="h-10 w-auto" />
           <div className="relative w-96">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
