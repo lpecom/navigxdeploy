@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { OrderSummary } from "@/components/optionals/OrderSummary";
 import { OptionalsList } from "@/components/optionals/OptionalsList";
 import { useEffect, useState } from "react";
@@ -59,6 +59,7 @@ const economyCars = [
 ];
 
 const Optionals = () => {
+  const navigate = useNavigate();
   const [selectedCar, setSelectedCar] = useState<SelectedCar | null>({
     category: "Ford Ka",
     specs: {
@@ -84,6 +85,10 @@ const Optionals = () => {
       document.body.classList.remove('animate-fade-in');
     };
   }, []);
+
+  const handleContinue = () => {
+    navigate('/checkout');
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl animate-fade-in">
@@ -127,12 +132,10 @@ const Optionals = () => {
                 Voltar
               </Button>
             </Link>
-            <Link to="/driver-details">
-              <Button className="flex items-center gap-2">
-                Continuar
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </Link>
+            <Button onClick={handleContinue} className="flex items-center gap-2">
+              Continuar para checkout
+              <ChevronRight className="w-4 h-4" />
+            </Button>
           </div>
         </Card>
         

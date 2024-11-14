@@ -20,7 +20,6 @@ import Optionals from "./pages/Optionals";
 import AdminLogin from "./pages/AdminLogin";
 import Automations from "./pages/Automations";
 import Offers from "./pages/Offers";
-import DriverDetails from "./pages/DriverDetails";
 import { CheckoutPage } from "./components/checkout/CheckoutPage";
 
 const DetailedReservationViewWrapper = () => {
@@ -70,7 +69,6 @@ const AppContent = () => {
           <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
           <Route path="/performance" element={<ProtectedRoute><Performance /></ProtectedRoute>} />
           <Route path="/optionals" element={<Optionals />} />
-          <Route path="/driver-details" element={<DriverDetails />} />
           <Route path="/automations" element={<ProtectedRoute><Automations /></ProtectedRoute>} />
           <Route path="/offers" element={<ProtectedRoute><Offers /></ProtectedRoute>} />
           <Route path="/checkout" element={<CheckoutPage />} />
