@@ -19,17 +19,7 @@ interface Car {
 
 const Optionals = () => {
   const navigate = useNavigate();
-  const [selectedCar, setSelectedCar] = useState<SelectedCar | null>({
-    category: "Ford Ka",
-    specs: {
-      passengers: 4,
-      transmission: "Manual",
-      plan: "Flex",
-      consumption: "14.5 km/l"
-    },
-    price: "634",
-    period: "semana"
-  });
+  const [selectedCar, setSelectedCar] = useState<SelectedCar | null>(null);
 
   const cars: Car[] = [
     {
@@ -71,55 +61,57 @@ const Optionals = () => {
   ];
 
   useEffect(() => {
-    document.body.classList.remove('animate-fade-out');
-    document.body.classList.add('animate-fade-in');
-
     const carData = sessionStorage.getItem('selectedCar');
     if (carData) {
-      setSelectedCar(JSON.parse(carData));
+      try {
+        setSelectedCar(JSON.parse(carData));
+      } catch (error) {
+        console.error('Error parsing selected car data:', error);
+        navigate('/');
+      }
+    } else {
+      navigate('/');
     }
-
-    return () => {
-      document.body.classList.remove('animate-fade-in');
-    };
-  }, []);
+  }, [navigate]);
 
   const handleContinue = () => {
     navigate('/checkout');
   };
 
+  if (!selectedCar) {
+    return null;
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl animate-fade-in">
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="grid gap-8 md:grid-cols-[1fr,400px]">
         <Card className="p-6">
-          {selectedCar && (
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4">{selectedCar.category}</h2>
-              <div className="bg-slate-50 rounded-lg p-4">
-                <CarSlider cars={cars} category="Economy" />
-                <div className="mt-4 grid grid-cols-2 gap-4 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <span>Passageiros: {selectedCar.specs.passengers}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span>Transmissão: {selectedCar.specs.transmission}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span>Plano: {selectedCar.specs.plan}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span>Consumo: {selectedCar.specs.consumption}</span>
-                  </div>
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">{selectedCar.category}</h2>
+            <div className="bg-slate-50 rounded-lg p-4">
+              <CarSlider cars={cars} category="Economy" />
+              <div className="mt-4 grid grid-cols-2 gap-4 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <span>Passageiros: {selectedCar.specs.passengers}</span>
                 </div>
-                <div className="mt-4 text-2xl font-bold text-blue-500">
-                  R$ {selectedCar.price}
-                  <span className="text-base font-normal text-gray-600 ml-1">
-                    /{selectedCar.period}
-                  </span>
+                <div className="flex items-center gap-2">
+                  <span>Transmissão: {selectedCar.specs.transmission}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>Plano: {selectedCar.specs.plan}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>Consumo: {selectedCar.specs.consumption}</span>
                 </div>
               </div>
+              <div className="mt-4 text-2xl font-bold text-blue-500">
+                R$ {selectedCar.price}
+                <span className="text-base font-normal text-gray-600 ml-1">
+                  /{selectedCar.period}
+                </span>
+              </div>
             </div>
-          )}
+          </div>
 
           <h1 className="text-2xl font-semibold mb-6">Opcionais</h1>
           <OptionalsList />

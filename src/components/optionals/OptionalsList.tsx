@@ -18,7 +18,7 @@ export const OptionalsList = () => {
   const { state, dispatch } = useCart();
   const { toast } = useToast();
 
-  const { data: optionals, isLoading } = useQuery({
+  const { data: optionals, isLoading, error } = useQuery({
     queryKey: ['optionals'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -64,6 +64,10 @@ export const OptionalsList = () => {
     }
   };
 
+  if (error) {
+    return <div className="text-red-500">Error loading optionals. Please try again.</div>;
+  }
+
   if (isLoading) {
     return <div className="animate-pulse space-y-4">
       {[1, 2, 3].map(i => (
@@ -72,9 +76,13 @@ export const OptionalsList = () => {
     </div>;
   }
 
+  if (!optionals?.length) {
+    return <div className="text-gray-500">No optionals available.</div>;
+  }
+
   return (
     <div className="space-y-6">
-      {optionals?.map((optional) => {
+      {optionals.map((optional) => {
         const currentQuantity = state.items.find(item => item.id === optional.id)?.quantity || 0;
 
         return (
