@@ -2,25 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { ThermometerSnowflake, ThermometerSun, Facebook, Car, MessageCircle, Eye, Check, X, Calendar, MapPin, Phone, CreditCard } from "lucide-react";
+import { ThermometerSnowflake, ThermometerSun, Facebook, Car, MessageCircle, Eye, Check, X, CreditCard } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { format } from "date-fns";
-
-interface Reservation {
-  id: string;
-  customerName: string;
-  email: string;
-  phone: string;
-  address: string;
-  pickupDate: string;
-  status: "pending" | "approved" | "rejected";
-  paymentStatus: "paid" | "pending";
-  riskScore: number;
-  documentsSubmitted: boolean;
-  createdAt: string;
-  carCategory: "SUV" | "Luxury" | "Economy" | "Sports";
-  leadSource: "facebook" | "whatsapp";
-}
+import { CustomerInfo } from "./CustomerInfo";
+import { PricingInfo } from "./PricingInfo";
+import type { Reservation } from "@/types/reservation";
 
 interface ReservationsListProps {
   filter?: "pending" | "approved" | "rejected";
@@ -29,7 +15,6 @@ interface ReservationsListProps {
 const ReservationsList = ({ filter }: ReservationsListProps) => {
   const { toast } = useToast();
 
-  // Mock data with more variety and new fields
   const mockReservations: Reservation[] = [
     {
       id: "1",
@@ -40,11 +25,18 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       pickupDate: "2024-04-01T10:00:00Z",
       status: "pending",
       paymentStatus: "pending",
+      customerStatus: "returning",
       riskScore: 25,
       documentsSubmitted: true,
       createdAt: "2024-03-20T10:00:00Z",
       carCategory: "Luxury",
-      leadSource: "facebook"
+      leadSource: "facebook",
+      weeklyFare: 1500,
+      optionals: [
+        { name: "Additional Driver", pricePerWeek: 100 },
+        { name: "GPS Navigation", pricePerWeek: 50 }
+      ],
+      kilometersPerWeek: 1000
     },
     {
       id: "2",
@@ -53,13 +45,17 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       phone: "(555) 987-6543",
       address: "456 Elm St, Los Angeles, CA 90005",
       pickupDate: "2024-04-02T11:00:00Z",
-      status: "pending",
-      paymentStatus: "pending",
-      riskScore: 45,
+      status: "approved",
+      paymentStatus: "paid",
+      customerStatus: "new",
+      riskScore: 35,
       documentsSubmitted: true,
       createdAt: "2024-03-19T15:30:00Z",
       carCategory: "SUV",
-      leadSource: "whatsapp"
+      leadSource: "whatsapp",
+      weeklyFare: 900,
+      optionals: [],
+      kilometersPerWeek: 'unlimited'
     },
     {
       id: "3",
@@ -70,11 +66,17 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       pickupDate: "2024-04-03T12:00:00Z",
       status: "pending",
       paymentStatus: "pending",
+      customerStatus: "blocked",
       riskScore: 15,
       documentsSubmitted: false,
       createdAt: "2024-03-18T09:15:00Z",
       carCategory: "Economy",
-      leadSource: "facebook"
+      leadSource: "facebook",
+      weeklyFare: 600,
+      optionals: [
+        { name: "Child Seat", pricePerWeek: 70 }
+      ],
+      kilometersPerWeek: 500
     },
     {
       id: "4",
@@ -85,11 +87,15 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       pickupDate: "2024-04-04T13:00:00Z",
       status: "pending",
       paymentStatus: "pending",
+      customerStatus: "returning",
       riskScore: 35,
       documentsSubmitted: true,
       createdAt: "2024-03-17T14:45:00Z",
       carCategory: "Sports",
-      leadSource: "whatsapp"
+      leadSource: "whatsapp",
+      weeklyFare: 1200,
+      optionals: [],
+      kilometersPerWeek: 700
     }
   ];
 
@@ -170,26 +176,14 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Phone className="w-4 h-4" />
-                  {reservation.phone}
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <MapPin className="w-4 h-4" />
-                  {reservation.address}
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Calendar className="w-4 h-4" />
-                  {format(new Date(reservation.pickupDate), 'PPP p')}
-                </div>
-              </div>
+              <CustomerInfo reservation={reservation} />
+              <PricingInfo reservation={reservation} />
 
               <div className="flex items-center justify-between">
                 {getCarCategoryBadge(reservation.carCategory)}
                 {getLeadSourceIcon(reservation.leadSource)}
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Risk Score</span>
