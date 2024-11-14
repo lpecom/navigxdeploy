@@ -11,16 +11,16 @@ export const StatusBadges = ({ reservation }: StatusBadgesProps) => {
   const getRiskBadge = (score: number) => {
     if (score <= 30) {
       return (
-        <Badge className="bg-success text-white flex gap-1 items-center">
+        <Badge className="bg-emerald-100 text-emerald-800 flex gap-1 items-center">
           <ThermometerSnowflake className="w-4 h-4" />
-          Low Risk
+          Baixo Risco
         </Badge>
       );
     }
     return (
-      <Badge className="bg-destructive text-white flex gap-1 items-center">
+      <Badge className="bg-red-100 text-red-800 flex gap-1 items-center">
         <ThermometerSun className="w-4 h-4" />
-        High Risk
+        Alto Risco
       </Badge>
     );
   };
@@ -43,20 +43,28 @@ export const StatusBadges = ({ reservation }: StatusBadgesProps) => {
 
   const getPaymentStatusBadge = (status: Reservation['paymentStatus']) => {
     return (
-      <Badge className={status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+      <Badge className={status === 'paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}>
         <CreditCard className="w-4 h-4 mr-1" />
-        {status === 'paid' ? 'Paid' : 'Payment Pending'}
+        {status === 'paid' ? 'Pago' : 'Pagamento Pendente'}
       </Badge>
     );
   };
 
   const getPriorityBadge = (pickupDate: string) => {
     const days = differenceInDays(new Date(pickupDate), new Date());
+    if (days === 1) {
+      return (
+        <Badge className="bg-red-100 text-red-800 flex gap-1 items-center font-bold">
+          <Flag className="w-4 h-4" />
+          PRIORIDADE: PRÓXIMO DIA
+        </Badge>
+      );
+    }
     if (days <= 2 && days >= 0) {
       return (
         <Badge className="bg-red-100 text-red-800 flex gap-1 items-center">
           <Flag className="w-4 h-4" />
-          High Priority
+          Alta Prioridade
         </Badge>
       );
     }

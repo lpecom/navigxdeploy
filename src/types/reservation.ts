@@ -13,6 +13,7 @@ export interface Reservation {
   id: string;
   customerName: string;
   email: string;
+  cpf: string;
   phone: string;
   address: string;
   pickupDate: string;
