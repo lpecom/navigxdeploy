@@ -1,20 +1,17 @@
 import { 
   LayoutDashboard, 
-  Calendar, 
-  Car, 
-  CreditCard, 
-  TicketCheck,
-  Users,
-  Settings,
+  BarChart, 
   FileText,
-  MapPin,
-  Clock,
-  AlertTriangle,
-  Banknote,
-  Receipt,
-  Shield,
   TrendingUp,
-  BarChart
+  UserPlus,
+  Truck,
+  Calendar,
+  History,
+  Gift,
+  ClipboardList,
+  Megaphone,
+  LayoutTemplate,
+  Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
@@ -30,51 +27,33 @@ const Sidebar = () => {
       active: location.pathname === "/",
       subItems: [
         { label: "Analytics", icon: BarChart, path: "/analytics" },
-        { label: "Reports", icon: FileText, path: "/reports" },
+        { label: "Relatórios", icon: FileText, path: "/reports" },
         { label: "Performance", icon: TrendingUp, path: "/performance" }
       ]
     },
     { 
-      icon: Calendar, 
-      label: "Reservas",
-      path: "/reservations",
-      active: location.pathname === "/reservations",
+      icon: UserPlus, 
+      label: "Leads",
+      path: "/leads",
+      active: location.pathname === "/leads",
       subItems: [
-        { label: "Aluguéis Ativos", icon: Clock },
-        { label: "Reservas", icon: Calendar },
-        { label: "Histórico", icon: FileText }
+        { label: "Retiradas", icon: Truck },
+        { label: "Reservas", icon: Calendar, path: "/reservations" },
+        { label: "Histórico", icon: History }
       ]
     },
     { 
-      icon: Car, 
-      label: "Veículos",
-      path: "/vehicles",
-      active: location.pathname === "/vehicles",
+      icon: Gift, 
+      label: "Ofertas",
+      path: "/offers",
+      active: location.pathname === "/offers",
       subItems: [
-        { label: "Visão Geral", icon: Car },
-        { label: "Manutenção", icon: Settings },
-        { label: "Localização", icon: MapPin },
-        { label: "Seguros", icon: Shield }
+        { label: "Formulários", icon: ClipboardList },
+        { label: "Promoções", icon: Megaphone },
+        { label: "Templates", icon: LayoutTemplate },
+        { label: "Configurações", icon: Settings }
       ]
-    },
-    { 
-      icon: CreditCard, 
-      label: "Charges",
-      subItems: [
-        { label: "Payments", icon: Banknote },
-        { label: "Invoices", icon: Receipt },
-        { label: "Pricing", icon: CreditCard }
-      ]
-    },
-    { 
-      icon: TicketCheck, 
-      label: "Tickets",
-      subItems: [
-        { label: "Support", icon: Users },
-        { label: "Issues", icon: AlertTriangle },
-        { label: "Feedback", icon: FileText }
-      ]
-    },
+    }
   ];
 
   return (
