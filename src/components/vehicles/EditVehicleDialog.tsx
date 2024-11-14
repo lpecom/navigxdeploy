@@ -16,6 +16,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CarModel } from "./types";
+import { ImageUpload } from "./ImageUpload";
 
 interface EditVehicleDialogProps {
   open: boolean;
@@ -89,11 +90,10 @@ export const EditVehicleDialog = ({
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="image">Image URL</label>
-            <Input
-              id="image"
-              value={editingCar?.image_url || ""}
-              onChange={(e) => updateCarField("image_url", e.target.value)}
+            <label>Vehicle Image</label>
+            <ImageUpload
+              currentImage={editingCar?.image_url}
+              onImageChange={(url) => updateCarField("image_url", url)}
             />
           </div>
 
