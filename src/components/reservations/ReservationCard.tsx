@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ThermometerSnowflake, ThermometerSun, Car, Calendar, Clock } from "lucide-react";
 import { ReservationExpandedContent } from "./ReservationExpandedContent";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import type { Reservation } from "@/types/reservation";
 
 interface ReservationCardProps {
@@ -12,6 +14,25 @@ interface ReservationCardProps {
 }
 
 export const ReservationCard = ({ reservation, isExpanded, onToggle }: ReservationCardProps) => {
+  const getRiskBadge = (score: number) => {
+    if (score <= 30) {
+      return (
+        <Badge className="bg-emerald-100 text-emerald-800 flex gap-1 items-center">
+          <ThermometerSnowflake className="w-4 h-4" />
+          Baixo Risco
+        </Badge>
+      );
+    }
+    return (
+      <Badge className="bg-red-100 text-red-800 flex gap-1 items-center">
+        <ThermometerSun className="w-4 h-4" />
+        Alto Risco
+      </Badge>
+    );
+  };
+
+  const pickupDate = new Date(reservation.pickupDate);
+
   return (
     <Card className="overflow-hidden">
       <CardHeader className="p-4 pb-2">
@@ -24,6 +45,27 @@ export const ReservationCard = ({ reservation, isExpanded, onToggle }: Reservati
             {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </div>
+        {!isExpanded && (
+          <div className="mt-4 space-y-2">
+            <div className="flex items-center gap-4">
+              <Badge variant="outline" className="flex items-center gap-1">
+                <Car className="w-4 h-4" />
+                {reservation.carCategory}
+              </Badge>
+              {getRiskBadge(reservation.riskScore)}
+            </div>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Calendar className="w-4 h-4" />
+                {format(pickupDate, "dd/MM/yyyy", { locale: ptBR })}
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                {format(pickupDate, "HH:mm", { locale: ptBR })}
+              </div>
+            </div>
+          </div>
+        )}
       </CardHeader>
       <CardContent className="p-4 pt-0">
         {isExpanded && <ReservationExpandedContent reservation={reservation} />}
