@@ -14,14 +14,21 @@ serve(async (req) => {
   try {
     // Parse request body
     const text = await req.text()
-    console.log('Raw request body:', text) // Debug log
+    console.log('Raw request body:', text)
     
     if (!text) {
       throw new Error('Request body is required')
     }
 
-    const body = JSON.parse(text)
-    console.log('Parsed request body:', body) // Debug log
+    let body
+    try {
+      body = JSON.parse(text)
+    } catch (e) {
+      console.error('JSON parse error:', e)
+      throw new Error('Invalid JSON in request body')
+    }
+
+    console.log('Parsed request body:', body)
 
     const { action, payload } = body
 
