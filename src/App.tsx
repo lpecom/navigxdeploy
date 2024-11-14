@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useParams, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import Index from "./pages/Index";
 import Home from "./pages/Home";
 import Plans from "./pages/Plans";
@@ -48,25 +49,27 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-          <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
-          <Route path="/reservations" element={<ProtectedRoute><Reservations /></ProtectedRoute>} />
-          <Route path="/reservations/:id" element={<ProtectedRoute><DetailedReservationViewWrapper /></ProtectedRoute>} />
-          <Route path="/vehicles" element={<ProtectedRoute><Vehicles /></ProtectedRoute>} />
-          <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-          <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
-          <Route path="/performance" element={<ProtectedRoute><Performance /></ProtectedRoute>} />
-          <Route path="/optionals" element={<ProtectedRoute><Optionals /></ProtectedRoute>} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <SessionContextProvider supabaseClient={supabase}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
+            <Route path="/reservations" element={<ProtectedRoute><Reservations /></ProtectedRoute>} />
+            <Route path="/reservations/:id" element={<ProtectedRoute><DetailedReservationViewWrapper /></ProtectedRoute>} />
+            <Route path="/vehicles" element={<ProtectedRoute><Vehicles /></ProtectedRoute>} />
+            <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+            <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+            <Route path="/performance" element={<ProtectedRoute><Performance /></ProtectedRoute>} />
+            <Route path="/optionals" element={<ProtectedRoute><Optionals /></ProtectedRoute>} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </SessionContextProvider>
   </QueryClientProvider>
 );
 
