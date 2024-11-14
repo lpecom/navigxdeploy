@@ -18,14 +18,14 @@ interface AccessoryDialogProps {
 export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: AccessoryDialogProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const [formData, setFormData] = useState<Partial<Accessory>>(
-    accessory || {
-      name: "",
-      description: "",
-      price: 0,
-      price_period: "per_rental"
-    }
-  );
+  const [formData, setFormData] = useState<Accessory>({
+    id: accessory?.id || '',
+    name: accessory?.name || '',
+    description: accessory?.description || '',
+    price: accessory?.price || 0,
+    price_period: accessory?.price_period || 'per_rental',
+    created_at: accessory?.created_at || new Date().toISOString()
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,19 +35,34 @@ export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: Ac
       if (accessory) {
         const { error } = await supabase
           .from('accessories')
-          .update(formData)
+          .update({
+            name: formData.name,
+            description: formData.description,
+            price: formData.price,
+            price_period: formData.price_period
+          })
           .eq('id', accessory.id);
 
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('accessories')
-          .insert([formData]);
+          .insert({
+            name: formData.name,
+            description: formData.description,
+            price: formData.price,
+            price_period: formData.price_period
+          });
 
         if (error) throw error;
       }
 
+      toast({
+        title: "Sucesso",
+        description: `Opcional ${accessory ? 'atualizado' : 'criado'} com sucesso.`,
+      });
       onSuccess();
+      onOpenChange(false);
     } catch (error) {
       console.error('Error saving accessory:', error);
       toast({
@@ -72,7 +87,7 @@ export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: Ac
             <label htmlFor="name">Nome</label>
             <Input
               id="name"
-              value={formData.name || ''}
+              value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
             />
@@ -82,7 +97,7 @@ export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: Ac
             <label htmlFor="description">Descrição</label>
             <Textarea
               id="description"
-              value={formData.description || ''}
+              value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               required
             />
@@ -94,7 +109,7 @@ export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: Ac
               id="price"
               type="number"
               step="0.01"
-              value={formData.price || ''}
+              value={formData.price}
               onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
               required
             />
