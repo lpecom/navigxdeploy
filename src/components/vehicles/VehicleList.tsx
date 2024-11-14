@@ -1,34 +1,75 @@
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { EditVehicleDialog } from "./EditVehicleDialog";
-import { CarModel, CarModelResponse } from "./types";
+import { CarModel } from "./types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Car, Calendar, Settings } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+const fetchVehicles = async () => {
+  const { data, error } = await supabase
+    .from('vehicles')
+    .select(`
+      *,
+      car_groups (
+        name
+      )
+    `);
+  
+  if (error) throw error;
+  return data;
+};
 
 const VehicleList = () => {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<CarModel | null>(null);
 
-  const { data: vehicles } = useQueryClient(); // Fetch query to get the vehicles
+  const { data: vehicles, isLoading } = useQuery({
+    queryKey: ['vehicles'],
+    queryFn: fetchVehicles
+  });
 
   const handleEdit = (vehicle: CarModel) => {
     setSelectedVehicle(vehicle);
     setIsEditing(true);
   };
 
-  const handleSave = () => {
-    // Save vehicle changes logic here
-    toast({
-      title: "Vehicle updated",
-      description: "The vehicle details have been saved successfully.",
-    });
-    queryClient.invalidateQueries("vehicles");
-    setIsEditing(false);
+  const handleSave = async () => {
+    if (!selectedVehicle) return;
+
+    try {
+      const { error } = await supabase
+        .from('vehicles')
+        .update({
+          name: selectedVehicle.name,
+          image_url: selectedVehicle.image_url,
+          year: selectedVehicle.year,
+          description: selectedVehicle.description,
+        })
+        .eq('id', selectedVehicle.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Vehicle updated",
+        description: "The vehicle details have been saved successfully.",
+      });
+      setIsEditing(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update vehicle details.",
+        variant: "destructive",
+      });
+    }
   };
+
+  if (isLoading) {
+    return <div>Loading vehicles...</div>;
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -67,10 +108,12 @@ const VehicleList = () => {
                 <Car className="w-4 h-4 text-primary" />
                 <span>{vehicle.transmission}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Calendar className="w-4 h-4 text-primary" />
-                <span>{vehicle.year}</span>
-              </div>
+              {vehicle.year && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  <span>{vehicle.year}</span>
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -101,8 +144,9 @@ const VehicleList = () => {
       <EditVehicleDialog
         open={isEditing}
         onOpenChange={setIsEditing}
-        vehicle={selectedVehicle}
-        onSave={handleSave}
+        editingCar={selectedVehicle}
+        setEditingCar={setSelectedVehicle}
+        onSubmit={handleSave}
       />
     </div>
   );
