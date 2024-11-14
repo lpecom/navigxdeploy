@@ -1,65 +1,34 @@
 import { useState } from "react"
-import { Card } from "@/components/ui/card"
-import { PaymentMethodSelector } from "./PaymentMethodSelector"
-import { CreditCardForm } from "./CreditCardForm"
-import { PixPayment } from "./PixPayment"
-import { BoletoPayment } from "./BoletoPayment"
-import { OrderSummary } from "@/components/optionals/OrderSummary"
-import { DriverForm } from "@/components/driver/DriverForm"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { driverSchema, type DriverFormValues } from "@/types/driver"
-import { Form } from "@/components/ui/form"
-import { supabase } from "@/integrations/supabase/client"
-import { useToast } from "@/components/ui/use-toast"
-import { Steps } from "./Steps"
+import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ShoppingCart, CreditCard, User } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
-import { useNavigate } from "react-router-dom"
-import { createCheckoutSession } from "./CheckoutSessionHandler"
+import { useToast } from "@/components/ui/use-toast"
+import { Steps } from "./Steps"
+import { CustomerForm } from "./sections/CustomerForm"
+import { PaymentSection } from "./sections/PaymentSection"
+import { CheckoutSummary } from "./sections/CheckoutSummary"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import type { DriverFormValues } from "@/types/driver"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
   const [paymentMethod, setPaymentMethod] = useState("credit")
-  const [paymentId, setPaymentId] = useState<string | null>(null)
   const [driverId, setDriverId] = useState<string | null>(null)
   const { toast } = useToast()
   const { state: cartState } = useCart()
   const navigate = useNavigate()
-  
-  const form = useForm<DriverFormValues>({
-    resolver: zodResolver(driverSchema),
-    defaultValues: {
-      fullName: "",
-      birthDate: "",
-      licenseNumber: "",
-      licenseExpiry: "",
-      cpf: "",
-      phone: "",
-      email: "",
-    },
-  })
+
+  const steps = [
+    { number: 1, title: "Seus Dados", icon: User },
+    { number: 2, title: "Pagamento", icon: CreditCard },
+    { number: 3, title: "Confirmação", icon: ShoppingCart }
+  ]
 
   const handleDriverSubmit = async (data: DriverFormValues) => {
     try {
-      const { data: driver, error } = await supabase
-        .from('driver_details')
-        .insert([{
-          full_name: data.fullName,
-          birth_date: data.birthDate,
-          license_number: data.licenseNumber,
-          license_expiry: data.licenseExpiry,
-          cpf: data.cpf,
-          phone: data.phone,
-          email: data.email,
-        }])
-        .select()
-        .single()
-
-      if (error) throw error
-
-      setDriverId(driver.id)
+      // TODO: Implement driver submission
       setStep(2)
     } catch (error) {
       console.error('Error saving driver details:', error)
@@ -71,15 +40,10 @@ export const CheckoutPage = () => {
     }
   }
 
-  const handlePaymentSuccess = async (id: string) => {
-    setPaymentId(id)
+  const handlePaymentSuccess = async (paymentId: string) => {
     try {
-      await createCheckoutSession({
-        driverId: driverId || '',
-        cartItems: cartState.items,
-        totalAmount: cartState.total,
-        onSuccess: () => setStep(3)
-      });
+      // TODO: Implement payment success handling
+      setStep(3)
     } catch (error) {
       console.error('Error finalizing checkout:', error)
       toast({
@@ -90,24 +54,15 @@ export const CheckoutPage = () => {
     }
   }
 
-  const steps = [
-    { number: 1, title: "Seus Dados", icon: User },
-    { number: 2, title: "Pagamento", icon: CreditCard },
-    { number: 3, title: "Confirmação", icon: ShoppingCart }
-  ]
-
   if (cartState.items.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-6xl text-center">
           <h2 className="text-2xl font-semibold mb-4">Seu carrinho está vazio</h2>
           <p className="text-gray-600 mb-6">Adicione itens ao seu carrinho para continuar com a compra.</p>
-          <button
-            onClick={() => navigate('/')}
-            className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90"
-          >
+          <Button onClick={() => navigate('/')}>
             Voltar para a página inicial
-          </button>
+          </Button>
         </div>
       </div>
     )
@@ -126,60 +81,21 @@ export const CheckoutPage = () => {
             transition={{ duration: 0.5 }}
           >
             {step === 1 && (
-              <Card className="p-6 shadow-lg">
-                <h2 className="text-2xl font-semibold mb-6">Informações do Condutor</h2>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(handleDriverSubmit)} className="space-y-4">
-                    <DriverForm form={form} />
-                    <button
-                      type="submit"
-                      className="w-full px-4 py-2 text-white bg-primary rounded-md hover:bg-primary/90 transition-colors"
-                    >
-                      Continuar para pagamento
-                    </button>
-                  </form>
-                </Form>
-              </Card>
+              <CustomerForm onSubmit={handleDriverSubmit} />
             )}
 
             {step === 2 && (
-              <>
-                <Card className="p-6 shadow-lg">
-                  <h2 className="text-2xl font-semibold mb-6">Método de Pagamento</h2>
-                  <PaymentMethodSelector
-                    selectedMethod={paymentMethod}
-                    onMethodChange={setPaymentMethod}
-                  />
-                </Card>
-
-                <Card className="p-6 shadow-lg">
-                  {paymentMethod === "credit" && (
-                    <CreditCardForm
-                      amount={cartState.total}
-                      driverId={driverId || ''}
-                      onSuccess={handlePaymentSuccess}
-                    />
-                  )}
-                  {paymentMethod === "pix" && (
-                    <PixPayment
-                      amount={cartState.total}
-                      driverId={driverId || ''}
-                      onSuccess={handlePaymentSuccess}
-                    />
-                  )}
-                  {paymentMethod === "boleto" && (
-                    <BoletoPayment
-                      amount={cartState.total}
-                      driverId={driverId || ''}
-                      onSuccess={handlePaymentSuccess}
-                    />
-                  )}
-                </Card>
-              </>
+              <PaymentSection
+                selectedMethod={paymentMethod}
+                onMethodChange={setPaymentMethod}
+                onPaymentSuccess={handlePaymentSuccess}
+                amount={cartState.total}
+                driverId={driverId || ''}
+              />
             )}
 
             {step === 3 && (
-              <Card className="p-6 shadow-lg">
+              <Card className="p-6">
                 <div className="text-center space-y-4">
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-500 mb-4">
                     <motion.div
@@ -194,19 +110,19 @@ export const CheckoutPage = () => {
                   <p className="text-gray-600">
                     Seu pedido foi processado com sucesso. Você receberá um email com os detalhes em breve.
                   </p>
-                  <button
+                  <Button
                     onClick={() => navigate('/')}
-                    className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 mt-4"
+                    className="mt-4"
                   >
                     Voltar para a página inicial
-                  </button>
+                  </Button>
                 </div>
               </Card>
             )}
           </motion.div>
 
           <div className="space-y-6">
-            <OrderSummary />
+            <CheckoutSummary />
           </div>
         </div>
       </div>
