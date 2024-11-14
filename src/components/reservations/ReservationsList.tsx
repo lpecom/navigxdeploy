@@ -1,10 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Facebook, MessageCircle } from "lucide-react";
+import { Facebook, MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { CustomerInfo } from "./CustomerInfo";
 import { PricingInfo } from "./PricingInfo";
 import { StatusBadges } from "./StatusBadges";
 import { ReservationActions } from "./ReservationActions";
+import { useState } from "react";
 import type { Reservation } from "@/types/reservation";
 
 interface ReservationsListProps {
@@ -12,6 +13,8 @@ interface ReservationsListProps {
 }
 
 const ReservationsList = ({ filter }: ReservationsListProps) => {
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
+
   const mockReservations: Reservation[] = [
     {
       id: "1",
@@ -104,6 +107,13 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
     );
   };
 
+  const toggleCard = (id: string) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
   const filteredReservations = filter
     ? mockReservations.filter((r) => r.status === filter)
     : mockReservations;
@@ -111,20 +121,29 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {filteredReservations.map((reservation) => (
-        <Card key={reservation.id} className="hover:shadow-lg transition-shadow">
+        <Card 
+          key={reservation.id} 
+          className="hover:shadow-lg transition-shadow"
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg font-medium">
               {reservation.customerName}
             </CardTitle>
+            <button
+              onClick={() => toggleCard(reservation.id)}
+              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label={expandedCards[reservation.id] ? "Show less" : "Show more"}
+            >
+              {expandedCards[reservation.id] ? (
+                <ChevronUp className="w-5 h-5" />
+              ) : (
+                <ChevronDown className="w-5 h-5" />
+              )}
+            </button>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <CustomerInfo reservation={reservation} />
-              <PricingInfo reservation={reservation} />
               <StatusBadges reservation={reservation} />
-              <div className="flex items-center justify-end">
-                {getLeadSourceIcon(reservation.leadSource)}
-              </div>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Risk Score</span>
@@ -132,7 +151,17 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
                 </div>
                 <Progress value={reservation.riskScore} className="h-2" />
               </div>
-              <ReservationActions reservation={reservation} />
+              
+              {expandedCards[reservation.id] && (
+                <div className="space-y-4 animate-accordion-down">
+                  <CustomerInfo reservation={reservation} />
+                  <PricingInfo reservation={reservation} />
+                  <div className="flex items-center justify-end">
+                    {getLeadSourceIcon(reservation.leadSource)}
+                  </div>
+                  <ReservationActions reservation={reservation} />
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
