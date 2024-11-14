@@ -2,15 +2,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { ThermometerSnowflake, ThermometerSun, Facebook, Car, MessageCircle, Eye, Check, X } from "lucide-react";
+import { ThermometerSnowflake, ThermometerSun, Facebook, Car, MessageCircle, Eye, Check, X, Calendar, MapPin, Phone, CreditCard } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { format } from "date-fns";
 
 interface Reservation {
   id: string;
   customerName: string;
   email: string;
   phone: string;
+  address: string;
+  pickupDate: string;
   status: "pending" | "approved" | "rejected";
+  paymentStatus: "paid" | "pending";
   riskScore: number;
   documentsSubmitted: boolean;
   createdAt: string;
@@ -25,14 +29,17 @@ interface ReservationsListProps {
 const ReservationsList = ({ filter }: ReservationsListProps) => {
   const { toast } = useToast();
 
-  // Mock data with more variety
+  // Mock data with more variety and new fields
   const mockReservations: Reservation[] = [
     {
       id: "1",
       customerName: "John Doe",
       email: "john@example.com",
       phone: "(555) 123-4567",
+      address: "123 Main St, San Francisco, CA 94105",
+      pickupDate: "2024-04-01T10:00:00Z",
       status: "pending",
+      paymentStatus: "pending",
       riskScore: 25,
       documentsSubmitted: true,
       createdAt: "2024-03-20T10:00:00Z",
@@ -44,7 +51,10 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       customerName: "Alice Smith",
       email: "alice@example.com",
       phone: "(555) 987-6543",
+      address: "456 Elm St, Los Angeles, CA 90005",
+      pickupDate: "2024-04-02T11:00:00Z",
       status: "pending",
+      paymentStatus: "pending",
       riskScore: 45,
       documentsSubmitted: true,
       createdAt: "2024-03-19T15:30:00Z",
@@ -56,7 +66,10 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       customerName: "Bob Johnson",
       email: "bob@example.com",
       phone: "(555) 456-7890",
+      address: "789 Pine St, New York, NY 10001",
+      pickupDate: "2024-04-03T12:00:00Z",
       status: "pending",
+      paymentStatus: "pending",
       riskScore: 15,
       documentsSubmitted: false,
       createdAt: "2024-03-18T09:15:00Z",
@@ -68,7 +81,10 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       customerName: "Emma Davis",
       email: "emma@example.com",
       phone: "(555) 234-5678",
+      address: "321 Oak St, Chicago, IL 60601",
+      pickupDate: "2024-04-04T13:00:00Z",
       status: "pending",
+      paymentStatus: "pending",
       riskScore: 35,
       documentsSubmitted: true,
       createdAt: "2024-03-17T14:45:00Z",
@@ -90,6 +106,15 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       <Badge className="bg-destructive text-white flex gap-1 items-center">
         <ThermometerSun className="w-4 h-4" />
         High Risk
+      </Badge>
+    );
+  };
+
+  const getPaymentStatusBadge = (status: Reservation['paymentStatus']) => {
+    return (
+      <Badge className={status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+        <CreditCard className="w-4 h-4 mr-1" />
+        {status === 'paid' ? 'Paid' : 'Payment Pending'}
       </Badge>
     );
   };
@@ -145,6 +170,21 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Phone className="w-4 h-4" />
+                  {reservation.phone}
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <MapPin className="w-4 h-4" />
+                  {reservation.address}
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Calendar className="w-4 h-4" />
+                  {format(new Date(reservation.pickupDate), 'PPP p')}
+                </div>
+              </div>
+
               <div className="flex items-center justify-between">
                 {getCarCategoryBadge(reservation.carCategory)}
                 {getLeadSourceIcon(reservation.leadSource)}
@@ -156,6 +196,10 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
                   <span>{reservation.riskScore}%</span>
                 </div>
                 <Progress value={reservation.riskScore} className="h-2" />
+              </div>
+
+              <div className="flex items-center justify-between">
+                {getPaymentStatusBadge(reservation.paymentStatus)}
               </div>
 
               <div className="flex gap-2 mt-4">
