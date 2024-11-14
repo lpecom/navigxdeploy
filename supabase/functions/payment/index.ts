@@ -21,6 +21,20 @@ serve(async (req) => {
     )
 
     switch (action) {
+      case 'test_connection':
+        console.log('Testing Appmax API connection')
+        const testResponse = await fetch(`${APPMAX_API_URL}/test`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${Deno.env.get('APPMAX_API_KEY')}`
+          }
+        })
+        const testData = await testResponse.json()
+        console.log('Test response:', testData)
+        return new Response(JSON.stringify(testData), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+
       case 'tokenize':
         const tokenizeResponse = await fetch(`${APPMAX_API_URL}/tokenize`, {
           method: 'POST',
