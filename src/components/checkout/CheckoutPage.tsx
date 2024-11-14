@@ -17,6 +17,7 @@ import { motion } from "framer-motion"
 import { ShoppingCart, CreditCard, User } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useNavigate } from "react-router-dom"
+import { createCheckoutSession } from "./CheckoutSessionHandler"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
@@ -73,38 +74,12 @@ export const CheckoutPage = () => {
   const handlePaymentSuccess = async (id: string) => {
     setPaymentId(id)
     try {
-      // Create checkout session
-      const { data: session, error: sessionError } = await supabase
-        .from('checkout_sessions')
-        .insert([{
-          driver_id: driverId,
-          selected_car: cartState.items.find(item => item.type === 'car'),
-          selected_optionals: cartState.items.filter(item => item.type === 'optional'),
-          total_amount: cartState.total,
-          status: 'completed'
-        }])
-        .select()
-        .single()
-
-      if (sessionError) throw sessionError
-
-      // Link cart items to checkout session
-      const { error: cartError } = await supabase
-        .from('cart_items')
-        .insert(
-          cartState.items.map(item => ({
-            checkout_session_id: session.id,
-            item_type: item.type,
-            item_id: item.id,
-            quantity: item.quantity,
-            unit_price: item.unitPrice,
-            total_price: item.totalPrice
-          }))
-        )
-
-      if (cartError) throw cartError
-
-      setStep(3)
+      await createCheckoutSession({
+        driverId: driverId || '',
+        cartItems: cartState.items,
+        totalAmount: cartState.total,
+        onSuccess: () => setStep(3)
+      });
     } catch (error) {
       console.error('Error finalizing checkout:', error)
       toast({
