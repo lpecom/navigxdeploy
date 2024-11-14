@@ -36,6 +36,47 @@ export type Database = {
         }
         Relationships: []
       }
+      boletos: {
+        Row: {
+          barcode: string
+          created_at: string
+          due_date: string
+          id: string
+          payment_id: string
+          pdf_url: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          barcode: string
+          created_at?: string
+          due_date: string
+          id?: string
+          payment_id: string
+          pdf_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          barcode?: string
+          created_at?: string
+          due_date?: string
+          id?: string
+          payment_id?: string
+          pdf_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "boletos_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       car_models: {
         Row: {
           category_id: string | null
@@ -245,6 +286,138 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_methods: {
+        Row: {
+          card_brand: string
+          card_token: string
+          created_at: string
+          driver_id: string
+          holder_name: string
+          id: string
+          is_default: boolean | null
+          last_four: string
+          updated_at: string
+        }
+        Insert: {
+          card_brand: string
+          card_token: string
+          created_at?: string
+          driver_id: string
+          holder_name: string
+          id?: string
+          is_default?: boolean | null
+          last_four: string
+          updated_at?: string
+        }
+        Update: {
+          card_brand?: string
+          card_token?: string
+          created_at?: string
+          driver_id?: string
+          holder_name?: string
+          id?: string
+          is_default?: boolean | null
+          last_four?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_methods_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "driver_details"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          appmax_transaction_id: string | null
+          created_at: string
+          description: string | null
+          driver_id: string
+          id: string
+          installments: number | null
+          payment_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          appmax_transaction_id?: string | null
+          created_at?: string
+          description?: string | null
+          driver_id: string
+          id?: string
+          installments?: number | null
+          payment_type: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          appmax_transaction_id?: string | null
+          created_at?: string
+          description?: string | null
+          driver_id?: string
+          id?: string
+          installments?: number | null
+          payment_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "driver_details"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pix_payments: {
+        Row: {
+          created_at: string
+          expiration_date: string
+          id: string
+          payment_id: string
+          qr_code: string
+          qr_code_url: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expiration_date: string
+          id?: string
+          payment_id: string
+          qr_code: string
+          qr_code_url: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expiration_date?: string
+          id?: string
+          payment_id?: string
+          qr_code?: string
+          qr_code_url?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pix_payments_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
             referencedColumns: ["id"]
           },
         ]
