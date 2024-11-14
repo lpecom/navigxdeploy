@@ -9,6 +9,17 @@ interface CheckoutSessionHandlerProps {
   onSuccess: (sessionId: string) => void;
 }
 
+// Transform CartItem to a JSON-compatible format
+const transformCartItemToJson = (item: CartItem) => {
+  return {
+    id: item.id,
+    type: item.type,
+    quantity: item.quantity,
+    unitPrice: item.unitPrice,
+    totalPrice: item.totalPrice,
+  };
+};
+
 export const createCheckoutSession = async ({
   driverId,
   cartItems,
@@ -21,8 +32,8 @@ export const createCheckoutSession = async ({
 
     const sessionData: CheckoutSession = {
       driver_id: driverId,
-      selected_car: selectedCar || null,
-      selected_optionals: selectedOptionals,
+      selected_car: selectedCar ? transformCartItemToJson(selectedCar) : null,
+      selected_optionals: selectedOptionals.map(transformCartItemToJson),
       total_amount: totalAmount,
       status: 'completed'
     };

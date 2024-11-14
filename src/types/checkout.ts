@@ -1,10 +1,18 @@
 import { Json } from "@/integrations/supabase/types";
 
+interface JsonCartItem {
+  id: string;
+  type: 'car' | 'optional';
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+}
+
 export interface CheckoutSession {
   id?: string;
-  driver_id?: string;
-  selected_car: Json;
-  selected_optionals: Json;
+  driver_id: string;
+  selected_car: JsonCartItem | null;
+  selected_optionals: JsonCartItem[];
   total_amount: number;
   status?: string;
   created_at?: string;
