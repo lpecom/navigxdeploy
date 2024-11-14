@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const APPMAX_API_URL = 'https://api.appmax.com.br/api/v3'
+const APPMAX_API_URL = 'https://sandbox.appmax.com.br/api/v3'  // Changed to sandbox URL
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
