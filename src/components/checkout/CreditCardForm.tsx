@@ -15,7 +15,7 @@ import { InstallmentsField } from "./form/InstallmentsField"
 const creditCardSchema = z.object({
   card_number: z.string().min(16).max(19),
   holder_name: z.string().min(3),
-  expiry: z.string().regex(/^(0[1-9]|1[0-2])\/([0-9]{2})$/),
+  expiry: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   cvv: z.string().length(3),
   installments: z.string(),
 })
@@ -44,43 +44,35 @@ export const CreditCardForm = ({ amount, driverId, onSuccess }: CreditCardFormPr
   const onSubmit = async (values: z.infer<typeof creditCardSchema>) => {
     setIsSubmitting(true)
     try {
-      const { data: tokenizeData, error: tokenizeError } = await supabase.functions.invoke('payment', {
-        body: {
-          action: 'tokenize',
-          payload: {
-            driver_id: driverId,
-            card_number: values.card_number.replace(/\s/g, ''),
-            holder_name: values.holder_name,
-            expiry: values.expiry,
-            cvv: values.cvv,
-          }
+      const requestBody = {
+        action: 'create_payment',
+        payload: {
+          driver_id: driverId,
+          amount,
+          payment_type: 'credit',
+          card_number: values.card_number.replace(/\s/g, ''),
+          holder_name: values.holder_name,
+          expiry: values.expiry,
+          cvv: values.cvv,
+          installments: parseInt(values.installments),
+          description: 'Car rental payment'
         }
+      }
+
+      console.log('Sending payment request:', JSON.stringify(requestBody))
+
+      const { data, error } = await supabase.functions.invoke('payment', {
+        body: JSON.stringify(requestBody)
       })
 
-      if (tokenizeError) throw tokenizeError
-
-      const { data: paymentData, error: paymentError } = await supabase.functions.invoke('payment', {
-        body: {
-          action: 'create_payment',
-          payload: {
-            driver_id: driverId,
-            amount,
-            payment_type: 'credit',
-            card_token: tokenizeData.token,
-            installments: parseInt(values.installments),
-            description: 'Car rental payment'
-          }
-        }
-      })
-
-      if (paymentError) throw paymentError
+      if (error) throw error
 
       toast({
         title: "Pagamento processado com sucesso!",
         description: "Seu pagamento foi confirmado.",
       })
 
-      onSuccess(paymentData.id)
+      onSuccess(data.id)
     } catch (error: any) {
       console.error('Payment error:', error)
       toast({

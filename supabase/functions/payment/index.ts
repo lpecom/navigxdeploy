@@ -9,21 +9,21 @@ const corsHeaders = {
 const APPMAX_API_URL = 'https://sandbox.appmax.com.br/api/v3'
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    // Ensure request has a body
     if (!req.body) {
       throw new Error('Request body is required')
     }
 
-    // Parse request body with error handling
+    const bodyText = await req.text()
+    console.log('Raw request body:', bodyText)
+
     let body
     try {
-      body = await req.json()
+      body = JSON.parse(bodyText)
     } catch (e) {
       console.error('Error parsing request body:', e)
       throw new Error('Invalid JSON in request body')
@@ -35,7 +35,7 @@ serve(async (req) => {
       throw new Error('Action and payload are required')
     }
 
-    console.log('Received request:', { action, payload })
+    console.log('Parsed request:', { action, payload })
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -89,7 +89,6 @@ serve(async (req) => {
           throw new Error(`Appmax error: ${JSON.stringify(paymentData)}`)
         }
 
-        // Create payment record
         const { data: payment, error: paymentError } = await supabase
           .from('payments')
           .insert({
@@ -108,7 +107,6 @@ serve(async (req) => {
           throw paymentError
         }
 
-        // Handle specific payment type records
         if (payload.payment_type === 'boleto' && paymentData.boleto) {
           const { error: boletoError } = await supabase
             .from('boletos')
@@ -157,7 +155,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        details: error.toString()
+        details: error.toString(),
+        timestamp: new Date().toISOString()
       }), 
       {
         status: 400,
