@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Pencil } from "lucide-react";
 import { CarModel } from "./types";
 
@@ -30,18 +31,18 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
           />
         )}
         <div className="space-y-2">
-          <p className="text-sm text-gray-500">Year: {car.year}</p>
-          <p className="text-sm">{car.description}</p>
+          <p className="text-sm text-gray-500">Category: {car.category}</p>
+          <p className="text-sm text-gray-500">Engine: {car.engine_size}</p>
+          <p className="text-sm text-gray-500">Transmission: {car.transmission}</p>
           <div className="grid grid-cols-2 gap-2">
-            {Object.entries(car.optionals || {}).map(([key, value]) => (
-              <div
-                key={key}
-                className={`text-sm px-2 py-1 rounded ${
-                  value ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                }`}
+            {car.features.map((feature, index) => (
+              <Badge 
+                key={index}
+                variant="secondary"
+                className="text-sm"
               >
-                {key.replace(/_/g, " ")}
-              </div>
+                {feature}
+              </Badge>
             ))}
           </div>
         </div>

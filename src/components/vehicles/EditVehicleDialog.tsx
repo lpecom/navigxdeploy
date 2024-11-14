@@ -55,19 +55,19 @@ export const EditVehicleDialog = ({
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="year">Year</label>
+            <label htmlFor="category">Category</label>
             <Input
-              id="year"
-              value={editingCar?.year || ""}
-              onChange={(e) => updateCarField("year", e.target.value)}
+              id="category"
+              value={editingCar?.category || ""}
+              onChange={(e) => updateCarField("category", e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="description">Description</label>
+            <label htmlFor="engine_size">Engine Size</label>
             <Input
-              id="description"
-              value={editingCar?.description || ""}
-              onChange={(e) => updateCarField("description", e.target.value)}
+              id="engine_size"
+              value={editingCar?.engine_size || ""}
+              onChange={(e) => updateCarField("engine_size", e.target.value)}
             />
           </div>
           <Button type="submit" className="w-full">
