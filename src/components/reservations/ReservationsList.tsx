@@ -1,11 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { ThermometerSnowflake, ThermometerSun, Facebook, Car, MessageCircle, Eye, Check, X, CreditCard } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { Facebook, MessageCircle } from "lucide-react";
 import { CustomerInfo } from "./CustomerInfo";
 import { PricingInfo } from "./PricingInfo";
+import { StatusBadges } from "./StatusBadges";
+import { ReservationActions } from "./ReservationActions";
 import type { Reservation } from "@/types/reservation";
 
 interface ReservationsListProps {
@@ -13,8 +12,6 @@ interface ReservationsListProps {
 }
 
 const ReservationsList = ({ filter }: ReservationsListProps) => {
-  const { toast } = useToast();
-
   const mockReservations: Reservation[] = [
     {
       id: "1",
@@ -34,9 +31,9 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       weeklyFare: 1500,
       optionals: [
         { name: "Additional Driver", pricePerWeek: 100 },
-        { name: "GPS Navigation", pricePerWeek: 50 }
+        { name: "GPS Navigation", pricePerWeek: 50 },
       ],
-      kilometersPerWeek: 1000
+      kilometersPerWeek: 1000,
     },
     {
       id: "2",
@@ -55,7 +52,7 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       leadSource: "whatsapp",
       weeklyFare: 900,
       optionals: [],
-      kilometersPerWeek: 'unlimited'
+      kilometersPerWeek: "unlimited",
     },
     {
       id: "3",
@@ -76,7 +73,7 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       optionals: [
         { name: "Child Seat", pricePerWeek: 70 }
       ],
-      kilometersPerWeek: 500
+      kilometersPerWeek: 500,
     },
     {
       id: "4",
@@ -95,69 +92,16 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       leadSource: "whatsapp",
       weeklyFare: 1200,
       optionals: [],
-      kilometersPerWeek: 700
+      kilometersPerWeek: 700,
     }
   ];
 
-  const getRiskBadge = (score: number) => {
-    if (score <= 30) {
-      return (
-        <Badge className="bg-success text-white flex gap-1 items-center">
-          <ThermometerSnowflake className="w-4 h-4" />
-          Low Risk
-        </Badge>
-      );
-    }
-    return (
-      <Badge className="bg-destructive text-white flex gap-1 items-center">
-        <ThermometerSun className="w-4 h-4" />
-        High Risk
-      </Badge>
+  const getLeadSourceIcon = (source: Reservation["leadSource"]) => {
+    return source === "facebook" ? (
+      <Facebook className="w-4 h-4 text-blue-600" />
+    ) : (
+      <MessageCircle className="w-4 h-4 text-green-600" />
     );
-  };
-
-  const getPaymentStatusBadge = (status: Reservation['paymentStatus']) => {
-    return (
-      <Badge className={status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
-        <CreditCard className="w-4 h-4 mr-1" />
-        {status === 'paid' ? 'Paid' : 'Payment Pending'}
-      </Badge>
-    );
-  };
-
-  const handleAction = (action: 'approve' | 'reject' | 'view', reservation: Reservation) => {
-    const messages = {
-      approve: 'Reservation approved successfully',
-      reject: 'Reservation rejected',
-      view: 'Opening reservation details'
-    };
-
-    toast({
-      title: messages[action],
-      description: `Action performed for ${reservation.customerName}`,
-    });
-  };
-
-  const getCarCategoryBadge = (category: Reservation['carCategory']) => {
-    const colors = {
-      Luxury: "bg-purple-100 text-purple-800",
-      SUV: "bg-blue-100 text-blue-800",
-      Economy: "bg-green-100 text-green-800",
-      Sports: "bg-red-100 text-red-800"
-    };
-
-    return (
-      <Badge className={`flex gap-1 items-center ${colors[category]}`}>
-        <Car className="w-4 h-4" />
-        {category}
-      </Badge>
-    );
-  };
-
-  const getLeadSourceIcon = (source: Reservation['leadSource']) => {
-    return source === 'facebook' ? 
-      <Facebook className="w-4 h-4 text-blue-600" /> : 
-      <MessageCircle className="w-4 h-4 text-green-600" />;
   };
 
   const filteredReservations = filter
@@ -172,18 +116,15 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
             <CardTitle className="text-lg font-medium">
               {reservation.customerName}
             </CardTitle>
-            {getRiskBadge(reservation.riskScore)}
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <CustomerInfo reservation={reservation} />
               <PricingInfo reservation={reservation} />
-
-              <div className="flex items-center justify-between">
-                {getCarCategoryBadge(reservation.carCategory)}
+              <StatusBadges reservation={reservation} />
+              <div className="flex items-center justify-end">
                 {getLeadSourceIcon(reservation.leadSource)}
               </div>
-
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Risk Score</span>
@@ -191,38 +132,7 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
                 </div>
                 <Progress value={reservation.riskScore} className="h-2" />
               </div>
-
-              <div className="flex items-center justify-between">
-                {getPaymentStatusBadge(reservation.paymentStatus)}
-              </div>
-
-              <div className="flex gap-2 mt-4">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex-1 bg-green-50 hover:bg-green-100 text-green-600"
-                  onClick={() => handleAction('approve', reservation)}
-                >
-                  <Check className="w-4 h-4 mr-1" />
-                  Approve
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex-1 bg-red-50 hover:bg-red-100 text-red-600"
-                  onClick={() => handleAction('reject', reservation)}
-                >
-                  <X className="w-4 h-4 mr-1" />
-                  Reject
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => handleAction('view', reservation)}
-                >
-                  <Eye className="w-4 h-4" />
-                </Button>
-              </div>
+              <ReservationActions reservation={reservation} />
             </div>
           </CardContent>
         </Card>
