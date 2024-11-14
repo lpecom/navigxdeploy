@@ -1,9 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit2, Eye, EyeOff } from "lucide-react";
+import { Edit2, Eye, EyeOff, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { CategoryEditDialog } from "./CategoryEditDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import type { Category } from "@/types/offers";
 
 interface CategoriesListProps {
@@ -11,6 +21,7 @@ interface CategoriesListProps {
   selectedCategory: Category | null;
   onSelectCategory: (category: Category) => void;
   onToggleVisibility: (category: Category) => void;
+  onDeleteCategory: (category: Category) => void;
   isLoading?: boolean;
 }
 
@@ -19,9 +30,11 @@ export const CategoriesList = ({
   selectedCategory,
   onSelectCategory,
   onToggleVisibility,
+  onDeleteCategory,
   isLoading,
 }: CategoriesListProps) => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
 
   if (isLoading) {
     return (
@@ -88,6 +101,16 @@ export const CategoriesList = ({
                   >
                     <Edit2 className="h-4 w-4" />
                   </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCategoryToDelete(category);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
                 </div>
               </div>
             </div>
@@ -102,6 +125,32 @@ export const CategoriesList = ({
           onClose={() => setEditingCategory(null)}
         />
       )}
+
+      <AlertDialog open={!!categoryToDelete} onOpenChange={() => setCategoryToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the category
+              "{categoryToDelete?.name}" and all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => {
+                if (categoryToDelete) {
+                  onDeleteCategory(categoryToDelete);
+                  setCategoryToDelete(null);
+                }
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

@@ -81,6 +81,38 @@ const Offers = () => {
     },
   });
 
+  const deleteCategoryMutation = useMutation({
+    mutationFn: async (category: Category) => {
+      const { error } = await supabase
+        .from("categories")
+        .delete()
+        .eq("id", category.id);
+      
+      if (error) throw error;
+    },
+    onSuccess: (_, category) => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      if (selectedCategory?.id === category.id) {
+        setSelectedCategory(null);
+      }
+      toast({
+        title: "Success",
+        description: "Category deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete category",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteCategory = (category: Category) => {
+    deleteCategoryMutation.mutate(category);
+  };
+
   const handleEditOffer = (offer: Offer) => {
     // TODO: Implement offer editing
     console.log("Edit offer:", offer);
@@ -146,6 +178,7 @@ const Offers = () => {
                   is_active: category.is_active,
                 })
               }
+              onDeleteCategory={handleDeleteCategory}
               isLoading={categoriesLoading}
             />
 
