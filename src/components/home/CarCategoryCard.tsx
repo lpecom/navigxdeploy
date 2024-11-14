@@ -1,7 +1,7 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Briefcase, Car, Fuel, Gauge, Shield, MapPin, Wifi, DollarSign, Calendar } from "lucide-react";
+import { Car, Gauge } from "lucide-react";
 import { CarSlider } from "./CarSlider";
 import { carsByCategory } from "@/constants/cars";
 import { useNavigate } from "react-router-dom";
@@ -9,22 +9,14 @@ import { useNavigate } from "react-router-dom";
 interface CarCategoryProps {
   category: {
     name: string;
-    models: string;
-    price: string;
-    period: string;
-    location: string;
-    availability: string;
     badge: string;
     specs: {
-      passengers: number;
-      luggage: number;
+      motorization?: string;
       transmission: string;
-      fuel: string;
-      mileage: string;
-      insurance: string;
-      wifi: boolean;
-      consumption: string;
     };
+    availability: string;
+    price: string;
+    period: string;
   };
 }
 
@@ -32,20 +24,14 @@ export const CarCategoryCard = ({ category }: CarCategoryProps) => {
   const navigate = useNavigate();
 
   const handleSelectCar = () => {
-    // Store car details in sessionStorage for the next page
     sessionStorage.setItem('selectedCar', JSON.stringify({
       category: category.name,
       specs: category.specs,
       price: category.price,
-      period: category.period,
-      image: category.name === "USADINHO" ? carsByCategory.USADINHO[0].image : null
+      period: category.period
     }));
     
-    // Navigate to optionals with fade out animation
-    document.body.classList.add('animate-fade-out');
-    setTimeout(() => {
-      navigate('/optionals');
-    }, 300);
+    navigate('/plans');
   };
 
   return (
@@ -58,58 +44,25 @@ export const CarCategoryCard = ({ category }: CarCategoryProps) => {
         <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
           {category.name}
         </CardTitle>
-        <p className="text-gray-600 font-medium">{category.models}</p>
       </CardHeader>
       
-      <CardContent className="space-y-8">
+      <CardContent className="space-y-6">
         {category.name === "USADINHO" && (
           <CarSlider cars={carsByCategory.USADINHO} category={category.name} />
         )}
         
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-gray-700">
-              <Users className="w-4 h-4 text-navig" />
-              <span>{category.specs.passengers} passageiros</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <Briefcase className="w-4 h-4 text-navig" />
-              <span>{category.specs.luggage} mala grande</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <Car className="w-4 h-4 text-navig" />
-              <span>{category.specs.transmission}</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <Fuel className="w-4 h-4 text-navig" />
-              <span>{category.specs.fuel}</span>
-            </div>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-gray-700">
+            <Car className="w-4 h-4 text-navig" />
+            <span>{category.specs.transmission}</span>
           </div>
-          <div className="space-y-4">
+          {category.specs.motorization && (
             <div className="flex items-center gap-2 text-gray-700">
               <Gauge className="w-4 h-4 text-navig" />
-              <span>{category.specs.consumption}</span>
+              <span>{category.specs.motorization}</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <Shield className="w-4 h-4 text-navig" />
-              <span>{category.specs.insurance}</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <MapPin className="w-4 h-4 text-navig" />
-              <span>{category.location}</span>
-            </div>
-            {category.specs.wifi && (
-              <div className="flex items-center gap-2 text-gray-700">
-                <Wifi className="w-4 h-4 text-navig" />
-                <span>Wi-Fi incluso</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-navig font-semibold flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
+          )}
+          <p className="text-navig font-semibold">
             {category.availability}
           </p>
         </div>
@@ -117,7 +70,6 @@ export const CarCategoryCard = ({ category }: CarCategoryProps) => {
         <div className="text-2xl font-bold text-gray-900">
           <p className="text-sm text-gray-600 mb-1">A partir de</p>
           <div className="flex items-center gap-2 text-navig">
-            <DollarSign className="w-6 h-6" />
             {category.price}
             <span className="text-base font-normal text-gray-600">{category.period}</span>
           </div>

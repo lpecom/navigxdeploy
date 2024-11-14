@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
 import Index from "./pages/Index";
 import Home from "./pages/Home";
+import Plans from "./pages/Plans";
 import Reservations from "./pages/Reservations";
 import DetailedReservationView from "./components/reservations/DetailedReservationView";
 import Vehicles from "./pages/Vehicles";
@@ -13,7 +14,6 @@ import Reports from "./pages/Reports";
 import Performance from "./pages/Performance";
 import Optionals from "./pages/Optionals";
 
-// Wrapper component to get URL parameters
 const DetailedReservationViewWrapper = () => {
   const { id } = useParams();
   return <DetailedReservationView reservationId={id || ''} />;
@@ -30,6 +30,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Index />} />
+          <Route path="/plans" element={<Plans />} />
           <Route path="/reservations" element={<Reservations />} />
           <Route path="/reservations/:id" element={<DetailedReservationViewWrapper />} />
           <Route path="/vehicles" element={<Vehicles />} />
