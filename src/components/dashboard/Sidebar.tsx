@@ -1,6 +1,5 @@
 import { Car, ChartBar, Users, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
-import navigLogo from "@/assets/navig-logo.png";
 
 const Sidebar = () => {
   const menuItems = [
@@ -13,7 +12,7 @@ const Sidebar = () => {
   return (
     <div className="w-64 bg-white border-r border-gray-200 h-screen p-4">
       <div className="flex items-center gap-2 mb-8 px-2">
-        <img src={navigLogo} alt="Navig Logo" className="h-8" />
+        <img src="https://i.imghippo.com/files/uafE3798xA.png" alt="Navig Logo" className="h-8" />
       </div>
       
       <nav className="space-y-1">
