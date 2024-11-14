@@ -43,7 +43,7 @@ export const ImageUpload = ({
         description: "Image uploaded successfully",
       });
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error('Upload error:', error instanceof Error ? error.message : 'Unknown error');
       toast({
         title: "Error",
         description: "Failed to upload image",
@@ -66,9 +66,8 @@ export const ImageUpload = ({
             src={currentImage}
             alt="Vehicle preview"
             className="w-full h-full rounded-lg object-cover"
-            onError={(e) => {
-              console.error('Image preview error:', e);
-              e.currentTarget.src = '/placeholder.svg';
+            onError={() => {
+              console.error('Failed to load preview image:', currentImage);
             }}
           />
           <Button

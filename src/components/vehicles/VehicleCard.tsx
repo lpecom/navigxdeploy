@@ -29,9 +29,8 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
               src={car.image_url}
               alt={car.name}
               className="w-full h-full object-cover rounded-md"
-              onError={(e) => {
-                console.error('Image load error:', e);
-                e.currentTarget.src = '/placeholder.svg';
+              onError={() => {
+                console.error('Failed to load image:', car.image_url);
               }}
             />
           </div>
