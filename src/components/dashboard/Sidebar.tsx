@@ -91,7 +91,11 @@ const Sidebar = () => {
   return (
     <aside className="bg-white w-64 min-h-screen border-r border-gray-200">
       <div className="p-6">
-        <img src="/src/assets/navig-logo.png" alt="Logo" className="h-8" />
+        <img 
+          src="https://i.imghippo.com/files/uafE3798xA.png" 
+          alt="Navig Logo" 
+          className="h-8 w-auto mx-auto"
+        />
       </div>
       <nav className="mt-6">
         {menuItems.map((item) => (
