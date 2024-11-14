@@ -2,8 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Plus, Car } from "lucide-react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import VehicleList from "@/components/vehicles/VehicleList";
+import { useState } from "react";
+import { EditVehicleDialog } from "@/components/vehicles/EditVehicleDialog";
 
 const Vehicles = () => {
+  const [isAddingVehicle, setIsAddingVehicle] = useState(false);
+
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
@@ -18,7 +22,10 @@ const Vehicles = () => {
                 Gerencie sua frota de veículos e seus detalhes
               </p>
             </div>
-            <Button className="inline-flex items-center gap-2">
+            <Button 
+              className="inline-flex items-center gap-2"
+              onClick={() => setIsAddingVehicle(true)}
+            >
               <Plus className="w-4 h-4" />
               Adicionar Veículo
             </Button>
@@ -35,6 +42,17 @@ const Vehicles = () => {
           </div>
         </div>
       </div>
+
+      <EditVehicleDialog
+        open={isAddingVehicle}
+        onOpenChange={setIsAddingVehicle}
+        editingCar={null}
+        setEditingCar={() => {}}
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setIsAddingVehicle(false);
+        }}
+      />
     </div>
   );
 };

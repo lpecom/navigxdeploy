@@ -30,15 +30,15 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
               alt={car.name}
               className="w-full h-full object-cover rounded-md"
               onError={() => {
-                console.error('Failed to load image:', car.image_url);
+                console.error('Falha ao carregar imagem:', car.image_url);
               }}
             />
           </div>
         )}
         <div className="space-y-2">
-          <p className="text-sm text-gray-500">Category: {car.category?.name || 'Uncategorized'}</p>
+          <p className="text-sm text-gray-500">Categoria: {car.category?.name || 'Sem categoria'}</p>
           {car.year && (
-            <p className="text-sm text-gray-500">Year: {car.year}</p>
+            <p className="text-sm text-gray-500">Ano: {car.year}</p>
           )}
           {car.description && (
             <p className="text-sm text-gray-500">{car.description}</p>
