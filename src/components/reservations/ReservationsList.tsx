@@ -14,17 +14,11 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
   const { data: recentLeads, isLoading } = useQuery({
     queryKey: ['recent-leads', filter],
     queryFn: async () => {
-      let query = supabase
+      const { data, error } = await supabase
         .from('driver_details')
         .select('*')
         .eq('crm_status', 'pending_payment')
         .order('created_at', { ascending: false });
-
-      if (filter) {
-        query = query.eq('status', filter);
-      }
-
-      const { data, error } = await query;
 
       if (error) throw error;
       
