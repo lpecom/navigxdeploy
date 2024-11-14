@@ -43,12 +43,17 @@ serve(async (req) => {
           }
         }
 
+        const appmaxApiKey = Deno.env.get('APPMAX_API_KEY')
+        if (!appmaxApiKey) {
+          throw new Error('APPMAX_API_KEY is not set')
+        }
+
         console.log('Sending to Appmax:', appmaxPayload)
         const paymentResponse = await fetch(`${APPMAX_API_URL}/payments`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Deno.env.get('APPMAX_API_KEY')}`
+            'Authorization': `Bearer ${appmaxApiKey}`
           },
           body: JSON.stringify(appmaxPayload)
         })
