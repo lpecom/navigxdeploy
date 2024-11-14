@@ -156,6 +156,7 @@ export type Database = {
           birth_date: string
           cpf: string
           created_at: string
+          crm_status: string | null
           email: string
           full_name: string
           id: string
@@ -167,6 +168,7 @@ export type Database = {
           birth_date: string
           cpf: string
           created_at?: string
+          crm_status?: string | null
           email: string
           full_name: string
           id?: string
@@ -178,6 +180,7 @@ export type Database = {
           birth_date?: string
           cpf?: string
           created_at?: string
+          crm_status?: string | null
           email?: string
           full_name?: string
           id?: string
