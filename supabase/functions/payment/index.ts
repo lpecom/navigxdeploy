@@ -6,8 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// Using Appmax sandbox API URL
-const APPMAX_API_URL = 'https://sandbox.appmax.com.br/api/v3'
+const APPMAX_API_URL = 'https://api.appmax.com.br/api/v3'
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -23,17 +22,15 @@ serve(async (req) => {
 
     switch (action) {
       case 'tokenize':
-        console.log('Tokenizing card in sandbox environment:', payload)
         const tokenizeResponse = await fetch(`${APPMAX_API_URL}/tokenize`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Deno.env.get('APPMAX_SANDBOX_API_KEY')}`
+            'Authorization': `Bearer ${Deno.env.get('APPMAX_API_KEY')}`
           },
           body: JSON.stringify(payload)
         })
         const tokenData = await tokenizeResponse.json()
-        console.log('Tokenization response:', tokenData)
         
         if (tokenData.token) {
           const { error } = await supabase
@@ -54,17 +51,15 @@ serve(async (req) => {
         })
 
       case 'create_payment':
-        console.log('Creating payment in sandbox environment:', payload)
         const paymentResponse = await fetch(`${APPMAX_API_URL}/payments`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Deno.env.get('APPMAX_SANDBOX_API_KEY')}`
+            'Authorization': `Bearer ${Deno.env.get('APPMAX_API_KEY')}`
           },
           body: JSON.stringify(payload)
         })
         const paymentData = await paymentResponse.json()
-        console.log('Payment response:', paymentData)
         
         // Create payment record
         const { data: payment, error: paymentError } = await supabase
