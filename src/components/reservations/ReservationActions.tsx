@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Check, X, Eye } from "lucide-react";
 import { type Reservation } from "@/types/reservation";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface ReservationActionsProps {
   reservation: Reservation;
@@ -9,6 +10,7 @@ interface ReservationActionsProps {
 
 export const ReservationActions = ({ reservation }: ReservationActionsProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleAction = (action: 'approve' | 'reject' | 'view') => {
     const messages = {
@@ -16,6 +18,10 @@ export const ReservationActions = ({ reservation }: ReservationActionsProps) => 
       reject: 'Reserva rejeitada',
       view: 'Abrindo detalhes da reserva'
     };
+
+    if (action === 'view') {
+      navigate(`/reservations/${reservation.id}`);
+    }
 
     toast({
       title: messages[action],

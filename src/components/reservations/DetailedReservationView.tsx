@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,17 +24,14 @@ import { TransactionsSection } from "./sections/TransactionsSection";
 import { IncidentsSection } from "./sections/IncidentsSection";
 import { HistorySection } from "./sections/HistorySection";
 
-interface DetailedReservationViewProps {
-  reservationId: string;
-}
-
-const DetailedReservationView = ({ reservationId }: DetailedReservationViewProps) => {
+const DetailedReservationView = () => {
+  const { id } = useParams();
   const { toast } = useToast();
   const [isCharging, setIsCharging] = useState(false);
 
   // Mock data - Em uma aplicação real, isso viria de uma API
   const reservation = {
-    id: reservationId,
+    id: id,
     customer: {
       name: "João Silva",
       phone: "+55 11 98765-4321",
@@ -106,7 +104,7 @@ const DetailedReservationView = ({ reservationId }: DetailedReservationViewProps
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in p-6">
       <CustomerSection 
         customer={reservation.customer} 
         onCall={handleCall} 
@@ -117,7 +115,7 @@ const DetailedReservationView = ({ reservationId }: DetailedReservationViewProps
         vehicle={reservation.vehicle} 
         onServiceRequest={handleServiceRequest} 
       />
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TransactionsSection transactions={reservation.transactions} />
         <IncidentsSection incidents={reservation.incidents} />
       </div>
