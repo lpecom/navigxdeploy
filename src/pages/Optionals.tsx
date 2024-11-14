@@ -6,6 +6,7 @@ import { OrderSummary } from "@/components/optionals/OrderSummary";
 import { OptionalsList } from "@/components/optionals/OptionalsList";
 import { useEffect, useState } from "react";
 import { CarSlider } from "@/components/home/CarSlider";
+import type { SelectedCar } from "@/types/car";
 
 interface Car {
   id: string;
@@ -95,7 +96,7 @@ const Optionals = () => {
             <div className="mb-8">
               <h2 className="text-xl font-semibold mb-4">{selectedCar.category}</h2>
               <div className="bg-slate-50 rounded-lg p-4">
-    <CarSlider cars={cars} category="Economy" />
+                <CarSlider cars={cars} category="Economy" />
                 <div className="mt-4 grid grid-cols-2 gap-4 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <span>Passageiros: {selectedCar.specs.passengers}</span>
