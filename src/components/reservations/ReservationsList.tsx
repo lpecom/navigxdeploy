@@ -116,10 +116,6 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
     }));
   };
 
-  const getRiskLevel = (score: number) => {
-    return score <= 30 ? "Low Risk" : "High Risk";
-  };
-
   const isHighPriority = (pickupDate: string) => {
     const days = differenceInDays(new Date(pickupDate), new Date());
     return days <= 2 && days >= 0;
@@ -144,9 +140,6 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
               <p className="text-sm text-muted-foreground">
                 Pickup: {format(new Date(reservation.pickupDate), 'MMM dd, yyyy')}
               </p>
-              <div className="text-sm font-medium">
-                {getRiskLevel(reservation.riskScore)}
-              </div>
             </div>
             <button
               onClick={() => toggleCard(reservation.id)}

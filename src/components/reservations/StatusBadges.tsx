@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
-import { ThermometerSnowflake, ThermometerSun, Car, CreditCard } from "lucide-react";
+import { ThermometerSnowflake, ThermometerSun, Car, CreditCard, Flag } from "lucide-react";
 import { type Reservation } from "@/types/reservation";
+import { differenceInDays } from "date-fns";
 
 interface StatusBadgesProps {
   reservation: Reservation;
@@ -49,6 +50,19 @@ export const StatusBadges = ({ reservation }: StatusBadgesProps) => {
     );
   };
 
+  const getPriorityBadge = (pickupDate: string) => {
+    const days = differenceInDays(new Date(pickupDate), new Date());
+    if (days <= 2 && days >= 0) {
+      return (
+        <Badge className="bg-red-100 text-red-800 flex gap-1 items-center">
+          <Flag className="w-4 h-4" />
+          High Priority
+        </Badge>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -57,6 +71,7 @@ export const StatusBadges = ({ reservation }: StatusBadgesProps) => {
       </div>
       <div className="flex items-center justify-between">
         {getPaymentStatusBadge(reservation.paymentStatus)}
+        {getPriorityBadge(reservation.pickupDate)}
       </div>
     </div>
   );
