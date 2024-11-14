@@ -1,12 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Facebook, MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Facebook, MessageCircle, ChevronDown, ChevronUp, AlertTriangle } from "lucide-react";
 import { CustomerInfo } from "./CustomerInfo";
 import { PricingInfo } from "./PricingInfo";
 import { StatusBadges } from "./StatusBadges";
 import { ReservationActions } from "./ReservationActions";
 import { useState } from "react";
 import type { Reservation } from "@/types/reservation";
+import { format, differenceInDays } from "date-fns";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ReservationsListProps {
   filter?: "pending" | "approved" | "rejected";
@@ -114,6 +116,15 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
     }));
   };
 
+  const getRiskLevel = (score: number) => {
+    return score <= 30 ? "Low Risk" : "High Risk";
+  };
+
+  const isHighPriority = (pickupDate: string) => {
+    const days = differenceInDays(new Date(pickupDate), new Date());
+    return days <= 2 && days >= 0;
+  };
+
   const filteredReservations = filter
     ? mockReservations.filter((r) => r.status === filter)
     : mockReservations;
@@ -126,9 +137,17 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
           className="hover:shadow-lg transition-shadow"
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-lg font-medium">
-              {reservation.customerName}
-            </CardTitle>
+            <div className="space-y-1">
+              <CardTitle className="text-lg font-medium">
+                {reservation.customerName}
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Pickup: {format(new Date(reservation.pickupDate), 'MMM dd, yyyy')}
+              </p>
+              <div className="text-sm font-medium">
+                {getRiskLevel(reservation.riskScore)}
+              </div>
+            </div>
             <button
               onClick={() => toggleCard(reservation.id)}
               className="p-1 hover:bg-gray-100 rounded-full transition-colors"
@@ -143,13 +162,25 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              {isHighPriority(reservation.pickupDate) && (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    High Priority - Pickup in next 2 days
+                  </AlertDescription>
+                </Alert>
+              )}
               <StatusBadges reservation={reservation} />
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Risk Score</span>
                   <span>{reservation.riskScore}%</span>
                 </div>
-                <Progress value={reservation.riskScore} className="h-2" />
+                <Progress 
+                  value={reservation.riskScore} 
+                  className="h-2"
+                  variant={reservation.riskScore <= 30 ? "default" : "destructive"}
+                />
               </div>
               
               {expandedCards[reservation.id] && (
