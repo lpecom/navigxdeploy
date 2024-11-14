@@ -24,7 +24,7 @@ const Sidebar = () => {
               "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
               item.active
                 ? "bg-primary text-white"
-                : "text-gray-600 hover:bg-gray-100"
+                : "text-gray-600 hover:bg-accent hover:text-primary"
             )}
           >
             <item.icon className="w-5 h-5" />
