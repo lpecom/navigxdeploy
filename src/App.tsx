@@ -50,31 +50,37 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const queryClient = new QueryClient();
 
+const AppContent = () => {
+  return (
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+        <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
+        <Route path="/reservations" element={<ProtectedRoute><Reservations /></ProtectedRoute>} />
+        <Route path="/reservations/:id" element={<ProtectedRoute><DetailedReservationViewWrapper /></ProtectedRoute>} />
+        <Route path="/vehicles" element={<ProtectedRoute><Vehicles /></ProtectedRoute>} />
+        <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+        <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+        <Route path="/performance" element={<ProtectedRoute><Performance /></ProtectedRoute>} />
+        <Route path="/optionals" element={<Optionals />} />
+        <Route path="/driver-details" element={<DriverDetails />} />
+        <Route path="/automations" element={<ProtectedRoute><Automations /></ProtectedRoute>} />
+        <Route path="/offers" element={<ProtectedRoute><Offers /></ProtectedRoute>} />
+      </Routes>
+    </TooltipProvider>
+  );
+};
+
 const App = () => {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <SessionContextProvider supabaseClient={supabase}>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-              <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
-              <Route path="/reservations" element={<ProtectedRoute><Reservations /></ProtectedRoute>} />
-              <Route path="/reservations/:id" element={<ProtectedRoute><DetailedReservationViewWrapper /></ProtectedRoute>} />
-              <Route path="/vehicles" element={<ProtectedRoute><Vehicles /></ProtectedRoute>} />
-              <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-              <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
-              <Route path="/performance" element={<ProtectedRoute><Performance /></ProtectedRoute>} />
-              <Route path="/optionals" element={<Optionals />} />
-              <Route path="/driver-details" element={<DriverDetails />} />
-              <Route path="/automations" element={<ProtectedRoute><Automations /></ProtectedRoute>} />
-              <Route path="/offers" element={<ProtectedRoute><Offers /></ProtectedRoute>} />
-            </Routes>
-          </TooltipProvider>
+          <AppContent />
         </SessionContextProvider>
       </QueryClientProvider>
     </BrowserRouter>

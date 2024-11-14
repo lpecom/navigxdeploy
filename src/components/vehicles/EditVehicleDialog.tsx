@@ -23,6 +23,14 @@ export const EditVehicleDialog = ({
   setEditingCar,
   onSubmit,
 }: EditVehicleDialogProps) => {
+  const updateCarField = (field: keyof CarModel, value: string) => {
+    if (!editingCar) return;
+    setEditingCar({
+      ...editingCar,
+      [field]: value,
+    });
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
@@ -35,11 +43,7 @@ export const EditVehicleDialog = ({
             <Input
               id="name"
               value={editingCar?.name || ""}
-              onChange={(e) =>
-                setEditingCar(
-                  (prev) => prev && { ...prev, name: e.target.value }
-                )
-              }
+              onChange={(e) => updateCarField("name", e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -47,11 +51,7 @@ export const EditVehicleDialog = ({
             <Input
               id="image"
               value={editingCar?.image_url || ""}
-              onChange={(e) =>
-                setEditingCar(
-                  (prev) => prev && { ...prev, image_url: e.target.value }
-                )
-              }
+              onChange={(e) => updateCarField("image_url", e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -59,11 +59,7 @@ export const EditVehicleDialog = ({
             <Input
               id="year"
               value={editingCar?.year || ""}
-              onChange={(e) =>
-                setEditingCar(
-                  (prev) => prev && { ...prev, year: e.target.value }
-                )
-              }
+              onChange={(e) => updateCarField("year", e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -71,11 +67,7 @@ export const EditVehicleDialog = ({
             <Input
               id="description"
               value={editingCar?.description || ""}
-              onChange={(e) =>
-                setEditingCar(
-                  (prev) => prev && { ...prev, description: e.target.value }
-                )
-              }
+              onChange={(e) => updateCarField("description", e.target.value)}
             />
           </div>
           <Button type="submit" className="w-full">
