@@ -53,7 +53,7 @@ serve(async (req) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${appmaxApiKey}`
+            'Authorization': appmaxApiKey // Removed Bearer prefix as Appmax expects just the key
           },
           body: JSON.stringify(appmaxPayload)
         })
