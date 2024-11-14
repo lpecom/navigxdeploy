@@ -14,7 +14,7 @@ export const PlanCard = ({ type, price, onSelect }: PlanCardProps) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <span className="text-2xl font-bold">
-            Kovi {type === 'weekly' ? 'Semanal' : 'Mensal'}
+            Navig {type === 'weekly' ? 'Semanal' : 'Mensal'}
           </span>
         </CardTitle>
       </CardHeader>
@@ -48,7 +48,7 @@ export const PlanCard = ({ type, price, onSelect }: PlanCardProps) => {
           <div className="flex gap-2">
             <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
             <p className="text-sm">
-              Facilidade no financiamento no momento da compra Kovi Anual
+              Facilidade no financiamento no momento da compra Navig Anual
             </p>
           </div>
         </div>
