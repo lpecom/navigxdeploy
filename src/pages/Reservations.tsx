@@ -37,52 +37,57 @@ const Reservations = () => {
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
-            <div className="flex justify-between items-center">
-              <h1 className="text-3xl font-bold text-gray-900">Reservas</h1>
-              <Badge variant="outline" className="px-4 py-1">
-                {isLoading ? "Carregando..." : `${reservations?.length || 0} Reservas Ativas`}
+        <main className="flex-1 overflow-y-auto p-8">
+          <div className="max-w-7xl mx-auto space-y-8">
+            <div className="flex justify-between items-center mb-8">
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+                Reservations Dashboard
+              </h1>
+              <Badge variant="outline" className="px-4 py-2 text-base">
+                {isLoading ? "Loading..." : `${reservations?.length || 0} Active Reservations`}
               </Badge>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Pending Reservations Section */}
+            <Card className="mb-8">
+              <CardHeader className="border-b">
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  <Calendar className="w-6 h-6 text-primary" />
+                  Pending Reservations
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <ReservationsList filter="pending" />
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Active Rentals Section */}
               <Card className="lg:col-span-1">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Clock className="w-5 h-5" />
-                    Aluguéis Ativos
+                <CardHeader className="border-b">
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <Clock className="w-5 h-5 text-primary" />
+                    Active Rentals
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                   <ActiveRentals />
                 </CardContent>
               </Card>
 
+              {/* Reservation History Section */}
               <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5" />
-                    Reservas Pendentes
+                <CardHeader className="border-b">
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <FileText className="w-5 h-5 text-primary" />
+                    Reservation History
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <ReservationsList filter="pending" />
+                <CardContent className="pt-6">
+                  <ReservationHistory />
                 </CardContent>
               </Card>
             </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
-                  Histórico de Reservas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ReservationHistory />
-              </CardContent>
-            </Card>
           </div>
         </main>
       </div>
