@@ -76,7 +76,7 @@ const Sidebar = () => {
         { to: "/automations", label: "Automações" },
       ]
     },
-    { to: "/optionals", icon: Package, label: "Opcionais" },
+    { to: "/accessories", icon: Package, label: "Opcionais" },
     {
       icon: Settings,
       label: "Configurações",

@@ -16,7 +16,7 @@ import Vehicles from "./pages/Vehicles";
 import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import Performance from "./pages/Performance";
-import Optionals from "./pages/Optionals";
+import Accessories from "./pages/Accessories";
 import AdminLogin from "./pages/AdminLogin";
 import Automations from "./pages/Automations";
 import Offers from "./pages/Offers";
@@ -68,7 +68,7 @@ const AppContent = () => {
           <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
           <Route path="/performance" element={<ProtectedRoute><Performance /></ProtectedRoute>} />
-          <Route path="/optionals" element={<Optionals />} />
+          <Route path="/accessories" element={<ProtectedRoute><Accessories /></ProtectedRoute>} />
           <Route path="/automations" element={<ProtectedRoute><Automations /></ProtectedRoute>} />
           <Route path="/offers" element={<ProtectedRoute><Offers /></ProtectedRoute>} />
           <Route path="/checkout" element={<CheckoutPage />} />
