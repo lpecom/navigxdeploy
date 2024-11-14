@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Plus, Minus } from "lucide-react";
@@ -54,6 +54,18 @@ export const OptionalsList = () => {
     Object.fromEntries(optionals.map(opt => [opt.id, 0]))
   );
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Store selected optionals in sessionStorage whenever they change
+    const selectedOptionals = optionals
+      .filter(opt => selectedQuantities[opt.id] > 0)
+      .map(opt => ({
+        ...opt,
+        quantity: selectedQuantities[opt.id]
+      }));
+    
+    sessionStorage.setItem('selectedOptionals', JSON.stringify(selectedOptionals));
+  }, [selectedQuantities]);
 
   const updateQuantity = (id: string, delta: number) => {
     setSelectedQuantities(prev => {

@@ -110,6 +110,83 @@ export type Database = {
         }
         Relationships: []
       }
+      checkout_sessions: {
+        Row: {
+          created_at: string
+          driver_id: string | null
+          id: string
+          selected_car: Json
+          selected_optionals: Json
+          status: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          driver_id?: string | null
+          id?: string
+          selected_car: Json
+          selected_optionals: Json
+          status?: string
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          driver_id?: string | null
+          id?: string
+          selected_car?: Json
+          selected_optionals?: Json
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checkout_sessions_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "driver_details"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      driver_details: {
+        Row: {
+          birth_date: string
+          cpf: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          license_expiry: string
+          license_number: string
+          phone: string
+        }
+        Insert: {
+          birth_date: string
+          cpf: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          license_expiry: string
+          license_number: string
+          phone: string
+        }
+        Update: {
+          birth_date?: string
+          cpf?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          license_expiry?: string
+          license_number?: string
+          phone?: string
+        }
+        Relationships: []
+      }
       offers: {
         Row: {
           availability: string | null
