@@ -18,6 +18,7 @@ import Performance from "./pages/Performance";
 import Optionals from "./pages/Optionals";
 import AdminLogin from "./pages/AdminLogin";
 import Automations from "./pages/Automations";
+import Offers from "./pages/Offers";
 
 const DetailedReservationViewWrapper = () => {
   const { id } = useParams();
@@ -69,6 +70,7 @@ const App = () => {
               <Route path="/performance" element={<ProtectedRoute><Performance /></ProtectedRoute>} />
               <Route path="/optionals" element={<ProtectedRoute><Optionals /></ProtectedRoute>} />
               <Route path="/automations" element={<ProtectedRoute><Automations /></ProtectedRoute>} />
+              <Route path="/offers" element={<ProtectedRoute><Offers /></ProtectedRoute>} />
             </Routes>
           </TooltipProvider>
         </SessionContextProvider>
