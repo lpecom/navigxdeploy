@@ -37,61 +37,59 @@ const Reservations = () => {
     <div className="flex h-screen bg-background">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-y-auto px-8 py-10">
-          <div className="max-w-7xl mx-auto space-y-10">
-            <div className="flex justify-between items-center mb-10">
-              <div className="space-y-1">
-                <h1 className="text-4xl font-semibold tracking-tight text-gray-900">
-                  Reservations
-                </h1>
-                <p className="text-muted-foreground text-lg">
+        <main className="flex-1 overflow-y-auto px-6 py-6">
+          <div className="max-w-7xl mx-auto space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-2xl font-medium text-gray-900">Reservations</h1>
+                <p className="text-sm text-muted-foreground mt-0.5">
                   Manage and track all reservation activities
                 </p>
               </div>
               <Badge 
                 variant="secondary" 
-                className="px-6 py-2.5 text-base font-medium bg-secondary/10 text-secondary"
+                className="px-3 py-1.5 text-sm font-medium bg-secondary/10 text-secondary"
               >
                 {isLoading ? "Loading..." : `${reservations?.length || 0} Active Reservations`}
               </Badge>
             </div>
 
             {/* Pending Reservations Section */}
-            <Card className="mb-10 shadow-sm border-muted">
-              <CardHeader className="border-b border-muted/20 py-8">
-                <CardTitle className="flex items-center gap-3 text-2xl font-semibold">
-                  <Calendar className="w-7 h-7 text-primary" />
+            <Card className="shadow-sm border-muted">
+              <CardHeader className="border-b border-muted/20 py-4">
+                <CardTitle className="flex items-center gap-2 text-base font-medium">
+                  <Calendar className="w-5 h-5 text-primary" />
                   Pending Reservations
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-8 px-8">
+              <CardContent className="pt-4 px-4">
                 <ReservationsList filter="pending" />
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Active Rentals Section */}
               <Card className="lg:col-span-1 shadow-sm border-muted">
-                <CardHeader className="border-b border-muted/20 py-6">
-                  <CardTitle className="flex items-center gap-2.5 text-xl font-semibold">
-                    <Clock className="w-5 h-5 text-primary" />
+                <CardHeader className="border-b border-muted/20 py-3">
+                  <CardTitle className="flex items-center gap-2 text-sm font-medium">
+                    <Clock className="w-4 h-4 text-primary" />
                     Active Rentals
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-6 px-6">
+                <CardContent className="pt-4 px-4">
                   <ActiveRentals />
                 </CardContent>
               </Card>
 
               {/* Reservation History Section */}
               <Card className="lg:col-span-2 shadow-sm border-muted">
-                <CardHeader className="border-b border-muted/20 py-6">
-                  <CardTitle className="flex items-center gap-2.5 text-xl font-semibold">
-                    <FileText className="w-5 h-5 text-primary" />
+                <CardHeader className="border-b border-muted/20 py-3">
+                  <CardTitle className="flex items-center gap-2 text-sm font-medium">
+                    <FileText className="w-4 h-4 text-primary" />
                     Reservation History
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-6 px-6">
+                <CardContent className="pt-4 px-4">
                   <ReservationHistory />
                 </CardContent>
               </Card>
