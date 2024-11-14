@@ -20,10 +20,10 @@ export const CategoryForm = ({ onSuccess }: CategoryFormProps) => {
   });
 
   const addCategoryMutation = useMutation({
-    mutationFn: async (categoryData: Partial<Category>) => {
+    mutationFn: async (categoryData: { name: string; description?: string; badge_text?: string }) => {
       const { data, error } = await supabase
         .from("categories")
-        .insert([categoryData])
+        .insert(categoryData)
         .select()
         .single();
       
