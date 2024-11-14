@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Users, Car, Fuel, Gauge } from "lucide-react";
 import { Link } from "react-router-dom";
 import { OrderSummary } from "@/components/optionals/OrderSummary";
 import { OptionalsList } from "@/components/optionals/OptionalsList";
@@ -27,11 +27,9 @@ const Optionals = () => {
   const [selectedCar, setSelectedCar] = useState<SelectedCar | null>(null);
 
   useEffect(() => {
-    // Add fade-in animation class when component mounts
     document.body.classList.remove('animate-fade-out');
     document.body.classList.add('animate-fade-in');
 
-    // Get selected car details from sessionStorage
     const carData = sessionStorage.getItem('selectedCar');
     if (carData) {
       setSelectedCar(JSON.parse(carData));
