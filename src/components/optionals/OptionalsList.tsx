@@ -14,36 +14,36 @@ interface Optional {
 const optionals: Optional[] = [
   {
     id: "gps",
-    name: "GPS Navigation",
-    description: "Satellite navigation system with the latest maps loaded.",
+    name: "GPS Navegação",
+    description: "Sistema de navegação por satélite com mapas atualizados.",
     price: 15.00,
     priceType: "per_rental"
   },
   {
     id: "wifi",
-    name: "WiFi Access",
-    description: "Wireless internet access for laptops, smartphones and tablets.",
+    name: "Acesso WiFi",
+    description: "Acesso à internet sem fio para notebooks, smartphones e tablets.",
     price: 50.00,
     priceType: "per_rental"
   },
   {
     id: "winter",
-    name: "Winter Package",
-    description: "Winter tires, ice scraper and snow chains - recommended for winter conditions.",
+    name: "Pacote Inverno",
+    description: "Pneus de inverno, raspador de gelo e correntes de neve - recomendado para condições de inverno.",
     price: 35.00,
     priceType: "per_rental"
   },
   {
     id: "ski",
-    name: "Ski Rack",
-    description: "Safe trunk for four ski sets.",
+    name: "Suporte para Esqui",
+    description: "Porta-malas seguro para quatro conjuntos de esqui.",
     price: 199.00,
     priceType: "per_rental"
   },
   {
     id: "insurance",
-    name: "Full Insurance",
-    description: "Full insurance covers every exterior and mechanical part of your car. Excess cover amount is fully covered.",
+    name: "Seguro Completo",
+    description: "O seguro completo cobre todas as partes exteriores e mecânicas do seu carro. Valor da franquia totalmente coberto.",
     price: 7.00,
     priceType: "per_day"
   }
@@ -60,8 +60,8 @@ export const OptionalsList = () => {
       const newValue = Math.max(0, (prev[id] || 0) + delta);
       if (newValue > 0) {
         toast({
-          title: "Optional Added",
-          description: `${optionals.find(opt => opt.id === id)?.name} has been added to your order.`
+          title: "Opcional Adicionado",
+          description: `${optionals.find(opt => opt.id === id)?.name} foi adicionado ao seu pedido.`
         });
       }
       return { ...prev, [id]: newValue };
@@ -76,7 +76,7 @@ export const OptionalsList = () => {
             <h3 className="font-medium">{optional.name}</h3>
             <p className="text-sm text-gray-600">{optional.description}</p>
             <p className="text-sm font-medium text-primary mt-1">
-              ${optional.price.toFixed(2)} {optional.priceType === 'per_rental' ? 'per rental' : 'per day'}
+              R$ {optional.price.toFixed(2)} {optional.priceType === 'per_rental' ? 'por aluguel' : 'por dia'}
             </p>
           </div>
           
