@@ -121,6 +121,50 @@ export type Database = {
           },
         ]
       }
+      cart_items: {
+        Row: {
+          checkout_session_id: string
+          created_at: string
+          id: string
+          item_id: string
+          item_type: string
+          quantity: number
+          total_price: number
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          checkout_session_id: string
+          created_at?: string
+          id?: string
+          item_id: string
+          item_type: string
+          quantity?: number
+          total_price: number
+          unit_price: number
+          updated_at?: string
+        }
+        Update: {
+          checkout_session_id?: string
+          created_at?: string
+          id?: string
+          item_id?: string
+          item_type?: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_checkout_session_id_fkey"
+            columns: ["checkout_session_id"]
+            isOneToOne: false
+            referencedRelation: "checkout_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           badge_text: string | null

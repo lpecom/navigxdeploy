@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useParams, Navigate } from "react-router-
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
+import { CartProvider } from '@/contexts/CartContext';
 import Index from "./pages/Index";
 import Home from "./pages/Home";
 import Plans from "./pages/Plans";
@@ -53,27 +54,29 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   return (
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-        <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
-        <Route path="/reservations" element={<ProtectedRoute><Reservations /></ProtectedRoute>} />
-        <Route path="/reservations/:id" element={<ProtectedRoute><DetailedReservationViewWrapper /></ProtectedRoute>} />
-        <Route path="/vehicles" element={<ProtectedRoute><Vehicles /></ProtectedRoute>} />
-        <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-        <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
-        <Route path="/performance" element={<ProtectedRoute><Performance /></ProtectedRoute>} />
-        <Route path="/optionals" element={<Optionals />} />
-        <Route path="/driver-details" element={<DriverDetails />} />
-        <Route path="/automations" element={<ProtectedRoute><Automations /></ProtectedRoute>} />
-        <Route path="/offers" element={<ProtectedRoute><Offers /></ProtectedRoute>} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-      </Routes>
-    </TooltipProvider>
+    <CartProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+          <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
+          <Route path="/reservations" element={<ProtectedRoute><Reservations /></ProtectedRoute>} />
+          <Route path="/reservations/:id" element={<ProtectedRoute><DetailedReservationViewWrapper /></ProtectedRoute>} />
+          <Route path="/vehicles" element={<ProtectedRoute><Vehicles /></ProtectedRoute>} />
+          <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+          <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+          <Route path="/performance" element={<ProtectedRoute><Performance /></ProtectedRoute>} />
+          <Route path="/optionals" element={<Optionals />} />
+          <Route path="/driver-details" element={<DriverDetails />} />
+          <Route path="/automations" element={<ProtectedRoute><Automations /></ProtectedRoute>} />
+          <Route path="/offers" element={<ProtectedRoute><Offers /></ProtectedRoute>} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+        </Routes>
+      </TooltipProvider>
+    </CartProvider>
   );
 };
 

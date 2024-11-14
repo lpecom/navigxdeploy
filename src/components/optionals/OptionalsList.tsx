@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Plus, Minus } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 interface Optional {
   id: string;
@@ -50,68 +51,77 @@ const optionals: Optional[] = [
 ];
 
 export const OptionalsList = () => {
-  const [selectedQuantities, setSelectedQuantities] = useState<Record<string, number>>(
-    Object.fromEntries(optionals.map(opt => [opt.id, 0]))
-  );
+  const { state, dispatch } = useCart();
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Store selected optionals in sessionStorage whenever they change
-    const selectedOptionals = optionals
-      .filter(opt => selectedQuantities[opt.id] > 0)
-      .map(opt => ({
-        ...opt,
-        quantity: selectedQuantities[opt.id]
-      }));
-    
-    sessionStorage.setItem('selectedOptionals', JSON.stringify(selectedOptionals));
-  }, [selectedQuantities]);
+  const updateQuantity = (optional: Optional, delta: number) => {
+    const currentItem = state.items.find(item => item.id === optional.id);
+    const newQuantity = (currentItem?.quantity || 0) + delta;
 
-  const updateQuantity = (id: string, delta: number) => {
-    setSelectedQuantities(prev => {
-      const newValue = Math.max(0, (prev[id] || 0) + delta);
-      if (newValue > 0) {
-        toast({
-          title: "Opcional Adicionado",
-          description: `${optionals.find(opt => opt.id === id)?.name} foi adicionado ao seu pedido.`
+    if (newQuantity === 0) {
+      dispatch({ type: 'REMOVE_ITEM', payload: optional.id });
+    } else if (newQuantity > 0) {
+      if (!currentItem) {
+        dispatch({
+          type: 'ADD_ITEM',
+          payload: {
+            id: optional.id,
+            type: 'optional',
+            quantity: 1,
+            unitPrice: optional.price,
+            totalPrice: optional.price
+          }
+        });
+      } else {
+        dispatch({
+          type: 'UPDATE_QUANTITY',
+          payload: { id: optional.id, quantity: newQuantity }
         });
       }
-      return { ...prev, [id]: newValue };
-    });
+
+      toast({
+        title: "Optional Adicionado",
+        description: `${optional.name} foi ${delta > 0 ? 'adicionado ao' : 'atualizado no'} seu pedido.`
+      });
+    }
   };
 
   return (
     <div className="space-y-6">
-      {optionals.map((optional) => (
-        <div key={optional.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition-colors">
-          <div className="flex-1">
-            <h3 className="font-medium">{optional.name}</h3>
-            <p className="text-sm text-gray-600">{optional.description}</p>
-            <p className="text-sm font-medium text-primary mt-1">
-              R$ {optional.price.toFixed(2)} {optional.priceType === 'per_rental' ? 'por aluguel' : 'por dia'}
-            </p>
+      {optionals.map((optional) => {
+        const currentQuantity = state.items.find(item => item.id === optional.id)?.quantity || 0;
+
+        return (
+          <div key={optional.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition-colors">
+            <div className="flex-1">
+              <h3 className="font-medium">{optional.name}</h3>
+              <p className="text-sm text-gray-600">{optional.description}</p>
+              <p className="text-sm font-medium text-primary mt-1">
+                R$ {optional.price.toFixed(2)} {optional.priceType === 'per_rental' ? 'por aluguel' : 'por dia'}
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => updateQuantity(optional, -1)}
+                disabled={currentQuantity === 0}
+              >
+                <Minus className="h-4 w-4" />
+              </Button>
+              <span className="w-8 text-center">{currentQuantity}</span>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => updateQuantity(optional, 1)}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => updateQuantity(optional.id, -1)}
-              disabled={selectedQuantities[optional.id] === 0}
-            >
-              <Minus className="h-4 w-4" />
-            </Button>
-            <span className="w-8 text-center">{selectedQuantities[optional.id]}</span>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => updateQuantity(optional.id, 1)}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

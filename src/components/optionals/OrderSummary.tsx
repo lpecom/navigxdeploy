@@ -1,6 +1,9 @@
 import { Card } from "@/components/ui/card";
+import { useCart } from "@/contexts/CartContext";
 
 export const OrderSummary = () => {
+  const { state } = useCart();
+
   return (
     <Card className="p-6">
       <h2 className="text-xl font-semibold mb-6">Resumo do Pedido</h2>
@@ -37,10 +40,12 @@ export const OrderSummary = () => {
         <div className="border-b pb-4">
           <h3 className="font-medium mb-2">Detalhamento do Preço</h3>
           <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span>Veículo selecionado</span>
-              <span>R$ 246,00</span>
-            </div>
+            {state.items.map((item) => (
+              <div key={item.id} className="flex justify-between">
+                <span>{item.type === 'car' ? 'Veículo selecionado' : 'Optional'}</span>
+                <span>R$ {item.totalPrice.toFixed(2)}</span>
+              </div>
+            ))}
             <div className="flex justify-between">
               <span>Caução</span>
               <span>R$ 75,00</span>
@@ -55,7 +60,7 @@ export const OrderSummary = () => {
         <div className="pt-2">
           <div className="flex justify-between items-center font-semibold">
             <span>Total</span>
-            <span className="text-xl">R$ 371,00</span>
+            <span className="text-xl">R$ {(state.total + 125).toFixed(2)}</span>
           </div>
         </div>
       </div>
