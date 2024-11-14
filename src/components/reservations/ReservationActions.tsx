@@ -12,14 +12,14 @@ export const ReservationActions = ({ reservation }: ReservationActionsProps) => 
 
   const handleAction = (action: 'approve' | 'reject' | 'view') => {
     const messages = {
-      approve: 'Reservation approved successfully',
-      reject: 'Reservation rejected',
-      view: 'Opening reservation details'
+      approve: 'Reserva aprovada com sucesso',
+      reject: 'Reserva rejeitada',
+      view: 'Abrindo detalhes da reserva'
     };
 
     toast({
       title: messages[action],
-      description: `Action performed for ${reservation.customerName}`,
+      description: `Ação realizada para ${reservation.customerName}`,
     });
   };
 
@@ -32,7 +32,7 @@ export const ReservationActions = ({ reservation }: ReservationActionsProps) => 
         onClick={() => handleAction('approve')}
       >
         <Check className="w-4 h-4 mr-1" />
-        Approve
+        Aprovar
       </Button>
       <Button 
         variant="outline" 
@@ -41,7 +41,7 @@ export const ReservationActions = ({ reservation }: ReservationActionsProps) => 
         onClick={() => handleAction('reject')}
       >
         <X className="w-4 h-4 mr-1" />
-        Reject
+        Rejeitar
       </Button>
       <Button 
         variant="outline" 

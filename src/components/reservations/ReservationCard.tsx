@@ -3,7 +3,8 @@ import { ChevronDown, ChevronUp, Car } from "lucide-react";
 import { StatusBadges } from "./StatusBadges";
 import { ReservationExpandedContent } from "./ReservationExpandedContent";
 import type { Reservation } from "@/types/reservation";
-import { format, differenceInDays } from "date-fns";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface ReservationCardProps {
   reservation: Reservation;
@@ -40,7 +41,7 @@ export const ReservationCard = ({ reservation, isExpanded, onToggle }: Reservati
           <button
             onClick={onToggle}
             className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-            aria-label={isExpanded ? "Show less" : "Show more"}
+            aria-label={isExpanded ? "Mostrar menos" : "Mostrar mais"}
           >
             {isExpanded ? (
               <ChevronUp className="w-5 h-5" />
@@ -50,7 +51,7 @@ export const ReservationCard = ({ reservation, isExpanded, onToggle }: Reservati
           </button>
         </div>
         <p className="text-sm text-muted-foreground mt-1">
-          Pickup: {format(new Date(reservation.pickupDate), 'MMM dd, yyyy')}
+          Retirada: {format(new Date(reservation.pickupDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
         </p>
       </CardHeader>
       <CardContent>

@@ -13,14 +13,14 @@ export const StreetView = ({ address }: StreetViewProps) => {
   return (
     <div className="mt-6 mb-6 space-y-2">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-muted-foreground">Location Preview</h3>
+        <h3 className="text-sm font-medium text-muted-foreground">Visualização do Local</h3>
         <a 
           href={mapsUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
         >
-          Open in Maps
+          Abrir no Maps
           <ExternalLink className="w-3 h-3" />
         </a>
       </div>
@@ -32,7 +32,7 @@ export const StreetView = ({ address }: StreetViewProps) => {
       >
         <img 
           src={imageUrl} 
-          alt={`Street view of ${address}`}
+          alt={`Visualização da rua ${address}`}
           className="w-full h-[200px] object-cover hover:opacity-90 transition-opacity"
           onError={(e) => {
             e.currentTarget.src = '/placeholder.svg';

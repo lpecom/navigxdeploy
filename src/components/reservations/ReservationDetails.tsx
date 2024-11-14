@@ -21,9 +21,9 @@ const ReservationDetails = ({ reservationId }: ReservationDetailsProps) => {
           <div className="space-y-2">
             <h3 className="text-sm font-medium text-muted-foreground">Informações do Cliente</h3>
             <div className="space-y-1">
-              <p className="text-sm">John Doe</p>
+              <p className="text-sm">João Silva</p>
               <p className="text-sm text-muted-foreground">CPF: 123.456.789-00</p>
-              <p className="text-sm text-muted-foreground">john@example.com</p>
+              <p className="text-sm text-muted-foreground">joao@example.com</p>
               <p className="text-sm text-muted-foreground">(11) 98765-4321</p>
             </div>
           </div>

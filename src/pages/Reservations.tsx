@@ -15,15 +15,14 @@ const Reservations = () => {
   const { data: reservations, isLoading } = useQuery({
     queryKey: ["reservations"],
     queryFn: async () => {
-      // This would be replaced with your actual API call
       const response = await fetch("/api/reservations");
       if (!response.ok) {
         toast({
-          title: "Error fetching reservations",
-          description: "Please try again later",
+          title: "Erro ao carregar reservas",
+          description: "Por favor, tente novamente mais tarde",
           variant: "destructive",
         });
-        throw new Error("Failed to fetch reservations");
+        throw new Error("Falha ao carregar reservas");
       }
       return response.json();
     },
@@ -36,18 +35,18 @@ const Reservations = () => {
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex justify-between items-center">
-              <h1 className="text-3xl font-bold text-gray-900">Reservations</h1>
+              <h1 className="text-3xl font-bold text-gray-900">Reservas</h1>
               <Badge variant="outline" className="px-4 py-1">
-                {isLoading ? "Loading..." : `${reservations?.length || 0} Active Leads`}
+                {isLoading ? "Carregando..." : `${reservations?.length || 0} Leads Ativos`}
               </Badge>
             </div>
 
             <Tabs defaultValue="all" className="w-full">
               <TabsList>
-                <TabsTrigger value="all">All Leads</TabsTrigger>
-                <TabsTrigger value="pending">Pending Review</TabsTrigger>
-                <TabsTrigger value="approved">Approved</TabsTrigger>
-                <TabsTrigger value="rejected">Rejected</TabsTrigger>
+                <TabsTrigger value="all">Todos os Leads</TabsTrigger>
+                <TabsTrigger value="pending">Aguardando Revisão</TabsTrigger>
+                <TabsTrigger value="approved">Aprovados</TabsTrigger>
+                <TabsTrigger value="rejected">Rejeitados</TabsTrigger>
               </TabsList>
 
               <TabsContent value="all" className="space-y-6">
