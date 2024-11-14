@@ -9,6 +9,7 @@ const corsHeaders = {
 const APPMAX_API_URL = 'https://sandbox.appmax.com.br/api/v3'
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -24,13 +25,25 @@ serve(async (req) => {
       console.log('Received request body:', JSON.stringify(body))
     } catch (e) {
       console.error('Error parsing request body:', e)
-      throw new Error('Invalid JSON in request body')
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON in request body' }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
     }
 
     const { action, payload } = body
 
     if (!action || !payload) {
-      throw new Error('Action and payload are required')
+      return new Response(
+        JSON.stringify({ error: 'Action and payload are required' }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
     }
 
     console.log('Processing request:', { action, payload })
@@ -87,7 +100,13 @@ serve(async (req) => {
 
         if (!paymentResponse.ok) {
           console.error('Appmax error response:', paymentData)
-          throw new Error(`Appmax error: ${JSON.stringify(paymentData)}`)
+          return new Response(
+            JSON.stringify({ error: `Payment processing failed: ${paymentData.message || 'Unknown error'}` }),
+            { 
+              status: paymentResponse.status,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          )
         }
 
         const { data: payment, error: paymentError } = await supabase
@@ -108,48 +127,25 @@ serve(async (req) => {
           throw paymentError
         }
 
-        if (payload.payment_type === 'boleto' && paymentData.boleto) {
-          const { error: boletoError } = await supabase
-            .from('boletos')
-            .insert({
-              payment_id: payment.id,
-              barcode: paymentData.boleto.barcode,
-              due_date: new Date(paymentData.boleto.due_date),
-              pdf_url: paymentData.boleto.pdf_url
-            })
-          
-          if (boletoError) {
-            console.error('Error creating boleto record:', boletoError)
-            throw boletoError
+        return new Response(
+          JSON.stringify({
+            id: payment.id,
+            ...paymentData
+          }), 
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
-        }
-        
-        if (payload.payment_type === 'pix' && paymentData.pix) {
-          const { error: pixError } = await supabase
-            .from('pix_payments')
-            .insert({
-              payment_id: payment.id,
-              qr_code: paymentData.pix.qr_code,
-              qr_code_url: paymentData.pix.qr_code_url,
-              expiration_date: new Date(paymentData.pix.expiration_date)
-            })
-          
-          if (pixError) {
-            console.error('Error creating pix record:', pixError)
-            throw pixError
-          }
-        }
-
-        return new Response(JSON.stringify({
-          id: payment.id,
-          ...paymentData
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
+        )
       }
 
       default:
-        throw new Error('Invalid action')
+        return new Response(
+          JSON.stringify({ error: 'Invalid action' }),
+          { 
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        )
     }
   } catch (error) {
     console.error('Payment processing error:', error)
