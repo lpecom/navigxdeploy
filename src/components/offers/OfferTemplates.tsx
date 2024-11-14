@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Check } from "lucide-react";
 
-export type TemplateType = "default" | "featured" | "promotional" | "seasonal";
+export type TemplateType = "default" | "featured" | "promotional" | "seasonal" | "monthly" | "flex" | "black";
 
 interface TemplateOption {
   type: TemplateType;
@@ -13,27 +13,39 @@ interface TemplateOption {
 const templates: TemplateOption[] = [
   {
     type: "default",
-    name: "Standard Template",
-    description: "Clean and simple layout for regular offers",
+    name: "Template Padrão",
+    description: "Layout limpo e simples para ofertas regulares",
     preview: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
   },
   {
-    type: "featured",
-    name: "Featured Highlight",
-    description: "Premium template with enhanced visibility",
+    type: "monthly",
+    name: "Navig Mensal",
+    description: "Template específico para planos mensais",
     preview: "https://images.unsplash.com/photo-1518770660439-4636190af475",
   },
   {
-    type: "promotional",
-    name: "Special Promotion",
-    description: "Eye-catching design for special deals",
+    type: "flex",
+    name: "Navig Flex",
+    description: "Design especial para planos flexíveis",
     preview: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
   },
   {
-    type: "seasonal",
-    name: "Seasonal Theme",
-    description: "Themed template for seasonal offers",
+    type: "black",
+    name: "Navig Black",
+    description: "Template premium para o plano Black",
     preview: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
+  },
+  {
+    type: "promotional",
+    name: "Promoção Especial",
+    description: "Design chamativo para ofertas promocionais",
+    preview: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d",
+  },
+  {
+    type: "seasonal",
+    name: "Sazonal",
+    description: "Template para ofertas sazonais",
+    preview: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800",
   },
 ];
 
@@ -47,7 +59,7 @@ export const OfferTemplates = ({
   onSelectTemplate,
 }: OfferTemplatesProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {templates.map((template) => (
         <Card
           key={template.type}
