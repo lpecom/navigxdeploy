@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { ThermometerSnowflake, ThermometerSun, Car, CreditCard, Flag } from "lucide-react";
+import { ThermometerSnowflake, ThermometerSun, CreditCard, Flag } from "lucide-react";
 import { type Reservation } from "@/types/reservation";
 import { differenceInDays } from "date-fns";
 
@@ -21,22 +21,6 @@ export const StatusBadges = ({ reservation }: StatusBadgesProps) => {
       <Badge className="bg-red-100 text-red-800 flex gap-1 items-center">
         <ThermometerSun className="w-4 h-4" />
         Alto Risco
-      </Badge>
-    );
-  };
-
-  const getCarCategoryBadge = (category: Reservation['carCategory']) => {
-    const colors = {
-      Luxury: "bg-purple-100 text-purple-800",
-      SUV: "bg-blue-100 text-blue-800",
-      Economy: "bg-green-100 text-green-800",
-      Sports: "bg-red-100 text-red-800"
-    };
-
-    return (
-      <Badge className={`flex gap-1 items-center ${colors[category]}`}>
-        <Car className="w-4 h-4" />
-        {category}
       </Badge>
     );
   };
@@ -72,15 +56,10 @@ export const StatusBadges = ({ reservation }: StatusBadgesProps) => {
   };
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        {getRiskBadge(reservation.riskScore)}
-        {getCarCategoryBadge(reservation.carCategory)}
-      </div>
-      <div className="flex items-center justify-between">
-        {getPaymentStatusBadge(reservation.paymentStatus)}
-        {getPriorityBadge(reservation.pickupDate)}
-      </div>
+    <div className="flex flex-wrap gap-2">
+      {getRiskBadge(reservation.riskScore)}
+      {getPaymentStatusBadge(reservation.paymentStatus)}
+      {getPriorityBadge(reservation.pickupDate)}
     </div>
   );
 };
