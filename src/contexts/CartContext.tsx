@@ -1,7 +1,7 @@
 import { createContext, useContext, useReducer, ReactNode } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 
-interface CartItem {
+export interface CartItem {
   id: string;
   type: 'car' | 'optional';
   quantity: number;

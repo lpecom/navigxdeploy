@@ -1,5 +1,4 @@
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import { CartItem } from "@/contexts/CartContext";
 import { CheckoutSession } from "@/types/checkout";
 
