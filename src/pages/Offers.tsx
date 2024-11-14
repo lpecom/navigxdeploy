@@ -83,6 +83,15 @@ const Offers = () => {
 
   const deleteCategoryMutation = useMutation({
     mutationFn: async (category: Category) => {
+      // First, update car_models to remove the category reference
+      const { error: carModelsError } = await supabase
+        .from("car_models")
+        .update({ category_id: null })
+        .eq("category_id", category.id);
+      
+      if (carModelsError) throw carModelsError;
+
+      // Then delete the category
       const { error } = await supabase
         .from("categories")
         .delete()
@@ -97,10 +106,11 @@ const Offers = () => {
       }
       toast({
         title: "Success",
-        description: "Category deleted successfully",
+        description: "Category and associated data deleted successfully",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Delete error:", error);
       toast({
         title: "Error",
         description: "Failed to delete category",
