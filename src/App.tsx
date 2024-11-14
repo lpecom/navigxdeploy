@@ -11,6 +11,7 @@ import Vehicles from "./pages/Vehicles";
 import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import Performance from "./pages/Performance";
+import Optionals from "./pages/Optionals";
 
 // Wrapper component to get URL parameters
 const DetailedReservationViewWrapper = () => {
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/performance" element={<Performance />} />
+          <Route path="/optionals" element={<Optionals />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
