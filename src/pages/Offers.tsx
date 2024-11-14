@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Dialog,
@@ -11,16 +10,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Plus, Pencil, Eye, EyeOff } from "lucide-react";
+import { Plus } from "lucide-react";
 import { CategoryForm } from "@/components/offers/CategoryForm";
+import { CategoriesList } from "@/components/offers/CategoriesList";
+import { OffersList } from "@/components/offers/OffersList";
 import type { Category, Offer } from "@/types/offers";
 
 const Offers = () => {
@@ -29,7 +22,6 @@ const Offers = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
 
-  // Fetch categories
   const { data: categories, isLoading: categoriesLoading } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
@@ -43,7 +35,6 @@ const Offers = () => {
     },
   });
 
-  // Fetch offers for selected category
   const { data: offers, isLoading: offersLoading } = useQuery({
     queryKey: ["offers", selectedCategory?.id],
     queryFn: async () => {
@@ -60,7 +51,6 @@ const Offers = () => {
     enabled: !!selectedCategory?.id,
   });
 
-  // Toggle category visibility mutation
   const toggleCategoryVisibilityMutation = useMutation({
     mutationFn: async ({ id, is_active }: { id: string; is_active: boolean | null }) => {
       const { data, error } = await supabase
@@ -81,6 +71,11 @@ const Offers = () => {
       });
     },
   });
+
+  const handleEditOffer = (offer: Offer) => {
+    // TODO: Implement offer editing
+    console.log("Edit offer:", offer);
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -103,126 +98,25 @@ const Offers = () => {
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Categories List */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Categories</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {categoriesLoading ? (
-              <div>Loading categories...</div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Badge</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {categories?.map((category) => (
-                    <TableRow
-                      key={category.id}
-                      className={
-                        selectedCategory?.id === category.id
-                          ? "bg-muted/50"
-                          : ""
-                      }
-                    >
-                      <TableCell>{category.name}</TableCell>
-                      <TableCell>{category.badge_text}</TableCell>
-                      <TableCell>
-                        {category.is_active ? "Active" : "Hidden"}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setSelectedCategory(category)}
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() =>
-                              toggleCategoryVisibilityMutation.mutate({
-                                id: category.id,
-                                is_active: category.is_active,
-                              })
-                            }
-                          >
-                            {category.is_active ? (
-                              <EyeOff className="w-4 h-4" />
-                            ) : (
-                              <Eye className="w-4 h-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+        <CategoriesList
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+          onToggleVisibility={(category) =>
+            toggleCategoryVisibilityMutation.mutate({
+              id: category.id,
+              is_active: category.is_active,
+            })
+          }
+          isLoading={categoriesLoading}
+        />
 
-        {/* Offers List */}
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {selectedCategory
-                ? `Offers in ${selectedCategory.name}`
-                : "Select a category"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {selectedCategory ? (
-              offersLoading ? (
-                <div>Loading offers...</div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {offers?.map((offer) => (
-                      <TableRow key={offer.id}>
-                        <TableCell>{offer.name}</TableCell>
-                        <TableCell>
-                          {offer.price} / {offer.price_period}
-                        </TableCell>
-                        <TableCell>
-                          {offer.is_active ? "Active" : "Hidden"}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="icon">
-                              <Pencil className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )
-            ) : (
-              <div className="text-center text-muted-foreground py-8">
-                Select a category to view its offers
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <OffersList
+          selectedCategory={selectedCategory}
+          offers={offers}
+          isLoading={offersLoading}
+          onEditOffer={handleEditOffer}
+        />
       </div>
     </div>
   );

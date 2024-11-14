@@ -70,6 +70,7 @@ export type Database = {
         Row: {
           availability: string | null
           badge_text: string | null
+          banner_image: string | null
           category_id: string | null
           created_at: string | null
           description: string | null
@@ -80,10 +81,12 @@ export type Database = {
           price: number
           price_period: string
           specs: Json | null
+          template_type: string | null
         }
         Insert: {
           availability?: string | null
           badge_text?: string | null
+          banner_image?: string | null
           category_id?: string | null
           created_at?: string | null
           description?: string | null
@@ -94,10 +97,12 @@ export type Database = {
           price: number
           price_period: string
           specs?: Json | null
+          template_type?: string | null
         }
         Update: {
           availability?: string | null
           badge_text?: string | null
+          banner_image?: string | null
           category_id?: string | null
           created_at?: string | null
           description?: string | null
@@ -108,6 +113,7 @@ export type Database = {
           price?: number
           price_period?: string
           specs?: Json | null
+          template_type?: string | null
         }
         Relationships: [
           {
