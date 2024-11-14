@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { ThermometerSnowflake, ThermometerSun, Facebook, Car, WhatsApp, Eye, Check, X } from "lucide-react";
+import { ThermometerSnowflake, ThermometerSun, Facebook, Car, MessageCircle, Eye, Check, X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Reservation {
@@ -126,7 +126,7 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
   const getLeadSourceIcon = (source: Reservation['leadSource']) => {
     return source === 'facebook' ? 
       <Facebook className="w-4 h-4 text-blue-600" /> : 
-      <WhatsApp className="w-4 h-4 text-green-600" />;
+      <MessageCircle className="w-4 h-4 text-green-600" />;
   };
 
   const filteredReservations = filter
