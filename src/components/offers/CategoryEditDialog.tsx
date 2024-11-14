@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CategoryVehicles } from "./category-edit/CategoryVehicles";
@@ -17,13 +16,13 @@ export const CategoryEditDialog = ({ category, isOpen, onClose }: CategoryEditDi
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Edit Category: {category.name}</DialogTitle>
+          <DialogTitle>Editar Categoria: {category.name}</DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="vehicles" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
-            <TabsTrigger value="fares">Fares</TabsTrigger>
-            <TabsTrigger value="plans">Plans</TabsTrigger>
+            <TabsTrigger value="vehicles">Veículos</TabsTrigger>
+            <TabsTrigger value="fares">Tarifas</TabsTrigger>
+            <TabsTrigger value="plans">Planos</TabsTrigger>
           </TabsList>
           <TabsContent value="vehicles">
             <CategoryVehicles categoryId={category.id} />

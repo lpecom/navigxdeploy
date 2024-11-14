@@ -59,14 +59,14 @@ export const CategoriesList = ({
 
     if (error) {
       toast({
-        title: "Error",
-        description: "Failed to rename category",
+        title: "Erro",
+        description: "Falha ao renomear categoria",
         variant: "destructive",
       });
     } else {
       toast({
-        title: "Success",
-        description: "Category renamed successfully",
+        title: "Sucesso",
+        description: "Categoria renomeada com sucesso",
       });
       setRenamingCategory(null);
       setNewCategoryName("");
@@ -77,9 +77,9 @@ export const CategoriesList = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Categories</CardTitle>
+          <CardTitle>Categorias</CardTitle>
         </CardHeader>
-        <CardContent>Loading categories...</CardContent>
+        <CardContent>Carregando categorias...</CardContent>
       </Card>
     );
   }
@@ -88,7 +88,7 @@ export const CategoriesList = ({
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Categories</CardTitle>
+          <CardTitle>Categorias</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {categories?.map((category) => (
@@ -177,14 +177,14 @@ export const CategoriesList = ({
       <AlertDialog open={!!categoryToDelete} onOpenChange={() => setCategoryToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the category
-              "{categoryToDelete?.name}" and all associated data.
+              Esta ação não pode ser desfeita. Isso excluirá permanentemente a categoria
+              "{categoryToDelete?.name}" e todos os dados associados.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
@@ -194,7 +194,7 @@ export const CategoriesList = ({
                 }
               }}
             >
-              Delete
+              Excluir
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -203,20 +203,20 @@ export const CategoriesList = ({
       <Dialog open={!!renamingCategory} onOpenChange={() => setRenamingCategory(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Rename Category</DialogTitle>
+            <DialogTitle>Renomear Categoria</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <Input
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
-              placeholder="Enter new category name"
+              placeholder="Digite o novo nome da categoria"
             />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setRenamingCategory(null)}>
-              Cancel
+              Cancelar
             </Button>
-            <Button onClick={handleRename}>Save</Button>
+            <Button onClick={handleRename}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

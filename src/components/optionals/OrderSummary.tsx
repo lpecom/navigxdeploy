@@ -42,7 +42,7 @@ export const OrderSummary = () => {
           <div className="space-y-2 text-sm">
             {state.items.map((item) => (
               <div key={item.id} className="flex justify-between">
-                <span>{item.type === 'car' ? 'Veículo selecionado' : 'Optional'}</span>
+                <span>{item.type === 'car' ? 'Veículo selecionado' : 'Opcional'}</span>
                 <span>R$ {item.totalPrice.toFixed(2)}</span>
               </div>
             ))}

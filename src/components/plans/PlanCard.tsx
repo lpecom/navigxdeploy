@@ -90,6 +90,7 @@ export const PlanCard = ({ type, price, onSelect }: PlanCardProps) => {
           <p className="font-semibold">Pague apenas pelos KMs rodados!</p>
           <div className="space-y-2">
             {planKmRanges[type].map((range, index) => (
+              
               <div key={index} className="flex justify-between text-sm">
                 <span>Rodando até {range.km}</span>
                 <span>R$ {range.price}</span>
