@@ -37,7 +37,7 @@ export const EditVehicleDialog = ({
     queryKey: ['categories'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('car_groups')
+        .from('categories')
         .select('*')
         .eq('is_active', true);
       
@@ -74,8 +74,8 @@ export const EditVehicleDialog = ({
           <div className="space-y-2">
             <label htmlFor="category">Categoria do Veículo</label>
             <Select
-              value={editingCar?.car_group_id || ""}
-              onValueChange={(value) => updateCarField("car_group_id", value)}
+              value={editingCar?.category_id || ""}
+              onValueChange={(value) => updateCarField("category_id", value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Selecione uma categoria" />
