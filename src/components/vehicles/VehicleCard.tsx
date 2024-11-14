@@ -36,7 +36,7 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
           </div>
         )}
         <div className="space-y-2">
-          <p className="text-sm text-gray-500">Categoria: {car.car_group?.name || 'Sem categoria'}</p>
+          <p className="text-sm text-gray-500">Categoria: {car.category?.name || 'Sem categoria'}</p>
           {car.year && (
             <p className="text-sm text-gray-500">Ano: {car.year}</p>
           )}

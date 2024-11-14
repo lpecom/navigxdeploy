@@ -19,7 +19,7 @@ const VehicleList = () => {
         .from('car_models')
         .select(`
           *,
-          car_group:car_groups(name)
+          category:categories(name)
         `);
       
       if (error) throw error;
@@ -64,7 +64,7 @@ const VehicleList = () => {
               .from('car_models')
               .update({
                 name: selectedVehicle.name,
-                car_group_id: selectedVehicle.car_group_id,
+                category_id: selectedVehicle.category_id,
                 image_url: selectedVehicle.image_url,
                 year: selectedVehicle.year,
                 description: selectedVehicle.description
