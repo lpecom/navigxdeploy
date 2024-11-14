@@ -62,22 +62,23 @@ export const EditVehicleDialog = ({
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="name">Nome</label>
+            <label htmlFor="name">Nome do Veículo</label>
             <Input
               id="name"
               value={editingCar?.name || ""}
               onChange={(e) => updateCarField("name", e.target.value)}
+              placeholder="Ex: Honda Civic"
             />
           </div>
           
           <div className="space-y-2">
-            <label htmlFor="category">Categoria</label>
+            <label htmlFor="category">Categoria do Veículo</label>
             <Select
               value={editingCar?.category_id || ""}
               onValueChange={(value) => updateCarField("category_id", value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione uma categoria" />
+                <SelectValue placeholder="Ex: SUV, Sedan, Hatch" />
               </SelectTrigger>
               <SelectContent>
                 {categories?.map((category) => (
@@ -98,11 +99,12 @@ export const EditVehicleDialog = ({
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="year">Ano</label>
+            <label htmlFor="year">Ano do Veículo</label>
             <Input
               id="year"
               value={editingCar?.year || ""}
               onChange={(e) => updateCarField("year", e.target.value)}
+              placeholder="Ex: 2024"
             />
           </div>
 
