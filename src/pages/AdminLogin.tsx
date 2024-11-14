@@ -3,9 +3,11 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -37,6 +39,13 @@ const AdminLogin = () => {
             appearance={{ theme: ThemeSupa }}
             theme="light"
             providers={[]}
+            onError={(error) => {
+              toast({
+                variant: "destructive",
+                title: "Authentication Error",
+                description: error.message,
+              });
+            }}
           />
         </div>
       </div>
