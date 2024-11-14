@@ -12,6 +12,7 @@ import { CardCVVField } from "./form/CardCVVField"
 import { InstallmentsField } from "./form/InstallmentsField"
 import { motion } from "framer-motion"
 import { CreditCard } from "lucide-react"
+import { supabase } from "@/integrations/supabase/client"
 
 const creditCardSchema = z.object({
   card_number: z.string().min(16).max(19),
@@ -45,8 +46,7 @@ export const CreditCardForm = ({ amount, driverId, onSuccess }: CreditCardFormPr
   const onSubmit = async (values: z.infer<typeof creditCardSchema>) => {
     setIsSubmitting(true)
     try {
-      // Temporarily commented out Appmax integration
-      /* const { data, error } = await supabase.functions.invoke('payment', {
+      const { data, error } = await supabase.functions.invoke('payment', {
         body: {
           action: 'create_payment',
           payload: {
@@ -61,17 +61,16 @@ export const CreditCardForm = ({ amount, driverId, onSuccess }: CreditCardFormPr
             description: 'Car rental payment'
           }
         }
-      }) */
+      })
 
-      // Temporary success simulation
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      if (error) throw error
 
       toast({
         title: "Pagamento processado com sucesso!",
         description: "Seu pagamento foi confirmado.",
       })
 
-      onSuccess("temp-id-123") // Temporary ID
+      onSuccess(data.transaction_id)
     } catch (error: any) {
       console.error('Payment error:', error)
       toast({
