@@ -1,6 +1,6 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { CreditCard, Qrcode, Receipt } from "lucide-react"
+import { CreditCard, QrCode, Receipt } from "lucide-react"
 
 interface PaymentMethodSelectorProps {
   selectedMethod: string
@@ -42,7 +42,7 @@ export const PaymentMethodSelector = ({
           htmlFor="pix"
           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
         >
-          <Qrcode className="mb-3 h-6 w-6" />
+          <QrCode className="mb-3 h-6 w-6" />
           PIX
         </Label>
       </div>
