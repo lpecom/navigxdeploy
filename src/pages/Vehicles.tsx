@@ -12,22 +12,22 @@ const Vehicles = () => {
           <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-                Vehicles
+                Veículos
               </h1>
               <p className="text-muted-foreground">
-                Manage your fleet of vehicles and their details
+                Gerencie sua frota de veículos e seus detalhes
               </p>
             </div>
             <Button className="inline-flex items-center gap-2">
               <Plus className="w-4 h-4" />
-              Add Vehicle
+              Adicionar Veículo
             </Button>
           </div>
 
           <div className="rounded-lg border bg-card">
             <div className="flex items-center gap-2 p-6 border-b">
               <Car className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-medium">Vehicle Fleet</h2>
+              <h2 className="text-lg font-medium">Frota de Veículos</h2>
             </div>
             <div className="p-6">
               <VehicleList />

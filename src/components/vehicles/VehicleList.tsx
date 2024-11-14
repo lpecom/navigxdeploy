@@ -37,7 +37,7 @@ const VehicleList = () => {
   };
 
   if (isLoading) {
-    return <div>Loading vehicles...</div>;
+    return <div>Carregando veículos...</div>;
   }
 
   return (
@@ -72,18 +72,17 @@ const VehicleList = () => {
 
             if (error) throw error;
 
-            // Invalidate and refetch the vehicles query
             await queryClient.invalidateQueries({ queryKey: ['vehicles'] });
 
             toast({
-              title: "Vehicle updated",
-              description: "The vehicle details have been saved successfully.",
+              title: "Veículo atualizado",
+              description: "Os detalhes do veículo foram salvos com sucesso.",
             });
             setIsEditing(false);
           } catch (error) {
             toast({
-              title: "Error",
-              description: "Failed to update vehicle details.",
+              title: "Erro",
+              description: "Falha ao atualizar os detalhes do veículo.",
               variant: "destructive",
             });
           }

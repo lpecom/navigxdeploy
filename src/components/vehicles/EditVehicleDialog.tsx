@@ -58,11 +58,11 @@ export const EditVehicleDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit Vehicle</DialogTitle>
+          <DialogTitle>Editar Veículo</DialogTitle>
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="name">Name</label>
+            <label htmlFor="name">Nome</label>
             <Input
               id="name"
               value={editingCar?.name || ""}
@@ -71,13 +71,13 @@ export const EditVehicleDialog = ({
           </div>
           
           <div className="space-y-2">
-            <label htmlFor="category">Category</label>
+            <label htmlFor="category">Categoria</label>
             <Select
               value={editingCar?.category_id || ""}
               onValueChange={(value) => updateCarField("category_id", value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
+                <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
               <SelectContent>
                 {categories?.map((category) => (
@@ -90,7 +90,7 @@ export const EditVehicleDialog = ({
           </div>
 
           <div className="space-y-2">
-            <label>Vehicle Image</label>
+            <label>Imagem do Veículo</label>
             <ImageUpload
               currentImage={editingCar?.image_url}
               onImageChange={(url) => updateCarField("image_url", url)}
@@ -98,7 +98,7 @@ export const EditVehicleDialog = ({
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="year">Year</label>
+            <label htmlFor="year">Ano</label>
             <Input
               id="year"
               value={editingCar?.year || ""}
@@ -107,7 +107,7 @@ export const EditVehicleDialog = ({
           </div>
 
           <Button type="submit" className="w-full">
-            Save Changes
+            Salvar Alterações
           </Button>
         </form>
       </DialogContent>
