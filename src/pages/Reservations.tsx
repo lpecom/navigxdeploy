@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { thermometer, thermometerSnowflake, thermometerSun, user, fileText } from "lucide-react";
+import { Thermometer, ThermometerSnowflake, ThermometerSun, User, FileText } from "lucide-react";
 import ReservationsList from "@/components/reservations/ReservationsList";
 import ReservationDetails from "@/components/reservations/ReservationDetails";
 import { useToast } from "@/components/ui/use-toast";
