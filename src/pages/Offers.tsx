@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -20,18 +19,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Eye, EyeOff } from "lucide-react";
+import { CategoryForm } from "@/components/offers/CategoryForm";
+import type { Category, Offer } from "@/types/offers";
 
 const Offers = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
-  const [newCategory, setNewCategory] = useState({
-    name: "",
-    description: "",
-    badge_text: "",
-  });
 
   // Fetch categories
   const { data: categories, isLoading: categoriesLoading } = useQuery({
@@ -43,7 +39,7 @@ const Offers = () => {
         .order("display_order", { ascending: true });
       
       if (error) throw error;
-      return data;
+      return data as Category[];
     },
   });
 
@@ -59,44 +55,14 @@ const Offers = () => {
         .order("display_order", { ascending: true });
       
       if (error) throw error;
-      return data;
+      return data as Offer[];
     },
     enabled: !!selectedCategory?.id,
   });
 
-  // Add category mutation
-  const addCategoryMutation = useMutation({
-    mutationFn: async (newCategory) => {
-      const { data, error } = await supabase
-        .from("categories")
-        .insert([newCategory])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      setIsAddingCategory(false);
-      setNewCategory({ name: "", description: "", badge_text: "" });
-      toast({
-        title: "Success",
-        description: "Category added successfully",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to add category",
-        variant: "destructive",
-      });
-    },
-  });
-
   // Toggle category visibility mutation
   const toggleCategoryVisibilityMutation = useMutation({
-    mutationFn: async ({ id, is_active }) => {
+    mutationFn: async ({ id, is_active }: { id: string; is_active: boolean | null }) => {
       const { data, error } = await supabase
         .from("categories")
         .update({ is_active: !is_active })
@@ -116,11 +82,6 @@ const Offers = () => {
     },
   });
 
-  const handleAddCategory = (e) => {
-    e.preventDefault();
-    addCategoryMutation.mutate(newCategory);
-  };
-
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
@@ -136,39 +97,7 @@ const Offers = () => {
             <DialogHeader>
               <DialogTitle>Add New Category</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleAddCategory} className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Name</label>
-                <Input
-                  value={newCategory.name}
-                  onChange={(e) =>
-                    setNewCategory({ ...newCategory, name: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Description</label>
-                <Input
-                  value={newCategory.description}
-                  onChange={(e) =>
-                    setNewCategory({ ...newCategory, description: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Badge Text</label>
-                <Input
-                  value={newCategory.badge_text}
-                  onChange={(e) =>
-                    setNewCategory({ ...newCategory, badge_text: e.target.value })
-                  }
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                Add Category
-              </Button>
-            </form>
+            <CategoryForm onSuccess={() => setIsAddingCategory(false)} />
           </DialogContent>
         </Dialog>
       </div>
@@ -279,9 +208,6 @@ const Offers = () => {
                           <div className="flex items-center gap-2">
                             <Button variant="ghost" size="icon">
                               <Pencil className="w-4 h-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
                         </TableCell>
