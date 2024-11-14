@@ -71,3 +71,47 @@
     transform: translateY(0);
   }
 }
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  #root {
+    padding: 1rem;
+  }
+  
+  .card {
+    padding: 1em;
+  }
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Slider animations */
+.slide-enter {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.slide-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.slide-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.slide-exit-active {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 300ms, transform 300ms;
+}
