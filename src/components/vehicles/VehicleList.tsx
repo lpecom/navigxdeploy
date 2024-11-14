@@ -6,7 +6,7 @@ import { VehicleCard } from "./VehicleCard";
 import { EditVehicleDialog } from "./EditVehicleDialog";
 import { CarModel, CarModelResponse } from "./types";
 
-export const VehicleList = () => {
+const VehicleList = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
@@ -97,3 +97,5 @@ export const VehicleList = () => {
     </div>
   );
 };
+
+export default VehicleList;
