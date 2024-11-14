@@ -1,6 +1,7 @@
 import { Json } from "@/integrations/supabase/types";
 
-interface JsonCartItem {
+// This type represents the JSON structure we'll store in Supabase
+export interface JsonCartItem {
   id: string;
   type: 'car' | 'optional';
   quantity: number;
@@ -11,8 +12,8 @@ interface JsonCartItem {
 export interface CheckoutSession {
   id?: string;
   driver_id: string;
-  selected_car: JsonCartItem | null;
-  selected_optionals: JsonCartItem[];
+  selected_car: Json;  // Changed back to Json type for Supabase compatibility
+  selected_optionals: Json;  // Changed back to Json type for Supabase compatibility
   total_amount: number;
   status?: string;
   created_at?: string;
