@@ -36,6 +36,50 @@ export type Database = {
         }
         Relationships: []
       }
+      car_models: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          optionals: Json | null
+          updated_at: string | null
+          year: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          optionals?: Json | null
+          updated_at?: string | null
+          year?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          optionals?: Json | null
+          updated_at?: string | null
+          year?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "car_models_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           badge_text: string | null
