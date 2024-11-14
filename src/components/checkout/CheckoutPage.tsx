@@ -10,7 +10,6 @@ import { PaymentSection } from "./sections/PaymentSection"
 import { CheckoutSummary } from "./sections/CheckoutSummary"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import type { DriverFormValues } from "@/types/driver"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
@@ -26,9 +25,9 @@ export const CheckoutPage = () => {
     { number: 3, title: "Confirmação", icon: ShoppingCart }
   ]
 
-  const handleDriverSubmit = async (data: DriverFormValues) => {
+  const handleDriverSubmit = async (newDriverId: string) => {
     try {
-      // TODO: Implement driver submission
+      setDriverId(newDriverId)
       setStep(2)
     } catch (error) {
       console.error('Error saving driver details:', error)
@@ -42,7 +41,6 @@ export const CheckoutPage = () => {
 
   const handlePaymentSuccess = async (paymentId: string) => {
     try {
-      // TODO: Implement payment success handling
       setStep(3)
     } catch (error) {
       console.error('Error finalizing checkout:', error)
