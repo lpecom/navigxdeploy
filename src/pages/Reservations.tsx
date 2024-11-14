@@ -1,13 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, FileText, AlertTriangle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import Sidebar from "@/components/dashboard/Sidebar";
+import ReservationsList from "@/components/reservations/ReservationsList";
 import ActiveRentals from "@/components/reservations/ActiveRentals";
 import ReservationHistory from "@/components/reservations/ReservationHistory";
+import { Calendar, Clock, FileText } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Reservations = () => {
   const { toast } = useToast();
@@ -50,70 +51,43 @@ const Reservations = () => {
               </Badge>
             </div>
 
-            <Tabs defaultValue="active" className="w-full">
-              <TabsList>
-                <TabsTrigger value="active" className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  Aluguéis Ativos
-                </TabsTrigger>
-                <TabsTrigger value="reservations" className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  Reservas
-                </TabsTrigger>
-                <TabsTrigger value="history" className="flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  Histórico
-                </TabsTrigger>
-              </TabsList>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="w-5 h-5" />
+                    Aluguéis Ativos
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ActiveRentals />
+                </CardContent>
+              </Card>
 
-              <TabsContent value="active">
-                <ActiveRentals />
-              </TabsContent>
-              <TabsContent value="reservations">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Reservas Pendentes</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {reservations?.filter(r => r.status === "pending").map(reservation => (
-                        <div key={reservation.id} className="flex items-center justify-between p-4 border rounded-lg">
-                          <div>
-                            <h3 className="font-medium">{reservation.customer}</h3>
-                            <p className="text-sm text-gray-500">{reservation.vehicle}</p>
-                            <p className="text-sm text-gray-500">
-                              {new Date(reservation.startDate).toLocaleDateString()} - 
-                              {new Date(reservation.endDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button variant="outline" onClick={() => 
-                              toast({
-                                title: "Reserva aprovada",
-                                description: `Reserva para ${reservation.customer} foi aprovada.`
-                              })
-                            }>
-                              Aprovar
-                            </Button>
-                            <Button variant="destructive" onClick={() => 
-                              toast({
-                                title: "Reserva rejeitada",
-                                description: `Reserva para ${reservation.customer} foi rejeitada.`
-                              })
-                            }>
-                              Rejeitar
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              <TabsContent value="history">
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5" />
+                    Reservas Pendentes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ReservationsList filter="pending" />
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Histórico de Reservas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
                 <ReservationHistory />
-              </TabsContent>
-            </Tabs>
+              </CardContent>
+            </Card>
           </div>
         </main>
       </div>
