@@ -6,24 +6,46 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const APPMAX_API_URL = 'https://sandbox.appmax.com.br/api/v3'  // Changed to sandbox URL
+const APPMAX_API_URL = 'https://sandbox.appmax.com.br/api/v3'
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { action, payload } = await req.json()
+    // Ensure request has a body
+    if (!req.body) {
+      throw new Error('Request body is required')
+    }
+
+    // Parse request body with error handling
+    let body
+    try {
+      body = await req.json()
+    } catch (e) {
+      console.error('Error parsing request body:', e)
+      throw new Error('Invalid JSON in request body')
+    }
+
+    const { action, payload } = body
+
+    if (!action || !payload) {
+      throw new Error('Action and payload are required')
+    }
+
+    console.log('Received request:', { action, payload })
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     switch (action) {
-      case 'create_payment':
+      case 'create_payment': {
         console.log('Creating payment:', payload)
-        let appmaxPayload = {
+        const appmaxPayload = {
           external_id: crypto.randomUUID(),
           customer: {
             name: payload.customer_name || 'Test Customer',
@@ -49,6 +71,7 @@ serve(async (req) => {
         }
 
         console.log('Sending to Appmax with payload:', JSON.stringify(appmaxPayload))
+        
         const paymentResponse = await fetch(`${APPMAX_API_URL}/payments`, {
           method: 'POST',
           headers: {
@@ -62,6 +85,7 @@ serve(async (req) => {
         console.log('Appmax response:', paymentData)
 
         if (!paymentResponse.ok) {
+          console.error('Appmax error response:', paymentData)
           throw new Error(`Appmax error: ${JSON.stringify(paymentData)}`)
         }
 
@@ -79,7 +103,10 @@ serve(async (req) => {
           .select()
           .single()
         
-        if (paymentError) throw paymentError
+        if (paymentError) {
+          console.error('Error creating payment record:', paymentError)
+          throw paymentError
+        }
 
         // Handle specific payment type records
         if (payload.payment_type === 'boleto' && paymentData.boleto) {
@@ -92,7 +119,10 @@ serve(async (req) => {
               pdf_url: paymentData.boleto.pdf_url
             })
           
-          if (boletoError) throw boletoError
+          if (boletoError) {
+            console.error('Error creating boleto record:', boletoError)
+            throw boletoError
+          }
         }
         
         if (payload.payment_type === 'pix' && paymentData.pix) {
@@ -105,7 +135,10 @@ serve(async (req) => {
               expiration_date: new Date(paymentData.pix.expiration_date)
             })
           
-          if (pixError) throw pixError
+          if (pixError) {
+            console.error('Error creating pix record:', pixError)
+            throw pixError
+          }
         }
 
         return new Response(JSON.stringify({
@@ -114,15 +147,22 @@ serve(async (req) => {
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         })
+      }
 
       default:
         throw new Error('Invalid action')
     }
   } catch (error) {
     console.error('Payment processing error:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    })
+    return new Response(
+      JSON.stringify({ 
+        error: error.message,
+        details: error.toString()
+      }), 
+      {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    )
   }
 })
