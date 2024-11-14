@@ -10,7 +10,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Form } from "@/components/ui/form";
 import { supabase } from "@/integrations/supabase/client";
-import { sendToCRM } from "@/utils/crmIntegration";
 import { DriverForm } from "@/components/driver/DriverForm";
 
 export const driverSchema = z.object({
@@ -65,15 +64,32 @@ const DriverDetails = () => {
 
       if (error) throw error;
 
-      // Send data to CRM
-      await sendToCRM(data);
+      const selectedCarStr = sessionStorage.getItem("selectedCar");
+      const selectedOptionalsStr = sessionStorage.getItem("selectedOptionals");
+      
+      if (!selectedCarStr) {
+        throw new Error("No car selected");
+      }
 
-      const selectedCar = JSON.parse(sessionStorage.getItem("selectedCar") || "{}");
-      const selectedOptionals = JSON.parse(sessionStorage.getItem("selectedOptionals") || "[]");
+      const selectedCar = JSON.parse(selectedCarStr);
+      const selectedOptionals = selectedOptionalsStr ? JSON.parse(selectedOptionalsStr) : [];
 
-      // Calculate total amount (this is a simplified calculation)
-      const totalAmount = parseFloat(selectedCar.price || "0") + 
-        selectedOptionals.reduce((acc: number, opt: any) => acc + (opt.price || 0), 0);
+      // Extract numeric price value from string (e.g., "R$ 934" -> 934)
+      const carPrice = selectedCar.price ? parseFloat(selectedCar.price.replace(/[^0-9.]/g, '')) : 0;
+      
+      // Calculate total amount ensuring we have numeric values
+      const optionalsTotal = selectedOptionals.reduce((acc: number, opt: any) => {
+        const optPrice = typeof opt.price === 'string' 
+          ? parseFloat(opt.price.replace(/[^0-9.]/g, ''))
+          : (typeof opt.price === 'number' ? opt.price : 0);
+        return acc + optPrice;
+      }, 0);
+
+      const totalAmount = carPrice + optionalsTotal;
+
+      if (isNaN(totalAmount) || totalAmount <= 0) {
+        throw new Error("Invalid total amount calculated");
+      }
 
       const { error: checkoutError } = await supabase
         .from("checkout_sessions")
@@ -95,9 +111,10 @@ const DriverDetails = () => {
 
       navigate("/payment");
     } catch (error: any) {
+      console.error('Submission error:', error);
       toast({
         title: "Erro",
-        description: "Ocorreu um erro ao salvar seus dados. Tente novamente.",
+        description: error.message || "Ocorreu um erro ao salvar seus dados. Tente novamente.",
         variant: "destructive",
       });
     } finally {
