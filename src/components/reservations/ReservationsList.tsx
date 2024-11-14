@@ -1,14 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Facebook, MessageCircle, ChevronDown, ChevronUp, AlertTriangle } from "lucide-react";
-import { CustomerInfo } from "./CustomerInfo";
-import { PricingInfo } from "./PricingInfo";
-import { StatusBadges } from "./StatusBadges";
-import { ReservationActions } from "./ReservationActions";
 import { useState } from "react";
 import type { Reservation } from "@/types/reservation";
-import { format, differenceInDays } from "date-fns";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ReservationCard } from "./ReservationCard";
 
 interface ReservationsListProps {
   filter?: "pending" | "approved" | "rejected";
@@ -105,24 +97,11 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
     }
   ];
 
-  const getLeadSourceIcon = (source: Reservation["leadSource"]) => {
-    return source === "facebook" ? (
-      <Facebook className="w-4 h-4 text-blue-600" />
-    ) : (
-      <MessageCircle className="w-4 h-4 text-green-600" />
-    );
-  };
-
   const toggleCard = (id: string) => {
     setExpandedCards(prev => ({
       ...prev,
       [id]: !prev[id]
     }));
-  };
-
-  const isHighPriority = (pickupDate: string) => {
-    const days = differenceInDays(new Date(pickupDate), new Date());
-    return days <= 2 && days >= 0;
   };
 
   const filteredReservations = filter
@@ -132,67 +111,12 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {filteredReservations.map((reservation) => (
-        <Card 
-          key={reservation.id} 
-          className="hover:shadow-lg transition-shadow"
-        >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div className="space-y-1">
-              <CardTitle className="text-lg font-medium">
-                {reservation.customerName}
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Pickup: {format(new Date(reservation.pickupDate), 'MMM dd, yyyy')}
-              </p>
-            </div>
-            <button
-              onClick={() => toggleCard(reservation.id)}
-              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-              aria-label={expandedCards[reservation.id] ? "Show less" : "Show more"}
-            >
-              {expandedCards[reservation.id] ? (
-                <ChevronUp className="w-5 h-5" />
-              ) : (
-                <ChevronDown className="w-5 h-5" />
-              )}
-            </button>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {isHighPriority(reservation.pickupDate) && (
-                <Alert variant="destructive" className="mb-4">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>
-                    High Priority - Pickup in next 2 days
-                  </AlertDescription>
-                </Alert>
-              )}
-              <StatusBadges reservation={reservation} />
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Risk Score</span>
-                  <span>{reservation.riskScore}%</span>
-                </div>
-                <Progress 
-                  value={reservation.riskScore} 
-                  className="h-2"
-                  variant={reservation.riskScore <= 30 ? "default" : "destructive"}
-                />
-              </div>
-              
-              {expandedCards[reservation.id] && (
-                <div className="space-y-4 animate-accordion-down">
-                  <CustomerInfo reservation={reservation} />
-                  <PricingInfo reservation={reservation} />
-                  <div className="flex items-center justify-end">
-                    {getLeadSourceIcon(reservation.leadSource)}
-                  </div>
-                  <ReservationActions reservation={reservation} />
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <ReservationCard
+          key={reservation.id}
+          reservation={reservation}
+          isExpanded={!!expandedCards[reservation.id]}
+          onToggle={() => toggleCard(reservation.id)}
+        />
       ))}
     </div>
   );
