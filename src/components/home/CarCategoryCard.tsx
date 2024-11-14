@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Users, Briefcase, Car, Fuel, Gauge, Shield, MapPin, Wifi, DollarSign, Calendar } from "lucide-react";
 import { CarSlider } from "./CarSlider";
 import { carsByCategory } from "@/constants/cars";
+import { useNavigate } from "react-router-dom";
 
 interface CarCategoryProps {
   category: {
@@ -28,6 +29,25 @@ interface CarCategoryProps {
 }
 
 export const CarCategoryCard = ({ category }: CarCategoryProps) => {
+  const navigate = useNavigate();
+
+  const handleSelectCar = () => {
+    // Store car details in sessionStorage for the next page
+    sessionStorage.setItem('selectedCar', JSON.stringify({
+      category: category.name,
+      specs: category.specs,
+      price: category.price,
+      period: category.period,
+      image: category.name === "USADINHO" ? carsByCategory.USADINHO[0].image : null
+    }));
+    
+    // Navigate to optionals with fade out animation
+    document.body.classList.add('animate-fade-out');
+    setTimeout(() => {
+      navigate('/optionals');
+    }, 300);
+  };
+
   return (
     <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm border-gray-100">
       <Badge className="absolute top-4 right-4 bg-red-500/90 backdrop-blur-sm text-white font-medium px-3 py-1 rounded-full">
@@ -105,7 +125,10 @@ export const CarCategoryCard = ({ category }: CarCategoryProps) => {
       </CardContent>
       
       <CardFooter>
-        <Button className="w-full bg-navig hover:bg-navig/90 text-white font-medium py-6 rounded-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
+        <Button 
+          onClick={handleSelectCar}
+          className="w-full bg-navig hover:bg-navig/90 text-white font-medium py-6 rounded-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+        >
           Quero esse
         </Button>
       </CardFooter>
