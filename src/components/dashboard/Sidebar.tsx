@@ -37,7 +37,7 @@ const Sidebar = () => {
       path: "/leads",
       active: location.pathname === "/leads",
       subItems: [
-        { label: "Retiradas", icon: Truck },
+        { label: "Agendamentos", icon: Truck },
         { label: "Reservas", icon: Calendar, path: "/reservations" },
         { label: "Histórico", icon: History }
       ]
