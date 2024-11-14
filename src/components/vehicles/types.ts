@@ -1,17 +1,14 @@
 export interface CarModel {
   id: string;
   name: string;
-  category: string;
-  engine_size: string;
-  transmission: string;
-  fuel_type: string;
-  consumption: string;
-  doors: number;
-  passengers: number;
-  image_url: string;
-  features: string[];
-  car_group_id: string | null;
-  car_groups?: {
+  category_id: string | null;
+  description: string | null;
+  image_url: string | null;
+  year: string | null;
+  optionals: Record<string, any> | null;
+  created_at: string | null;
+  updated_at: string | null;
+  category?: {
     name: string;
   };
 }

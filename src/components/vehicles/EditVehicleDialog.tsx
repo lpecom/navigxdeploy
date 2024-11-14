@@ -6,6 +6,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { CarModel } from "./types";
 
 interface EditVehicleDialogProps {
@@ -23,6 +32,19 @@ export const EditVehicleDialog = ({
   setEditingCar,
   onSubmit,
 }: EditVehicleDialogProps) => {
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('is_active', true);
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const updateCarField = (field: keyof CarModel, value: string) => {
     if (!editingCar) return;
     setEditingCar({
@@ -35,7 +57,7 @@ export const EditVehicleDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit Car</DialogTitle>
+          <DialogTitle>Edit Vehicle</DialogTitle>
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -46,6 +68,26 @@ export const EditVehicleDialog = ({
               onChange={(e) => updateCarField("name", e.target.value)}
             />
           </div>
+          
+          <div className="space-y-2">
+            <label htmlFor="category">Category</label>
+            <Select
+              value={editingCar?.category_id || ""}
+              onValueChange={(value) => updateCarField("category_id", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories?.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="space-y-2">
             <label htmlFor="image">Image URL</label>
             <Input
@@ -54,22 +96,16 @@ export const EditVehicleDialog = ({
               onChange={(e) => updateCarField("image_url", e.target.value)}
             />
           </div>
+
           <div className="space-y-2">
-            <label htmlFor="category">Category</label>
+            <label htmlFor="year">Year</label>
             <Input
-              id="category"
-              value={editingCar?.category || ""}
-              onChange={(e) => updateCarField("category", e.target.value)}
+              id="year"
+              value={editingCar?.year || ""}
+              onChange={(e) => updateCarField("year", e.target.value)}
             />
           </div>
-          <div className="space-y-2">
-            <label htmlFor="engine_size">Engine Size</label>
-            <Input
-              id="engine_size"
-              value={editingCar?.engine_size || ""}
-              onChange={(e) => updateCarField("engine_size", e.target.value)}
-            />
-          </div>
+
           <Button type="submit" className="w-full">
             Save Changes
           </Button>
