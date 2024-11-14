@@ -1,6 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Car } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Plus, Car } from "lucide-react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import VehicleList from "@/components/vehicles/VehicleList";
 
@@ -8,37 +7,33 @@ const Vehicles = () => {
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 overflow-y-auto px-6 py-6">
-          <div className="max-w-7xl mx-auto space-y-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-2xl font-medium text-gray-900">Vehicles</h1>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  Manage your vehicle fleet and availability
-                </p>
-              </div>
-              <Badge 
-                variant="secondary" 
-                className="px-3 py-1.5 text-sm font-medium bg-secondary/10 text-secondary"
-              >
-                Fleet Status
-              </Badge>
+      <div className="flex-1 overflow-auto">
+        <div className="container py-6 space-y-6">
+          <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+                Vehicles
+              </h1>
+              <p className="text-muted-foreground">
+                Manage your fleet of vehicles and their details
+              </p>
             </div>
-
-            <Card className="shadow-sm border-muted">
-              <CardHeader className="border-b border-muted/20 py-4">
-                <CardTitle className="flex items-center gap-2 text-base font-medium">
-                  <Car className="w-5 h-5 text-primary" />
-                  Vehicle Fleet
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4 px-4">
-                <VehicleList />
-              </CardContent>
-            </Card>
+            <Button className="inline-flex items-center gap-2">
+              <Plus className="w-4 h-4" />
+              Add Vehicle
+            </Button>
           </div>
-        </main>
+
+          <div className="rounded-lg border bg-card">
+            <div className="flex items-center gap-2 p-6 border-b">
+              <Car className="w-5 h-5 text-primary" />
+              <h2 className="text-lg font-medium">Vehicle Fleet</h2>
+            </div>
+            <div className="p-6">
+              <VehicleList />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
