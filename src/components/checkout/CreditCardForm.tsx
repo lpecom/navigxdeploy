@@ -5,12 +5,13 @@ import { z } from "zod"
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
-import { supabase } from "@/integrations/supabase/client"
 import { CardNumberField } from "./form/CardNumberField"
 import { CardHolderField } from "./form/CardHolderField"
 import { CardExpiryField } from "./form/CardExpiryField"
 import { CardCVVField } from "./form/CardCVVField"
 import { InstallmentsField } from "./form/InstallmentsField"
+import { motion } from "framer-motion"
+import { CreditCard } from "lucide-react"
 
 const creditCardSchema = z.object({
   card_number: z.string().min(16).max(19),
@@ -44,7 +45,8 @@ export const CreditCardForm = ({ amount, driverId, onSuccess }: CreditCardFormPr
   const onSubmit = async (values: z.infer<typeof creditCardSchema>) => {
     setIsSubmitting(true)
     try {
-      const { data, error } = await supabase.functions.invoke('payment', {
+      // Temporarily commented out Appmax integration
+      /* const { data, error } = await supabase.functions.invoke('payment', {
         body: {
           action: 'create_payment',
           payload: {
@@ -59,16 +61,17 @@ export const CreditCardForm = ({ amount, driverId, onSuccess }: CreditCardFormPr
             description: 'Car rental payment'
           }
         }
-      })
+      }) */
 
-      if (error) throw error
+      // Temporary success simulation
+      await new Promise(resolve => setTimeout(resolve, 1500))
 
       toast({
         title: "Pagamento processado com sucesso!",
         description: "Seu pagamento foi confirmado.",
       })
 
-      onSuccess(data.id)
+      onSuccess("temp-id-123") // Temporary ID
     } catch (error: any) {
       console.error('Payment error:', error)
       toast({
@@ -82,22 +85,47 @@ export const CreditCardForm = ({ amount, driverId, onSuccess }: CreditCardFormPr
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <CardNumberField form={form} />
-        <CardHolderField form={form} />
-        
-        <div className="grid grid-cols-2 gap-4">
-          <CardExpiryField form={form} />
-          <CardCVVField form={form} />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="flex items-center justify-center mb-6">
+        <div className="bg-primary/10 p-4 rounded-full">
+          <CreditCard className="w-8 h-8 text-primary" />
         </div>
+      </div>
 
-        <InstallmentsField form={form} amount={amount} />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-4">
+            <CardNumberField form={form} />
+            <CardHolderField form={form} />
+            
+            <div className="grid grid-cols-2 gap-4">
+              <CardExpiryField form={form} />
+              <CardCVVField form={form} />
+            </div>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? "Processando..." : "Pagar"}
-        </Button>
-      </form>
-    </Form>
+            <InstallmentsField form={form} amount={amount} />
+          </div>
+
+          <Button 
+            type="submit" 
+            className="w-full h-12 text-lg font-medium transition-all duration-200 hover:scale-[1.02]" 
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <div className="flex items-center space-x-2">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Processando...</span>
+              </div>
+            ) : (
+              `Pagar R$ ${amount.toFixed(2)}`
+            )}
+          </Button>
+        </form>
+      </Form>
+    </motion.div>
   )
 }

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
-import { supabase } from "@/integrations/supabase/client"
 import { QRCodeSVG } from 'qrcode.react'
+import { motion } from "framer-motion"
+import { QrCode } from "lucide-react"
 
 interface PixPaymentProps {
   amount: number
@@ -18,30 +19,14 @@ export const PixPayment = ({ amount, driverId, onSuccess }: PixPaymentProps) => 
   useEffect(() => {
     const createPixPayment = async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('payment', {
-          body: {
-            action: 'create_payment',
-            payload: {
-              driver_id: driverId,
-              amount,
-              payment_type: 'pix',
-              description: 'Car rental payment',
-              customer_name: 'Test Customer', // This should come from driver details
-              customer_email: 'test@example.com',
-              customer_phone: '11999999999',
-              customer_cpf: '12345678909'
-            }
-          }
-        })
+        // Temporarily commented out Appmax integration
+        /* const { data, error } = await supabase.functions.invoke('payment', {...}) */
 
-        if (error) throw error
-
-        if (!data.pix?.qr_code) {
-          throw new Error('QR Code not received from payment provider')
-        }
-
-        setQrCode(data.pix.qr_code)
-        onSuccess(data.id)
+        // Simulate API response
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        
+        setQrCode("00020126580014BR.GOV.BCB.PIX0136123e4567-e89b-12d3-a456-426614174000520400005303986540510.005802BR5913Recipient Name6008Sao Paulo62070503***6304E2CA")
+        onSuccess("temp-pix-id-123")
       } catch (error) {
         console.error('PIX payment error:', error)
         toast({
@@ -58,26 +43,44 @@ export const PixPayment = ({ amount, driverId, onSuccess }: PixPaymentProps) => 
   }, [amount, driverId, onSuccess, toast])
 
   if (isLoading) {
-    return <div className="text-center py-8">Gerando QR Code...</div>
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-muted-foreground">Gerando QR Code...</p>
+      </div>
+    )
   }
 
   return (
-    <div className="flex flex-col items-center space-y-6 p-4">
+    <motion.div 
+      className="flex flex-col items-center space-y-6 p-4"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="text-center space-y-2">
-        <h3 className="font-semibold">Pague com PIX</h3>
+        <div className="bg-primary/10 p-4 rounded-full mb-4">
+          <QrCode className="h-8 w-8 text-primary" />
+        </div>
+        <h3 className="text-xl font-semibold">Pague com PIX</h3>
         <p className="text-sm text-muted-foreground">
           Escaneie o QR Code abaixo com seu aplicativo de banco
         </p>
       </div>
 
-      <div className="bg-white p-4 rounded-lg">
+      <motion.div 
+        className="bg-white p-8 rounded-lg shadow-lg"
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.3, delay: 0.2 }}
+      >
         <QRCodeSVG value={qrCode} size={200} />
-      </div>
+      </motion.div>
 
-      <div className="space-y-2 w-full">
+      <div className="space-y-4 w-full">
         <Button
           variant="outline"
-          className="w-full"
+          className="w-full h-12 gap-2 text-lg font-medium transition-all duration-200 hover:scale-[1.02] hover:bg-primary/10 hover:text-primary"
           onClick={() => {
             navigator.clipboard.writeText(qrCode)
             toast({
@@ -93,6 +96,6 @@ export const PixPayment = ({ amount, driverId, onSuccess }: PixPaymentProps) => 
           O QR Code expira em 30 minutos
         </p>
       </div>
-    </div>
+    </motion.div>
   )
 }
