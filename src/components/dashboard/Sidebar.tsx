@@ -12,7 +12,9 @@ import {
   AlertTriangle,
   Banknote,
   Receipt,
-  Shield
+  Shield,
+  TrendingUp,
+  BarChart
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
@@ -27,30 +29,32 @@ const Sidebar = () => {
       path: "/",
       active: location.pathname === "/",
       subItems: [
-        { label: "Analytics", icon: FileText },
-        { label: "Reports", icon: FileText },
-        { label: "Performance", icon: Clock }
+        { label: "Analytics", icon: BarChart, path: "/analytics" },
+        { label: "Reports", icon: FileText, path: "/reports" },
+        { label: "Performance", icon: TrendingUp, path: "/performance" }
       ]
     },
     { 
       icon: Calendar, 
-      label: "Bookings",
+      label: "Reservas",
       path: "/reservations",
       active: location.pathname === "/reservations",
       subItems: [
-        { label: "Active Rentals", icon: Clock },
-        { label: "Reservations", icon: Calendar },
-        { label: "History", icon: FileText }
+        { label: "Aluguéis Ativos", icon: Clock },
+        { label: "Reservas", icon: Calendar },
+        { label: "Histórico", icon: FileText }
       ]
     },
     { 
       icon: Car, 
-      label: "Vehicles",
+      label: "Veículos",
+      path: "/vehicles",
+      active: location.pathname === "/vehicles",
       subItems: [
-        { label: "Fleet Overview", icon: Car },
-        { label: "Maintenance", icon: Settings },
-        { label: "Location", icon: MapPin },
-        { label: "Insurance", icon: Shield }
+        { label: "Visão Geral", icon: Car },
+        { label: "Manutenção", icon: Settings },
+        { label: "Localização", icon: MapPin },
+        { label: "Seguros", icon: Shield }
       ]
     },
     { 
@@ -96,8 +100,7 @@ const Sidebar = () => {
                 {item.label}
               </Link>
             ) : (
-              <a
-                href="#"
+              <div
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                   item.active
@@ -107,20 +110,30 @@ const Sidebar = () => {
               >
                 <item.icon className="w-5 h-5" />
                 {item.label}
-              </a>
+              </div>
             )}
             
             {item.subItems && (
               <div className="ml-9 space-y-1">
                 {item.subItems.map((subItem) => (
-                  <a
-                    key={subItem.label}
-                    href="#"
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-primary transition-colors rounded-lg"
-                  >
-                    <subItem.icon className="w-4 h-4" />
-                    {subItem.label}
-                  </a>
+                  subItem.path ? (
+                    <Link
+                      key={subItem.label}
+                      to={subItem.path}
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-primary transition-colors rounded-lg"
+                    >
+                      <subItem.icon className="w-4 h-4" />
+                      {subItem.label}
+                    </Link>
+                  ) : (
+                    <div
+                      key={subItem.label}
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-primary transition-colors rounded-lg"
+                    >
+                      <subItem.icon className="w-4 h-4" />
+                      {subItem.label}
+                    </div>
+                  )
                 ))}
               </div>
             )}
