@@ -10,10 +10,14 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { driverSchema, type DriverFormValues } from "@/types/driver"
 import { Form } from "@/components/ui/form"
+import { supabase } from "@/integrations/supabase/client"
+import { useToast } from "@/components/ui/use-toast"
 
 export const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState("credit")
   const [paymentId, setPaymentId] = useState<string | null>(null)
+  const [driverId, setDriverId] = useState<string | null>(null)
+  const { toast } = useToast()
   
   const form = useForm<DriverFormValues>({
     resolver: zodResolver(driverSchema),
@@ -28,8 +32,36 @@ export const CheckoutPage = () => {
     },
   });
 
-  const handlePaymentSuccess = (id: string) => {
+  const handlePaymentSuccess = async (id: string) => {
     setPaymentId(id)
+    // Save driver details if not already saved
+    if (!driverId) {
+      try {
+        const { data, error } = await supabase
+          .from('driver_details')
+          .insert([{
+            full_name: form.getValues('fullName'),
+            birth_date: form.getValues('birthDate'),
+            license_number: form.getValues('licenseNumber'),
+            license_expiry: form.getValues('licenseExpiry'),
+            cpf: form.getValues('cpf'),
+            phone: form.getValues('phone'),
+            email: form.getValues('email'),
+          }])
+          .select()
+          .single()
+
+        if (error) throw error
+        setDriverId(data.id)
+      } catch (error) {
+        console.error('Error saving driver details:', error)
+        toast({
+          title: "Erro ao salvar dados do condutor",
+          description: "Ocorreu um erro ao salvar seus dados. Por favor, tente novamente.",
+          variant: "destructive",
+        })
+      }
+    }
   }
 
   return (
@@ -56,19 +88,22 @@ export const CheckoutPage = () => {
           <Card className="p-6">
             {paymentMethod === "credit" && (
               <CreditCardForm
-                form={form}
+                amount={1000} // This should come from your cart total
+                driverId={driverId || ''} // Pass the driver ID
                 onSuccess={handlePaymentSuccess}
               />
             )}
             {paymentMethod === "pix" && (
               <PixPayment
-                form={form}
+                amount={1000} // This should come from your cart total
+                driverId={driverId || ''} // Pass the driver ID
                 onSuccess={handlePaymentSuccess}
               />
             )}
             {paymentMethod === "boleto" && (
               <BoletoPayment
-                form={form}
+                amount={1000} // This should come from your cart total
+                driverId={driverId || ''} // Pass the driver ID
                 onSuccess={handlePaymentSuccess}
               />
             )}
