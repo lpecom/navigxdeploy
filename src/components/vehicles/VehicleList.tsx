@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { EditVehicleDialog } from "./EditVehicleDialog";
 import { VehicleCard } from "./VehicleCard";
@@ -10,6 +10,7 @@ const VehicleList = () => {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<CarModel | null>(null);
+  const queryClient = useQueryClient();
 
   const { data: vehicles, isLoading } = useQuery({
     queryKey: ['vehicles'],
@@ -23,7 +24,6 @@ const VehicleList = () => {
       
       if (error) throw error;
       
-      // Transform the response data to match CarModel type
       return (data as CarModelResponse[]).map(vehicle => ({
         ...vehicle,
         optionals: vehicle.optionals as Record<string, any> | null
@@ -71,6 +71,9 @@ const VehicleList = () => {
               .eq('id', selectedVehicle.id);
 
             if (error) throw error;
+
+            // Invalidate and refetch the vehicles query
+            await queryClient.invalidateQueries({ queryKey: ['vehicles'] });
 
             toast({
               title: "Vehicle updated",
