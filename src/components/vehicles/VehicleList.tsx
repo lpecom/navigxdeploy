@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { EditVehicleDialog } from "./EditVehicleDialog";
 import { VehicleCard } from "./VehicleCard";
-import type { CarModel } from "./types";
+import type { CarModel, CarModelResponse } from "./types";
 import { supabase } from "@/integrations/supabase/client";
 
 const VehicleList = () => {
@@ -22,7 +22,12 @@ const VehicleList = () => {
         `);
       
       if (error) throw error;
-      return data;
+      
+      // Transform the response data to match CarModel type
+      return (data as CarModelResponse[]).map(vehicle => ({
+        ...vehicle,
+        optionals: vehicle.optionals as Record<string, any> | null
+      }));
     }
   });
 
