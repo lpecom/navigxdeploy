@@ -77,6 +77,36 @@ export type Database = {
           },
         ]
       }
+      car_groups: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       car_models: {
         Row: {
           category_id: string | null
@@ -275,6 +305,53 @@ export type Database = {
         }
         Relationships: []
       }
+      group_fares: {
+        Row: {
+          base_price: number
+          car_group_id: string
+          created_at: string | null
+          extra_km_price: number | null
+          id: string
+          is_active: boolean | null
+          km_included: number | null
+          plan_type: string
+          price_period: string
+          updated_at: string | null
+        }
+        Insert: {
+          base_price: number
+          car_group_id: string
+          created_at?: string | null
+          extra_km_price?: number | null
+          id?: string
+          is_active?: boolean | null
+          km_included?: number | null
+          plan_type: string
+          price_period: string
+          updated_at?: string | null
+        }
+        Update: {
+          base_price?: number
+          car_group_id?: string
+          created_at?: string | null
+          extra_km_price?: number | null
+          id?: string
+          is_active?: boolean | null
+          km_included?: number | null
+          plan_type?: string
+          price_period?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_fares_car_group_id_fkey"
+            columns: ["car_group_id"]
+            isOneToOne: false
+            referencedRelation: "car_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       offers: {
         Row: {
           availability: string | null
@@ -468,6 +545,7 @@ export type Database = {
       }
       vehicles: {
         Row: {
+          car_group_id: string | null
           category: string
           consumption: string
           created_at: string
@@ -482,6 +560,7 @@ export type Database = {
           transmission: string
         }
         Insert: {
+          car_group_id?: string | null
           category: string
           consumption: string
           created_at?: string
@@ -496,6 +575,7 @@ export type Database = {
           transmission: string
         }
         Update: {
+          car_group_id?: string | null
           category?: string
           consumption?: string
           created_at?: string
@@ -509,7 +589,15 @@ export type Database = {
           passengers?: number
           transmission?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_car_group_id_fkey"
+            columns: ["car_group_id"]
+            isOneToOne: false
+            referencedRelation: "car_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
