@@ -1,10 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Users, Car, Fuel, Gauge } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { OrderSummary } from "@/components/optionals/OrderSummary";
 import { OptionalsList } from "@/components/optionals/OptionalsList";
 import { useEffect, useState } from "react";
+import { CarSlider } from "@/components/home/CarSlider";
 
 interface SelectedCar {
   category: string;
@@ -16,8 +17,45 @@ interface SelectedCar {
   };
   price: string;
   period: string;
-  image: string;
 }
+
+const economyCars = [
+  {
+    id: '1',
+    name: 'Ford Ka SE',
+    image: 'https://raw.githubusercontent.com/navigcars/cars/main/ford-ka.png',
+    year: '2021',
+    mileage: '25.000 km'
+  },
+  {
+    id: '2',
+    name: 'Fiat Uno',
+    image: 'https://raw.githubusercontent.com/navigcars/cars/main/uno.png',
+    year: '2020',
+    mileage: '30.000 km'
+  },
+  {
+    id: '3',
+    name: 'Onix Joy',
+    image: 'https://raw.githubusercontent.com/navigcars/cars/main/onix.png',
+    year: '2019',
+    mileage: '45.000 km'
+  },
+  {
+    id: '4',
+    name: 'Renault Kwid',
+    image: 'https://raw.githubusercontent.com/navigcars/cars/main/kwid.png',
+    year: '2020',
+    mileage: '35.000 km'
+  },
+  {
+    id: '5',
+    name: 'Hyundai HB20',
+    image: 'https://raw.githubusercontent.com/navigcars/cars/main/hb20.png',
+    year: '2021',
+    mileage: '28.000 km'
+  }
+];
 
 const Optionals = () => {
   const [selectedCar, setSelectedCar] = useState<SelectedCar | null>({
@@ -29,8 +67,7 @@ const Optionals = () => {
       consumption: "14.5 km/l"
     },
     price: "634",
-    period: "semana",
-    image: "/placeholder.svg"
+    period: "semana"
   });
 
   useEffect(() => {
@@ -52,34 +89,29 @@ const Optionals = () => {
       <div className="grid gap-8 md:grid-cols-[1fr,400px]">
         <Card className="p-6">
           {selectedCar && (
-            <div className="mb-8 p-4 bg-slate-50 rounded-lg">
-              <div className="grid gap-6">
-                <div className="space-y-4">
-                  <h2 className="text-xl font-semibold">{selectedCar.category}</h2>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Users className="w-4 h-4 text-blue-500" />
-                      <span>{selectedCar.specs.passengers} passageiros</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Car className="w-4 h-4 text-blue-500" />
-                      <span>{selectedCar.specs.transmission}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Fuel className="w-4 h-4 text-blue-500" />
-                      <span>{selectedCar.specs.plan}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Gauge className="w-4 h-4 text-blue-500" />
-                      <span>{selectedCar.specs.consumption}</span>
-                    </div>
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold mb-4">{selectedCar.category}</h2>
+              <div className="bg-slate-50 rounded-lg p-4">
+                <CarSlider cars={economyCars} category="Economy" />
+                <div className="mt-4 grid grid-cols-2 gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <span>Passageiros: {selectedCar.specs.passengers}</span>
                   </div>
-                  <div className="text-2xl font-bold text-blue-500">
-                    R$ {selectedCar.price}
-                    <span className="text-base font-normal text-gray-600 ml-1">
-                      /{selectedCar.period}
-                    </span>
+                  <div className="flex items-center gap-2">
+                    <span>Transmissão: {selectedCar.specs.transmission}</span>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <span>Plano: {selectedCar.specs.plan}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>Consumo: {selectedCar.specs.consumption}</span>
+                  </div>
+                </div>
+                <div className="mt-4 text-2xl font-bold text-blue-500">
+                  R$ {selectedCar.price}
+                  <span className="text-base font-normal text-gray-600 ml-1">
+                    /{selectedCar.period}
+                  </span>
                 </div>
               </div>
             </div>
