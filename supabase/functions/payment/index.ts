@@ -37,9 +37,9 @@ serve(async (req) => {
             installments: payload.installments || 1,
             card_token: payload.card_token,
             pix_expiration_date: payload.payment_type === 'pix' ? 
-              new Date(Date.now() + 30 * 60000).toISOString() : undefined, // 30 minutes
+              new Date(Date.now() + 30 * 60000).toISOString() : undefined,
             boleto_expiration_date: payload.payment_type === 'boleto' ? 
-              new Date(Date.now() + 3 * 24 * 60 * 60000).toISOString() : undefined // 3 days
+              new Date(Date.now() + 3 * 24 * 60 * 60000).toISOString() : undefined
           }
         }
 
@@ -48,12 +48,12 @@ serve(async (req) => {
           throw new Error('APPMAX_API_KEY is not set')
         }
 
-        console.log('Sending to Appmax:', appmaxPayload)
+        console.log('Sending to Appmax with payload:', JSON.stringify(appmaxPayload))
         const paymentResponse = await fetch(`${APPMAX_API_URL}/payments`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': appmaxApiKey // Removed Bearer prefix as Appmax expects just the key
+            'Authorization': `Basic ${btoa(appmaxApiKey + ':')}`
           },
           body: JSON.stringify(appmaxPayload)
         })
