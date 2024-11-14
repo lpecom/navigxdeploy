@@ -10,12 +10,8 @@ interface SelectedCar {
   category: string;
   specs: {
     passengers: number;
-    luggage: number;
     transmission: string;
-    fuel: string;
-    mileage: string;
-    insurance: string;
-    wifi: boolean;
+    plan: string;
     consumption: string;
   };
   price: string;
@@ -24,7 +20,18 @@ interface SelectedCar {
 }
 
 const Optionals = () => {
-  const [selectedCar, setSelectedCar] = useState<SelectedCar | null>(null);
+  const [selectedCar, setSelectedCar] = useState<SelectedCar | null>({
+    category: "Ford Ka",
+    specs: {
+      passengers: 4,
+      transmission: "Manual",
+      plan: "Flex",
+      consumption: "14.5 km/l"
+    },
+    price: "634",
+    period: "semana",
+    image: "/placeholder.svg"
+  });
 
   useEffect(() => {
     document.body.classList.remove('animate-fade-out');
@@ -45,39 +52,32 @@ const Optionals = () => {
       <div className="grid gap-8 md:grid-cols-[1fr,400px]">
         <Card className="p-6">
           {selectedCar && (
-            <div className="mb-8 p-4 bg-gray-50 rounded-lg">
-              <div className="grid md:grid-cols-[300px,1fr] gap-6 items-center">
-                {selectedCar.image && (
-                  <img 
-                    src={selectedCar.image} 
-                    alt={selectedCar.category}
-                    className="w-full h-auto rounded-lg"
-                  />
-                )}
+            <div className="mb-8 p-4 bg-slate-50 rounded-lg">
+              <div className="grid gap-6">
                 <div className="space-y-4">
                   <h2 className="text-xl font-semibold">{selectedCar.category}</h2>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-navig" />
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Users className="w-4 h-4 text-blue-500" />
                       <span>{selectedCar.specs.passengers} passageiros</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Car className="w-4 h-4 text-navig" />
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Car className="w-4 h-4 text-blue-500" />
                       <span>{selectedCar.specs.transmission}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Fuel className="w-4 h-4 text-navig" />
-                      <span>{selectedCar.specs.fuel}</span>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Fuel className="w-4 h-4 text-blue-500" />
+                      <span>{selectedCar.specs.plan}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Gauge className="w-4 h-4 text-navig" />
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Gauge className="w-4 h-4 text-blue-500" />
                       <span>{selectedCar.specs.consumption}</span>
                     </div>
                   </div>
-                  <div className="text-xl font-bold text-navig">
-                    {selectedCar.price}
+                  <div className="text-2xl font-bold text-blue-500">
+                    R$ {selectedCar.price}
                     <span className="text-base font-normal text-gray-600 ml-1">
-                      {selectedCar.period}
+                      /{selectedCar.period}
                     </span>
                   </div>
                 </div>
