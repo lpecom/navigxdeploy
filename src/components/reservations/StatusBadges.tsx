@@ -38,7 +38,7 @@ export const StatusBadges = ({ reservation }: StatusBadgesProps) => {
     const days = differenceInDays(new Date(pickupDate), new Date());
     if (days === 1) {
       return (
-        <Badge className="bg-red-100 text-red-800 flex gap-1 items-center font-bold">
+        <Badge className="bg-red-600 text-white flex gap-1 items-center font-bold">
           <Flag className="w-4 h-4" />
           PRIORIDADE: PRÓXIMO DIA
         </Badge>
@@ -46,7 +46,7 @@ export const StatusBadges = ({ reservation }: StatusBadgesProps) => {
     }
     if (days <= 2 && days >= 0) {
       return (
-        <Badge className="bg-red-100 text-red-800 flex gap-1 items-center">
+        <Badge className="bg-red-600 text-white flex gap-1 items-center">
           <Flag className="w-4 h-4" />
           Alta Prioridade
         </Badge>

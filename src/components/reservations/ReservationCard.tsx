@@ -1,11 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronDown, ChevronUp, AlertTriangle, Car } from "lucide-react";
+import { ChevronDown, ChevronUp, Car } from "lucide-react";
 import { StatusBadges } from "./StatusBadges";
 import { ReservationExpandedContent } from "./ReservationExpandedContent";
 import type { Reservation } from "@/types/reservation";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { format, differenceInDays } from "date-fns";
-import { Badge } from "@/components/ui/badge";
 
 interface ReservationCardProps {
   reservation: Reservation;
@@ -14,11 +12,6 @@ interface ReservationCardProps {
 }
 
 export const ReservationCard = ({ reservation, isExpanded, onToggle }: ReservationCardProps) => {
-  const isHighPriority = (pickupDate: string) => {
-    const days = differenceInDays(new Date(pickupDate), new Date());
-    return days <= 2 && days >= 0;
-  };
-
   const getCategoryColor = (category: Reservation['carCategory']) => {
     const colors = {
       Luxury: "text-purple-600",
@@ -62,14 +55,6 @@ export const ReservationCard = ({ reservation, isExpanded, onToggle }: Reservati
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {isHighPriority(reservation.pickupDate) && (
-            <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                High Priority - Pickup in next 2 days
-              </AlertDescription>
-            </Alert>
-          )}
           <StatusBadges reservation={reservation} />
           {isExpanded && <ReservationExpandedContent reservation={reservation} />}
         </div>
