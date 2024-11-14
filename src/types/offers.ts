@@ -28,7 +28,7 @@ export interface CarModel {
   image_url: string | null;
   year: string | null;
   description: string | null;
-  optionals: Record<string, boolean>;
+  optionals: Record<string, any> | null;
   created_at: string | null;
   updated_at: string | null;
   categories?: {
