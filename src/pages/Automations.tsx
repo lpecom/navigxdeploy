@@ -2,7 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, Filter, Zap } from "lucide-react";
+import { Plus, Search, Filter, Zap, Mail, MessageSquare, PhoneCall } from "lucide-react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { useState } from "react";
 import { AutomationCard } from "@/components/automations/AutomationCard";

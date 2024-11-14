@@ -39,13 +39,6 @@ const AdminLogin = () => {
             appearance={{ theme: ThemeSupa }}
             theme="light"
             providers={[]}
-            onError={(error) => {
-              toast({
-                variant: "destructive",
-                title: "Authentication Error",
-                description: error.message,
-              });
-            }}
           />
         </div>
       </div>
