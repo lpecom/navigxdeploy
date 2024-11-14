@@ -17,12 +17,20 @@ interface CarCategoryProps {
   };
 }
 
+interface Specs {
+  transmission?: string;
+  motorization?: string;
+  [key: string]: any;
+}
+
 export const CarCategoryCard = ({ category }: CarCategoryProps) => {
   const navigate = useNavigate();
 
   const { data: carModels, isLoading } = useQuery({
     queryKey: ["car-models", category.id],
     queryFn: async () => {
+      if (!category.id) return [];
+      
       const { data, error } = await supabase
         .from("car_models")
         .select("*")
@@ -31,11 +39,14 @@ export const CarCategoryCard = ({ category }: CarCategoryProps) => {
       if (error) throw error;
       return data;
     },
+    enabled: !!category.id,
   });
 
   const { data: offers } = useQuery({
     queryKey: ["category-offers", category.id],
     queryFn: async () => {
+      if (!category.id) return null;
+      
       const { data, error } = await supabase
         .from("offers")
         .select("*")
@@ -46,14 +57,17 @@ export const CarCategoryCard = ({ category }: CarCategoryProps) => {
       if (error) throw error;
       return data[0];
     },
+    enabled: !!category.id,
   });
 
   const handleSelectCar = () => {
+    if (!offers) return;
+    
     sessionStorage.setItem('selectedCar', JSON.stringify({
       category: category.name,
-      price: offers?.price,
-      period: offers?.price_period,
-      specs: offers?.specs
+      price: offers.price,
+      period: offers.price_period,
+      specs: offers.specs
     }));
     
     navigate('/plans');
@@ -93,16 +107,16 @@ export const CarCategoryCard = ({ category }: CarCategoryProps) => {
         
         {offers?.specs && (
           <div className="space-y-4">
-            {offers.specs.transmission && (
+            {(offers.specs as Specs).transmission && (
               <div className="flex items-center gap-2 text-gray-700">
                 <Car className="w-4 h-4 text-navig" />
-                <span>{offers.specs.transmission}</span>
+                <span>{(offers.specs as Specs).transmission}</span>
               </div>
             )}
-            {offers.specs.motorization && (
+            {(offers.specs as Specs).motorization && (
               <div className="flex items-center gap-2 text-gray-700">
                 <Gauge className="w-4 h-4 text-navig" />
-                <span>{offers.specs.motorization}</span>
+                <span>{(offers.specs as Specs).motorization}</span>
               </div>
             )}
             {offers.availability && (

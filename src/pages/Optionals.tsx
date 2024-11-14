@@ -7,56 +7,14 @@ import { OptionalsList } from "@/components/optionals/OptionalsList";
 import { useEffect, useState } from "react";
 import { CarSlider } from "@/components/home/CarSlider";
 
-interface SelectedCar {
-  category: string;
-  specs: {
-    passengers: number;
-    transmission: string;
-    plan: string;
-    consumption: string;
-  };
-  price: string;
-  period: string;
+interface Car {
+  id: string;
+  name: string;
+  image_url: string;
+  year: string;
+  description: string;
+  note?: string;
 }
-
-const economyCars = [
-  {
-    id: '1',
-    name: 'HB20 1.0',
-    image: 'https://www.kovi.com.br/hubfs/HB20%20Sense%20-%20Branco%20-%20Hatch_web.webp',
-    year: '2021',
-    description: 'Hatch • *Carro com até 6 mil kms rodados.',
-    note: 'Aproveite! Restam poucas unidades para entrega imediata.'
-  },
-  {
-    id: '2',
-    name: 'Ford Ka SE',
-    image: 'https://raw.githubusercontent.com/navigcars/cars/main/ford-ka.png',
-    year: '2021',
-    description: 'Equipado com pneus Remold.'
-  },
-  {
-    id: '3',
-    name: 'Onix Joy',
-    image: 'https://raw.githubusercontent.com/navigcars/cars/main/onix.png',
-    year: '2019',
-    description: 'Hatch • Completo'
-  },
-  {
-    id: '4',
-    name: 'Renault Kwid',
-    image: 'https://raw.githubusercontent.com/navigcars/cars/main/kwid.png',
-    year: '2020',
-    description: 'Compacto e econômico'
-  },
-  {
-    id: '5',
-    name: 'Hyundai HB20',
-    image: 'https://raw.githubusercontent.com/navigcars/cars/main/hb20.png',
-    year: '2021',
-    description: 'Hatch • Completo'
-  }
-];
 
 const Optionals = () => {
   const navigate = useNavigate();
@@ -71,6 +29,45 @@ const Optionals = () => {
     price: "634",
     period: "semana"
   });
+
+  const cars: Car[] = [
+    {
+      id: '1',
+      name: 'HB20 1.0',
+      image_url: 'https://www.kovi.com.br/hubfs/HB20%20Sense%20-%20Branco%20-%20Hatch_web.webp',
+      year: '2021',
+      description: 'Hatch • *Carro com até 6 mil kms rodados.',
+      note: 'Aproveite! Restam poucas unidades para entrega imediata.'
+    },
+    {
+      id: '2',
+      name: 'Ford Ka SE',
+      image_url: 'https://raw.githubusercontent.com/navigcars/cars/main/ford-ka.png',
+      year: '2021',
+      description: 'Equipado com pneus Remold.'
+    },
+    {
+      id: '3',
+      name: 'Onix Joy',
+      image_url: 'https://raw.githubusercontent.com/navigcars/cars/main/onix.png',
+      year: '2019',
+      description: 'Hatch • Completo'
+    },
+    {
+      id: '4',
+      name: 'Renault Kwid',
+      image_url: 'https://raw.githubusercontent.com/navigcars/cars/main/kwid.png',
+      year: '2020',
+      description: 'Compacto e econômico'
+    },
+    {
+      id: '5',
+      name: 'Hyundai HB20',
+      image_url: 'https://raw.githubusercontent.com/navigcars/cars/main/hb20.png',
+      year: '2021',
+      description: 'Hatch • Completo'
+    }
+  ];
 
   useEffect(() => {
     document.body.classList.remove('animate-fade-out');
@@ -98,7 +95,7 @@ const Optionals = () => {
             <div className="mb-8">
               <h2 className="text-xl font-semibold mb-4">{selectedCar.category}</h2>
               <div className="bg-slate-50 rounded-lg p-4">
-                <CarSlider cars={economyCars} category="Economy" />
+    <CarSlider cars={cars} category="Economy" />
                 <div className="mt-4 grid grid-cols-2 gap-4 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <span>Passageiros: {selectedCar.specs.passengers}</span>

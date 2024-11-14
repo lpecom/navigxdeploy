@@ -1,48 +1,21 @@
 import React from 'react';
-import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CarCategoryCard } from '@/components/home/CarCategoryCard';
 
 const Home = () => {
-  const { data: offers, isLoading } = useQuery({
-    queryKey: ['public-offers'],
+  const { data: categories, isLoading } = useQuery({
+    queryKey: ['categories'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('offers')
-        .select(`
-          *,
-          categories (
-            name,
-            badge_text
-          )
-        `)
+        .from('categories')
+        .select('*')
         .eq('is_active', true)
         .order('display_order');
       
       if (error) throw error;
       return data;
     },
-  });
-
-  const formatOfferToCategory = (offer: any) => ({
-    name: offer.name,
-    models: offer.description,
-    price: `R$ ${offer.price}`,
-    period: `/${offer.price_period}`,
-    location: offer.specs?.location || 'Porto Alegre',
-    availability: offer.availability || 'Pronta Entrega',
-    badge: offer.categories?.badge_text || 'Usados',
-    specs: {
-      passengers: offer.specs?.passengers || 4,
-      luggage: offer.specs?.luggage || 1,
-      transmission: offer.specs?.transmission || 'Manual',
-      fuel: offer.specs?.fuel || 'Flex',
-      mileage: offer.specs?.mileage || '10.000km',
-      insurance: offer.specs?.insurance || 'Básico',
-      wifi: offer.specs?.wifi || false,
-      consumption: offer.specs?.consumption || '14.5 km/l'
-    }
   });
 
   return (
@@ -61,10 +34,10 @@ const Home = () => {
           <div className="text-center">Carregando ofertas...</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
-            {offers?.map((offer) => (
+            {categories?.map((category) => (
               <CarCategoryCard 
-                key={offer.id} 
-                category={formatOfferToCategory(offer)} 
+                key={category.id} 
+                category={category}
               />
             ))}
           </div>
