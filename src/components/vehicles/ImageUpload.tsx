@@ -26,7 +26,7 @@ export const ImageUpload = ({
       const fileExt = file.name.split('.').pop();
       const filePath = `${crypto.randomUUID()}.${fileExt}`;
 
-      const { error: uploadError, data } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('vehicle-images')
         .upload(filePath, file);
 
@@ -61,11 +61,15 @@ export const ImageUpload = ({
   return (
     <div className="space-y-4">
       {currentImage ? (
-        <div className="relative">
+        <div className="relative aspect-video">
           <img
             src={currentImage}
             alt="Vehicle preview"
-            className="w-full aspect-video rounded-lg object-cover"
+            className="w-full h-full rounded-lg object-cover"
+            onError={(e) => {
+              console.error('Image preview error:', e);
+              e.currentTarget.src = '/placeholder.svg';
+            }}
           />
           <Button
             variant="destructive"

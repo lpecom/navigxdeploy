@@ -24,11 +24,17 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
       </CardHeader>
       <CardContent className="space-y-4">
         {car.image_url && (
-          <img
-            src={car.image_url}
-            alt={car.name}
-            className="w-full h-48 object-cover rounded-md"
-          />
+          <div className="relative aspect-video w-full">
+            <img
+              src={car.image_url}
+              alt={car.name}
+              className="w-full h-full object-cover rounded-md"
+              onError={(e) => {
+                console.error('Image load error:', e);
+                e.currentTarget.src = '/placeholder.svg';
+              }}
+            />
+          </div>
         )}
         <div className="space-y-2">
           <p className="text-sm text-gray-500">Category: {car.category?.name || 'Uncategorized'}</p>
