@@ -5,6 +5,7 @@ export interface Category {
   badge_text: string | null;
   display_order: number | null;
   is_active: boolean | null;
+  created_at?: string;
 }
 
 export interface Offer {
@@ -19,19 +20,10 @@ export interface Offer {
   badge_text: string | null;
   display_order: number | null;
   is_active: boolean | null;
-}
-
-export interface CarModel {
-  id: string;
-  category_id: string | null;
-  name: string;
-  image_url: string | null;
-  year: string | null;
-  description: string | null;
-  optionals: Record<string, any> | null;
-  created_at: string | null;
-  updated_at: string | null;
+  banner_image: string | null;
+  template_type: string;
   categories?: {
     name: string;
+    badge_text: string | null;
   };
 }

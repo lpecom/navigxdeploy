@@ -15,7 +15,7 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import { CategoryForm } from "@/components/offers/CategoryForm";
 import { CategoriesList } from "@/components/offers/CategoriesList";
 import { OffersList } from "@/components/offers/OffersList";
-import { OfferTemplates } from "@/components/offers/OfferTemplates";
+import { OfferForm } from "@/components/offers/OfferForm";
 import type { Category, Offer } from "@/types/offers";
 
 const Offers = () => {
@@ -23,7 +23,7 @@ const Offers = () => {
   const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
-  const [showTemplates, setShowTemplates] = useState(false);
+  const [isAddingOffer, setIsAddingOffer] = useState(false);
 
   const { data: categories, isLoading: categoriesLoading } = useQuery({
     queryKey: ["categories"],
@@ -44,7 +44,13 @@ const Offers = () => {
       if (!selectedCategory?.id) return [];
       const { data, error } = await supabase
         .from("offers")
-        .select("*")
+        .select(`
+          *,
+          categories (
+            name,
+            badge_text
+          )
+        `)
         .eq("category_id", selectedCategory.id)
         .order("display_order", { ascending: true });
       
@@ -93,9 +99,25 @@ const Offers = () => {
               </p>
             </div>
             <div className="flex items-center space-x-2">
-              <Button onClick={() => setShowTemplates(!showTemplates)}>
-                {showTemplates ? "Voltar" : "Templates"}
-              </Button>
+              <Dialog open={isAddingOffer} onOpenChange={setIsAddingOffer}>
+                <DialogTrigger asChild>
+                  <Button disabled={!selectedCategory}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Nova Oferta
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Adicionar Nova Oferta</DialogTitle>
+                  </DialogHeader>
+                  {selectedCategory && (
+                    <OfferForm
+                      categoryId={selectedCategory.id}
+                      onSuccess={() => setIsAddingOffer(false)}
+                    />
+                  )}
+                </DialogContent>
+              </Dialog>
               <Dialog open={isAddingCategory} onOpenChange={setIsAddingCategory}>
                 <DialogTrigger asChild>
                   <Button>
@@ -113,41 +135,27 @@ const Offers = () => {
             </div>
           </div>
 
-          {showTemplates ? (
-            <OfferTemplates
-              onSelectTemplate={(template) => {
-                setShowTemplates(false);
-                // TODO: Implement template selection logic
-                toast({
-                  title: "Template selecionado",
-                  description: `Template ${template} selecionado com sucesso.`,
-                });
-              }}
-              selectedTemplate="default"
+          <div className="grid md:grid-cols-2 gap-6">
+            <CategoriesList
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+              onToggleVisibility={(category) =>
+                toggleCategoryVisibilityMutation.mutate({
+                  id: category.id,
+                  is_active: category.is_active,
+                })
+              }
+              isLoading={categoriesLoading}
             />
-          ) : (
-            <div className="grid md:grid-cols-2 gap-6">
-              <CategoriesList
-                categories={categories}
-                selectedCategory={selectedCategory}
-                onSelectCategory={setSelectedCategory}
-                onToggleVisibility={(category) =>
-                  toggleCategoryVisibilityMutation.mutate({
-                    id: category.id,
-                    is_active: category.is_active,
-                  })
-                }
-                isLoading={categoriesLoading}
-              />
 
-              <OffersList
-                selectedCategory={selectedCategory}
-                offers={offers}
-                isLoading={offersLoading}
-                onEditOffer={handleEditOffer}
-              />
-            </div>
-          )}
+            <OffersList
+              selectedCategory={selectedCategory}
+              offers={offers}
+              isLoading={offersLoading}
+              onEditOffer={handleEditOffer}
+            />
+          </div>
         </div>
       </div>
     </div>
