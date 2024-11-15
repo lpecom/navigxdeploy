@@ -1,22 +1,51 @@
 import { DollarSign, Users, Car } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const StatsPanel = () => {
-  const stats = [
+  const { data: stats } = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: async () => {
+      const { data: payments } = await supabase
+        .from('payments')
+        .select('amount')
+        .eq('status', 'completed');
+
+      const { count: activeRentals } = await supabase
+        .from('checkout_sessions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active');
+
+      const { count: totalCustomers } = await supabase
+        .from('driver_details')
+        .select('*', { count: 'exact', head: true });
+
+      const totalRevenue = payments?.reduce((acc, payment) => acc + Number(payment.amount), 0) || 0;
+
+      return {
+        revenue: totalRevenue,
+        activeRentals: activeRentals || 0,
+        customers: totalCustomers || 0,
+      };
+    },
+  });
+
+  const statsConfig = [
     {
-      label: "Total Revenue",
-      value: "$52,147",
+      label: "Receita Total",
+      value: `R$ ${stats?.revenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` || "R$ 0,00",
       change: "+12%",
       icon: DollarSign,
     },
     {
-      label: "Active Rentals",
-      value: "32",
+      label: "Aluguéis Ativos",
+      value: stats?.activeRentals.toString() || "0",
       change: "+4%",
       icon: Car,
     },
     {
-      label: "Total Customers",
-      value: "24",
+      label: "Total de Clientes",
+      value: stats?.customers.toString() || "0",
       change: "+7%",
       icon: Users,
     },
@@ -24,7 +53,7 @@ const StatsPanel = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {stats.map((stat) => (
+      {statsConfig.map((stat) => (
         <div
           key={stat.label}
           className="bg-white p-6 rounded-lg border border-gray-200 animate-fade-in hover:border-primary/20 transition-colors"
@@ -42,7 +71,7 @@ const StatsPanel = () => {
             <span className="text-sm font-medium text-success">
               {stat.change}
             </span>
-            <span className="text-sm text-gray-500 ml-2">vs last month</span>
+            <span className="text-sm text-gray-500 ml-2">vs mês anterior</span>
           </div>
         </div>
       ))}
