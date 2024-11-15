@@ -19,6 +19,17 @@ interface Rental {
   } | null;
 }
 
+interface RentalResponse {
+  id: string;
+  created_at: string;
+  total_amount: number;
+  selected_car: any;
+  driver: {
+    full_name: string;
+    email: string;
+  } | null;
+}
+
 const RentalsList = () => {
   const { data: rentals, isLoading } = useQuery({
     queryKey: ['recent-rentals'],
@@ -37,7 +48,12 @@ const RentalsList = () => {
         .limit(5);
 
       if (error) throw error;
-      return data as Rental[];
+      
+      // Transform the response data to match our Rental type
+      return (data as RentalResponse[]).map(rental => ({
+        ...rental,
+        selected_car: rental.selected_car as SelectedCar
+      }));
     },
   });
 
