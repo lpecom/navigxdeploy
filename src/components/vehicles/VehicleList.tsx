@@ -64,10 +64,10 @@ const VehicleList = () => {
               .from('car_models')
               .update({
                 name: selectedVehicle.name,
+                description: selectedVehicle.description,
                 category_id: selectedVehicle.category_id,
                 image_url: selectedVehicle.image_url,
                 year: selectedVehicle.year,
-                description: selectedVehicle.description
               })
               .eq('id', selectedVehicle.id);
 

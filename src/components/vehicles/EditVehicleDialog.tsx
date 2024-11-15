@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -71,6 +72,16 @@ export const EditVehicleDialog = ({
             />
           </div>
           
+          <div className="space-y-2">
+            <label htmlFor="description">Descrição</label>
+            <Textarea
+              id="description"
+              value={editingCar?.description || ""}
+              onChange={(e) => updateCarField("description", e.target.value)}
+              placeholder="Descreva o veículo..."
+            />
+          </div>
+
           <div className="space-y-2">
             <label htmlFor="category">Categoria do Veículo</label>
             <Select

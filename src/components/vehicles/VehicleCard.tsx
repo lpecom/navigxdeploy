@@ -43,19 +43,17 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
           {car.description && (
             <p className="text-sm text-gray-500">{car.description}</p>
           )}
-          {car.optionals && Object.entries(car.optionals).length > 0 && (
-            <div className="grid grid-cols-2 gap-2">
-              {Object.entries(car.optionals).map(([key, value]) => (
-                <Badge 
-                  key={key}
-                  variant="secondary"
-                  className="text-sm"
-                >
-                  {`${key}: ${value}`}
-                </Badge>
-              ))}
-            </div>
-          )}
+          {car.optionals && Object.entries(car.optionals).filter(([key]) => 
+            !key.includes('power_steering') && !key.includes('air_conditioning')
+          ).map(([key, value]) => (
+            <Badge 
+              key={key}
+              variant="secondary"
+              className="text-sm"
+            >
+              {`${key}: ${value}`}
+            </Badge>
+          ))}
         </div>
       </CardContent>
     </Card>
