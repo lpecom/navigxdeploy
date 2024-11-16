@@ -15,7 +15,6 @@ import { handleCustomerData } from "./handlers/CustomerHandler"
 import { createDriverDetails } from "./handlers/DriverHandler"
 import { createCheckoutSession } from "./CheckoutSessionHandler"
 import { supabase } from "@/integrations/supabase/client"
-import { Separator } from "@/components/ui/separator"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
@@ -122,6 +121,15 @@ export const CheckoutPage = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="mb-8"
+        >
+          <CheckoutSummary />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
           <Steps currentStep={step} steps={steps} />
         </motion.div>
@@ -134,17 +142,23 @@ export const CheckoutPage = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             {step === 1 && (
-              <>
-                <CustomerForm onSubmit={handleCustomerSubmit} />
-                <Card className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Opcionais Disponíveis</h3>
-                  <OptionalsList />
-                </Card>
-              </>
+              <CustomerForm onSubmit={handleCustomerSubmit} />
             )}
 
             {step === 2 && (
-              <PickupScheduler onSubmit={handleScheduleSubmit} />
+              <>
+                <PickupScheduler onSubmit={handleScheduleSubmit} />
+                <Card className="p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <ShoppingCart className="w-5 h-5 text-primary" />
+                    Opcionais Disponíveis
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Aproveite para adicionar itens que tornarão sua experiência ainda melhor:
+                  </p>
+                  <OptionalsList />
+                </Card>
+              </>
             )}
 
             {step === 3 && (
@@ -180,12 +194,22 @@ export const CheckoutPage = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <CheckoutSummary />
             {step < 3 && (
-              <Card className="p-4 bg-blue-50 border-blue-200">
-                <p className="text-sm text-blue-700">
-                  Precisa de ajuda? Entre em contato com nosso suporte pelo WhatsApp
+              <Card className="p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100">
+                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                  <User className="w-5 h-5 text-primary" />
+                  Precisa de ajuda?
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Nossa equipe está disponível para te ajudar pelo WhatsApp. Clique no botão abaixo para iniciar uma conversa.
                 </p>
+                <Button 
+                  variant="outline"
+                  className="w-full mt-4 bg-white hover:bg-gray-50"
+                  onClick={() => window.open('https://wa.me/seu-numero', '_blank')}
+                >
+                  Falar com Suporte
+                </Button>
               </Card>
             )}
           </motion.div>
