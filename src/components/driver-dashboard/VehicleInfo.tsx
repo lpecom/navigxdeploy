@@ -38,8 +38,12 @@ const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
         console.error('Error fetching vehicle info:', error);
         return null;
       }
+
+      if (!data) return null;
       
-      return data;
+      // Parse the JSON data and ensure it matches our SelectedCar type
+      const parsedCar = data.selected_car as SelectedCar;
+      return { selected_car: parsedCar };
     },
   });
 
