@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import DetailedReservationView from "./DetailedReservationView";
 
 interface ReservationActionsProps {
@@ -18,22 +19,38 @@ interface ReservationActionsProps {
 export const ReservationActions = ({ reservation }: ReservationActionsProps) => {
   const { toast } = useToast();
   const [showDetails, setShowDetails] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleAction = (action: 'approve' | 'reject' | 'view') => {
-    const messages = {
-      approve: 'Reserva aprovada com sucesso',
-      reject: 'Reserva rejeitada',
-      view: 'Abrindo detalhes da reserva'
-    };
-
+  const handleAction = async (action: 'approve' | 'reject' | 'view') => {
     if (action === 'view') {
       setShowDetails(true);
+      return;
     }
 
-    toast({
-      title: messages[action],
-      description: `Ação realizada para ${reservation.customerName}`,
-    });
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('checkout_sessions')
+        .update({ 
+          status: action === 'approve' ? 'approved' : 'rejected' 
+        })
+        .eq('id', reservation.id);
+
+      if (error) throw error;
+
+      toast({
+        title: action === 'approve' ? 'Reserva aprovada' : 'Reserva rejeitada',
+        description: `Ação realizada para ${reservation.customerName}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível processar a ação",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -44,6 +61,7 @@ export const ReservationActions = ({ reservation }: ReservationActionsProps) => 
           size="sm" 
           className="flex-1 bg-green-50 hover:bg-green-100 text-green-600"
           onClick={() => handleAction('approve')}
+          disabled={isLoading}
         >
           <Check className="w-4 h-4 mr-1" />
           Aprovar
@@ -53,6 +71,7 @@ export const ReservationActions = ({ reservation }: ReservationActionsProps) => 
           size="sm" 
           className="flex-1 bg-red-50 hover:bg-red-100 text-red-600"
           onClick={() => handleAction('reject')}
+          disabled={isLoading}
         >
           <X className="w-4 h-4 mr-1" />
           Rejeitar
@@ -61,6 +80,7 @@ export const ReservationActions = ({ reservation }: ReservationActionsProps) => 
           variant="outline" 
           size="sm"
           onClick={() => handleAction('view')}
+          disabled={isLoading}
         >
           <Eye className="w-4 h-4" />
         </Button>
