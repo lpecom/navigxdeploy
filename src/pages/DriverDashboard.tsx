@@ -9,6 +9,7 @@ import MaintenanceHistory from "@/components/driver-dashboard/MaintenanceHistory
 import PaymentHistory from "@/components/driver-dashboard/PaymentHistory";
 import SupportTickets from "@/components/driver-dashboard/SupportTickets";
 import DriverHeader from "@/components/driver-dashboard/DriverHeader";
+import { Car, Wrench, CreditCard, MessageSquare } from "lucide-react";
 
 const DriverDashboard = () => {
   const navigate = useNavigate();
@@ -23,7 +24,6 @@ const DriverDashboard = () => {
         return;
       }
 
-      // Get driver details - now handling multiple results
       const { data: drivers, error } = await supabase
         .from('driver_details')
         .select('id')
@@ -40,7 +40,6 @@ const DriverDashboard = () => {
         return;
       }
 
-      // Use the most recent driver record if multiple exist
       if (drivers && drivers.length > 0) {
         setDriverId(drivers[0].id);
       } else {
@@ -61,30 +60,61 @@ const DriverDashboard = () => {
     <div className="min-h-screen bg-gray-50">
       <DriverHeader />
       
-      <main className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="vehicle" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="vehicle">Meu Veículo</TabsTrigger>
-            <TabsTrigger value="maintenance">Manutenção</TabsTrigger>
-            <TabsTrigger value="payments">Pagamentos</TabsTrigger>
-            <TabsTrigger value="support">Suporte</TabsTrigger>
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900">Painel do Motorista</h1>
+          <p className="text-gray-500 mt-1">Gerencie seu veículo e acompanhe suas informações</p>
+        </div>
+
+        <Tabs defaultValue="vehicle" className="space-y-8">
+          <TabsList className="inline-flex h-14 items-center justify-center rounded-lg bg-white p-1 shadow-sm border border-gray-200">
+            <TabsTrigger 
+              value="vehicle" 
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-3 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm h-11 gap-2"
+            >
+              <Car className="w-4 h-4" />
+              Meu Veículo
+            </TabsTrigger>
+            <TabsTrigger 
+              value="maintenance"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-3 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm h-11 gap-2"
+            >
+              <Wrench className="w-4 h-4" />
+              Manutenção
+            </TabsTrigger>
+            <TabsTrigger 
+              value="payments"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-3 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm h-11 gap-2"
+            >
+              <CreditCard className="w-4 h-4" />
+              Pagamentos
+            </TabsTrigger>
+            <TabsTrigger 
+              value="support"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-3 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm h-11 gap-2"
+            >
+              <MessageSquare className="w-4 h-4" />
+              Suporte
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="vehicle" className="space-y-4">
-            <VehicleInfo driverId={driverId} />
-          </TabsContent>
+          <div className="mt-6">
+            <TabsContent value="vehicle" className="space-y-6 animate-fade-in">
+              <VehicleInfo driverId={driverId} />
+            </TabsContent>
 
-          <TabsContent value="maintenance" className="space-y-4">
-            <MaintenanceHistory driverId={driverId} />
-          </TabsContent>
+            <TabsContent value="maintenance" className="space-y-6 animate-fade-in">
+              <MaintenanceHistory driverId={driverId} />
+            </TabsContent>
 
-          <TabsContent value="payments" className="space-y-4">
-            <PaymentHistory driverId={driverId} />
-          </TabsContent>
+            <TabsContent value="payments" className="space-y-6 animate-fade-in">
+              <PaymentHistory driverId={driverId} />
+            </TabsContent>
 
-          <TabsContent value="support" className="space-y-4">
-            <SupportTickets driverId={driverId} />
-          </TabsContent>
+            <TabsContent value="support" className="space-y-6 animate-fade-in">
+              <SupportTickets driverId={driverId} />
+            </TabsContent>
+          </div>
         </Tabs>
       </main>
     </div>
