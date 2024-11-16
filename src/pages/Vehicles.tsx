@@ -6,8 +6,25 @@ import { FleetImport } from "@/components/vehicles/FleetImport";
 import { useState } from "react";
 import { EditVehicleDialog } from "@/components/vehicles/EditVehicleDialog";
 
-const Vehicles = () => {
+interface VehiclesProps {
+  view: 'fleet' | 'rentals' | 'customers';
+}
+
+const Vehicles = ({ view }: VehiclesProps) => {
   const [isAddingVehicle, setIsAddingVehicle] = useState(false);
+
+  const getTitle = () => {
+    switch (view) {
+      case 'fleet':
+        return 'Frota de Veículos';
+      case 'rentals':
+        return 'Locações Ativas';
+      case 'customers':
+        return 'Clientes';
+      default:
+        return 'Veículos';
+    }
+  };
 
   return (
     <div className="flex h-screen bg-background">
@@ -17,30 +34,34 @@ const Vehicles = () => {
           <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-                Veículos
+                {getTitle()}
               </h1>
               <p className="text-muted-foreground">
-                Gerencie sua frota de veículos e seus detalhes
+                {view === 'fleet' && 'Gerencie sua frota de veículos e seus detalhes'}
+                {view === 'rentals' && 'Visualize e gerencie as locações ativas'}
+                {view === 'customers' && 'Gerencie os clientes e suas informações'}
               </p>
             </div>
-            <Button 
-              className="inline-flex items-center gap-2"
-              onClick={() => setIsAddingVehicle(true)}
-            >
-              <Plus className="w-4 h-4" />
-              Adicionar Veículo
-            </Button>
+            {view === 'fleet' && (
+              <Button 
+                className="inline-flex items-center gap-2"
+                onClick={() => setIsAddingVehicle(true)}
+              >
+                <Plus className="w-4 h-4" />
+                Adicionar Veículo
+              </Button>
+            )}
           </div>
 
-          <FleetImport />
+          {view === 'fleet' && <FleetImport />}
 
           <div className="rounded-lg border bg-card">
             <div className="flex items-center gap-2 p-6 border-b">
               <Car className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-medium">Frota de Veículos</h2>
+              <h2 className="text-lg font-medium">{getTitle()}</h2>
             </div>
             <div className="p-6">
-              <VehicleList />
+              <VehicleList view={view} />
             </div>
           </div>
         </div>
