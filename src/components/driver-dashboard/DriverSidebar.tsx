@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,6 +7,7 @@ import {
   Tag,
   ChevronLeft,
   LogOut,
+  LayoutDashboard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,9 +29,10 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
   const navigate = useNavigate();
 
   const navItems: NavItem[] = [
-    { icon: Car, label: "Meu Veículo", href: "/driver" },
+    { icon: LayoutDashboard, label: "Visão Geral", href: "/driver" },
+    { icon: Car, label: "Meu Veículo", href: "/driver/vehicle" },
     { icon: Calendar, label: "Minhas Reservas", href: "/driver/reservations" },
-    { icon: CreditCard, label: "Financeiro", href: "/driver/payments" },
+    { icon: CreditCard, label: "Financeiro", href: "/driver/financial" },
     { icon: Tag, label: "Promoções", href: "/driver/promotions" },
   ];
 
@@ -53,7 +54,7 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed lg:static inset-y-0 left-0 z-50 flex flex-col w-64 bg-white border-r border-gray-200 shadow-lg lg:shadow-none transition-transform duration-300",
+          "fixed lg:sticky top-0 left-0 z-50 flex h-screen w-72 flex-col bg-white border-r border-gray-200 lg:shadow-none transition-transform duration-300",
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
@@ -67,21 +68,20 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        <nav className="flex-1 space-y-1 px-3 py-4">
           {navItems.map((item) => (
             <Link
               key={item.href}
               to={item.href}
               className={cn(
-                "flex items-center px-3 py-2 text-sm rounded-lg transition-colors",
-                "hover:bg-gray-100 hover:text-gray-900",
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                 location.pathname === item.href
                   ? "bg-primary/10 text-primary"
-                  : "text-gray-700"
+                  : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
               )}
             >
-              <item.icon className="w-5 h-5 mr-3" />
-              <span>{item.label}</span>
+              <item.icon className="h-5 w-5" />
+              {item.label}
             </Link>
           ))}
         </nav>
@@ -93,8 +93,8 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
             className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
             onClick={handleLogout}
           >
-            <LogOut className="w-5 h-5 mr-3" />
-            <span>Sair</span>
+            <LogOut className="h-5 w-5 mr-3" />
+            Sair
           </Button>
         </div>
 

@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Routes, Route } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { VehicleInfo } from "@/components/driver-dashboard/VehicleInfo";
 import MaintenanceHistory from "@/components/driver-dashboard/MaintenanceHistory";
 import PaymentHistory from "@/components/driver-dashboard/PaymentHistory";
-import SupportTickets from "@/components/driver-dashboard/SupportTickets";
 import DriverHeader from "@/components/driver-dashboard/DriverHeader";
 import { DriverSidebar } from "@/components/driver-dashboard/DriverSidebar";
+import { DriverVehicle } from "@/components/driver-dashboard/DriverVehicle";
+import { DriverReservations } from "@/components/driver-dashboard/DriverReservations";
+import { DriverFinancial } from "@/components/driver-dashboard/DriverFinancial";
+import { DriverPromotions } from "@/components/driver-dashboard/DriverPromotions";
+import { DriverOverview } from "@/components/driver-dashboard/DriverOverview";
 
 const DriverDashboard = () => {
   const navigate = useNavigate();
@@ -67,7 +71,13 @@ const DriverDashboard = () => {
         
         <main className="flex-1 p-4 md:p-6 lg:p-8 transition-all duration-200">
           <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
-            {/* Content will be rendered here based on the current route */}
+            <Routes>
+              <Route path="/" element={<DriverOverview driverId={driverId} />} />
+              <Route path="/vehicle" element={<DriverVehicle driverId={driverId} />} />
+              <Route path="/reservations" element={<DriverReservations driverId={driverId} />} />
+              <Route path="/financial" element={<DriverFinancial driverId={driverId} />} />
+              <Route path="/promotions" element={<DriverPromotions driverId={driverId} />} />
+            </Routes>
           </div>
         </main>
       </div>
