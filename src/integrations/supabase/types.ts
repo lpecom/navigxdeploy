@@ -352,6 +352,50 @@ export type Database = {
           },
         ]
       }
+      maintenance_records: {
+        Row: {
+          cost: number | null
+          created_at: string
+          description: string
+          driver_id: string
+          id: string
+          service_date: string
+          service_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          cost?: number | null
+          created_at?: string
+          description: string
+          driver_id: string
+          id?: string
+          service_date: string
+          service_type: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          cost?: number | null
+          created_at?: string
+          description?: string
+          driver_id?: string
+          id?: string
+          service_date?: string
+          service_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_records_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "driver_details"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       offers: {
         Row: {
           availability: string | null
@@ -539,6 +583,44 @@ export type Database = {
             columns: ["payment_id"]
             isOneToOne: false
             referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          driver_id: string
+          id: string
+          status: string
+          title: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          driver_id: string
+          id?: string
+          status?: string
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          driver_id?: string
+          id?: string
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "driver_details"
             referencedColumns: ["id"]
           },
         ]
