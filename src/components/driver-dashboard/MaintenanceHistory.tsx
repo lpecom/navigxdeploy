@@ -9,17 +9,29 @@ interface MaintenanceHistoryProps {
   driverId: string;
 }
 
+interface MaintenanceRecord {
+  id: string;
+  driver_id: string;
+  service_type: string;
+  description: string;
+  service_date: string;
+  cost: number | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
 const MaintenanceHistory = ({ driverId }: MaintenanceHistoryProps) => {
-  const { data: maintenanceRecords } = useQuery({
+  const { data: maintenanceRecords } = useQuery<MaintenanceRecord[]>({
     queryKey: ['maintenance-records', driverId],
     queryFn: async () => {
       const { data } = await supabase
         .from('maintenance_records')
         .select('*')
         .eq('driver_id', driverId)
-        .order('date', { ascending: false });
+        .order('service_date', { ascending: false });
       
-      return data;
+      return data || [];
     },
   });
 
@@ -38,7 +50,7 @@ const MaintenanceHistory = ({ driverId }: MaintenanceHistoryProps) => {
               <div>
                 <p className="font-medium">{record.service_type}</p>
                 <p className="text-sm text-gray-500">
-                  {format(new Date(record.date), "PP", { locale: ptBR })}
+                  {format(new Date(record.service_date), "PP", { locale: ptBR })}
                 </p>
                 <p className="text-sm text-gray-500">{record.description}</p>
               </div>

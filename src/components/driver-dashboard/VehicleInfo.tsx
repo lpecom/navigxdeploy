@@ -18,8 +18,12 @@ interface SelectedCar {
   period: string;
 }
 
+interface CheckoutSession {
+  selected_car: SelectedCar;
+}
+
 const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
-  const { data: checkoutSession } = useQuery({
+  const { data: checkoutSession } = useQuery<CheckoutSession | null>({
     queryKey: ['driver-vehicle', driverId],
     queryFn: async () => {
       const { data } = await supabase
@@ -29,7 +33,11 @@ const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
         .eq('status', 'active')
         .single();
       
-      return data ? { selected_car: data.selected_car as SelectedCar } : null;
+      if (!data) return null;
+      
+      // Type assertion to ensure the data matches our expected structure
+      const selectedCar = data.selected_car as unknown as SelectedCar;
+      return { selected_car: selectedCar };
     },
   });
 
