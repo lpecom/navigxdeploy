@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import DetailedReservationView from "./DetailedReservationView";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ReservationActionsProps {
   reservation: Reservation;
@@ -19,7 +20,8 @@ interface ReservationActionsProps {
 export const ReservationActions = ({ reservation }: ReservationActionsProps) => {
   const { toast } = useToast();
   const [showDetails, setShowDetails] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const handleAction = async (action: 'approve' | 'reject' | 'view') => {
     if (action === 'view') {
@@ -27,7 +29,7 @@ export const ReservationActions = ({ reservation }: ReservationActionsProps) => 
       return;
     }
 
-    setIsLoading(true);
+    setIsLoading(action);
     try {
       const { error } = await supabase
         .from('checkout_sessions')
@@ -37,6 +39,8 @@ export const ReservationActions = ({ reservation }: ReservationActionsProps) => 
         .eq('id', reservation.id);
 
       if (error) throw error;
+
+      await queryClient.invalidateQueries({ queryKey: ['reservations'] });
 
       toast({
         title: action === 'approve' ? 'Reserva aprovada' : 'Reserva rejeitada',
@@ -49,7 +53,7 @@ export const ReservationActions = ({ reservation }: ReservationActionsProps) => 
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsLoading(null);
     }
   };
 
@@ -59,28 +63,28 @@ export const ReservationActions = ({ reservation }: ReservationActionsProps) => 
         <Button 
           variant="outline" 
           size="sm" 
-          className="flex-1 bg-green-50 hover:bg-green-100 text-green-600"
+          className="flex-1 bg-green-50 hover:bg-green-100 text-green-600 disabled:opacity-50"
           onClick={() => handleAction('approve')}
-          disabled={isLoading}
+          disabled={isLoading !== null}
         >
           <Check className="w-4 h-4 mr-1" />
-          Aprovar
+          {isLoading === 'approve' ? 'Aprovando...' : 'Aprovar'}
         </Button>
         <Button 
           variant="outline" 
           size="sm" 
-          className="flex-1 bg-red-50 hover:bg-red-100 text-red-600"
+          className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 disabled:opacity-50"
           onClick={() => handleAction('reject')}
-          disabled={isLoading}
+          disabled={isLoading !== null}
         >
           <X className="w-4 h-4 mr-1" />
-          Rejeitar
+          {isLoading === 'reject' ? 'Rejeitando...' : 'Rejeitar'}
         </Button>
         <Button 
           variant="outline" 
           size="sm"
           onClick={() => handleAction('view')}
-          disabled={isLoading}
+          disabled={isLoading !== null}
         >
           <Eye className="w-4 h-4" />
         </Button>
