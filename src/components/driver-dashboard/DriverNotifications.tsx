@@ -43,7 +43,14 @@ export const DriverNotifications = () => {
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-        setNotifications(data || []);
+
+        // Validate and transform the notification type
+        const validatedNotifications = (data || []).map(notification => ({
+          ...notification,
+          type: validateNotificationType(notification.type)
+        }));
+
+        setNotifications(validatedNotifications);
       } catch (error) {
         toast({
           title: "Error",
@@ -57,6 +64,17 @@ export const DriverNotifications = () => {
 
     fetchNotifications();
   }, [toast]);
+
+  const validateNotificationType = (type: string): 'maintenance' | 'payment' | 'system' => {
+    switch (type) {
+      case 'maintenance':
+      case 'payment':
+      case 'system':
+        return type;
+      default:
+        return 'system';
+    }
+  };
 
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
