@@ -6,18 +6,20 @@ export interface CartItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
-  name?: string;  // Added for better display
+  name?: string;
 }
 
 interface CartState {
   items: CartItem[];
   total: number;
+  checkoutSessionId?: string;
 }
 
 type CartAction =
   | { type: 'ADD_ITEM'; payload: CartItem }
   | { type: 'REMOVE_ITEM'; payload: string }
   | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
+  | { type: 'SET_CHECKOUT_SESSION'; payload: string }
   | { type: 'CLEAR_CART' };
 
 const CartContext = createContext<{
@@ -78,10 +80,18 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       };
     }
 
+    case 'SET_CHECKOUT_SESSION': {
+      return {
+        ...state,
+        checkoutSessionId: action.payload
+      };
+    }
+
     case 'CLEAR_CART':
       return {
         items: [],
-        total: 0
+        total: 0,
+        checkoutSessionId: undefined
       };
 
     default:
@@ -92,7 +102,8 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(cartReducer, {
     items: [],
-    total: 0
+    total: 0,
+    checkoutSessionId: undefined
   });
 
   return (
