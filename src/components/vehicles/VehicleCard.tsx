@@ -44,7 +44,10 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
             <p className="text-sm text-gray-500">{car.description}</p>
           )}
           {car.optionals && Object.entries(car.optionals).filter(([key]) => 
-            !key.includes('power_steering') && !key.includes('air_conditioning')
+            !key.includes('power_steering') && 
+            !key.includes('air_conditioning') && 
+            !key.includes('abs') && 
+            !key.includes('power_windows')
           ).map(([key, value]) => (
             <Badge 
               key={key}
