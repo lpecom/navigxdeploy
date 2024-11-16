@@ -8,12 +8,14 @@ import { Steps } from "./Steps"
 import { CustomerForm } from "./sections/CustomerForm"
 import { PickupScheduler } from "./sections/PickupScheduler"
 import { CheckoutSummary } from "./sections/CheckoutSummary"
+import { OptionalsList } from "@/components/optionals/OptionalsList"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { handleCustomerData } from "./handlers/CustomerHandler"
 import { createDriverDetails } from "./handlers/DriverHandler"
 import { createCheckoutSession } from "./CheckoutSessionHandler"
 import { supabase } from "@/integrations/supabase/client"
+import { Separator } from "@/components/ui/separator"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
@@ -30,13 +32,9 @@ export const CheckoutPage = () => {
 
   const handleCustomerSubmit = async (customerData: any) => {
     try {
-      // Handle customer data (create or update)
       const customer = await handleCustomerData(customerData)
-      
-      // Create driver details
       const driverData = await createDriverDetails(customer)
 
-      // Create checkout session
       const session = await createCheckoutSession({
         driverId: driverData.id,
         cartItems: cartState.items,
@@ -100,11 +98,18 @@ export const CheckoutPage = () => {
     return (
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-6xl text-center">
-          <h2 className="text-2xl font-semibold mb-4">Seu carrinho está vazio</h2>
-          <p className="text-gray-600 mb-6">Adicione itens ao seu carrinho para continuar com a reserva.</p>
-          <Button onClick={() => navigate('/')}>
-            Voltar para a página inicial
-          </Button>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Car className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+            <h2 className="text-2xl font-semibold mb-4">Seu carrinho está vazio</h2>
+            <p className="text-gray-600 mb-6">Adicione itens ao seu carrinho para continuar com a reserva.</p>
+            <Button onClick={() => navigate('/')} className="hover:scale-105 transition-transform">
+              Voltar para a página inicial
+            </Button>
+          </motion.div>
         </div>
       </div>
     )
@@ -113,17 +118,29 @@ export const CheckoutPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-6xl">
-        <Steps currentStep={step} steps={steps} />
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Steps currentStep={step} steps={steps} />
+        </motion.div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
           <motion.div 
-            className="space-y-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            className="lg:col-span-2 space-y-6"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
             {step === 1 && (
-              <CustomerForm onSubmit={handleCustomerSubmit} />
+              <>
+                <CustomerForm onSubmit={handleCustomerSubmit} />
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">Opcionais Disponíveis</h3>
+                  <OptionalsList />
+                </Card>
+              </>
             )}
 
             {step === 2 && (
@@ -148,7 +165,7 @@ export const CheckoutPage = () => {
                   </p>
                   <Button
                     onClick={() => navigate('/')}
-                    className="mt-4"
+                    className="mt-4 hover:scale-105 transition-transform"
                   >
                     Voltar para a página inicial
                   </Button>
@@ -157,9 +174,21 @@ export const CheckoutPage = () => {
             )}
           </motion.div>
 
-          <div className="space-y-6">
+          <motion.div 
+            className="space-y-6"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
             <CheckoutSummary />
-          </div>
+            {step < 3 && (
+              <Card className="p-4 bg-blue-50 border-blue-200">
+                <p className="text-sm text-blue-700">
+                  Precisa de ajuda? Entre em contato com nosso suporte pelo WhatsApp
+                </p>
+              </Card>
+            )}
+          </motion.div>
         </div>
       </div>
     </div>

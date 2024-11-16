@@ -5,6 +5,9 @@ import { Form } from "@/components/ui/form"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useLoadScript, Autocomplete } from "@react-google-maps/api"
+import { useState, useCallback } from "react"
+import { Loader2 } from "lucide-react"
 
 const customerSchema = z.object({
   full_name: z.string().min(3, "Nome completo é obrigatório"),
@@ -24,9 +27,44 @@ interface CustomerFormProps {
 }
 
 export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false)
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
   })
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: "AIzaSyDjnhLdrsCZlcSjJemKCmjYqfqk11_nwM8",
+    libraries: ["places"]
+  })
+
+  const handleAddressSelect = useCallback(async (postal_code: string) => {
+    setIsLoadingAddress(true)
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${postal_code}/json/`)
+      const data = await response.json()
+      
+      if (!data.erro) {
+        form.setValue('address', data.logradouro)
+        form.setValue('city', data.localidade)
+        form.setValue('state', data.uf)
+      }
+    } catch (error) {
+      console.error('Error fetching address:', error)
+    } finally {
+      setIsLoadingAddress(false)
+    }
+  }, [form])
+
+  if (!isLoaded) {
+    return (
+      <Card className="p-6">
+        <div className="flex items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin" />
+          <span className="ml-2">Carregando...</span>
+        </div>
+      </Card>
+    )
+  }
 
   return (
     <Card className="p-6">
@@ -37,7 +75,7 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Nome Completo</label>
-              <Input {...form.register("full_name")} />
+              <Input {...form.register("full_name")} className="transition-all" />
               {form.formState.errors.full_name && (
                 <p className="text-sm text-red-500">{form.formState.errors.full_name.message}</p>
               )}
@@ -69,6 +107,25 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
           </div>
 
           <div className="space-y-2">
+            <label className="text-sm font-medium">CEP</label>
+            <Input 
+              {...form.register("postal_code")}
+              onChange={(e) => {
+                form.register("postal_code").onChange(e)
+                if (e.target.value.length === 8) {
+                  handleAddressSelect(e.target.value)
+                }
+              }}
+            />
+            {isLoadingAddress && (
+              <div className="flex items-center text-sm text-blue-600">
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                Buscando endereço...
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
             <label className="text-sm font-medium">Endereço</label>
             <Input {...form.register("address")} />
             {form.formState.errors.address && (
@@ -76,7 +133,7 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Cidade</label>
               <Input {...form.register("city")} />
@@ -92,17 +149,13 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
                 <p className="text-sm text-red-500">{form.formState.errors.state.message}</p>
               )}
             </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">CEP</label>
-              <Input {...form.register("postal_code")} />
-              {form.formState.errors.postal_code && (
-                <p className="text-sm text-red-500">{form.formState.errors.postal_code.message}</p>
-              )}
-            </div>
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button 
+            type="submit" 
+            className="w-full hover:scale-105 transition-transform"
+            disabled={isLoadingAddress}
+          >
             Continuar
           </Button>
         </form>
