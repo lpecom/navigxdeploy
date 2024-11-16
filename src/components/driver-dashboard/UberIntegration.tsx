@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Car, Link as LinkIcon } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 interface UberIntegrationProps {
   driverId: string;
@@ -11,10 +12,39 @@ interface UberIntegrationProps {
 
 export const UberIntegration = ({ driverId }: UberIntegrationProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
   const [isConnected, setIsConnected] = useState(false);
+  const { toast } = useToast();
+  const location = useLocation();
 
-  const handleUberConnect = async () => {
+  useEffect(() => {
+    // Check if we have a code parameter in the URL (OAuth callback)
+    const params = new URLSearchParams(location.search);
+    const code = params.get('code');
+    
+    if (code) {
+      handleUberCallback(code);
+    }
+
+    // Check existing integration
+    checkIntegrationStatus();
+  }, [driverId]);
+
+  const checkIntegrationStatus = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('driver_uber_integrations')
+        .select('is_active')
+        .eq('driver_id', driverId)
+        .single();
+
+      if (error) throw error;
+      setIsConnected(data?.is_active || false);
+    } catch (error) {
+      console.error('Error checking integration status:', error);
+    }
+  };
+
+  const handleUberConnect = () => {
     const clientId = import.meta.env.VITE_UBER_CLIENT_ID;
     const redirectUri = import.meta.env.VITE_UBER_REDIRECT_URI;
     const scope = 'partner.accounts';
@@ -43,6 +73,9 @@ export const UberIntegration = ({ driverId }: UberIntegrationProps) => {
       });
       
       setIsConnected(true);
+      
+      // Clean up URL
+      window.history.replaceState({}, '', location.pathname);
     } catch (error) {
       console.error('Error connecting Uber account:', error);
       toast({

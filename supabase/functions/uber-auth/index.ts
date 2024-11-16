@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,12 +9,14 @@ const corsHeaders = {
 const UBER_API_URL = 'https://api.uber.com/v1'
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
     const { code, driver_id } = await req.json()
+    console.log('Received auth code for driver:', driver_id)
 
     if (!code || !driver_id) {
       throw new Error('Missing required parameters')
@@ -35,8 +38,10 @@ serve(async (req) => {
     })
 
     const tokens = await tokenResponse.json()
+    console.log('Received tokens from Uber')
 
     if (!tokenResponse.ok) {
+      console.error('Token exchange failed:', tokens)
       throw new Error('Failed to exchange authorization code')
     }
 
@@ -48,18 +53,20 @@ serve(async (req) => {
     })
 
     const profile = await profileResponse.json()
+    console.log('Retrieved Uber profile')
 
     if (!profileResponse.ok) {
+      console.error('Profile fetch failed:', profile)
       throw new Error('Failed to fetch Uber profile')
     }
 
     // Store integration data in Supabase
-    const supabaseClient = createClient(
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { error } = await supabaseClient
+    const { error: upsertError } = await supabaseAdmin
       .from('driver_uber_integrations')
       .upsert({
         driver_id,
@@ -69,17 +76,25 @@ serve(async (req) => {
         token_expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
       })
 
-    if (error) throw error
+    if (upsertError) {
+      console.error('Database update failed:', upsertError)
+      throw upsertError
+    }
+
+    console.log('Successfully stored Uber integration data')
 
     return new Response(
       JSON.stringify({ success: true }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error in uber-auth function:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        status: 400, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
     )
   }
 })
