@@ -12,6 +12,7 @@ import Automations from "@/pages/Automations";
 import Reservations from "@/pages/Reservations";
 import Dashboard from "@/pages/Dashboard";
 import Customers from "@/pages/Customers";
+import CustomerDetails from "@/pages/CustomerDetails";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 
