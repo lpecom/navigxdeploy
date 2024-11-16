@@ -10,7 +10,6 @@ import {
   ChevronDown,
   ChevronRight,
   Settings,
-  Users,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -44,55 +43,46 @@ const Sidebar = () => {
   };
 
   const menuItems: MenuItem[] = [
-    { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
     {
       icon: Calendar,
       label: "Reservas",
       subItems: [
-        { to: "/reservations/pending", label: "Pendentes" },
-        { to: "/reservations/pickup", label: "Retirada" },
+        { to: "/admin/reservations/pending", label: "Pendentes" },
+        { to: "/admin/reservations/pickup", label: "Retirada" },
       ]
     },
     {
       icon: Car,
       label: "Veículos",
       subItems: [
-        { to: "/vehicles/fleet", label: "Frota" },
-        { to: "/vehicles/rentals", label: "Locações" },
-        { to: "/vehicles/customers", label: "Clientes" },
+        { to: "/admin/vehicles/fleet", label: "Frota" },
+        { to: "/admin/vehicles/rentals", label: "Locações" },
+        { to: "/admin/vehicles/customers", label: "Clientes" },
       ]
     },
     {
       icon: BarChart2,
       label: "Análises",
       subItems: [
-        { to: "/analytics", label: "Visão Geral" },
-        { to: "/reports", label: "Relatórios" },
-        { to: "/performance", label: "Performance" },
+        { to: "/admin/analytics", label: "Visão Geral" },
+        { to: "/admin/reports", label: "Relatórios" },
+        { to: "/admin/performance", label: "Performance" },
       ]
     },
     {
       icon: Tag,
       label: "Marketing",
       subItems: [
-        { to: "/offers", label: "Ofertas" },
-        { to: "/automations", label: "Automações" },
+        { to: "/admin/offers", label: "Ofertas" },
+        { to: "/admin/automations", label: "Automações" },
       ]
     },
-    { to: "/accessories", icon: Package, label: "Opcionais" },
-    {
-      icon: Settings,
-      label: "Configurações",
-      subItems: [
-        { to: "/settings/profile", label: "Perfil" },
-        { to: "/settings/company", label: "Empresa" },
-        { to: "/settings/integrations", label: "Integrações" },
-      ]
-    },
+    { to: "/admin/accessories", icon: Package, label: "Opcionais" },
   ];
 
   return (
-    <aside className="bg-white w-64 min-h-screen border-r border-gray-200">
+    <aside className="fixed top-0 left-0 z-40 w-64 h-screen bg-white border-r border-gray-200">
       <div className="p-6">
         <img 
           src="https://i.imghippo.com/files/uafE3798xA.png" 

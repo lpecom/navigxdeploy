@@ -39,7 +39,7 @@ const AdminRoutes = () => {
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
+      if (event === 'SIGNED_OUT' || !session) {
         navigate("/admin/login");
         setIsAuthenticated(false);
       } else {
@@ -59,7 +59,7 @@ const AdminRoutes = () => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/admin/login" replace />;
+    return null;
   }
 
   return (
@@ -71,17 +71,21 @@ const AdminRoutes = () => {
           <div className="max-w-7xl mx-auto">
             <Routes>
               <Route index element={<Dashboard />} />
-              <Route path="vehicles/fleet" element={<Vehicles view="fleet" />} />
-              <Route path="vehicles/rentals" element={<Vehicles view="rentals" />} />
-              <Route path="vehicles/customers" element={<Vehicles view="customers" />} />
+              <Route path="vehicles">
+                <Route path="fleet" element={<Vehicles view="fleet" />} />
+                <Route path="rentals" element={<Vehicles view="rentals" />} />
+                <Route path="customers" element={<Vehicles view="customers" />} />
+              </Route>
               <Route path="offers" element={<Offers />} />
               <Route path="accessories" element={<Accessories />} />
               <Route path="analytics" element={<Analytics />} />
               <Route path="performance" element={<Performance />} />
               <Route path="reports" element={<Reports />} />
               <Route path="automations" element={<Automations />} />
-              <Route path="reservations/pending" element={<Reservations filter="pending" />} />
-              <Route path="reservations/pickup" element={<Reservations filter="pickup" />} />
+              <Route path="reservations">
+                <Route path="pending" element={<Reservations filter="pending" />} />
+                <Route path="pickup" element={<Reservations filter="pickup" />} />
+              </Route>
               <Route path="*" element={<Navigate to="/admin" replace />} />
             </Routes>
           </div>
