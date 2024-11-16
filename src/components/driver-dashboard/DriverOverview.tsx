@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Car, CreditCard, Calendar, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { ProfitCalculator } from "./ProfitCalculator";
 
 interface DriverOverviewProps {
   driverId: string;
@@ -97,6 +98,8 @@ export const DriverOverview = ({ driverId }: DriverOverviewProps) => {
           </CardContent>
         </Card>
       </div>
+
+      <ProfitCalculator driverId={driverId} />
     </div>
   );
 };
