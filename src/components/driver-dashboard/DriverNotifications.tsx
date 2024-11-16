@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Calendar, MessageSquare } from "lucide-react";
+import { Bell, Calendar, MessageSquare, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Notification {
   id: string;
@@ -53,8 +54,8 @@ export const DriverNotifications = () => {
         setNotifications(validatedNotifications);
       } catch (error) {
         toast({
-          title: "Error",
-          description: "Não foi possível carregar as notificações",
+          title: "Erro ao carregar notificações",
+          description: "Não foi possível carregar suas notificações. Tente novamente mais tarde.",
           variant: "destructive",
         });
       } finally {
@@ -79,11 +80,11 @@ export const DriverNotifications = () => {
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
       case 'maintenance':
-        return <Calendar className="h-5 w-5" />;
+        return <Calendar className="h-5 w-5 text-blue-500" />;
       case 'payment':
-        return <Bell className="h-5 w-5" />;
+        return <Bell className="h-5 w-5 text-green-500" />;
       case 'system':
-        return <MessageSquare className="h-5 w-5" />;
+        return <MessageSquare className="h-5 w-5 text-purple-500" />;
     }
   };
 
@@ -113,83 +114,97 @@ export const DriverNotifications = () => {
             : notification
         )
       );
+
+      toast({
+        title: "Notificação marcada como lida",
+        description: "A notificação foi atualizada com sucesso.",
+      });
     } catch (error) {
       toast({
-        title: "Error",
+        title: "Erro",
         description: "Não foi possível atualizar a notificação",
         variant: "destructive",
       });
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight">Notificações</h1>
+  const LoadingSkeleton = () => (
+    <div className="space-y-4">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="flex items-start space-x-4 p-4 rounded-lg border animate-pulse">
+          <div className="w-10 h-10 rounded-full bg-gray-200" />
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-1/4" />
+            <div className="h-3 bg-gray-200 rounded w-3/4" />
+          </div>
         </div>
-        <Card>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="h-20 bg-gray-100 rounded-lg" />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+      ))}
+    </div>
+  );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Notificações</h1>
-        <Badge variant="secondary">
-          {notifications.filter(n => !n.is_read).length} não lidas
-        </Badge>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight">Notificações</h1>
+          <p className="text-muted-foreground">
+            Gerencie suas notificações e atualizações importantes
+          </p>
+        </div>
+        {!isLoading && (
+          <Badge variant="secondary" className="h-7">
+            {notifications.filter(n => !n.is_read).length} não lidas
+          </Badge>
+        )}
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Central de Notificações</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Central de Notificações
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {notifications.length === 0 ? (
+        <CardContent>
+          {isLoading ? (
+            <LoadingSkeleton />
+          ) : notifications.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              Nenhuma notificação encontrada
+              <MessageSquare className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <p className="font-medium">Nenhuma notificação encontrada</p>
+              <p className="text-sm">Você será notificado quando houver atualizações importantes</p>
             </div>
           ) : (
-            notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={cn(
-                  "flex items-start space-x-4 p-4 rounded-lg transition-colors cursor-pointer",
-                  notification.is_read ? "bg-background" : "bg-primary/5"
-                )}
-                onClick={() => !notification.is_read && markAsRead(notification.id)}
-              >
-                <div className={cn(
-                  "p-2 rounded-full",
-                  notification.is_read ? "bg-muted" : "bg-primary/10"
-                )}>
-                  {getNotificationIcon(notification.type)}
-                </div>
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <p className="font-medium">{notification.title}</p>
-                    <span className="text-sm text-muted-foreground">
-                      {formatDate(notification.created_at)}
-                    </span>
+            <div className="space-y-4">
+              {notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={cn(
+                    "flex items-start space-x-4 p-4 rounded-lg transition-colors cursor-pointer hover:bg-accent/50",
+                    notification.is_read ? "bg-background" : "bg-primary/5"
+                  )}
+                  onClick={() => !notification.is_read && markAsRead(notification.id)}
+                >
+                  <div className={cn(
+                    "p-2 rounded-full shrink-0",
+                    notification.is_read ? "bg-muted" : "bg-primary/10"
+                  )}>
+                    {getNotificationIcon(notification.type)}
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    {notification.message}
-                  </p>
+                  <div className="flex-1 space-y-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-medium truncate">{notification.title}</p>
+                      <span className="text-sm text-muted-foreground whitespace-nowrap">
+                        {formatDate(notification.created_at)}
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {notification.message}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
