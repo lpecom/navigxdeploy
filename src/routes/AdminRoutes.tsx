@@ -38,7 +38,7 @@ const AdminRoutes = () => {
 
     checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!session) {
         navigate("/admin/login");
         setIsAuthenticated(false);

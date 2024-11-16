@@ -27,11 +27,15 @@ const App = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/plans" element={<Plans />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
+                
+                {/* Driver Routes */}
                 <Route path="/driver/*" element={<DriverDashboard />} />
                 
-                {/* Admin Routes */}
+                {/* Admin Routes - Separate Authentication Context */}
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin/*" element={<AdminRoutes />} />
+                
+                {/* Legacy route redirect */}
                 <Route path="/dashboard/*" element={<Navigate to="/admin" replace />} />
               </Routes>
               <Toaster />
