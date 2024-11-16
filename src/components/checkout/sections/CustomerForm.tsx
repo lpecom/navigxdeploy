@@ -19,7 +19,6 @@ const customerSchema = z.object({
   city: z.string().min(2, "Cidade é obrigatória"),
   state: z.string().min(2, "Estado é obrigatório"),
   postal_code: z.string().min(8, "CEP inválido").max(9, "CEP inválido"),
-  has_account: z.boolean().default(false),
 })
 
 type CustomerFormValues = z.infer<typeof customerSchema>
@@ -34,9 +33,6 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
   
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
-    defaultValues: {
-      has_account: false,
-    }
   })
 
   const handleAddressSelect = useCallback(async (postal_code: string) => {
@@ -57,6 +53,12 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
     }
   }, [form])
 
+  const handleFormSubmit = async (data: CustomerFormValues) => {
+    // Remove password from customer data if not needed
+    const { password, ...customerData } = data
+    onSubmit(customerData)
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -65,7 +67,7 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
       className="space-y-6"
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
           <AuthSection 
             form={form}
             hasAccount={hasAccount}
