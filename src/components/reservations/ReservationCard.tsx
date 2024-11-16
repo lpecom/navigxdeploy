@@ -6,6 +6,8 @@ import { ReservationExpandedContent } from "./ReservationExpandedContent";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { Reservation } from "@/types/reservation";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface ReservationCardProps {
   reservation: Reservation;
@@ -14,6 +16,34 @@ interface ReservationCardProps {
 }
 
 export const ReservationCard = ({ reservation, isExpanded, onToggle }: ReservationCardProps) => {
+  const handleApprove = async () => {
+    const { error } = await supabase
+      .from('checkout_sessions')
+      .update({ status: 'approved' })
+      .eq('id', reservation.id);
+
+    if (error) {
+      toast.error('Erro ao aprovar reserva');
+      return;
+    }
+
+    toast.success('Reserva aprovada com sucesso');
+  };
+
+  const handleReject = async () => {
+    const { error } = await supabase
+      .from('checkout_sessions')
+      .update({ status: 'rejected' })
+      .eq('id', reservation.id);
+
+    if (error) {
+      toast.error('Erro ao rejeitar reserva');
+      return;
+    }
+
+    toast.success('Reserva rejeitada com sucesso');
+  };
+
   const getRiskBadge = (score: number) => {
     if (score <= 30) {
       return (
@@ -70,7 +100,13 @@ export const ReservationCard = ({ reservation, isExpanded, onToggle }: Reservati
         )}
       </CardHeader>
       <CardContent className="p-4 pt-0">
-        {isExpanded && <ReservationExpandedContent reservation={reservation} />}
+        {isExpanded && (
+          <ReservationExpandedContent 
+            reservation={reservation} 
+            onApprove={handleApprove}
+            onReject={handleReject}
+          />
+        )}
       </CardContent>
     </Card>
   );
