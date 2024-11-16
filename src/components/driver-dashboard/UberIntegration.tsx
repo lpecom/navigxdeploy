@@ -35,12 +35,20 @@ export const UberIntegration = ({ driverId }: UberIntegrationProps) => {
         .from('driver_uber_integrations')
         .select('is_active')
         .eq('driver_id', driverId)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+      
       setIsConnected(data?.is_active || false);
     } catch (error) {
       console.error('Error checking integration status:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível verificar o status da integração.",
+        variant: "destructive",
+      });
     }
   };
 
