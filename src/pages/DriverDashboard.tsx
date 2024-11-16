@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Routes, Route } from "react-router-dom";
+import { useNavigate, Routes, Route, Navigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import DriverHeader from "@/components/driver-dashboard/DriverHeader";
@@ -69,11 +69,12 @@ const DriverDashboard = () => {
         <main className="flex-1 p-4 md:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">
             <Routes>
-              <Route path="/" element={<DriverOverview driverId={driverId} />} />
-              <Route path="/vehicle" element={<DriverVehicle driverId={driverId} />} />
-              <Route path="/reservations" element={<DriverReservations driverId={driverId} />} />
-              <Route path="/financial" element={<DriverFinancial driverId={driverId} />} />
-              <Route path="/promotions" element={<DriverPromotions driverId={driverId} />} />
+              <Route index element={<DriverOverview driverId={driverId} />} />
+              <Route path="vehicle" element={<DriverVehicle driverId={driverId} />} />
+              <Route path="reservations" element={<DriverReservations driverId={driverId} />} />
+              <Route path="financial" element={<DriverFinancial driverId={driverId} />} />
+              <Route path="promotions" element={<DriverPromotions driverId={driverId} />} />
+              <Route path="*" element={<Navigate to="/driver" replace />} />
             </Routes>
           </div>
         </main>
