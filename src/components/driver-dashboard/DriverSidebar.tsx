@@ -3,14 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Car,
-  Wrench,
+  Calendar,
   CreditCard,
-  MessageSquare,
-  Settings,
+  Tag,
   ChevronLeft,
-  ChevronRight,
-  Bell,
-  LogOut
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,14 +27,12 @@ interface DriverSidebarProps {
 export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isHovered, setIsHovered] = useState(false);
 
   const navItems: NavItem[] = [
     { icon: Car, label: "Meu Veículo", href: "/driver" },
-    { icon: Wrench, label: "Manutenção", href: "/driver/maintenance" },
-    { icon: CreditCard, label: "Pagamentos", href: "/driver/payments" },
-    { icon: MessageSquare, label: "Suporte", href: "/driver/support" },
-    { icon: Settings, label: "Configurações", href: "/driver/settings" },
+    { icon: Calendar, label: "Minhas Reservas", href: "/driver/reservations" },
+    { icon: CreditCard, label: "Financeiro", href: "/driver/payments" },
+    { icon: Tag, label: "Promoções", href: "/driver/promotions" },
   ];
 
   const handleLogout = async () => {
@@ -59,30 +54,16 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
       <aside
         className={cn(
           "fixed lg:static inset-y-0 left-0 z-50 flex flex-col w-64 bg-white border-r border-gray-200 shadow-lg lg:shadow-none transition-transform duration-300",
-          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-          !isOpen && !isHovered && "lg:w-20"
+          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
         {/* Logo */}
-        <div className="p-6 flex items-center justify-between">
+        <div className="p-6">
           <img 
             src="https://i.imghippo.com/files/uafE3798xA.png" 
             alt="Navig Logo" 
-            className={cn(
-              "transition-all duration-300",
-              !isOpen && !isHovered ? "w-8" : "w-24"
-            )}
+            className="h-8 w-auto"
           />
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggle}
-            className="lg:hidden"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
         </div>
 
         {/* Navigation */}
@@ -96,20 +77,11 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
                 "hover:bg-gray-100 hover:text-gray-900",
                 location.pathname === item.href
                   ? "bg-primary/10 text-primary"
-                  : "text-gray-700",
-                !isOpen && !isHovered && "justify-center lg:px-3"
+                  : "text-gray-700"
               )}
             >
-              <item.icon className={cn(
-                "w-5 h-5",
-                !isOpen && !isHovered ? "mr-0" : "mr-3"
-              )} />
-              <span className={cn(
-                "transition-opacity duration-300",
-                !isOpen && !isHovered ? "lg:hidden" : "block"
-              )}>
-                {item.label}
-              </span>
+              <item.icon className="w-5 h-5 mr-3" />
+              <span>{item.label}</span>
             </Link>
           ))}
         </nav>
@@ -118,37 +90,22 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
         <div className="p-4 border-t border-gray-200">
           <Button
             variant="ghost"
-            className={cn(
-              "w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50",
-              !isOpen && !isHovered && "justify-center"
-            )}
+            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
             onClick={handleLogout}
           >
-            <LogOut className={cn(
-              "w-5 h-5",
-              !isOpen && !isHovered ? "mr-0" : "mr-3"
-            )} />
-            <span className={cn(
-              "transition-opacity duration-300",
-              !isOpen && !isHovered ? "lg:hidden" : "block"
-            )}>
-              Sair
-            </span>
+            <LogOut className="w-5 h-5 mr-3" />
+            <span>Sair</span>
           </Button>
         </div>
 
-        {/* Toggle button (desktop only) */}
+        {/* Mobile close button */}
         <Button
           variant="ghost"
           size="icon"
           onClick={onToggle}
-          className="absolute -right-4 top-10 hidden lg:flex h-8 w-8 items-center justify-center rounded-full border bg-white shadow-md"
+          className="absolute right-4 top-4 lg:hidden"
         >
-          {isOpen ? (
-            <ChevronLeft className="h-4 w-4" />
-          ) : (
-            <ChevronRight className="h-4 w-4" />
-          )}
+          <ChevronLeft className="h-4 w-4" />
         </Button>
       </aside>
     </>
