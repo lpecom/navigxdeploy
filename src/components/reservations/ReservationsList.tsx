@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Reservation, PickupFilter } from "@/types/reservation";
 import { ReservationCard } from "./ReservationCard";
 import { supabase } from "@/integrations/supabase/client";
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, addWeeks, format } from "date-fns";
+import { startOfWeek, endOfWeek, addWeeks, format } from "date-fns";
 
 interface ReservationsListProps {
   filter: "pending" | PickupFilter;
@@ -30,7 +30,8 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
             state,
             postal_code
           )
-        `);
+        `)
+        .order('reservation_number', { ascending: false });
 
       if (filter === 'pending') {
         query = query.eq('status', 'pending_approval');
@@ -58,12 +59,13 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
         }
       }
 
-      const { data, error } = await query.order('created_at', { ascending: false });
+      const { data, error } = await query;
       
       if (error) throw error;
       
       return (data || []).map((session: any): Reservation => ({
         id: session.id,
+        reservationNumber: session.reservation_number,
         customerName: session.driver?.full_name || 'Cliente não identificado',
         email: session.driver?.email || '',
         cpf: session.driver?.cpf || '',

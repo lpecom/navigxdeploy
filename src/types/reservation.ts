@@ -13,6 +13,7 @@ export interface Optional {
 
 export interface Reservation {
   id: string;
+  reservationNumber: number;
   customerName: string;
   email: string;
   cpf: string;
