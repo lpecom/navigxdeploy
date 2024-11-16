@@ -305,6 +305,50 @@ export type Database = {
         }
         Relationships: []
       }
+      driver_uber_integrations: {
+        Row: {
+          access_token: string
+          created_at: string | null
+          driver_id: string
+          id: string
+          is_active: boolean | null
+          refresh_token: string
+          token_expires_at: string
+          uber_driver_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          access_token: string
+          created_at?: string | null
+          driver_id: string
+          id?: string
+          is_active?: boolean | null
+          refresh_token: string
+          token_expires_at: string
+          uber_driver_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          access_token?: string
+          created_at?: string | null
+          driver_id?: string
+          id?: string
+          is_active?: boolean | null
+          refresh_token?: string
+          token_expires_at?: string
+          uber_driver_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_uber_integrations_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: true
+            referencedRelation: "driver_details"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_fares: {
         Row: {
           base_price: number
