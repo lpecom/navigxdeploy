@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { addDays, format, setHours, setMinutes } from "date-fns"
+import { addDays, format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { Clock } from "lucide-react"
 
@@ -47,28 +47,24 @@ export const PickupScheduler = ({ onSubmit }: PickupSchedulerProps) => {
   const timeSlots = generateTimeSlots();
 
   return (
-    <Card className="p-6 animate-fade-in">
-      <h2 className="text-xl font-semibold mb-6">Agende sua Retirada</h2>
-      
-      <div className="space-y-6">
+    <div className="space-y-6">
+      <Card className="p-6 animate-fade-in">
+        <h2 className="text-xl font-semibold mb-6">Selecione a Data</h2>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Data de Retirada
-          </label>
           <Calendar
             mode="single"
             selected={date}
             onSelect={setDate}
             locale={ptBR}
             disabled={(date) => date < new Date() || date > addDays(new Date(), 30)}
-            className="rounded-md border"
+            className="rounded-md border mx-auto"
           />
         </div>
+      </Card>
 
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Horário de Retirada
-          </label>
+      <Card className="p-6 animate-fade-in">
+        <h2 className="text-xl font-semibold mb-6">Selecione o Horário</h2>
+        <div className="space-y-4">
           <Select 
             value={time} 
             onValueChange={setTime}
@@ -85,7 +81,7 @@ export const PickupScheduler = ({ onSubmit }: PickupSchedulerProps) => {
                 )}
               </SelectValue>
             </SelectTrigger>
-            <SelectContent className="max-h-[300px]">
+            <SelectContent className="max-h-[200px]">
               {timeSlots.map((slot) => (
                 <SelectItem key={slot} value={slot}>
                   <div className="flex items-center gap-2">
@@ -96,16 +92,16 @@ export const PickupScheduler = ({ onSubmit }: PickupSchedulerProps) => {
               ))}
             </SelectContent>
           </Select>
-        </div>
 
-        <Button 
-          onClick={handleSubmit}
-          disabled={!date || !time}
-          className="w-full"
-        >
-          Confirmar Agendamento
-        </Button>
-      </div>
-    </Card>
+          <Button 
+            onClick={handleSubmit}
+            disabled={!date || !time}
+            className="w-full"
+          >
+            Confirmar Agendamento
+          </Button>
+        </div>
+      </Card>
+    </div>
   )
 }
