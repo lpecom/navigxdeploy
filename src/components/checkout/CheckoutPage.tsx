@@ -64,9 +64,30 @@ export const CheckoutPage = () => {
         customer = newCustomer
       }
 
-      // Create checkout session after customer is created/updated
+      // Create driver details record
+      const { data: driverData, error: driverError } = await supabase
+        .from('driver_details')
+        .insert([{
+          full_name: customer.full_name,
+          email: customer.email,
+          cpf: customer.cpf,
+          phone: customer.phone,
+          birth_date: customerData.birth_date || new Date().toISOString().split('T')[0],
+          license_number: customerData.license_number || 'PENDING',
+          license_expiry: customerData.license_expiry || new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+          address: customer.address,
+          city: customer.city,
+          state: customer.state,
+          postal_code: customer.postal_code,
+        }])
+        .select()
+        .single()
+
+      if (driverError) throw driverError
+
+      // Create checkout session after driver is created
       const session = await createCheckoutSession({
-        driverId: customer.id,
+        driverId: driverData.id,
         cartItems: cartState.items,
         totalAmount: cartState.total,
         onSuccess: (sessionId) => {
