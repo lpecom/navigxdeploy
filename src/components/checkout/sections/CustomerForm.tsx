@@ -29,11 +29,48 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
 
   const handleSubmit = async (data: DriverFormValues) => {
     try {
-      // Create driver record with CRM status
-      const { data: driverData, error: driverError } = await supabase
+      // First, check if a driver with this email already exists
+      const { data: existingDriver, error: searchError } = await supabase
         .from("driver_details")
-        .insert([
-          {
+        .select("id")
+        .eq("email", data.email)
+        .single()
+
+      if (searchError && searchError.code !== 'PGRST116') {
+        throw searchError
+      }
+
+      let driverId: string
+
+      if (existingDriver) {
+        // If driver exists, use their ID
+        driverId = existingDriver.id
+        
+        // Update their information
+        const { error: updateError } = await supabase
+          .from("driver_details")
+          .update({
+            full_name: data.fullName,
+            birth_date: data.birthDate,
+            license_number: data.licenseNumber,
+            license_expiry: data.licenseExpiry,
+            cpf: data.cpf,
+            phone: data.phone,
+            crm_status: 'pending_payment'
+          })
+          .eq("id", driverId)
+
+        if (updateError) throw updateError
+
+        toast({
+          title: "Dados atualizados!",
+          description: "Suas informações foram atualizadas com sucesso.",
+        })
+      } else {
+        // If driver doesn't exist, create new record
+        const { data: newDriver, error: createError } = await supabase
+          .from("driver_details")
+          .insert([{
             full_name: data.fullName,
             birth_date: data.birthDate,
             license_number: data.licenseNumber,
@@ -42,20 +79,21 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
             phone: data.phone,
             email: data.email,
             crm_status: 'pending_payment'
-          }
-        ])
-        .select()
-        .single()
+          }])
+          .select()
+          .single()
 
-      if (driverError) throw driverError
-
-      toast({
-        title: "Sucesso!",
-        description: "Seus dados foram salvos com sucesso.",
-      })
+        if (createError) throw createError
+        
+        driverId = newDriver.id
+        toast({
+          title: "Sucesso!",
+          description: "Seus dados foram salvos com sucesso.",
+        })
+      }
 
       // Pass the driver ID back to parent component
-      onSubmit(driverData.id)
+      onSubmit(driverId)
     } catch (error: any) {
       console.error('Error submitting driver details:', error)
       toast({
