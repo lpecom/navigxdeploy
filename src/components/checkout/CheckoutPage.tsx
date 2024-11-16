@@ -32,11 +32,7 @@ export const CheckoutPage = () => {
         .from('customers')
         .select()
         .eq('cpf', customerData.cpf)
-        .single()
-
-      if (searchError && searchError.code !== 'PGRST116') {
-        throw searchError
-      }
+        .maybeSingle()
 
       let customer
       if (existingCustomer) {
