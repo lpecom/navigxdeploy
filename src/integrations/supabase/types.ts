@@ -230,6 +230,8 @@ export type Database = {
           created_at: string
           driver_id: string | null
           id: string
+          pickup_date: string | null
+          pickup_time: string | null
           selected_car: Json
           selected_optionals: Json
           status: string
@@ -240,6 +242,8 @@ export type Database = {
           created_at?: string
           driver_id?: string | null
           id?: string
+          pickup_date?: string | null
+          pickup_time?: string | null
           selected_car: Json
           selected_optionals: Json
           status?: string
@@ -250,6 +254,8 @@ export type Database = {
           created_at?: string
           driver_id?: string | null
           id?: string
+          pickup_date?: string | null
+          pickup_time?: string | null
           selected_car?: Json
           selected_optionals?: Json
           status?: string
@@ -268,7 +274,9 @@ export type Database = {
       }
       driver_details: {
         Row: {
+          address: string | null
           birth_date: string
+          city: string | null
           cpf: string
           created_at: string
           crm_status: string | null
@@ -278,9 +286,13 @@ export type Database = {
           license_expiry: string
           license_number: string
           phone: string
+          postal_code: string | null
+          state: string | null
         }
         Insert: {
+          address?: string | null
           birth_date: string
+          city?: string | null
           cpf: string
           created_at?: string
           crm_status?: string | null
@@ -290,9 +302,13 @@ export type Database = {
           license_expiry: string
           license_number: string
           phone: string
+          postal_code?: string | null
+          state?: string | null
         }
         Update: {
+          address?: string | null
           birth_date?: string
+          city?: string | null
           cpf?: string
           created_at?: string
           crm_status?: string | null
@@ -302,6 +318,8 @@ export type Database = {
           license_expiry?: string
           license_number?: string
           phone?: string
+          postal_code?: string | null
+          state?: string | null
         }
         Relationships: []
       }
