@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Car } from "lucide-react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import VehicleList from "@/components/vehicles/VehicleList";
+import { FleetImport } from "@/components/vehicles/FleetImport";
 import { useState } from "react";
 import { EditVehicleDialog } from "@/components/vehicles/EditVehicleDialog";
 
@@ -30,6 +31,8 @@ const Vehicles = () => {
               Adicionar Veículo
             </Button>
           </div>
+
+          <FleetImport />
 
           <div className="rounded-lg border bg-card">
             <div className="flex items-center gap-2 p-6 border-b">
