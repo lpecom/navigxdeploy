@@ -28,6 +28,15 @@ interface SupportTicketsProps {
   driverId: string;
 }
 
+interface SupportTicket {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  status: string;
+  created_at: string;
+}
+
 const SupportTickets = ({ driverId }: SupportTicketsProps) => {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
@@ -44,7 +53,7 @@ const SupportTickets = ({ driverId }: SupportTicketsProps) => {
         .eq('driver_id', driverId)
         .order('created_at', { ascending: false });
       
-      return data;
+      return data as SupportTicket[];
     },
   });
 

@@ -7,6 +7,17 @@ interface VehicleInfoProps {
   driverId: string;
 }
 
+interface SelectedCar {
+  name: string;
+  category: string;
+  specs: {
+    plan: string;
+    consumption: string;
+  };
+  price: number;
+  period: string;
+}
+
 const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
   const { data: checkoutSession } = useQuery({
     queryKey: ['driver-vehicle', driverId],
@@ -18,7 +29,7 @@ const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
         .eq('status', 'active')
         .single();
       
-      return data;
+      return data ? { selected_car: data.selected_car as SelectedCar } : null;
     },
   });
 
