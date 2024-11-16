@@ -272,6 +272,57 @@ export type Database = {
           },
         ]
       }
+      customers: {
+        Row: {
+          address: string | null
+          city: string | null
+          cpf: string
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          last_rental_date: string | null
+          phone: string
+          postal_code: string | null
+          state: string | null
+          status: string | null
+          total_rentals: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          cpf: string
+          created_at?: string | null
+          email: string
+          full_name: string
+          id?: string
+          last_rental_date?: string | null
+          phone: string
+          postal_code?: string | null
+          state?: string | null
+          status?: string | null
+          total_rentals?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          cpf?: string
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          last_rental_date?: string | null
+          phone?: string
+          postal_code?: string | null
+          state?: string | null
+          status?: string | null
+          total_rentals?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       driver_details: {
         Row: {
           address: string | null

@@ -1,36 +1,49 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
-import { ShoppingCart, CreditCard, User } from "lucide-react"
+import { Car, Calendar, User, ShoppingCart } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useToast } from "@/components/ui/use-toast"
 import { Steps } from "./Steps"
 import { CustomerForm } from "./sections/CustomerForm"
-import { PaymentSection } from "./sections/PaymentSection"
+import { PickupScheduler } from "./sections/PickupScheduler"
 import { CheckoutSummary } from "./sections/CheckoutSummary"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { supabase } from "@/integrations/supabase/client"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
-  const [paymentMethod, setPaymentMethod] = useState("credit")
-  const [driverId, setDriverId] = useState<string | null>(null)
+  const [customerId, setCustomerId] = useState<string | null>(null)
   const { toast } = useToast()
   const { state: cartState } = useCart()
   const navigate = useNavigate()
 
   const steps = [
     { number: 1, title: "Seus Dados", icon: User },
-    { number: 2, title: "Pagamento", icon: CreditCard },
+    { number: 2, title: "Agendamento", icon: Calendar },
     { number: 3, title: "Confirmação", icon: ShoppingCart }
   ]
 
-  const handleDriverSubmit = async (newDriverId: string) => {
+  const handleCustomerSubmit = async (customerData: any) => {
     try {
-      setDriverId(newDriverId)
+      const { data: customer, error } = await supabase
+        .from('customers')
+        .insert([customerData])
+        .select()
+        .single()
+
+      if (error) throw error
+
+      setCustomerId(customer.id)
       setStep(2)
-    } catch (error) {
-      console.error('Error saving driver details:', error)
+      
+      toast({
+        title: "Dados salvos",
+        description: "Seus dados foram salvos com sucesso.",
+      })
+    } catch (error: any) {
+      console.error('Error saving customer details:', error)
       toast({
         title: "Erro ao salvar dados",
         description: "Ocorreu um erro ao salvar seus dados. Por favor, tente novamente.",
@@ -39,14 +52,30 @@ export const CheckoutPage = () => {
     }
   }
 
-  const handlePaymentSuccess = async (paymentId: string) => {
+  const handleScheduleSubmit = async (scheduleData: any) => {
     try {
+      const { error } = await supabase
+        .from('checkout_sessions')
+        .update({
+          pickup_date: scheduleData.date,
+          pickup_time: scheduleData.time,
+          status: 'pending_approval'
+        })
+        .eq('id', cartState.checkoutSessionId)
+
+      if (error) throw error
+
       setStep(3)
-    } catch (error) {
-      console.error('Error finalizing checkout:', error)
+      
       toast({
-        title: "Erro ao finalizar compra",
-        description: "Ocorreu um erro ao finalizar sua compra. Por favor, tente novamente.",
+        title: "Agendamento confirmado",
+        description: "Seu horário foi agendado com sucesso.",
+      })
+    } catch (error: any) {
+      console.error('Error saving schedule:', error)
+      toast({
+        title: "Erro ao agendar",
+        description: "Ocorreu um erro ao agendar seu horário. Por favor, tente novamente.",
         variant: "destructive",
       })
     }
@@ -57,7 +86,7 @@ export const CheckoutPage = () => {
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-6xl text-center">
           <h2 className="text-2xl font-semibold mb-4">Seu carrinho está vazio</h2>
-          <p className="text-gray-600 mb-6">Adicione itens ao seu carrinho para continuar com a compra.</p>
+          <p className="text-gray-600 mb-6">Adicione itens ao seu carrinho para continuar com a reserva.</p>
           <Button onClick={() => navigate('/')}>
             Voltar para a página inicial
           </Button>
@@ -79,17 +108,11 @@ export const CheckoutPage = () => {
             transition={{ duration: 0.5 }}
           >
             {step === 1 && (
-              <CustomerForm onSubmit={handleDriverSubmit} />
+              <CustomerForm onSubmit={handleCustomerSubmit} />
             )}
 
             {step === 2 && (
-              <PaymentSection
-                selectedMethod={paymentMethod}
-                onMethodChange={setPaymentMethod}
-                onPaymentSuccess={handlePaymentSuccess}
-                amount={cartState.total}
-                driverId={driverId || ''}
-              />
+              <PickupScheduler onSubmit={handleScheduleSubmit} />
             )}
 
             {step === 3 && (
@@ -101,12 +124,12 @@ export const CheckoutPage = () => {
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", stiffness: 200, damping: 10 }}
                     >
-                      <ShoppingCart className="w-8 h-8" />
+                      <Car className="w-8 h-8" />
                     </motion.div>
                   </div>
-                  <h2 className="text-2xl font-semibold">Pedido Confirmado!</h2>
+                  <h2 className="text-2xl font-semibold">Reserva Confirmada!</h2>
                   <p className="text-gray-600">
-                    Seu pedido foi processado com sucesso. Você receberá um email com os detalhes em breve.
+                    Sua reserva foi recebida com sucesso. Em breve nossa equipe entrará em contato para confirmar os detalhes.
                   </p>
                   <Button
                     onClick={() => navigate('/')}
