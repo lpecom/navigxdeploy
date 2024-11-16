@@ -27,13 +27,48 @@ export const CheckoutPage = () => {
 
   const handleCustomerSubmit = async (customerData: any) => {
     try {
-      const { data: customer, error } = await supabase
+      // First check if customer exists by CPF
+      const { data: existingCustomer, error: searchError } = await supabase
         .from('customers')
-        .insert([customerData])
         .select()
+        .eq('cpf', customerData.cpf)
         .single()
 
-      if (error) throw error
+      if (searchError && searchError.code !== 'PGRST116') {
+        throw searchError
+      }
+
+      let customer
+      if (existingCustomer) {
+        // Update existing customer
+        const { data: updatedCustomer, error: updateError } = await supabase
+          .from('customers')
+          .update({
+            full_name: customerData.full_name,
+            email: customerData.email,
+            phone: customerData.phone,
+            address: customerData.address,
+            city: customerData.city,
+            state: customerData.state,
+            postal_code: customerData.postal_code,
+          })
+          .eq('id', existingCustomer.id)
+          .select()
+          .single()
+
+        if (updateError) throw updateError
+        customer = updatedCustomer
+      } else {
+        // Insert new customer
+        const { data: newCustomer, error: insertError } = await supabase
+          .from('customers')
+          .insert([customerData])
+          .select()
+          .single()
+
+        if (insertError) throw insertError
+        customer = newCustomer
+      }
 
       setCustomerId(customer.id)
       setStep(2)
