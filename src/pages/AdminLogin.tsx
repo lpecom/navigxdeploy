@@ -3,32 +3,30 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSession } from '@supabase/auth-helpers-react';
 import { useToast } from "@/components/ui/use-toast";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const session = useSession();
 
   useEffect(() => {
-    // Check if user is already logged in
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate('/admin');
-      }
-    };
-    
-    checkSession();
+    // If already logged in, redirect to admin
+    if (session) {
+      navigate('/admin');
+      return;
+    }
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') {
+      if (event === 'SIGNED_IN' && session) {
         navigate('/admin');
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, session]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">

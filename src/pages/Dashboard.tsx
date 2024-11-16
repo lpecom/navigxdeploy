@@ -1,23 +1,21 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useSession } from '@supabase/auth-helpers-react';
 import Header from "@/components/dashboard/Header";
 import Sidebar from "@/components/dashboard/Sidebar";
 import StatsPanel from "@/components/dashboard/StatsPanel";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const session = useSession();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate('/admin/login');
-      }
-    };
+    if (!session) {
+      navigate('/admin/login');
+    }
+  }, [navigate, session]);
 
-    checkAuth();
-  }, [navigate]);
+  if (!session) return null;
 
   return (
     <div className="min-h-screen bg-gray-50">
