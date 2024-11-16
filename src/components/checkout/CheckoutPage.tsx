@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { handleCustomerData } from "./handlers/CustomerHandler"
 import { createDriverDetails } from "./handlers/DriverHandler"
 import { createCheckoutSession } from "./CheckoutSessionHandler"
+import { supabase } from "@/integrations/supabase/client"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)

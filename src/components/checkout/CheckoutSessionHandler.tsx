@@ -34,18 +34,19 @@ export const createCheckoutSession = async ({
 
     if (sessionError) throw sessionError;
 
+    // Map cart items to the correct format with valid UUIDs
+    const cartItemsData = cartItems.map(item => ({
+      checkout_session_id: session.id,
+      item_type: item.type,
+      item_id: item.id.replace(/[^a-fA-F0-9-]/g, ''), // Clean non-UUID characters
+      quantity: item.quantity,
+      unit_price: item.unitPrice,
+      total_price: item.totalPrice
+    }));
+
     const { error: cartError } = await supabase
       .from('cart_items')
-      .insert(
-        cartItems.map(item => ({
-          checkout_session_id: session.id,
-          item_type: item.type,
-          item_id: item.id,
-          quantity: item.quantity,
-          unit_price: item.unitPrice,
-          total_price: item.totalPrice
-        }))
-      );
+      .insert(cartItemsData);
 
     if (cartError) throw cartError;
 
