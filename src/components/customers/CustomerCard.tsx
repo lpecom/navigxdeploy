@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Phone, Mail, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronUp, Phone, Mail, MapPin, Eye } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -24,9 +25,10 @@ interface CustomerCardProps {
   customer: Customer;
   isExpanded: boolean;
   onToggle: () => void;
+  onViewDetails: () => void;
 }
 
-export const CustomerCard = ({ customer, isExpanded, onToggle }: CustomerCardProps) => {
+export const CustomerCard = ({ customer, isExpanded, onToggle, onViewDetails }: CustomerCardProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
@@ -45,9 +47,21 @@ export const CustomerCard = ({ customer, isExpanded, onToggle }: CustomerCardPro
           <h3 className="font-semibold text-lg">{customer.full_name}</h3>
           <p className="text-sm text-muted-foreground">CPF: {customer.cpf}</p>
         </div>
-        <Badge className={getStatusColor(customer.status)}>
-          {customer.status === 'active' ? 'Ativo' : 'Inativo'}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge className={getStatusColor(customer.status)}>
+            {customer.status === 'active' ? 'Ativo' : 'Inativo'}
+          </Badge>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewDetails();
+            }}
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="mt-4 space-y-2">
