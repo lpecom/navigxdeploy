@@ -59,7 +59,7 @@ const AdminRoutes = () => {
   }
 
   if (!isAuthenticated) {
-    return null;
+    return <Navigate to="/admin/login" replace />;
   }
 
   return (
