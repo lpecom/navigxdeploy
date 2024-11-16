@@ -9,7 +9,7 @@ import {
   Tag,
   ChevronDown,
   ChevronRight,
-  Settings,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -44,6 +44,7 @@ const Sidebar = () => {
 
   const menuItems: MenuItem[] = [
     { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
+    { to: "/admin/customers", icon: Users, label: "Clientes" },
     {
       icon: Calendar,
       label: "Reservas",
@@ -58,7 +59,6 @@ const Sidebar = () => {
       subItems: [
         { to: "/admin/vehicles/fleet", label: "Frota" },
         { to: "/admin/vehicles/rentals", label: "Locações" },
-        { to: "/admin/vehicles/customers", label: "Clientes" },
       ]
     },
     {

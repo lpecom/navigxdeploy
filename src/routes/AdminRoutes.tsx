@@ -11,6 +11,7 @@ import Reports from "@/pages/Reports";
 import Automations from "@/pages/Automations";
 import Reservations from "@/pages/Reservations";
 import Dashboard from "@/pages/Dashboard";
+import Customers from "@/pages/Customers";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 
@@ -76,6 +77,7 @@ const AdminRoutes = () => {
                 <Route path="rentals" element={<Vehicles view="rentals" />} />
                 <Route path="customers" element={<Vehicles view="customers" />} />
               </Route>
+              <Route path="customers" element={<Customers />} />
               <Route path="offers" element={<Offers />} />
               <Route path="accessories" element={<Accessories />} />
               <Route path="analytics" element={<Analytics />} />
