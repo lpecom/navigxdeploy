@@ -232,6 +232,7 @@ export type Database = {
           id: string
           pickup_date: string | null
           pickup_time: string | null
+          reservation_number: number
           selected_car: Json
           selected_optionals: Json
           status: string
@@ -244,6 +245,7 @@ export type Database = {
           id?: string
           pickup_date?: string | null
           pickup_time?: string | null
+          reservation_number?: number
           selected_car: Json
           selected_optionals: Json
           status?: string
@@ -256,6 +258,7 @@ export type Database = {
           id?: string
           pickup_date?: string | null
           pickup_time?: string | null
+          reservation_number?: number
           selected_car?: Json
           selected_optionals?: Json
           status?: string
