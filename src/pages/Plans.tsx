@@ -10,7 +10,7 @@ const Plans = () => {
   const selectedCar = JSON.parse(sessionStorage.getItem('selectedCar') || '{}');
 
   const handlePlanSelect = (planType: 'flex' | 'monthly' | 'black') => {
-    if (!selectedCar) {
+    if (!selectedCar?.category) {
       toast({
         title: "Erro",
         description: "Por favor, selecione um carro primeiro.",
@@ -20,7 +20,6 @@ const Plans = () => {
       return;
     }
 
-    // Add the car to cart with the selected plan
     dispatch({
       type: 'ADD_ITEM',
       payload: {
@@ -33,12 +32,14 @@ const Plans = () => {
       }
     });
 
-    // Store plan selection in session
     sessionStorage.setItem('selectedPlan', planType);
-
-    // Navigate to checkout
     navigate('/checkout');
   };
+
+  if (!selectedCar?.category) {
+    navigate('/');
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-12">
