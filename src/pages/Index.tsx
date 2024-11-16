@@ -1,37 +1,56 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 import StatsPanel from "@/components/dashboard/StatsPanel";
 import RentalsList from "@/components/dashboard/RentalsList";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          navigate("/admin/login");
+          return;
+        }
+        setIsLoading(false);
+      } catch (error) {
+        toast({
+          title: "Erro",
+          description: "Não foi possível verificar sua autenticação",
+          variant: "destructive",
+        });
+        navigate("/admin/login");
+      }
+    };
+
+    checkAuth();
+  }, [navigate, toast]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-100">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900">Painel de Controle</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Monitore e gerencie suas operações de aluguel
-              </p>
-            </div>
-
+        <main className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-7xl mx-auto space-y-6">
             <StatsPanel />
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <h2 className="text-base font-medium flex items-center gap-2 mb-4">Aluguéis Ativos</h2>
-                <RentalsList />
-              </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <h2 className="text-base font-medium mb-4">Localização dos Veículos</h2>
-                <div className="aspect-video bg-gray-50 rounded-lg flex items-center justify-center">
-                  <p className="text-sm text-muted-foreground">Visualização do Mapa</p>
-                </div>
-              </div>
-            </div>
+            <RentalsList />
           </div>
         </main>
       </div>
