@@ -11,7 +11,7 @@ import Plans from "./pages/Plans";
 import { CheckoutPage } from "./components/checkout/CheckoutPage";
 import DriverDashboard from "./pages/DriverDashboard";
 import AdminRoutes from "./routes/AdminRoutes";
-import Dashboard from "./pages/Dashboard";
+import AdminLogin from "./pages/AdminLogin";
 
 const queryClient = new QueryClient();
 
@@ -31,7 +31,8 @@ const App = () => {
                 {/* Customer/Driver Dashboard Routes */}
                 <Route path="/driver/*" element={<DriverDashboard />} />
                 
-                {/* Admin Dashboard Routes */}
+                {/* Admin Routes */}
+                <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin/*" element={<AdminRoutes />} />
                 <Route path="/dashboard/*" element={<Navigate to="/admin" replace />} />
               </Routes>
