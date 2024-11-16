@@ -32,6 +32,8 @@ export const ReservationCard = ({ reservation, isExpanded, onToggle }: Reservati
   };
 
   const pickupDate = new Date(reservation.pickupDate);
+  const formattedDate = format(pickupDate, "dd 'de' MMMM", { locale: ptBR });
+  const formattedTime = reservation.pickupTime || "Horário não definido";
 
   return (
     <Card className="overflow-hidden">
@@ -57,11 +59,11 @@ export const ReservationCard = ({ reservation, isExpanded, onToggle }: Reservati
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                {format(pickupDate, "dd/MM/yyyy", { locale: ptBR })}
+                {formattedDate}
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
-                {format(pickupDate, "HH:mm", { locale: ptBR })}
+                {formattedTime}
               </div>
             </div>
           </div>

@@ -19,6 +19,7 @@ export interface Reservation {
   phone: string;
   address: string;
   pickupDate: string;
+  pickupTime?: string;
   status: ReservationStatus;
   paymentStatus: PaymentStatus;
   customerStatus: CustomerStatus;

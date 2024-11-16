@@ -9,8 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { addDays, format } from "date-fns"
+import { addDays, format, setHours, setMinutes } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { Clock } from "lucide-react"
 
 interface PickupSchedulerProps {
   onSubmit: (data: { date: string; time: string }) => void;
@@ -30,14 +31,23 @@ export const PickupScheduler = ({ onSubmit }: PickupSchedulerProps) => {
   }
 
   // Generate available time slots from 8 AM to 6 PM
-  const timeSlots = Array.from({ length: 21 }, (_, i) => {
-    const hour = Math.floor(i / 2) + 8
-    const minutes = i % 2 === 0 ? '00' : '30'
-    return `${hour.toString().padStart(2, '0')}:${minutes}`
-  })
+  const generateTimeSlots = () => {
+    const slots = [];
+    const startHour = 8;
+    const endHour = 18;
+
+    for (let hour = startHour; hour <= endHour; hour++) {
+      for (let minutes of ['00', '30']) {
+        slots.push(`${hour.toString().padStart(2, '0')}:${minutes}`);
+      }
+    }
+    return slots;
+  }
+
+  const timeSlots = generateTimeSlots();
 
   return (
-    <Card className="p-6">
+    <Card className="p-6 animate-fade-in">
       <h2 className="text-xl font-semibold mb-6">Agende sua Retirada</h2>
       
       <div className="space-y-6">
@@ -55,18 +65,33 @@ export const PickupScheduler = ({ onSubmit }: PickupSchedulerProps) => {
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
             Horário de Retirada
           </label>
-          <Select onValueChange={setTime}>
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione um horário" />
+          <Select 
+            value={time} 
+            onValueChange={setTime}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione um horário">
+                {time ? (
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    <span>{time}</span>
+                  </div>
+                ) : (
+                  "Selecione um horário"
+                )}
+              </SelectValue>
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-[300px]">
               {timeSlots.map((slot) => (
                 <SelectItem key={slot} value={slot}>
-                  {slot}
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    <span>{slot}</span>
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
