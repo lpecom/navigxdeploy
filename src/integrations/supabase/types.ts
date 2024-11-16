@@ -349,6 +349,53 @@ export type Database = {
           },
         ]
       }
+      fleet_vehicles: {
+        Row: {
+          car_model_id: string | null
+          created_at: string | null
+          current_km: number
+          id: string
+          is_available: boolean | null
+          last_revision_date: string
+          next_revision_date: string
+          plate: string
+          updated_at: string | null
+          year: string
+        }
+        Insert: {
+          car_model_id?: string | null
+          created_at?: string | null
+          current_km: number
+          id?: string
+          is_available?: boolean | null
+          last_revision_date: string
+          next_revision_date: string
+          plate: string
+          updated_at?: string | null
+          year: string
+        }
+        Update: {
+          car_model_id?: string | null
+          created_at?: string | null
+          current_km?: number
+          id?: string
+          is_available?: boolean | null
+          last_revision_date?: string
+          next_revision_date?: string
+          plate?: string
+          updated_at?: string | null
+          year?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_vehicles_car_model_id_fkey"
+            columns: ["car_model_id"]
+            isOneToOne: false
+            referencedRelation: "car_models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_fares: {
         Row: {
           base_price: number
