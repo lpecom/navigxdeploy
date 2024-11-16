@@ -13,14 +13,13 @@ import Dashboard from "@/pages/Dashboard";
 const AdminRoutes = () => {
   const session = useSession();
 
-  // If there's no session, redirect to login
   if (!session) {
     return <Navigate to="/admin/login" replace />;
   }
 
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
+      <Route index element={<Dashboard />} />
       <Route path="vehicles/fleet" element={<Vehicles view="fleet" />} />
       <Route path="vehicles/rentals" element={<Vehicles view="rentals" />} />
       <Route path="vehicles/customers" element={<Vehicles view="customers" />} />
@@ -32,6 +31,7 @@ const AdminRoutes = () => {
       <Route path="automations" element={<Automations />} />
       <Route path="reservations/pending" element={<Reservations filter="pending" />} />
       <Route path="reservations/pickup" element={<Reservations filter="pickup" />} />
+      <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>
   );
 };

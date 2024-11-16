@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSession } from '@supabase/auth-helpers-react';
 import Header from "@/components/dashboard/Header";
@@ -9,13 +8,10 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const session = useSession();
 
-  useEffect(() => {
-    if (!session) {
-      navigate('/admin/login');
-    }
-  }, [navigate, session]);
-
-  if (!session) return null;
+  if (!session) {
+    navigate('/admin/login');
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
