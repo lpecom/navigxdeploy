@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useSession } from '@supabase/auth-helpers-react';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import Vehicles from "@/pages/Vehicles";
 import Offers from "@/pages/Offers";
 import Accessories from "@/pages/Accessories";
@@ -13,10 +15,51 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 
 const AdminRoutes = () => {
-  const session = useSession();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  if (!session) {
-    return <Navigate to="/admin/login" replace />;
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          navigate("/admin/login");
+          return;
+        }
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error("Auth error:", error);
+        navigate("/admin/login");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        navigate("/admin/login");
+        setIsAuthenticated(false);
+      } else {
+        setIsAuthenticated(true);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
   }
 
   return (
@@ -27,18 +70,18 @@ const AdminRoutes = () => {
         <main className="p-8">
           <div className="max-w-7xl mx-auto">
             <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/vehicles/fleet" element={<Vehicles view="fleet" />} />
-              <Route path="/vehicles/rentals" element={<Vehicles view="rentals" />} />
-              <Route path="/vehicles/customers" element={<Vehicles view="customers" />} />
-              <Route path="/offers" element={<Offers />} />
-              <Route path="/accessories" element={<Accessories />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/performance" element={<Performance />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/automations" element={<Automations />} />
-              <Route path="/reservations/pending" element={<Reservations filter="pending" />} />
-              <Route path="/reservations/pickup" element={<Reservations filter="pickup" />} />
+              <Route index element={<Dashboard />} />
+              <Route path="vehicles/fleet" element={<Vehicles view="fleet" />} />
+              <Route path="vehicles/rentals" element={<Vehicles view="rentals" />} />
+              <Route path="vehicles/customers" element={<Vehicles view="customers" />} />
+              <Route path="offers" element={<Offers />} />
+              <Route path="accessories" element={<Accessories />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="performance" element={<Performance />} />
+              <Route path="reports" element={<Reports />} />
+              <Route path="automations" element={<Automations />} />
+              <Route path="reservations/pending" element={<Reservations filter="pending" />} />
+              <Route path="reservations/pickup" element={<Reservations filter="pickup" />} />
               <Route path="*" element={<Navigate to="/admin" replace />} />
             </Routes>
           </div>
