@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { CartProvider } from '@/contexts/CartContext';
@@ -27,11 +27,13 @@ const App = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/plans" element={<Plans />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/driver/*" element={<DriverDashboard />} />
-                <Route path="/dashboard/*" element={<Dashboard />} />
                 
-                {/* Admin Routes - All admin routes are now handled by AdminRoutes */}
+                {/* Customer/Driver Dashboard Routes */}
+                <Route path="/driver/*" element={<DriverDashboard />} />
+                
+                {/* Admin Dashboard Routes */}
                 <Route path="/admin/*" element={<AdminRoutes />} />
+                <Route path="/dashboard/*" element={<Navigate to="/admin" replace />} />
               </Routes>
               <Toaster />
               <Sonner />
