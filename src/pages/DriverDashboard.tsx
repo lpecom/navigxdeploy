@@ -9,6 +9,7 @@ import { DriverReservations } from "@/components/driver-dashboard/DriverReservat
 import { DriverFinancial } from "@/components/driver-dashboard/DriverFinancial";
 import { DriverPromotions } from "@/components/driver-dashboard/DriverPromotions";
 import { DriverOverview } from "@/components/driver-dashboard/DriverOverview";
+import { DriverNotifications } from "@/components/driver-dashboard/DriverNotifications";
 
 const DriverDashboard = () => {
   const navigate = useNavigate();
@@ -74,6 +75,7 @@ const DriverDashboard = () => {
               <Route path="reservations" element={<DriverReservations driverId={driverId} />} />
               <Route path="financial" element={<DriverFinancial driverId={driverId} />} />
               <Route path="promotions" element={<DriverPromotions driverId={driverId} />} />
+              <Route path="notifications" element={<DriverNotifications />} />
               <Route path="*" element={<Navigate to="/driver" replace />} />
             </Routes>
           </div>

@@ -7,6 +7,7 @@ import {
   Tag,
   LogOut,
   LayoutDashboard,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +34,7 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
     { icon: Calendar, label: "Minhas Reservas", href: "/driver/reservations" },
     { icon: CreditCard, label: "Financeiro", href: "/driver/financial" },
     { icon: Tag, label: "Promoções", href: "/driver/promotions" },
+    { icon: Bell, label: "Notificações", href: "/driver/notifications" },
   ];
 
   const handleLogout = async () => {
