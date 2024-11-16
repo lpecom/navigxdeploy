@@ -40,7 +40,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   if (isAuthenticated === null) {
-    return null; // Loading state
+    return null;
   }
 
   if (!isAuthenticated) {
@@ -64,9 +64,19 @@ const AppContent = () => {
           <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
           <Route path="/driver/*" element={<DriverDashboard />} />
           <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
-          <Route path="/reservations" element={<ProtectedRoute><Reservations /></ProtectedRoute>} />
+          
+          {/* Reservations Routes */}
+          <Route path="/reservations/pending" element={<ProtectedRoute><Reservations filter="pending" /></ProtectedRoute>} />
+          <Route path="/reservations/pickup-today" element={<ProtectedRoute><Reservations filter="pickup-today" /></ProtectedRoute>} />
+          <Route path="/reservations/upcoming" element={<ProtectedRoute><Reservations filter="upcoming" /></ProtectedRoute>} />
+          <Route path="/reservations/active" element={<ProtectedRoute><Reservations filter="active" /></ProtectedRoute>} />
           <Route path="/reservations/:id" element={<ProtectedRoute><DetailedReservationViewWrapper /></ProtectedRoute>} />
-          <Route path="/vehicles" element={<ProtectedRoute><Vehicles /></ProtectedRoute>} />
+          
+          {/* Vehicles Routes */}
+          <Route path="/vehicles/fleet" element={<ProtectedRoute><Vehicles view="fleet" /></ProtectedRoute>} />
+          <Route path="/vehicles/rentals" element={<ProtectedRoute><Vehicles view="rentals" /></ProtectedRoute>} />
+          <Route path="/vehicles/customers" element={<ProtectedRoute><Vehicles view="customers" /></ProtectedRoute>} />
+          
           <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
           <Route path="/performance" element={<ProtectedRoute><Performance /></ProtectedRoute>} />

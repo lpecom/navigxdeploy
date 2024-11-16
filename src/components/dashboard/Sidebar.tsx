@@ -5,16 +5,12 @@ import {
   Car,
   BarChart2,
   FileText,
-  Gauge,
   Package,
-  Cog,
   Tag,
   ChevronDown,
   ChevronRight,
   Settings,
   Users,
-  MessageSquare,
-  Bell
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -53,12 +49,21 @@ const Sidebar = () => {
       icon: Calendar,
       label: "Reservas",
       subItems: [
-        { to: "/reservations", label: "Todas as Reservas" },
         { to: "/reservations/pending", label: "Pendentes" },
+        { to: "/reservations/pickup-today", label: "Retirada Hoje" },
+        { to: "/reservations/upcoming", label: "Próximas Semanas" },
         { to: "/reservations/active", label: "Ativas" },
       ]
     },
-    { to: "/vehicles", icon: Car, label: "Veículos" },
+    {
+      icon: Car,
+      label: "Veículos",
+      subItems: [
+        { to: "/vehicles/fleet", label: "Frota" },
+        { to: "/vehicles/rentals", label: "Locações" },
+        { to: "/vehicles/customers", label: "Clientes" },
+      ]
+    },
     {
       icon: BarChart2,
       label: "Análises",
