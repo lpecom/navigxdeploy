@@ -6,7 +6,11 @@ import { VehicleCard } from "./VehicleCard";
 import type { CarModel, CarModelResponse } from "./types";
 import { supabase } from "@/integrations/supabase/client";
 
-const VehicleList = () => {
+interface VehicleListProps {
+  view: 'fleet' | 'rentals' | 'customers';
+}
+
+const VehicleList = ({ view }: VehicleListProps) => {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<CarModel | null>(null);

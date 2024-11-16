@@ -16,31 +16,34 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
     queryKey: ['reservations', filter],
     queryFn: async () => {
       let query = supabase
-        .from('driver_details')
-        .select('*')
+        .from('checkout_sessions')
+        .select(`
+          *,
+          driver:driver_details(*)
+        `)
         .order('created_at', { ascending: false });
 
       if (filter === 'pending') {
-        query = query.eq('crm_status', 'pending_payment');
+        query = query.eq('status', 'pending');
       } else {
         // For pickup filters, only show approved reservations
-        query = query.eq('crm_status', 'approved');
+        query = query.eq('status', 'approved');
 
         const now = new Date();
         if (filter === 'today') {
           query = query
-            .gte('pickup_date', startOfDay(now).toISOString())
-            .lte('pickup_date', endOfDay(now).toISOString());
+            .gte('created_at', startOfDay(now).toISOString())
+            .lte('created_at', endOfDay(now).toISOString());
         } else if (filter === 'this-week') {
           query = query
-            .gte('pickup_date', startOfWeek(now, { weekStartsOn: 1 }).toISOString())
-            .lte('pickup_date', endOfWeek(now, { weekStartsOn: 1 }).toISOString());
+            .gte('created_at', startOfWeek(now, { weekStartsOn: 1 }).toISOString())
+            .lte('created_at', endOfWeek(now, { weekStartsOn: 1 }).toISOString());
         } else if (filter === 'next-week') {
           const nextWeekStart = startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 });
           const nextWeekEnd = endOfWeek(addWeeks(now, 1), { weekStartsOn: 1 });
           query = query
-            .gte('pickup_date', nextWeekStart.toISOString())
-            .lte('pickup_date', nextWeekEnd.toISOString());
+            .gte('created_at', nextWeekStart.toISOString())
+            .lte('created_at', nextWeekEnd.toISOString());
         }
       }
 
@@ -48,23 +51,23 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       
       if (error) throw error;
       
-      return data.map((lead): Reservation => ({
-        id: lead.id,
-        customerName: lead.full_name,
-        email: lead.email,
-        cpf: lead.cpf,
-        phone: lead.phone,
-        address: "",
-        pickupDate: new Date().toISOString(),
-        status: "pending",
-        paymentStatus: "pending",
-        customerStatus: "new",
+      return data.map((session): Reservation => ({
+        id: session.id,
+        customerName: session.driver?.full_name || '',
+        email: session.driver?.email || '',
+        cpf: session.driver?.cpf || '',
+        phone: session.driver?.phone || '',
+        address: '',
+        pickupDate: session.created_at,
+        status: session.status === 'pending' ? 'pending' : 'approved',
+        paymentStatus: 'pending',
+        customerStatus: 'new',
         riskScore: 25,
         documentsSubmitted: false,
-        createdAt: lead.created_at,
-        carCategory: "Economy",
-        leadSource: "form",
-        weeklyFare: 0,
+        createdAt: session.created_at,
+        carCategory: (session.selected_car as any)?.category || 'Economy',
+        leadSource: 'form',
+        weeklyFare: session.total_amount,
         optionals: [],
         kilometersPerWeek: 1000,
       }));
