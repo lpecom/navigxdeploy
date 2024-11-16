@@ -2,9 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate, Routes, Route } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { VehicleInfo } from "@/components/driver-dashboard/VehicleInfo";
-import MaintenanceHistory from "@/components/driver-dashboard/MaintenanceHistory";
-import PaymentHistory from "@/components/driver-dashboard/PaymentHistory";
 import DriverHeader from "@/components/driver-dashboard/DriverHeader";
 import { DriverSidebar } from "@/components/driver-dashboard/DriverSidebar";
 import { DriverVehicle } from "@/components/driver-dashboard/DriverVehicle";
@@ -60,17 +57,17 @@ const DriverDashboard = () => {
   if (!driverId) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50">
       <DriverSidebar 
         isOpen={isSidebarOpen} 
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)} 
       />
       
-      <div className="flex-1 flex flex-col">
+      <div className="lg:pl-64 flex flex-col min-h-screen">
         <DriverHeader onMenuClick={() => setIsSidebarOpen(true)} />
         
-        <main className="flex-1 p-4 md:p-6 lg:p-8 transition-all duration-200">
-          <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
+        <main className="flex-1 p-4 md:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto">
             <Routes>
               <Route path="/" element={<DriverOverview driverId={driverId} />} />
               <Route path="/vehicle" element={<DriverVehicle driverId={driverId} />} />

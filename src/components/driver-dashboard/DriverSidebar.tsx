@@ -5,7 +5,6 @@ import {
   Calendar,
   CreditCard,
   Tag,
-  ChevronLeft,
   LogOut,
   LayoutDashboard,
 } from "lucide-react";
@@ -54,12 +53,13 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed lg:sticky top-0 left-0 z-50 flex h-screen w-72 flex-col bg-white border-r border-gray-200 lg:shadow-none transition-transform duration-300",
+          "fixed top-0 left-0 z-50 flex h-screen w-64 flex-col bg-white border-r border-gray-200",
+          "transition-transform duration-300 lg:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
         {/* Logo */}
-        <div className="p-6">
+        <div className="p-6 border-b">
           <img 
             src="https://i.imghippo.com/files/uafE3798xA.png" 
             alt="Navig Logo" 
@@ -87,7 +87,7 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t">
           <Button
             variant="ghost"
             className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
@@ -97,16 +97,6 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
             Sair
           </Button>
         </div>
-
-        {/* Mobile close button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onToggle}
-          className="absolute right-4 top-4 lg:hidden"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
       </aside>
     </>
   );
