@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import PaymentHistory from "./PaymentHistory";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Plus } from "lucide-react";
+import { CreditCard, Plus, Calendar } from "lucide-react";
 
 interface DriverFinancialProps {
   driverId: string;
@@ -51,11 +51,14 @@ export const DriverFinancial = ({ driverId }: DriverFinancialProps) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Próxima Fatura</span>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-gray-400" />
+                  <span className="text-sm text-muted-foreground">Próxima Fatura</span>
+                </div>
                 <span className="font-medium">R$ 750,00</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Vencimento</span>
                 <span className="font-medium">15/04/2024</span>
               </div>
