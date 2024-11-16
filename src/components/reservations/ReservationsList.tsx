@@ -44,9 +44,11 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
             .gte('pickup_date', startOfDay(now).toISOString())
             .lte('pickup_date', endOfDay(now).toISOString());
         } else if (filter === 'this-week') {
+          const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+          const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
           query = query
-            .gte('pickup_date', startOfWeek(now, { weekStartsOn: 1 }).toISOString())
-            .lte('pickup_date', endOfWeek(now, { weekStartsOn: 1 }).toISOString());
+            .gte('pickup_date', weekStart.toISOString())
+            .lte('pickup_date', weekEnd.toISOString());
         } else if (filter === 'next-week') {
           const nextWeekStart = startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 });
           const nextWeekEnd = endOfWeek(addWeeks(now, 1), { weekStartsOn: 1 });
