@@ -50,9 +50,7 @@ const Sidebar = () => {
       label: "Reservas",
       subItems: [
         { to: "/reservations/pending", label: "Pendentes" },
-        { to: "/reservations/pickup-today", label: "Retirada Hoje" },
-        { to: "/reservations/upcoming", label: "Próximas Semanas" },
-        { to: "/reservations/active", label: "Ativas" },
+        { to: "/reservations/pickup", label: "Retirada" },
       ]
     },
     {

@@ -67,9 +67,7 @@ const AppContent = () => {
           
           {/* Reservations Routes */}
           <Route path="/reservations/pending" element={<ProtectedRoute><Reservations filter="pending" /></ProtectedRoute>} />
-          <Route path="/reservations/pickup-today" element={<ProtectedRoute><Reservations filter="pickup-today" /></ProtectedRoute>} />
-          <Route path="/reservations/upcoming" element={<ProtectedRoute><Reservations filter="upcoming" /></ProtectedRoute>} />
-          <Route path="/reservations/active" element={<ProtectedRoute><Reservations filter="active" /></ProtectedRoute>} />
+          <Route path="/reservations/pickup" element={<ProtectedRoute><Reservations filter="pickup" /></ProtectedRoute>} />
           <Route path="/reservations/:id" element={<ProtectedRoute><DetailedReservationViewWrapper /></ProtectedRoute>} />
           
           {/* Vehicles Routes */}

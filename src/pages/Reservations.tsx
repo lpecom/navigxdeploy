@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import ReservationsList from "@/components/reservations/ReservationsList";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { type ReservationFilter } from "@/types/reservation";
 
 interface ReservationsProps {
-  filter: 'pending' | 'pickup-today' | 'upcoming' | 'active';
+  filter: ReservationFilter;
 }
 
 const Reservations = ({ filter }: ReservationsProps) => {
@@ -39,15 +41,34 @@ const Reservations = ({ filter }: ReservationsProps) => {
     );
   }
 
+  if (filter === 'pending') {
+    return (
+      <div className="container py-6">
+        <h1 className="text-2xl font-bold mb-6">Reservas Pendentes</h1>
+        <ReservationsList filter="pending" />
+      </div>
+    );
+  }
+
   return (
     <div className="container py-6">
-      <h1 className="text-2xl font-bold mb-6">
-        {filter === 'pending' && 'Reservas Pendentes'}
-        {filter === 'pickup-today' && 'Retiradas de Hoje'}
-        {filter === 'upcoming' && 'Próximas Semanas'}
-        {filter === 'active' && 'Reservas Ativas'}
-      </h1>
-      <ReservationsList filter={filter} />
+      <h1 className="text-2xl font-bold mb-6">Retiradas</h1>
+      <Tabs defaultValue="today" className="w-full">
+        <TabsList>
+          <TabsTrigger value="today">Hoje</TabsTrigger>
+          <TabsTrigger value="this-week">Esta Semana</TabsTrigger>
+          <TabsTrigger value="next-week">Próxima Semana</TabsTrigger>
+        </TabsList>
+        <TabsContent value="today">
+          <ReservationsList filter="pickup-today" />
+        </TabsContent>
+        <TabsContent value="this-week">
+          <ReservationsList filter="pickup-this-week" />
+        </TabsContent>
+        <TabsContent value="next-week">
+          <ReservationsList filter="pickup-next-week" />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
