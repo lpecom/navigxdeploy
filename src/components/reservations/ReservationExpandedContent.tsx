@@ -18,9 +18,22 @@ export const ReservationExpandedContent = ({ reservation }: ReservationExpandedC
     );
   };
 
+  // Convert reservation data to customer format
+  const customerData = {
+    id: reservation.id,
+    full_name: reservation.customerName,
+    email: reservation.email,
+    cpf: reservation.cpf,
+    phone: reservation.phone,
+    address: reservation.address,
+    created_at: reservation.createdAt,
+    status: 'active',
+    total_rentals: 0
+  };
+
   return (
     <div className="space-y-4 animate-accordion-down">
-      <CustomerInfo reservation={reservation} />
+      <CustomerInfo customer={customerData} />
       <StreetView address={reservation.address} />
       <PricingInfo reservation={reservation} />
       <div className="flex items-center justify-end">
