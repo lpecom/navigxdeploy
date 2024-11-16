@@ -10,7 +10,8 @@ import { PickupScheduler } from "./sections/PickupScheduler"
 import { CheckoutSummary } from "./sections/CheckoutSummary"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { supabase } from "@/integrations/supabase/client"
+import { handleCustomerData } from "./handlers/CustomerHandler"
+import { createDriverDetails } from "./handlers/DriverHandler"
 import { createCheckoutSession } from "./CheckoutSessionHandler"
 
 export const CheckoutPage = () => {
@@ -28,64 +29,13 @@ export const CheckoutPage = () => {
 
   const handleCustomerSubmit = async (customerData: any) => {
     try {
-      const { data: existingCustomer, error: searchError } = await supabase
-        .from('customers')
-        .select()
-        .eq('cpf', customerData.cpf)
-        .maybeSingle()
+      // Handle customer data (create or update)
+      const customer = await handleCustomerData(customerData)
+      
+      // Create driver details
+      const driverData = await createDriverDetails(customer)
 
-      let customer
-      if (existingCustomer) {
-        const { data: updatedCustomer, error: updateError } = await supabase
-          .from('customers')
-          .update({
-            full_name: customerData.full_name,
-            email: customerData.email,
-            phone: customerData.phone,
-            address: customerData.address,
-            city: customerData.city,
-            state: customerData.state,
-            postal_code: customerData.postal_code,
-          })
-          .eq('id', existingCustomer.id)
-          .select()
-          .single()
-
-        if (updateError) throw updateError
-        customer = updatedCustomer
-      } else {
-        const { data: newCustomer, error: insertError } = await supabase
-          .from('customers')
-          .insert([customerData])
-          .select()
-          .single()
-
-        if (insertError) throw insertError
-        customer = newCustomer
-      }
-
-      // Create driver details record
-      const { data: driverData, error: driverError } = await supabase
-        .from('driver_details')
-        .insert([{
-          full_name: customer.full_name,
-          email: customer.email,
-          cpf: customer.cpf,
-          phone: customer.phone,
-          birth_date: customerData.birth_date || new Date().toISOString().split('T')[0],
-          license_number: customerData.license_number || 'PENDING',
-          license_expiry: customerData.license_expiry || new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-          address: customer.address,
-          city: customer.city,
-          state: customer.state,
-          postal_code: customer.postal_code,
-        }])
-        .select()
-        .single()
-
-      if (driverError) throw driverError
-
-      // Create checkout session after driver is created
+      // Create checkout session
       const session = await createCheckoutSession({
         driverId: driverData.id,
         cartItems: cartState.items,
