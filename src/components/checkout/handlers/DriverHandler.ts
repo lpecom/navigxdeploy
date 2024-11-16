@@ -21,6 +21,10 @@ export const createDriverDetails = async (customer: any) => {
         state: customer.state,
         postal_code: customer.postal_code,
         auth_user_id: customer.auth_user_id,
+        // Set required fields with default values if not provided
+        birth_date: customer.birth_date || new Date().toISOString().split('T')[0],
+        license_number: customer.license_number || 'PENDING',
+        license_expiry: customer.license_expiry || new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0]
       })
       .eq('id', existingDriver.id)
       .select()
@@ -33,7 +37,7 @@ export const createDriverDetails = async (customer: any) => {
   // Create new driver
   const { data: newDriver, error: insertError } = await supabase
     .from('driver_details')
-    .insert([{
+    .insert({
       full_name: customer.full_name,
       email: customer.email,
       cpf: customer.cpf,
@@ -43,7 +47,11 @@ export const createDriverDetails = async (customer: any) => {
       state: customer.state,
       postal_code: customer.postal_code,
       auth_user_id: customer.auth_user_id,
-    }])
+      // Set required fields with default values
+      birth_date: customer.birth_date || new Date().toISOString().split('T')[0],
+      license_number: customer.license_number || 'PENDING',
+      license_expiry: customer.license_expiry || new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0]
+    })
     .select()
     .single()
 

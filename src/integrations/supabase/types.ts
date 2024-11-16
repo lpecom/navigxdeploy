@@ -326,6 +326,7 @@ export type Database = {
       driver_details: {
         Row: {
           address: string | null
+          auth_user_id: string | null
           birth_date: string
           city: string | null
           cpf: string
@@ -342,6 +343,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          auth_user_id?: string | null
           birth_date: string
           city?: string | null
           cpf: string
@@ -358,6 +360,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          auth_user_id?: string | null
           birth_date?: string
           city?: string | null
           cpf?: string
