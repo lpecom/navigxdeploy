@@ -6,6 +6,7 @@ import { ArrowRight, Car, CreditCard, Calendar, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { ProfitCalculator } from "./ProfitCalculator";
+import { UberIntegration } from "./UberIntegration";
 
 interface DriverOverviewProps {
   driverId: string;
@@ -89,15 +90,17 @@ export const DriverOverview = ({ driverId }: DriverOverviewProps) => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Últimos Pagamentos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PaymentHistory driverId={driverId} />
-          </CardContent>
-        </Card>
+        <UberIntegration driverId={driverId} />
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Últimos Pagamentos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PaymentHistory driverId={driverId} />
+        </CardContent>
+      </Card>
 
       <ProfitCalculator driverId={driverId} />
     </div>

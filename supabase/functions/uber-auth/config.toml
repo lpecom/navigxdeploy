@@ -1,0 +1,4 @@
+project_id = "frxvpishprygdksbgziz"
+
+[functions.uber-auth]
+verify_jwt = false
