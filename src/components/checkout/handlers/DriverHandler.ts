@@ -1,35 +1,52 @@
 import { supabase } from "@/integrations/supabase/client"
 
-interface CustomerData {
-  full_name: string
-  email: string
-  cpf: string
-  phone: string
-  address?: string
-  city?: string
-  state?: string
-  postal_code?: string
-}
+export const createDriverDetails = async (customer: any) => {
+  const { data: existingDriver } = await supabase
+    .from('driver_details')
+    .select()
+    .eq('email', customer.email)
+    .maybeSingle()
 
-export const createDriverDetails = async (customerData: CustomerData) => {
-  const { data: driverData, error: driverError } = await supabase
+  if (existingDriver) {
+    // Update existing driver
+    const { data: updatedDriver, error: updateError } = await supabase
+      .from('driver_details')
+      .update({
+        full_name: customer.full_name,
+        email: customer.email,
+        cpf: customer.cpf,
+        phone: customer.phone,
+        address: customer.address,
+        city: customer.city,
+        state: customer.state,
+        postal_code: customer.postal_code,
+        auth_user_id: customer.auth_user_id,
+      })
+      .eq('id', existingDriver.id)
+      .select()
+      .single()
+
+    if (updateError) throw updateError
+    return updatedDriver
+  }
+
+  // Create new driver
+  const { data: newDriver, error: insertError } = await supabase
     .from('driver_details')
     .insert([{
-      full_name: customerData.full_name,
-      email: customerData.email,
-      cpf: customerData.cpf,
-      phone: customerData.phone,
-      birth_date: new Date().toISOString().split('T')[0],
-      license_number: 'PENDING',
-      license_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-      address: customerData.address,
-      city: customerData.city,
-      state: customerData.state,
-      postal_code: customerData.postal_code,
+      full_name: customer.full_name,
+      email: customer.email,
+      cpf: customer.cpf,
+      phone: customer.phone,
+      address: customer.address,
+      city: customer.city,
+      state: customer.state,
+      postal_code: customer.postal_code,
+      auth_user_id: customer.auth_user_id,
     }])
     .select()
     .single()
 
-  if (driverError) throw driverError
-  return driverData
+  if (insertError) throw insertError
+  return newDriver
 }

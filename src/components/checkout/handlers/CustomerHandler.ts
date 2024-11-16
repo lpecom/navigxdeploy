@@ -9,6 +9,7 @@ interface CustomerData {
   city?: string
   state?: string
   postal_code?: string
+  auth_user_id?: string
 }
 
 export const handleCustomerData = async (customerData: CustomerData) => {
