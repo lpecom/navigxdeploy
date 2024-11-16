@@ -26,18 +26,20 @@ const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
   const { data: checkoutSession } = useQuery<CheckoutSession | null>({
     queryKey: ['driver-vehicle', driverId],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('checkout_sessions')
         .select('selected_car')
         .eq('driver_id', driverId)
         .eq('status', 'active')
-        .single();
+        .limit(1)
+        .maybeSingle();
       
-      if (!data) return null;
+      if (error) {
+        console.error('Error fetching vehicle info:', error);
+        return null;
+      }
       
-      // Type assertion to ensure the data matches our expected structure
-      const selectedCar = data.selected_car as unknown as SelectedCar;
-      return { selected_car: selectedCar };
+      return data;
     },
   });
 
