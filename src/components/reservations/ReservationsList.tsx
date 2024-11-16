@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Reservation, PickupFilter } from "@/types/reservation";
 import { ReservationCard } from "./ReservationCard";
 import { supabase } from "@/integrations/supabase/client";
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, addWeeks } from "date-fns";
+import { startOfDay, endOfDay, startOfWeek, endOfWeek, addWeeks, format } from "date-fns";
 
 interface ReservationsListProps {
   filter: "pending" | PickupFilter;
@@ -39,22 +39,22 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
         query = query.eq('status', 'approved');
 
         const now = new Date();
+        const today = format(now, 'yyyy-MM-dd');
+
         if (filter === 'today') {
-          query = query
-            .gte('pickup_date', startOfDay(now).toISOString())
-            .lte('pickup_date', endOfDay(now).toISOString());
+          query = query.eq('pickup_date', today);
         } else if (filter === 'this-week') {
-          const weekStart = startOfWeek(now, { weekStartsOn: 1 });
-          const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+          const weekStart = format(startOfWeek(now, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+          const weekEnd = format(endOfWeek(now, { weekStartsOn: 1 }), 'yyyy-MM-dd');
           query = query
-            .gte('pickup_date', weekStart.toISOString())
-            .lte('pickup_date', weekEnd.toISOString());
+            .gte('pickup_date', weekStart)
+            .lte('pickup_date', weekEnd);
         } else if (filter === 'next-week') {
-          const nextWeekStart = startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 });
-          const nextWeekEnd = endOfWeek(addWeeks(now, 1), { weekStartsOn: 1 });
+          const nextWeekStart = format(startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 }), 'yyyy-MM-dd');
+          const nextWeekEnd = format(endOfWeek(addWeeks(now, 1), { weekStartsOn: 1 }), 'yyyy-MM-dd');
           query = query
-            .gte('pickup_date', nextWeekStart.toISOString())
-            .lte('pickup_date', nextWeekEnd.toISOString());
+            .gte('pickup_date', nextWeekStart)
+            .lte('pickup_date', nextWeekEnd);
         }
       }
 
