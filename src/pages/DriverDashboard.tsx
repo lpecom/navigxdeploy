@@ -23,14 +23,15 @@ const DriverDashboard = () => {
         return;
       }
 
-      // Get driver details
-      const { data: driver, error } = await supabase
+      // Get driver details - now handling multiple results
+      const { data: drivers, error } = await supabase
         .from('driver_details')
         .select('id')
         .eq('email', session.user.email)
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1);
 
-      if (error || !driver) {
+      if (error) {
         toast({
           title: "Erro",
           description: "Não foi possível carregar seus dados.",
@@ -39,7 +40,16 @@ const DriverDashboard = () => {
         return;
       }
 
-      setDriverId(driver.id);
+      // Use the most recent driver record if multiple exist
+      if (drivers && drivers.length > 0) {
+        setDriverId(drivers[0].id);
+      } else {
+        toast({
+          title: "Erro",
+          description: "Perfil de motorista não encontrado.",
+          variant: "destructive",
+        });
+      }
     };
 
     checkAuth();

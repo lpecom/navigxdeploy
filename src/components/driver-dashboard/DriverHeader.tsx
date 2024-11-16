@@ -12,14 +12,15 @@ const DriverHeader = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      const { data } = await supabase
+      const { data: drivers } = await supabase
         .from('driver_details')
         .select('full_name')
         .eq('email', session.user.email)
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1);
 
-      if (data) {
-        setDriverName(data.full_name);
+      if (drivers && drivers.length > 0) {
+        setDriverName(drivers[0].full_name);
       }
     };
 
