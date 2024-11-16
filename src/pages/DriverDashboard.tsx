@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import VehicleInfo from "@/components/driver-dashboard/VehicleInfo";
+import { VehicleInfo } from "@/components/driver-dashboard/VehicleInfo";
 import MaintenanceHistory from "@/components/driver-dashboard/MaintenanceHistory";
 import PaymentHistory from "@/components/driver-dashboard/PaymentHistory";
 import SupportTickets from "@/components/driver-dashboard/SupportTickets";
