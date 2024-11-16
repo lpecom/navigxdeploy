@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useSession } from '@supabase/auth-helpers-react';
 import Vehicles from "@/pages/Vehicles";
 import Offers from "@/pages/Offers";
@@ -13,6 +13,7 @@ import Dashboard from "@/pages/Dashboard";
 const AdminRoutes = () => {
   const session = useSession();
 
+  // If there's no session, redirect to login
   if (!session) {
     return <Navigate to="/admin/login" replace />;
   }
