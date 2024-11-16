@@ -9,33 +9,6 @@ interface ReservationsListProps {
   filter: "pending" | PickupFilter;
 }
 
-interface SelectedCar {
-  category: string;
-  [key: string]: any;
-}
-
-interface CheckoutSession {
-  id: string;
-  driver: {
-    id: string;
-    full_name: string;
-    email: string;
-    cpf: string;
-    phone: string;
-    address: string;
-    city: string;
-    state: string;
-    postal_code: string;
-  } | null;
-  selected_car: SelectedCar;
-  selected_optionals: Array<{ name: string; pricePerWeek: number }>;
-  total_amount: number;
-  status: string;
-  created_at: string;
-  pickup_date: string | null;
-  pickup_time: string | null;
-}
-
 const ReservationsList = ({ filter }: ReservationsListProps) => {
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
 
@@ -60,7 +33,7 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
         `);
 
       if (filter === 'pending') {
-        query = query.eq('status', 'pending');
+        query = query.eq('status', 'pending_approval');
       } else {
         // For pickup filters, only show approved reservations
         query = query.eq('status', 'approved');
@@ -87,7 +60,7 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       
       if (error) throw error;
       
-      return (data as CheckoutSession[]).map((session): Reservation => ({
+      return (data || []).map((session: any): Reservation => ({
         id: session.id,
         customerName: session.driver?.full_name || 'Cliente não identificado',
         email: session.driver?.email || '',
@@ -96,7 +69,7 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
         address: session.driver?.address || '',
         pickupDate: session.pickup_date || session.created_at,
         pickupTime: session.pickup_time || '',
-        status: session.status === 'pending' ? 'pending' : 'approved',
+        status: session.status,
         paymentStatus: 'pending',
         customerStatus: 'new',
         riskScore: 25,
