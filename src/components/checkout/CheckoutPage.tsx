@@ -11,12 +11,13 @@ import { CheckoutSummary } from "./sections/CheckoutSummary"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { supabase } from "@/integrations/supabase/client"
+import { createCheckoutSession } from "./CheckoutSessionHandler"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
   const [customerId, setCustomerId] = useState<string | null>(null)
   const { toast } = useToast()
-  const { state: cartState } = useCart()
+  const { state: cartState, dispatch } = useCart()
   const navigate = useNavigate()
 
   const steps = [
@@ -27,7 +28,6 @@ export const CheckoutPage = () => {
 
   const handleCustomerSubmit = async (customerData: any) => {
     try {
-      // First check if customer exists by CPF
       const { data: existingCustomer, error: searchError } = await supabase
         .from('customers')
         .select()
@@ -36,7 +36,6 @@ export const CheckoutPage = () => {
 
       let customer
       if (existingCustomer) {
-        // Update existing customer
         const { data: updatedCustomer, error: updateError } = await supabase
           .from('customers')
           .update({
@@ -55,7 +54,6 @@ export const CheckoutPage = () => {
         if (updateError) throw updateError
         customer = updatedCustomer
       } else {
-        // Insert new customer
         const { data: newCustomer, error: insertError } = await supabase
           .from('customers')
           .insert([customerData])
@@ -65,6 +63,16 @@ export const CheckoutPage = () => {
         if (insertError) throw insertError
         customer = newCustomer
       }
+
+      // Create checkout session after customer is created/updated
+      const session = await createCheckoutSession({
+        driverId: customer.id,
+        cartItems: cartState.items,
+        totalAmount: cartState.total,
+        onSuccess: (sessionId) => {
+          dispatch({ type: 'SET_CHECKOUT_SESSION', payload: sessionId })
+        }
+      })
 
       setCustomerId(customer.id)
       setStep(2)
@@ -85,6 +93,10 @@ export const CheckoutPage = () => {
 
   const handleScheduleSubmit = async (scheduleData: any) => {
     try {
+      if (!cartState.checkoutSessionId) {
+        throw new Error('No checkout session found')
+      }
+
       const { error } = await supabase
         .from('checkout_sessions')
         .update({
