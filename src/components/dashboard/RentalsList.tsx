@@ -1,15 +1,10 @@
-import { Car, Calendar, User } from "lucide-react";
+import { Car, Calendar } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-
-interface SelectedCar {
-  name: string;
-  category: string;
-  price: number;
-}
+import type { SelectedCar } from "@/types/car";
 
 interface Rental {
   id: string;
@@ -40,7 +35,12 @@ const RentalsList = () => {
         .limit(5);
 
       if (error) throw error;
-      return data as Rental[];
+      
+      // Type assertion to ensure the selected_car matches SelectedCar type
+      return (data || []).map(item => ({
+        ...item,
+        selected_car: item.selected_car as unknown as SelectedCar
+      })) as Rental[];
     },
   });
 
