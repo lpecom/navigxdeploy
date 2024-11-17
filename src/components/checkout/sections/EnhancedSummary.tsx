@@ -16,7 +16,7 @@ export const EnhancedSummary = () => {
     queryFn: async () => {
       if (!carGroupItem?.id) return null
       
-      // Extract the base ID without the plan type suffix
+      // Extract the base ID without any suffix
       const baseId = carGroupItem.id.split('-')[0]
       
       const { data, error } = await supabase
@@ -25,7 +25,10 @@ export const EnhancedSummary = () => {
         .eq('id', baseId)
         .single()
       
-      if (error) throw error
+      if (error) {
+        console.error('Error fetching car group:', error)
+        return null
+      }
       return data
     },
     enabled: !!carGroupItem?.id
