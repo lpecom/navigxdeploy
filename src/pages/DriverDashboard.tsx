@@ -27,18 +27,47 @@ const DriverDashboard = () => {
           return;
         }
 
-        // Query driver details using auth_user_id
-        const { data: drivers, error: dbError } = await supabase
+        // First, try to find the driver details by email
+        const { data: driversByEmail, error: emailError } = await supabase
           .from('driver_details')
           .select('id')
-          .eq('auth_user_id', session.user.id);
+          .eq('email', session.user.email)
+          .maybeSingle();
 
-        if (dbError) {
-          console.error("Database error:", dbError);
+        if (emailError) {
+          console.error("Database error:", emailError);
           throw new Error("Failed to fetch driver details");
         }
 
-        if (!drivers || drivers.length === 0) {
+        // If we found a driver by email but auth_user_id is not set, update it
+        if (driversByEmail) {
+          const { error: updateError } = await supabase
+            .from('driver_details')
+            .update({ auth_user_id: session.user.id })
+            .eq('id', driversByEmail.id);
+
+          if (updateError) {
+            console.error("Failed to update auth_user_id:", updateError);
+          }
+
+          setDriverId(driversByEmail.id);
+          setIsLoading(false);
+          return;
+        }
+
+        // If no driver found by email, try by auth_user_id as fallback
+        const { data: driversByAuthId, error: authError } = await supabase
+          .from('driver_details')
+          .select('id')
+          .eq('auth_user_id', session.user.id)
+          .maybeSingle();
+
+        if (authError) {
+          console.error("Database error:", authError);
+          throw new Error("Failed to fetch driver details");
+        }
+
+        if (!driversByAuthId) {
           await supabase.auth.signOut();
           toast({
             title: "Access Denied",
@@ -49,7 +78,7 @@ const DriverDashboard = () => {
           return;
         }
 
-        setDriverId(drivers[0].id);
+        setDriverId(driversByAuthId.id);
       } catch (error: any) {
         console.error("Auth error:", error);
         toast({
