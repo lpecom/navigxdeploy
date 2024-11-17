@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { LucideIcon } from "lucide-react"
+import { LucideIcon, CheckCircle } from "lucide-react"
 
 interface Step {
   number: number
@@ -43,11 +43,14 @@ export const Steps = ({ steps, currentStep }: StepsProps) => {
                 initial={false}
                 animate={{
                   scale: isActive ? 1.2 : 1,
-                  backgroundColor: isActive || isCompleted ? 'rgb(0, 178, 255)' : 'rgb(229, 231, 235)'
                 }}
                 transition={{ duration: 0.2 }}
               >
-                <Icon className="w-5 h-5" />
+                {isCompleted ? (
+                  <CheckCircle className="w-5 h-5" />
+                ) : (
+                  <Icon className="w-5 h-5" />
+                )}
               </motion.div>
               
               <span className={`mt-2 text-sm font-medium ${

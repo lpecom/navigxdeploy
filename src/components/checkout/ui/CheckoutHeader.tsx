@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import navigLogo from "@/assets/navig-logo.png";
 
 export const CheckoutHeader = () => {
   return (
@@ -7,7 +8,7 @@ export const CheckoutHeader = () => {
         <div className="flex items-center justify-center h-full relative">
           <Link to="/" className="absolute left-0">
             <img 
-              src="/src/assets/navig-logo.png" 
+              src={navigLogo}
               alt="Navig Logo" 
               className="h-8 w-auto"
             />

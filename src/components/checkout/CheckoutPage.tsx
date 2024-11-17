@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Car, Calendar, User, ShoppingCart, CreditCard } from "lucide-react"
+import { User, Calendar, CreditCard, ShoppingCart } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
@@ -16,7 +16,7 @@ import { CheckoutLayout } from "./ui/CheckoutLayout"
 import { EmptyCartMessage } from "./ui/EmptyCartMessage"
 import { PaymentSection } from "./sections/PaymentSection"
 import { motion } from "framer-motion"
-import { CheckoutSteps } from "./sections/CheckoutSteps"
+import { Steps } from "./Steps"
 import { SupportCard } from "./sections/SupportCard"
 
 export const CheckoutPage = () => {
@@ -121,7 +121,7 @@ export const CheckoutPage = () => {
         transition={{ duration: 0.5 }}
         className="space-y-6"
       >
-        <CheckoutSteps currentStep={step} steps={steps} />
+        <Steps currentStep={step} steps={steps} />
         
         <div className="mb-6">
           <CheckoutSummary />
@@ -163,7 +163,7 @@ export const CheckoutPage = () => {
               <Card className="p-4 sm:p-6">
                 <div className="text-center space-y-4">
                   <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-green-100 text-green-500 mb-4">
-                    <Car className="w-6 h-6 sm:w-8 sm:h-8" />
+                    <ShoppingCart className="w-6 h-6 sm:w-8 sm:h-8" />
                   </div>
                   <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">Reserva Confirmada!</h2>
                   <p className="text-sm sm:text-base text-gray-600">
