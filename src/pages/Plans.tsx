@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { PlanCard } from "@/components/plans/PlanCard";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/components/ui/use-toast";
+import { Navigation } from "@/components/website/Navigation";
+import { motion } from "framer-motion";
 
 const Plans = () => {
   const navigate = useNavigate();
@@ -42,29 +44,37 @@ const Plans = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-12">
-      <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-center mb-8">Escolha seu plano</h1>
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          <PlanCard
-            type="flex"
-            price="529,00"
-            onSelect={() => handlePlanSelect('flex')}
-          />
-          <div className="transform hover:scale-105 transition-transform duration-300">
+    <div className="min-h-screen">
+      <Navigation />
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="pt-28 pb-16 bg-gradient-to-b from-white to-gray-50"
+      >
+        <div className="container mx-auto px-4">
+          <h1 className="text-3xl font-bold text-center mb-8">Escolha seu plano</h1>
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
             <PlanCard
-              type="black"
-              price="1299,00"
-              onSelect={() => handlePlanSelect('black')}
+              type="flex"
+              price="529,00"
+              onSelect={() => handlePlanSelect('flex')}
+            />
+            <div className="transform hover:scale-105 transition-transform duration-300">
+              <PlanCard
+                type="black"
+                price="1299,00"
+                onSelect={() => handlePlanSelect('black')}
+              />
+            </div>
+            <PlanCard
+              type="monthly"
+              price="729,00"
+              onSelect={() => handlePlanSelect('monthly')}
             />
           </div>
-          <PlanCard
-            type="monthly"
-            price="729,00"
-            onSelect={() => handlePlanSelect('monthly')}
-          />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
