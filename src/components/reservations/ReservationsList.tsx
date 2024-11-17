@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import type { Reservation, PickupFilter } from "@/types/reservation"
 import { ReservationCard } from "./ReservationCard"
@@ -11,6 +11,13 @@ interface ReservationsListProps {
 
 const ReservationsList = ({ filter }: ReservationsListProps) => {
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({})
+
+  const toggleCard = useCallback((id: string) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }))
+  }, [])
 
   const { data: reservations, isLoading, error } = useQuery({
     queryKey: ['reservations', filter],
@@ -87,48 +94,45 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
     },
   })
 
-  if (error) {
-    console.error('Error fetching reservations:', error)
-    return <div className="text-center py-8 text-red-600">Erro ao carregar reservas.</div>
-  }
+  const renderedReservations = useMemo(() => {
+    if (error) {
+      console.error('Error fetching reservations:', error)
+      return <div className="text-center py-4 text-red-600">Erro ao carregar reservas.</div>
+    }
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="animate-pulse">
-            <div className="h-32 bg-gray-100 rounded-lg"></div>
-          </div>
-        ))}
-      </div>
-    )
-  }
+    if (isLoading) {
+      return (
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="animate-pulse">
+              <div className="h-24 bg-gray-100 rounded-lg"></div>
+            </div>
+          ))}
+        </div>
+      )
+    }
 
-  if (!reservations?.length) {
-    return (
-      <div className="text-center py-8 text-muted-foreground">
-        Nenhuma reserva encontrada.
-      </div>
-    )
-  }
+    if (!reservations?.length) {
+      return (
+        <div className="text-center py-4 text-muted-foreground">
+          Nenhuma reserva encontrada.
+        </div>
+      )
+    }
 
-  const toggleCard = (id: string) => {
-    setExpandedCards(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }))
-  }
+    return reservations.map((reservation) => (
+      <ReservationCard
+        key={reservation.id}
+        reservation={reservation}
+        isExpanded={!!expandedCards[reservation.id]}
+        onToggle={() => toggleCard(reservation.id)}
+      />
+    ))
+  }, [reservations, isLoading, error, expandedCards, toggleCard])
 
   return (
-    <div className="space-y-4 max-w-3xl mx-auto">
-      {reservations.map((reservation) => (
-        <ReservationCard
-          key={reservation.id}
-          reservation={reservation}
-          isExpanded={!!expandedCards[reservation.id]}
-          onToggle={() => toggleCard(reservation.id)}
-        />
-      ))}
+    <div className="space-y-2 max-w-3xl mx-auto">
+      {renderedReservations}
     </div>
   )
 }
