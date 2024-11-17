@@ -77,9 +77,11 @@ const AdminRoutes = () => {
             <Routes>
               <Route index element={<Dashboard />} />
               <Route path="vehicles">
+                <Route path="overview" element={<Vehicles view="overview" />} />
+                <Route path="categories" element={<Vehicles view="categories" />} />
+                <Route path="models" element={<Vehicles view="models" />} />
                 <Route path="fleet" element={<Vehicles view="fleet" />} />
-                <Route path="rentals" element={<Vehicles view="rentals" />} />
-                <Route path="customers" element={<Vehicles view="customers" />} />
+                <Route path="maintenance" element={<Vehicles view="maintenance" />} />
               </Route>
               <Route path="customers">
                 <Route index element={<Customers />} />

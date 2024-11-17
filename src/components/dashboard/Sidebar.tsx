@@ -11,6 +11,9 @@ import {
   ChevronRight,
   Users,
   Globe,
+  Wrench,
+  CarFront,
+  Grid,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -29,10 +32,13 @@ const menuItems = [
   },
   {
     icon: Car,
-    label: "Veículos",
+    label: "Frota",
     subItems: [
-      { to: "/admin/vehicles/fleet", label: "Frota" },
-      { to: "/admin/vehicles/rentals", label: "Locações" },
+      { to: "/admin/vehicles/overview", label: "Visão Geral", icon: Grid },
+      { to: "/admin/vehicles/categories", label: "Categorias", icon: Tag },
+      { to: "/admin/vehicles/models", label: "Modelos", icon: CarFront },
+      { to: "/admin/vehicles/fleet", label: "Veículos", icon: Car },
+      { to: "/admin/vehicles/maintenance", label: "Manutenção", icon: Wrench },
     ]
   },
   {
@@ -104,6 +110,7 @@ const Sidebar = () => {
                       : "text-gray-600 hover:text-primary hover:bg-primary/5"
                   )}
                 >
+                  {subItem.icon && <subItem.icon className="w-4 h-4 mr-2" />}
                   {subItem.label}
                 </Link>
               ))}

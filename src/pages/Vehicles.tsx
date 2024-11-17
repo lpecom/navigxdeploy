@@ -7,7 +7,7 @@ import { useState } from "react";
 import { EditVehicleDialog } from "@/components/vehicles/EditVehicleDialog";
 
 interface VehiclesProps {
-  view: 'fleet' | 'rentals' | 'customers';
+  view: 'overview' | 'categories' | 'models' | 'fleet' | 'maintenance';
 }
 
 const Vehicles = ({ view }: VehiclesProps) => {
@@ -15,14 +15,35 @@ const Vehicles = ({ view }: VehiclesProps) => {
 
   const getTitle = () => {
     switch (view) {
+      case 'overview':
+        return 'Visão Geral da Frota';
+      case 'categories':
+        return 'Categorias de Veículos';
+      case 'models':
+        return 'Modelos de Veículos';
       case 'fleet':
-        return 'Frota de Veículos';
-      case 'rentals':
-        return 'Locações Ativas';
-      case 'customers':
-        return 'Clientes';
+        return 'Frota Ativa';
+      case 'maintenance':
+        return 'Manutenção';
       default:
         return 'Veículos';
+    }
+  };
+
+  const getDescription = () => {
+    switch (view) {
+      case 'overview':
+        return 'Visualize métricas e status da sua frota';
+      case 'categories':
+        return 'Gerencie as categorias de veículos disponíveis';
+      case 'models':
+        return 'Gerencie os modelos de veículos';
+      case 'fleet':
+        return 'Gerencie sua frota ativa de veículos';
+      case 'maintenance':
+        return 'Acompanhe manutenções e serviços';
+      default:
+        return '';
     }
   };
 
@@ -37,9 +58,7 @@ const Vehicles = ({ view }: VehiclesProps) => {
                 {getTitle()}
               </h1>
               <p className="text-muted-foreground">
-                {view === 'fleet' && 'Gerencie sua frota de veículos e seus detalhes'}
-                {view === 'rentals' && 'Visualize e gerencie as locações ativas'}
-                {view === 'customers' && 'Gerencie os clientes e suas informações'}
+                {getDescription()}
               </p>
             </div>
             {view === 'fleet' && (
