@@ -118,13 +118,18 @@ export const CheckoutPage = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        className="space-y-6"
       >
-        <CheckoutSummary />
-        <ProgressSteps currentStep={step} steps={steps} />
+        <div className="mb-6">
+          <CheckoutSummary />
+        </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="mb-8">
+          <ProgressSteps currentStep={step} steps={steps} />
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {step === 1 && (
               <CustomerForm onSubmit={handleCustomerSubmit} />
             )}
@@ -132,7 +137,7 @@ export const CheckoutPage = () => {
             {step === 2 && (
               <>
                 <PickupScheduler onSubmit={handleScheduleSubmit} />
-                <Card className="p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100">
+                <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <ShoppingCart className="w-5 h-5 text-primary" />
                     Opcionais Disponíveis
@@ -156,13 +161,13 @@ export const CheckoutPage = () => {
             )}
 
             {step === 4 && (
-              <Card className="p-6">
+              <Card className="p-4 sm:p-6">
                 <div className="text-center space-y-4">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-500 mb-4">
-                    <Car className="w-8 h-8" />
+                  <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-green-100 text-green-500 mb-4">
+                    <Car className="w-6 h-6 sm:w-8 sm:h-8" />
                   </div>
-                  <h2 className="text-2xl font-semibold text-gray-800">Reserva Confirmada!</h2>
-                  <p className="text-gray-600">
+                  <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">Reserva Confirmada!</h2>
+                  <p className="text-sm sm:text-base text-gray-600">
                     Sua reserva foi recebida com sucesso. Em breve nossa equipe entrará em contato para confirmar os detalhes.
                   </p>
                   <Button
@@ -176,9 +181,9 @@ export const CheckoutPage = () => {
             )}
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {step < 4 && (
-              <Card className="p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100 sticky top-4">
+              <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100 sticky top-4">
                 <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
                   <User className="w-5 h-5 text-primary" />
                   Precisa de ajuda?

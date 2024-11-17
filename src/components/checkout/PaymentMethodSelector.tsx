@@ -16,7 +16,7 @@ export const PaymentMethodSelector = ({
     <RadioGroup
       value={selectedMethod}
       onValueChange={onMethodChange}
-      className="grid grid-cols-3 gap-4"
+      className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4"
     >
       <motion.div
         whileHover={{ scale: 1.02 }}
@@ -31,8 +31,8 @@ export const PaymentMethodSelector = ({
           htmlFor="credit"
           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary transition-all duration-200"
         >
-          <CreditCard className="mb-3 h-6 w-6" />
-          Cartão de Crédito
+          <CreditCard className="mb-2 sm:mb-3 h-5 w-5 sm:h-6 sm:w-6" />
+          <span className="text-sm sm:text-base">Cartão de Crédito</span>
         </Label>
       </motion.div>
       
@@ -49,8 +49,8 @@ export const PaymentMethodSelector = ({
           htmlFor="pix"
           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary transition-all duration-200"
         >
-          <QrCode className="mb-3 h-6 w-6" />
-          PIX
+          <QrCode className="mb-2 sm:mb-3 h-5 w-5 sm:h-6 sm:w-6" />
+          <span className="text-sm sm:text-base">PIX</span>
         </Label>
       </motion.div>
       
@@ -67,8 +67,8 @@ export const PaymentMethodSelector = ({
           htmlFor="boleto"
           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary transition-all duration-200"
         >
-          <Receipt className="mb-3 h-6 w-6" />
-          Boleto
+          <Receipt className="mb-2 sm:mb-3 h-5 w-5 sm:h-6 sm:w-6" />
+          <span className="text-sm sm:text-base">Boleto</span>
         </Label>
       </motion.div>
     </RadioGroup>
