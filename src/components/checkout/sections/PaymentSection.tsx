@@ -1,10 +1,10 @@
+import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { PaymentMethodSelector } from "../PaymentMethodSelector"
-import { CreditCardForm } from "../CreditCardForm"
-import { PixPayment } from "../PixPayment"
-import { BoletoPayment } from "../BoletoPayment"
+import { CreditCardForm } from "../payment-methods/CreditCardForm"
+import { PixPayment } from "../payment-methods/PixPayment"
+import { BoletoPayment } from "../payment-methods/BoletoPayment"
 import { motion } from "framer-motion"
-import { useState } from "react"
 
 interface PaymentSectionProps {
   onPaymentSuccess: (id: string) => void

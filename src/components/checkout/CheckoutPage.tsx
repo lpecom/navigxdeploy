@@ -7,44 +7,18 @@ import { EmptyCartMessage } from "./ui/EmptyCartMessage"
 import { motion } from "framer-motion"
 import { CheckoutProgress } from "./sections/CheckoutProgress"
 import { EnhancedSummary } from "./sections/EnhancedSummary"
-import { CheckoutSteps } from "./sections/CheckoutSteps"
+import { CustomerForm } from "./sections/CustomerForm"
+import { PickupScheduler } from "./sections/PickupScheduler"
+import { PaymentSection } from "./sections/PaymentSection"
+import { SuccessSection } from "./sections/SuccessSection"
 import { SupportCard } from "./sections/SupportCard"
 import { createCheckoutSession } from "./CheckoutSessionHandler"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
   const [customerId, setCustomerId] = useState<string | null>(null)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const { toast } = useToast()
   const { state: cartState, dispatch } = useCart()
-
-  const handleLoginSuccess = async (userId: string) => {
-    try {
-      const { data: driverData, error } = await supabase
-        .from('driver_details')
-        .select('*')
-        .eq('auth_user_id', userId)
-        .single()
-
-      if (error) throw error
-
-      setCustomerId(driverData.id)
-      setIsLoggedIn(true)
-      setStep(2)
-
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Vamos agendar sua retirada.",
-      })
-    } catch (error: any) {
-      console.error('Error fetching driver details:', error)
-      toast({
-        title: "Erro ao carregar dados",
-        description: "Ocorreu um erro ao carregar seus dados. Por favor, tente novamente.",
-        variant: "destructive",
-      })
-    }
-  }
 
   const handleCustomerSubmit = async (customerData: any) => {
     try {
@@ -135,16 +109,25 @@ export const CheckoutPage = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <CheckoutSteps
-              step={step}
-              isLoggedIn={isLoggedIn}
-              customerId={customerId}
-              checkoutSessionId={cartState.checkoutSessionId}
-              onLoginSuccess={handleLoginSuccess}
-              onCustomerSubmit={handleCustomerSubmit}
-              onScheduleSubmit={handleScheduleSubmit}
-              onPaymentSuccess={handlePaymentSuccess}
-            />
+            {step === 1 && (
+              <CustomerForm onSubmit={handleCustomerSubmit} />
+            )}
+            
+            {step === 2 && (
+              <PickupScheduler onSubmit={handleScheduleSubmit} />
+            )}
+            
+            {step === 3 && customerId && (
+              <PaymentSection
+                amount={cartState.total}
+                driverId={customerId}
+                onPaymentSuccess={handlePaymentSuccess}
+              />
+            )}
+            
+            {step === 4 && (
+              <SuccessSection />
+            )}
           </div>
 
           <div className="space-y-6">
