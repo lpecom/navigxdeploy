@@ -6,6 +6,9 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import type { Database } from "@/integrations/supabase/types";
+
+type DriverDetails = Database['public']['Tables']['driver_details']['Row'];
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -22,7 +25,7 @@ const AdminLogin = () => {
       // First check if the user exists
       const { data: userExists, error: userCheckError } = await supabase
         .from('driver_details')
-        .select('id, crm_status')
+        .select('id, crm_status, auth_user_id')
         .eq('email', email)
         .single();
 
