@@ -2,11 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VehicleInfo } from "./VehicleInfo";
 import PaymentHistory from "./PaymentHistory";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Car, CreditCard, Calendar, Bell } from "lucide-react";
+import { ArrowRight, Calendar, CreditCard, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { ProfitCalculator } from "./ProfitCalculator";
 import { UberIntegration } from "./UberIntegration";
+import { OBDInterface } from "./OBDInterface";
 
 interface DriverOverviewProps {
   driverId: string;
@@ -90,8 +91,10 @@ export const DriverOverview = ({ driverId }: DriverOverviewProps) => {
           </CardContent>
         </Card>
 
-        <UberIntegration driverId={driverId} />
+        <OBDInterface />
       </div>
+
+      <UberIntegration driverId={driverId} />
 
       <Card>
         <CardHeader>
