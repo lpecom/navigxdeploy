@@ -7,9 +7,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
+interface HeroSettings {
+  title: string;
+  subtitle: string;
+  buttonText: string;
+  backgroundImage: string;
+}
+
+interface WebsiteSettingsData {
+  id: string;
+  settings: {
+    hero: HeroSettings;
+  };
+}
+
 export const WebsiteSettings = () => {
   const { toast } = useToast();
-  const [heroSettings, setHeroSettings] = useState({
+  const [heroSettings, setHeroSettings] = useState<HeroSettings>({
     title: "Alugue o carro perfeito para sua jornada",
     subtitle: "Descubra nossa frota premium e comece sua aventura hoje mesmo.",
     buttonText: "Ver Planos",
@@ -20,10 +34,10 @@ export const WebsiteSettings = () => {
     try {
       const { error } = await supabase
         .from('website_settings')
-        .upsert({ 
+        .upsert({
           id: 'hero',
-          settings: heroSettings 
-        });
+          settings: { hero: heroSettings }
+        } as WebsiteSettingsData);
 
       if (error) throw error;
 
