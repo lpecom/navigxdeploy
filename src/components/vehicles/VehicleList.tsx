@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface VehicleListProps {
-  view: 'fleet' | 'rentals' | 'customers';
+  view: 'overview' | 'categories' | 'models' | 'fleet' | 'maintenance';
 }
 
 const VehicleList = ({ view }: VehicleListProps) => {
@@ -55,6 +55,11 @@ const VehicleList = ({ view }: VehicleListProps) => {
 
   if (modelsLoading || fleetLoading) {
     return <div>Carregando...</div>;
+  }
+
+  // Only show the tabs for models and fleet views
+  if (view !== 'models' && view !== 'fleet') {
+    return <div>Content for {view} view</div>;
   }
 
   return (
