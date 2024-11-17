@@ -48,14 +48,11 @@ const Reservations = ({ filter }: ReservationsProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="flex-1 overflow-y-auto p-6 bg-gray-50"
+        className="flex-1 p-6 bg-gray-50"
       >
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">Reservas Pendentes</h1>
-            <div className="flex gap-2">
-              {/* Add any additional actions/filters here */}
-            </div>
           </div>
           <ReservationsList filter="pending" />
         </div>
@@ -68,7 +65,7 @@ const Reservations = ({ filter }: ReservationsProps) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="flex-1 overflow-y-auto p-6 bg-gray-50"
+      className="flex-1 p-6 bg-gray-50"
     >
       <div className="max-w-7xl mx-auto space-y-6">
         <h1 className="text-2xl font-bold">Retiradas</h1>

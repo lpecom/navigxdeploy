@@ -36,7 +36,6 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       if (filter === 'pending') {
         query = query.eq('status', 'pending_approval');
       } else {
-        // For pickup filters, only show approved reservations
         query = query.eq('status', 'approved');
 
         const now = new Date();
@@ -95,7 +94,7 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4">
         {[1, 2, 3].map((i) => (
           <div key={i} className="animate-pulse">
             <div className="h-48 bg-gray-200 rounded-lg"></div>
@@ -121,7 +120,7 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
   };
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4">
       {reservations.map((reservation) => (
         <ReservationCard
           key={reservation.id}
