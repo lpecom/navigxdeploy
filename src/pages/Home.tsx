@@ -34,17 +34,17 @@ const Home = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16 space-y-4"
+            className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
+            <h2 className="text-[2.75rem] font-medium tracking-tight text-gray-900 mb-4">
               Nossa Frota Premium
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl font-light text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Descubra o veículo perfeito para suas necessidades entre nossa seleção premium de carros
             </p>
           </motion.div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-[1400px] mx-auto">
             {categories?.map((category, index) => (
               <motion.div
                 key={category.id}
