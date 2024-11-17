@@ -31,11 +31,13 @@ const Plans = () => {
       type: 'ADD_ITEM',
       payload: {
         id: `${selectedCar.category}-${planType}`,
-        type: 'car',
+        type: 'car_group',
         quantity: 1,
         unitPrice: parseFloat(selectedCar.price),
         totalPrice: parseFloat(selectedCar.price),
-        name: `${selectedCar.category} - Plano ${planType}`
+        name: `${selectedCar.category} - Plano ${planType}`,
+        category: selectedCar.category,
+        period: planType
       }
     });
 
