@@ -1,10 +1,8 @@
 import { useState } from "react"
-import { User, Calendar, CreditCard, ShoppingCart } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useToast } from "@/components/ui/use-toast"
 import { CustomerForm } from "./sections/CustomerForm"
 import { PickupScheduler } from "./sections/PickupScheduler"
-import { CheckoutSummary } from "./sections/CheckoutSummary"
 import { OptionalsList } from "@/components/optionals/OptionalsList"
 import { Card } from "@/components/ui/card"
 import { handleCustomerData } from "./handlers/CustomerHandler"
@@ -14,11 +12,13 @@ import { CheckoutLayout } from "./ui/CheckoutLayout"
 import { EmptyCartMessage } from "./ui/EmptyCartMessage"
 import { PaymentSection } from "./sections/PaymentSection"
 import { motion } from "framer-motion"
-import { Steps } from "./Steps"
 import { SupportCard } from "./sections/SupportCard"
 import { CheckoutAuth } from "./sections/auth/CheckoutAuth"
 import { supabase } from "@/integrations/supabase/client"
-import { Button } from "@/components/ui/button" // Added import for Button
+import { Button } from "@/components/ui/button"
+import { ShoppingCart } from "lucide-react"
+import { CheckoutProgress } from "./sections/CheckoutProgress"
+import { EnhancedSummary } from "./sections/EnhancedSummary"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
@@ -27,13 +27,6 @@ export const CheckoutPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const { toast } = useToast()
   const { state: cartState, dispatch } = useCart()
-
-  const steps = [
-    { number: 1, title: "Seus Dados", icon: User },
-    { number: 2, title: "Agendamento", icon: Calendar },
-    { number: 3, title: "Pagamento", icon: CreditCard },
-    { number: 4, title: "Confirmação", icon: ShoppingCart }
-  ]
 
   const handleLoginSuccess = async (userId: string) => {
     try {
@@ -151,19 +144,19 @@ export const CheckoutPage = () => {
         transition={{ duration: 0.5 }}
         className="space-y-8"
       >
-        <Steps currentStep={step} steps={steps} />
-        
-        <div className="mb-8">
-          <CheckoutSummary />
-        </div>
+        <CheckoutProgress currentStep={step} />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           <div className="lg:col-span-2 space-y-6">
-            {step === 1 && (
-              <>
+            {step === 1 && !isLoggedIn && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+              >
                 <CheckoutAuth onLoginSuccess={handleLoginSuccess} />
-                {!isLoggedIn && <CustomerForm onSubmit={handleCustomerSubmit} />}
-              </>
+                <CustomerForm onSubmit={handleCustomerSubmit} />
+              </motion.div>
             )}
 
             {step === 2 && (
@@ -223,6 +216,7 @@ export const CheckoutPage = () => {
           </div>
 
           <div className="space-y-6">
+            <EnhancedSummary />
             {step < 4 && <SupportCard />}
           </div>
         </div>
