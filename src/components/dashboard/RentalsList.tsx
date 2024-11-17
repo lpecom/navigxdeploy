@@ -1,6 +1,9 @@
-import { Car } from "lucide-react";
+import { Car, Calendar, User } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface SelectedCar {
   name: string;
@@ -13,17 +16,6 @@ interface Rental {
   created_at: string;
   total_amount: number;
   selected_car: SelectedCar;
-  driver: {
-    full_name: string;
-    email: string;
-  } | null;
-}
-
-interface RentalResponse {
-  id: string;
-  created_at: string;
-  total_amount: number;
-  selected_car: any;
   driver: {
     full_name: string;
     email: string;
@@ -48,84 +40,93 @@ const RentalsList = () => {
         .limit(5);
 
       if (error) throw error;
-      
-      // Transform the response data to match our Rental type
-      return (data as RentalResponse[]).map(rental => ({
-        ...rental,
-        selected_car: rental.selected_car as SelectedCar
-      }));
+      return data as Rental[];
     },
   });
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="p-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Aluguéis Recentes</h2>
-        </div>
-        <div className="animate-pulse space-y-4 p-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-gray-200 rounded-lg" />
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold">Aluguéis Recentes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between p-4 rounded-lg border border-gray-100">
+                <div className="flex items-center gap-4">
+                  <Skeleton className="w-10 h-10 rounded-lg" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  <div className="h-4 w-32 bg-gray-200 rounded" />
-                  <div className="h-3 w-24 bg-gray-200 rounded" />
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-3 w-16" />
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="h-3 w-20 bg-gray-200 rounded" />
-                <div className="h-3 w-16 bg-gray-200 rounded" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200">
-      <div className="p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">Aluguéis Recentes</h2>
-      </div>
-      <div className="divide-y divide-gray-200">
-        {rentals?.map((rental) => (
-          <div key={rental.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-            <div className="flex items-center gap-4">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Car className="w-5 h-5 text-primary" />
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-xl font-semibold">Aluguéis Recentes</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {rentals?.map((rental) => (
+            <div 
+              key={rental.id} 
+              className="p-4 flex items-center justify-between rounded-lg border border-gray-100 hover:border-gray-200 hover:bg-gray-50/50 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <div className="p-2.5 bg-primary/10 rounded-lg">
+                  <Car className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-medium text-gray-900">{rental.driver?.full_name}</p>
+                    <Badge variant="secondary" className="font-medium">
+                      Ativo
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <div className="flex items-center gap-1.5">
+                      <Car className="w-4 h-4" />
+                      <span>{rental.selected_car.name}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="w-4 h-4" />
+                      <span>{new Date(rental.created_at).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="font-medium text-gray-900">{rental.driver?.full_name}</p>
-                <p className="text-sm text-gray-500">{rental.selected_car.name}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-6">
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-lg font-medium text-gray-900">
                   {new Intl.NumberFormat('pt-BR', {
                     style: 'currency',
                     currency: 'BRL'
                   }).format(rental.total_amount)}
                 </p>
-                <p className="text-sm text-gray-500">
-                  {new Date(rental.created_at).toLocaleDateString('pt-BR')}
-                </p>
               </div>
-              <span className="px-3 py-1 rounded-full text-xs font-medium bg-success/10 text-success">
-                Ativo
-              </span>
             </div>
-          </div>
-        ))}
-        {(!rentals || rentals.length === 0) && (
-          <div className="p-8 text-center">
-            <p className="text-gray-500">Nenhum aluguel ativo no momento</p>
-          </div>
-        )}
-      </div>
-    </div>
+          ))}
+          {(!rentals || rentals.length === 0) && (
+            <div className="py-12 text-center">
+              <Car className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500 font-medium">Nenhum aluguel ativo no momento</p>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
