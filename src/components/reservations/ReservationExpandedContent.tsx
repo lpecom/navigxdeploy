@@ -1,7 +1,6 @@
 import { CustomerDetails } from "../checkout/sections/CustomerDetails"
 import { ReservationDetails } from "../checkout/sections/ReservationDetails"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Check, X } from "lucide-react"
 import type { Reservation } from "@/types/reservation"
@@ -50,18 +49,18 @@ export const ReservationExpandedContent = ({
       initial={{ opacity: 0, height: 0 }}
       animate={{ opacity: 1, height: "auto" }}
       exit={{ opacity: 0, height: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.2 }}
       className="border-t"
     >
-      <div className="p-6 space-y-6">
-        <div className="grid gap-6">
+      <div className="p-4 space-y-4">
+        <div className="grid gap-4">
           <CustomerDetails customer={customerData} />
           <ReservationDetails reservation={reservationData} />
         </div>
 
         <Separator />
 
-        <div className="flex items-center justify-end gap-4">
+        <div className="flex items-center justify-end gap-2">
           <Button
             variant="outline"
             onClick={handleReject}
@@ -72,7 +71,7 @@ export const ReservationExpandedContent = ({
           </Button>
           <Button 
             onClick={handleApprove} 
-            className="bg-green-600 hover:bg-green-700 text-white transition-colors"
+            className="bg-primary hover:bg-primary/90 text-white transition-colors"
           >
             <Check className="w-4 h-4 mr-2" />
             Aprovar

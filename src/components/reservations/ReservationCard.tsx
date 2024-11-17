@@ -67,40 +67,14 @@ export const ReservationCard = ({ reservation, isExpanded, onToggle }: Reservati
       transition={{ duration: 0.3 }}
     >
       <Card className="overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
-        <CardHeader className="p-6">
-          <div className="flex flex-col space-y-4">
-            <div className="flex justify-between items-start">
-              <div className="space-y-1">
-                <h3 className="text-lg font-semibold">{reservation.customerName}</h3>
-                <p className="text-sm text-muted-foreground">Reserva #{reservation.reservationNumber}</p>
+        <CardContent className="p-4">
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-medium">{reservation.customerName}</h3>
+                <span className="text-sm text-muted-foreground">#{reservation.reservationNumber}</span>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={onToggle}
-                className="hover:bg-gray-100"
-              >
-                {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </Button>
-            </div>
-
-            <div className="grid gap-4">
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Car className="w-4 h-4" />
-                  {reservation.carCategory}
-                </Badge>
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  {formattedDate}
-                </Badge>
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  {formattedTime}
-                </Badge>
-              </div>
-
-              <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+              <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Phone className="w-4 h-4" />
                   {reservation.phone}
@@ -114,43 +88,64 @@ export const ReservationCard = ({ reservation, isExpanded, onToggle }: Reservati
                   CPF: {reservation.cpf}
                 </div>
               </div>
-
-              <div className="flex items-center justify-between border-t pt-4">
-                <div className="text-sm font-medium">
-                  Total: <span className="text-primary">R$ {reservation.weeklyFare.toFixed(2)}</span>
-                </div>
-                {!isExpanded && (
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleReject}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      Rejeitar
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={handleApprove}
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      Aprovar
-                    </Button>
-                  </div>
-                )}
-              </div>
             </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onToggle}
+              className="hover:bg-gray-100"
+            >
+              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
           </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          {isExpanded && (
-            <ReservationExpandedContent 
-              reservation={reservation} 
-              onApprove={handleApprove}
-              onReject={handleReject}
-            />
-          )}
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Car className="w-4 h-4" />
+              {reservation.carCategory}
+            </Badge>
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Calendar className="w-4 h-4" />
+              {formattedDate}
+            </Badge>
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Clock className="w-4 h-4" />
+              {formattedTime}
+            </Badge>
+          </div>
+
+          <div className="mt-4 flex items-center justify-between border-t pt-4">
+            <div className="text-sm">
+              Total: <span className="font-medium text-primary">R$ {reservation.weeklyFare.toFixed(2)}</span>
+            </div>
+            {!isExpanded && (
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleReject}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  Rejeitar
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleApprove}
+                  className="bg-primary hover:bg-primary/90 text-white"
+                >
+                  Aprovar
+                </Button>
+              </div>
+            )}
+          </div>
         </CardContent>
+        {isExpanded && (
+          <ReservationExpandedContent 
+            reservation={reservation} 
+            onApprove={handleApprove}
+            onReject={handleReject}
+          />
+        )}
       </Card>
     </motion.div>
   )

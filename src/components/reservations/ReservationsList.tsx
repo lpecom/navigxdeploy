@@ -1,16 +1,16 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import type { Reservation, PickupFilter } from "@/types/reservation";
-import { ReservationCard } from "./ReservationCard";
-import { supabase } from "@/integrations/supabase/client";
-import { startOfWeek, endOfWeek, addWeeks, format } from "date-fns";
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
+import type { Reservation, PickupFilter } from "@/types/reservation"
+import { ReservationCard } from "./ReservationCard"
+import { supabase } from "@/integrations/supabase/client"
+import { startOfWeek, endOfWeek, addWeeks, format } from "date-fns"
 
 interface ReservationsListProps {
-  filter: "pending" | PickupFilter;
+  filter: "pending" | PickupFilter
 }
 
 const ReservationsList = ({ filter }: ReservationsListProps) => {
-  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({})
 
   const { data: reservations, isLoading, error } = useQuery({
     queryKey: ['reservations', filter],
@@ -31,36 +31,36 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
             postal_code
           )
         `)
-        .order('reservation_number', { ascending: false });
+        .order('reservation_number', { ascending: false })
 
       if (filter === 'pending') {
-        query = query.eq('status', 'pending_approval');
+        query = query.eq('status', 'pending_approval')
       } else {
-        query = query.eq('status', 'approved');
+        query = query.eq('status', 'approved')
 
-        const now = new Date();
-        const today = format(now, 'yyyy-MM-dd');
+        const now = new Date()
+        const today = format(now, 'yyyy-MM-dd')
 
         if (filter === 'today') {
-          query = query.eq('pickup_date', today);
+          query = query.eq('pickup_date', today)
         } else if (filter === 'this-week') {
-          const weekStart = format(startOfWeek(now, { weekStartsOn: 1 }), 'yyyy-MM-dd');
-          const weekEnd = format(endOfWeek(now, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+          const weekStart = format(startOfWeek(now, { weekStartsOn: 1 }), 'yyyy-MM-dd')
+          const weekEnd = format(endOfWeek(now, { weekStartsOn: 1 }), 'yyyy-MM-dd')
           query = query
             .gte('pickup_date', weekStart)
-            .lte('pickup_date', weekEnd);
+            .lte('pickup_date', weekEnd)
         } else if (filter === 'next-week') {
-          const nextWeekStart = format(startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 }), 'yyyy-MM-dd');
-          const nextWeekEnd = format(endOfWeek(addWeeks(now, 1), { weekStartsOn: 1 }), 'yyyy-MM-dd');
+          const nextWeekStart = format(startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 }), 'yyyy-MM-dd')
+          const nextWeekEnd = format(endOfWeek(addWeeks(now, 1), { weekStartsOn: 1 }), 'yyyy-MM-dd')
           query = query
             .gte('pickup_date', nextWeekStart)
-            .lte('pickup_date', nextWeekEnd);
+            .lte('pickup_date', nextWeekEnd)
         }
       }
 
-      const { data, error } = await query;
+      const { data, error } = await query
       
-      if (error) throw error;
+      if (error) throw error
       
       return (data || []).map((session: any): Reservation => ({
         id: session.id,
@@ -83,25 +83,25 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
         weeklyFare: session.total_amount,
         optionals: session.selected_optionals || [],
         kilometersPerWeek: 1000,
-      }));
+      }))
     },
-  });
+  })
 
   if (error) {
-    console.error('Error fetching reservations:', error);
-    return <div className="text-center py-8 text-red-600">Erro ao carregar reservas.</div>;
+    console.error('Error fetching reservations:', error)
+    return <div className="text-center py-8 text-red-600">Erro ao carregar reservas.</div>
   }
 
   if (isLoading) {
     return (
-      <div className="grid gap-4">
+      <div className="space-y-4">
         {[1, 2, 3].map((i) => (
           <div key={i} className="animate-pulse">
-            <div className="h-48 bg-gray-200 rounded-lg"></div>
+            <div className="h-32 bg-gray-100 rounded-lg"></div>
           </div>
         ))}
       </div>
-    );
+    )
   }
 
   if (!reservations?.length) {
@@ -109,18 +109,18 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
       <div className="text-center py-8 text-muted-foreground">
         Nenhuma reserva encontrada.
       </div>
-    );
+    )
   }
 
   const toggleCard = (id: string) => {
     setExpandedCards(prev => ({
       ...prev,
       [id]: !prev[id]
-    }));
-  };
+    }))
+  }
 
   return (
-    <div className="grid gap-4">
+    <div className="space-y-4 max-w-3xl mx-auto">
       {reservations.map((reservation) => (
         <ReservationCard
           key={reservation.id}
@@ -130,7 +130,7 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
         />
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default ReservationsList;
+export default ReservationsList
