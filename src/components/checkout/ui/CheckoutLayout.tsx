@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { motion } from "framer-motion";
+import { CheckoutHeader } from "./CheckoutHeader";
 
 interface CheckoutLayoutProps {
   children: ReactNode;
@@ -7,15 +7,13 @@ interface CheckoutLayoutProps {
 
 export const CheckoutLayout = ({ children }: CheckoutLayoutProps) => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-4 sm:py-8">
-      <motion.div
-        className="container mx-auto px-4 sm:px-6 max-w-6xl"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {children}
-      </motion.div>
+    <div className="min-h-screen bg-gray-50">
+      <CheckoutHeader />
+      <main className="pt-32 pb-16">
+        <div className="container mx-auto px-4 max-w-6xl">
+          {children}
+        </div>
+      </main>
     </div>
   );
 };

@@ -13,10 +13,11 @@ import { createDriverDetails } from "./handlers/DriverHandler"
 import { createCheckoutSession } from "./CheckoutSessionHandler"
 import { supabase } from "@/integrations/supabase/client"
 import { CheckoutLayout } from "./ui/CheckoutLayout"
-import { ProgressSteps } from "./ui/ProgressSteps"
 import { EmptyCartMessage } from "./ui/EmptyCartMessage"
 import { PaymentSection } from "./sections/PaymentSection"
 import { motion } from "framer-motion"
+import { CheckoutSteps } from "./sections/CheckoutSteps"
+import { SupportCard } from "./sections/SupportCard"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
@@ -124,9 +125,7 @@ export const CheckoutPage = () => {
           <CheckoutSummary />
         </div>
         
-        <div className="mb-8">
-          <ProgressSteps currentStep={step} steps={steps} />
-        </div>
+        <CheckoutSteps currentStep={step} steps={steps} />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
@@ -182,27 +181,10 @@ export const CheckoutPage = () => {
           </div>
 
           <div className="space-y-4 sm:space-y-6">
-            {step < 4 && (
-              <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100 sticky top-4">
-                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                  <User className="w-5 h-5 text-primary" />
-                  Precisa de ajuda?
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Nossa equipe está disponível para te ajudar pelo WhatsApp. Clique no botão abaixo para iniciar uma conversa.
-                </p>
-                <Button 
-                  variant="outline"
-                  className="w-full mt-4 bg-white hover:bg-gray-50"
-                  onClick={() => window.open('https://wa.me/seu-numero', '_blank')}
-                >
-                  Falar com Suporte
-                </Button>
-              </Card>
-            )}
+            {step < 4 && <SupportCard />}
           </div>
         </div>
       </motion.div>
     </CheckoutLayout>
-  )
-}
+  );
+};
