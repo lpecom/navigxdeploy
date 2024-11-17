@@ -6,6 +6,8 @@ import { OrderSummary } from "@/components/optionals/OrderSummary";
 import { OptionalsList } from "@/components/optionals/OptionalsList";
 import { useEffect, useState } from "react";
 import { CarSlider } from "@/components/home/CarSlider";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/components/ui/use-toast";
 import type { SelectedCar } from "@/types/car";
 
 interface Car {
@@ -19,6 +21,8 @@ interface Car {
 
 const Optionals = () => {
   const navigate = useNavigate();
+  const { state: cartState } = useCart();
+  const { toast } = useToast();
   const [selectedCar, setSelectedCar] = useState<SelectedCar | null>(null);
 
   const cars: Car[] = [
@@ -75,6 +79,16 @@ const Optionals = () => {
   }, [navigate]);
 
   const handleContinue = () => {
+    if (cartState.items.length === 0) {
+      toast({
+        title: "Carrinho vazio",
+        description: "Por favor, selecione um plano antes de continuar.",
+        variant: "destructive",
+      });
+      navigate('/plans');
+      return;
+    }
+
     navigate('/checkout');
   };
 
@@ -116,7 +130,7 @@ const Optionals = () => {
           <h1 className="text-2xl font-semibold mb-6">Opcionais</h1>
           <OptionalsList />
           <div className="flex justify-between mt-8">
-            <Link to="/">
+            <Link to="/plans">
               <Button variant="outline" className="flex items-center gap-2">
                 <ChevronLeft className="w-4 h-4" />
                 Voltar
