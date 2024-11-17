@@ -14,6 +14,13 @@ interface SelectedCar {
 
 interface CheckoutSession {
   selected_car: SelectedCar;
+  fleet_vehicles?: {
+    car_model: {
+      name: string;
+      image_url: string | null;
+      description: string | null;
+    };
+  }[];
 }
 
 interface VehicleInfoProps {
@@ -27,7 +34,16 @@ export const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
       try {
         const { data, error } = await supabase
           .from("checkout_sessions")
-          .select("selected_car")
+          .select(`
+            selected_car,
+            fleet_vehicles (
+              car_model (
+                name,
+                image_url,
+                description
+              )
+            )
+          `)
           .eq("driver_id", driverId)
           .eq("status", "active")
           .maybeSingle();
@@ -37,10 +53,7 @@ export const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
           return null;
         }
 
-        if (!data) return null;
-
-        const selectedCar = data.selected_car as unknown as SelectedCar;
-        return { selected_car: selectedCar };
+        return data as CheckoutSession;
       } catch (error) {
         console.error('Error in query:', error);
         return null;
@@ -74,6 +87,7 @@ export const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
   }
 
   const { name, category, specs } = session.selected_car;
+  const carModel = session.fleet_vehicles?.[0]?.car_model;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -85,9 +99,26 @@ export const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          {carModel?.image_url ? (
+            <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+              <img
+                src={carModel.image_url}
+                alt={carModel.name || name}
+                className="object-cover w-full h-full"
+              />
+            </div>
+          ) : (
+            <div className="aspect-video w-full bg-gray-100 rounded-lg flex items-center justify-center">
+              <Car className="w-12 h-12 text-gray-400" />
+            </div>
+          )}
+          
           <div className="space-y-2">
-            <h3 className="text-xl font-semibold text-gray-900">{name}</h3>
+            <h3 className="text-xl font-semibold text-gray-900">{carModel?.name || name}</h3>
             <p className="text-sm text-gray-500">{category}</p>
+            {carModel?.description && (
+              <p className="text-sm text-gray-500">{carModel.description}</p>
+            )}
           </div>
           
           <div className="grid grid-cols-2 gap-4">
