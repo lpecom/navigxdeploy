@@ -15,14 +15,16 @@ export const EnhancedSummary = () => {
     queryKey: ['car-group', carGroupItem?.id],
     queryFn: async () => {
       if (!carGroupItem?.id) return null
+      
+      // Extract the base ID without the plan type suffix
+      const baseId = carGroupItem.id.split('-')[0]
+      
       const { data, error } = await supabase
         .from('car_groups')
-        .select(`
-          *,
-          car_models (*)
-        `)
-        .eq('id', carGroupItem.id)
+        .select('*, vehicles(*)')
+        .eq('id', baseId)
         .single()
+      
       if (error) throw error
       return data
     },
@@ -40,10 +42,10 @@ export const EnhancedSummary = () => {
         
         {carGroup && (
           <div className="mb-6">
-            {carGroup.car_models?.[0]?.image_url && (
+            {carGroup.vehicles?.[0]?.image_url && (
               <div className="aspect-video rounded-lg overflow-hidden mb-4">
                 <img 
-                  src={carGroup.car_models[0].image_url} 
+                  src={carGroup.vehicles[0].image_url} 
                   alt={carGroup.name}
                   className="w-full h-full object-cover"
                 />
