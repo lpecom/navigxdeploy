@@ -3,12 +3,14 @@ export interface PhotoCategory {
   label: string;
 }
 
+export interface SelectedCar {
+  name: string;
+  [key: string]: any;
+}
+
 export interface CheckInReservation {
   id: string;
-  selected_car: {
-    name: string;
-    [key: string]: any;
-  };
+  selected_car: SelectedCar;
   driver: {
     full_name: string;
     [key: string]: any;
@@ -18,4 +20,16 @@ export interface CheckInReservation {
 
 export interface PhotosState {
   [key: string]: string[];
+}
+
+export interface CheckoutSession {
+  id: string;
+  reservation_number: number;
+  selected_car: SelectedCar;
+  driver: {
+    full_name: string;
+  };
+  pickup_date: string;
+  pickup_time: string;
+  status: string;
 }

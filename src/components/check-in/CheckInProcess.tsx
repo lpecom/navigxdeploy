@@ -38,7 +38,7 @@ const CheckInProcess = () => {
         .single();
       
       if (error) throw error;
-      return data as CheckInReservation;
+      return data as unknown as CheckInReservation;
     },
   });
 

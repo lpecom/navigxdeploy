@@ -3,24 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Car, Camera, FileText, Clock } from "lucide-react";
-
-interface SelectedCar {
-  name: string;
-  [key: string]: any;
-}
-
-interface CheckoutSession {
-  id: string;
-  reservation_number: number;
-  selected_car: SelectedCar;
-  driver: {
-    full_name: string;
-  };
-  pickup_date: string;
-  pickup_time: string;
-  status: string;
-}
+import { Car, Camera, Clock } from "lucide-react";
+import { CheckoutSession } from "./types";
 
 const CheckInList = () => {
   const navigate = useNavigate();
@@ -38,7 +22,7 @@ const CheckInList = () => {
         .order('pickup_date', { ascending: true });
       
       if (error) throw error;
-      return data as CheckoutSession[];
+      return (data || []) as unknown as CheckoutSession[];
     },
   });
 
