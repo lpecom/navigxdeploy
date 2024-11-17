@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Bluetooth } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { BluetoothDeviceWithGATT, BluetoothRemoteGATTCharacteristic } from "./bluetooth/types";
+import { BluetoothRemoteGATTCharacteristic, BluetoothDevice } from "./bluetooth/types";
 
 interface OBDData {
   rpm?: number;
@@ -13,16 +13,25 @@ interface OBDData {
 }
 
 export const OBDInterface = () => {
-  const [device, setDevice] = useState<BluetoothDeviceWithGATT | null>(null);
+  const [device, setDevice] = useState<BluetoothDevice | null>(null);
   const [characteristic, setCharacteristic] = useState<BluetoothRemoteGATTCharacteristic | null>(null);
   const [obdData, setOBDData] = useState<OBDData>({});
   const { toast } = useToast();
 
   const connectToOBD = async () => {
+    if (!navigator.bluetooth) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Bluetooth não está disponível neste navegador.",
+      });
+      return;
+    }
+
     try {
       const device = await navigator.bluetooth.requestDevice({
         filters: [{ services: ['FFE0'] }]
-      }) as BluetoothDeviceWithGATT;
+      });
 
       toast({
         title: "Conectando ao dispositivo...",

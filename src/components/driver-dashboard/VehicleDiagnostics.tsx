@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { RotateCw } from "lucide-react";
+import { RotateCw, Gauge } from "lucide-react";
 import { DiagnosticMetrics } from "./diagnostic/DiagnosticMetrics";
 import { DiagnosticCodes } from "./diagnostic/DiagnosticCodes";
 import { DiagnosticData } from "./bluetooth/types";
@@ -37,7 +37,7 @@ export const VehicleDiagnostics = ({ driverId }: VehicleDiagnosticsProps) => {
     setIsConnecting(true);
     try {
       const device = await navigator.bluetooth.requestDevice({
-        filters: [{ services: ['FFE0'] }], // Common service UUID for ELM327
+        filters: [{ services: ['FFE0'] }],
       });
 
       toast({
