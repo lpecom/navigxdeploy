@@ -13,14 +13,16 @@ interface SelectedCar {
   period: string;
 }
 
+interface CarModelDetails {
+  name: string;
+  image_url: string | null;
+  description: string | null;
+}
+
 interface CheckoutSession {
   selected_car: SelectedCar;
   fleet_vehicles?: {
-    car_model: {
-      name: string;
-      image_url: string | null;
-      description: string | null;
-    };
+    car_model: CarModelDetails;
   }[];
 }
 
@@ -54,16 +56,17 @@ export const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
           return null;
         }
 
-        // Convert the JSON data to our expected type
-        if (data) {
-          const parsedSession: CheckoutSession = {
-            selected_car: data.selected_car as SelectedCar,
-            fleet_vehicles: data.fleet_vehicles
-          };
-          return parsedSession;
-        }
+        if (!data) return null;
 
-        return null;
+        // Safely type cast the data
+        const selectedCar = data.selected_car as unknown as SelectedCar;
+        const fleetVehicles = data.fleet_vehicles as { car_model: CarModelDetails }[];
+
+        return {
+          selected_car: selectedCar,
+          fleet_vehicles: fleetVehicles
+        } as CheckoutSession;
+
       } catch (error) {
         console.error('Error in query:', error);
         return null;
