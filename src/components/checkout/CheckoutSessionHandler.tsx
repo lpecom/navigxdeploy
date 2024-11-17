@@ -22,13 +22,16 @@ export const createCheckoutSession = async ({
     const sessionData = {
       driver_id: driverId,
       selected_car: selectedGroup ? {
-        group_id: selectedGroup.id,
+        group_id: selectedGroup.id.split('-')[0], // Remove any suffix
         name: selectedGroup.name,
         category: selectedGroup.category,
         price: selectedGroup.unitPrice,
         period: selectedGroup.period
       } as Json : {} as Json,
-      selected_optionals: selectedOptionals as unknown as Json,
+      selected_optionals: selectedOptionals.map(opt => ({
+        ...opt,
+        id: opt.id.split('-')[0] // Remove any suffix
+      })) as unknown as Json,
       total_amount: totalAmount,
       status: 'pending'
     };
@@ -44,7 +47,7 @@ export const createCheckoutSession = async ({
     const cartItemsData = cartItems.map(item => ({
       checkout_session_id: session.id,
       item_type: item.type,
-      item_id: item.id,
+      item_id: item.id.split('-')[0], // Remove any suffix
       quantity: item.quantity,
       unit_price: item.unitPrice,
       total_price: item.totalPrice
