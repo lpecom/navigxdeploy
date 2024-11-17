@@ -22,32 +22,15 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      // First check if the user exists in driver_details
-      const { data: userExists, error: userCheckError } = await supabase
-        .from('driver_details')
-        .select('id, crm_status, auth_user_id')
-        .eq('email', email)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (userCheckError) {
-        throw new Error('Erro ao verificar usuário. Por favor, tente novamente.');
-      }
-
-      if (!userExists) {
-        throw new Error('Usuário não encontrado. Verifique suas credenciais.');
-      }
-
-      // Then attempt to sign in with Supabase Auth
+      // First attempt to sign in with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (authError) {
-        if (authError.message === 'Invalid login credentials') {
-          throw new Error('Senha incorreta. Por favor, verifique suas credenciais.');
+        if (authError.message.includes('Invalid login credentials')) {
+          throw new Error('Email ou senha incorretos. Por favor, verifique suas credenciais.');
         }
         throw authError;
       }
@@ -56,16 +39,34 @@ const AdminLogin = () => {
         throw new Error('Falha na autenticação');
       }
 
-      // Update auth_user_id if not already set
-      if (!userExists.auth_user_id) {
-        const { error: updateError } = await supabase
-          .from('driver_details')
-          .update({ auth_user_id: authData.user.id })
-          .eq('id', userExists.id);
+      // Then check if the user exists in driver_details
+      const { data: driverDetails, error: driverCheckError } = await supabase
+        .from('driver_details')
+        .select('id, crm_status')
+        .eq('email', email)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-        if (updateError && !updateError.message.includes('duplicate key value')) {
-          console.error('Error updating driver details:', updateError);
-        }
+      if (driverCheckError) {
+        throw new Error('Erro ao verificar perfil do motorista. Por favor, tente novamente.');
+      }
+
+      if (!driverDetails) {
+        // If authentication succeeded but no driver profile exists
+        await supabase.auth.signOut(); // Sign out the authenticated user
+        throw new Error('Perfil de motorista não encontrado para este email.');
+      }
+
+      // Update auth_user_id if not already set
+      const { error: updateError } = await supabase
+        .from('driver_details')
+        .update({ auth_user_id: authData.user.id })
+        .eq('id', driverDetails.id)
+        .is('auth_user_id', null);
+
+      if (updateError && !updateError.message.includes('duplicate key value')) {
+        console.error('Error updating driver details:', updateError);
       }
 
       toast({
