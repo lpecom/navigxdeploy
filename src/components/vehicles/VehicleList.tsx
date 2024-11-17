@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
-import { EditVehicleDialog } from "./EditVehicleDialog";
-import { VehicleCard } from "./VehicleCard";
-import { FleetVehicleCard } from "./FleetVehicleCard";
+import { CategoryList } from "./categories/CategoryList";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { CarModel, FleetVehicle } from "./types";
 import { supabase } from "@/integrations/supabase/client";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface VehicleListProps {
   view: 'overview' | 'categories' | 'models' | 'fleet' | 'maintenance';
@@ -55,6 +53,10 @@ const VehicleList = ({ view }: VehicleListProps) => {
 
   if (modelsLoading || fleetLoading) {
     return <div>Carregando...</div>;
+  }
+
+  if (view === 'categories') {
+    return <CategoryList />;
   }
 
   // Only show the tabs for models and fleet views
