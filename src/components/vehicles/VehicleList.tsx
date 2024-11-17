@@ -3,6 +3,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { CategoryList } from "./categories/CategoryList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { VehicleCard } from "./VehicleCard";
+import { FleetVehicleCard } from "./FleetVehicleCard";
+import { EditVehicleDialog } from "./EditVehicleDialog";
 import type { CarModel, FleetVehicle } from "./types";
 import { supabase } from "@/integrations/supabase/client";
 
