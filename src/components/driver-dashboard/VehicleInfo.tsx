@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Car, Calendar, Fuel, Gauge } from "lucide-react";
+import { Json } from "@/integrations/supabase/types";
 
 interface SelectedCar {
   name: string;
@@ -53,7 +54,16 @@ export const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
           return null;
         }
 
-        return data as CheckoutSession;
+        // Convert the JSON data to our expected type
+        if (data) {
+          const parsedSession: CheckoutSession = {
+            selected_car: data.selected_car as SelectedCar,
+            fleet_vehicles: data.fleet_vehicles
+          };
+          return parsedSession;
+        }
+
+        return null;
       } catch (error) {
         console.error('Error in query:', error);
         return null;
