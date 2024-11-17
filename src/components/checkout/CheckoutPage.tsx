@@ -13,6 +13,7 @@ import { PaymentSection } from "./sections/PaymentSection"
 import { SuccessSection } from "./sections/SuccessSection"
 import { SupportCard } from "./sections/SupportCard"
 import { createCheckoutSession } from "./CheckoutSessionHandler"
+import { useEffect } from "react"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
@@ -20,8 +21,48 @@ export const CheckoutPage = () => {
   const { toast } = useToast()
   const { state: cartState, dispatch } = useCart()
 
+  // Add effect to check auth state and cart state
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        // If user is authenticated, get their driver details
+        const { data: driverDetails } = await supabase
+          .from('driver_details')
+          .select('*')
+          .eq('auth_user_id', session.user.id)
+          .single()
+
+        if (driverDetails) {
+          setCustomerId(driverDetails.id)
+        }
+      }
+    }
+    checkSession()
+  }, [])
+
+  // Prevent empty cart access
+  useEffect(() => {
+    if (cartState.items.length === 0) {
+      toast({
+        title: "Carrinho vazio",
+        description: "Adicione itens ao carrinho antes de prosseguir.",
+        variant: "destructive",
+      })
+    }
+  }, [cartState.items.length, toast])
+
   const handleCustomerSubmit = async (customerData: any) => {
     try {
+      if (cartState.items.length === 0) {
+        toast({
+          title: "Carrinho vazio",
+          description: "Adicione itens ao carrinho antes de prosseguir.",
+          variant: "destructive",
+        })
+        return
+      }
+
       const session = await createCheckoutSession({
         driverId: customerData.id,
         cartItems: cartState.items,
@@ -89,7 +130,8 @@ export const CheckoutPage = () => {
     })
   }
 
-  if (cartState.items.length === 0) {
+  // Only show empty cart message if there are no items and user hasn't started checkout
+  if (cartState.items.length === 0 && !cartState.checkoutSessionId) {
     return (
       <CheckoutLayout>
         <EmptyCartMessage />
