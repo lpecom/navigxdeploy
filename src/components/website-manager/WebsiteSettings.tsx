@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Json } from "@/integrations/supabase/types";
 
 interface HeroSettings {
   title: string;
@@ -17,7 +16,14 @@ interface HeroSettings {
 
 interface WebsiteSettingsData {
   id: string;
-  settings: Json;
+  settings: {
+    hero?: {
+      title: string;
+      subtitle: string;
+      buttonText: string;
+      backgroundImage: string;
+    };
+  };
 }
 
 export const WebsiteSettings = () => {
@@ -33,7 +39,14 @@ export const WebsiteSettings = () => {
     try {
       const settingsData: WebsiteSettingsData = {
         id: 'hero',
-        settings: { hero: heroSettings } as Json
+        settings: {
+          hero: {
+            title: heroSettings.title,
+            subtitle: heroSettings.subtitle,
+            buttonText: heroSettings.buttonText,
+            backgroundImage: heroSettings.backgroundImage
+          }
+        }
       };
 
       const { error } = await supabase
