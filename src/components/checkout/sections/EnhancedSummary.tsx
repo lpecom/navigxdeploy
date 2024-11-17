@@ -25,7 +25,7 @@ export const EnhancedSummary = () => {
         .from('car_groups')
         .select('*, vehicles(*)')
         .eq('id', baseId)
-        .single()
+        .maybeSingle() // Use maybeSingle() instead of single() to handle no results gracefully
       
       if (error) {
         console.error('Error fetching car group:', error)
