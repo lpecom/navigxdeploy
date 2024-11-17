@@ -35,11 +35,11 @@ export const DriverVehicle = ({ driverId }: DriverVehicleProps) => {
         .eq('status', 'active')
         .single();
 
-      if (!checkoutSession?.fleet_vehicles) {
+      if (!checkoutSession?.fleet_vehicles?.[0]) {
         return null;
       }
 
-      const vehicle = checkoutSession.fleet_vehicles;
+      const vehicle = checkoutSession.fleet_vehicles[0]; // Access the first vehicle in the array
       
       return {
         nextRevision: new Date(vehicle.next_revision_date).toLocaleDateString(),
