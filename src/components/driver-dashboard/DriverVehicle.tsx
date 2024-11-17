@@ -2,10 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VehicleInfo } from "./VehicleInfo";
 import MaintenanceHistory from "./MaintenanceHistory";
 import { Button } from "@/components/ui/button";
-import { Wrench, AlertCircle, Calendar, Fuel, Gauge } from "lucide-react";
+import { Wrench, AlertCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VehicleDiagnostics } from "./VehicleDiagnostics";
+import { VehicleStatusCard } from "./VehicleStatusCard";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DriverVehicleProps {
   driverId: string;
@@ -13,6 +16,40 @@ interface DriverVehicleProps {
 
 export const DriverVehicle = ({ driverId }: DriverVehicleProps) => {
   const { toast } = useToast();
+
+  const { data: vehicleStatus } = useQuery({
+    queryKey: ['vehicle-status', driverId],
+    queryFn: async () => {
+      const { data: checkoutSession } = await supabase
+        .from('checkout_sessions')
+        .select(`
+          id,
+          fleet_vehicles (
+            current_km,
+            last_revision_date,
+            next_revision_date,
+            is_available
+          )
+        `)
+        .eq('driver_id', driverId)
+        .eq('status', 'active')
+        .single();
+
+      if (!checkoutSession?.fleet_vehicles) {
+        return null;
+      }
+
+      const vehicle = checkoutSession.fleet_vehicles;
+      
+      return {
+        nextRevision: new Date(vehicle.next_revision_date).toLocaleDateString(),
+        mileage: vehicle.current_km,
+        fuelLevel: 75, // This would ideally come from OBD data
+        maintenanceNeeded: new Date(vehicle.next_revision_date) <= new Date(),
+        isAvailable: vehicle.is_available
+      };
+    }
+  });
 
   const handleServiceRequest = () => {
     toast({
@@ -52,50 +89,23 @@ export const DriverVehicle = ({ driverId }: DriverVehicleProps) => {
             </div>
 
             <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Status do Veículo</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm">Próxima Revisão</span>
+              {vehicleStatus ? (
+                <VehicleStatusCard status={vehicleStatus} />
+              ) : (
+                <Card className="bg-yellow-50 border-yellow-200">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center space-x-4">
+                      <AlertCircle className="w-6 h-6 text-yellow-600" />
+                      <div>
+                        <h3 className="font-medium text-yellow-900">Sem veículo ativo</h3>
+                        <p className="text-sm text-yellow-800">
+                          Você não possui nenhum veículo ativo no momento.
+                        </p>
                       </div>
-                      <span className="text-sm font-medium">Em 3 meses</span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Gauge className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm">Quilometragem</span>
-                      </div>
-                      <span className="text-sm font-medium">15.000 km</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Fuel className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm">Combustível</span>
-                      </div>
-                      <span className="text-sm font-medium text-green-600">75%</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-yellow-50 border-yellow-200">
-                <CardContent className="pt-6">
-                  <div className="flex items-center space-x-4">
-                    <AlertCircle className="w-6 h-6 text-yellow-600" />
-                    <div>
-                      <h3 className="font-medium text-yellow-900">Lembrete</h3>
-                      <p className="text-sm text-yellow-800">
-                        Sua próxima revisão está agendada para 15/05/2024
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </TabsContent>
