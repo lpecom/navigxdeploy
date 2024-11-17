@@ -26,10 +26,30 @@ export default {
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "#00B2FF", // Navig bright blue
+          50: '#E6F7FF',
+          100: '#CCF0FF',
+          200: '#99E0FF',
+          300: '#66D1FF',
+          400: '#33C1FF',
+          500: '#00B2FF',
+          600: '#008ECC',
+          700: '#006B99',
+          800: '#004766',
+          900: '#002433',
           foreground: "#FFFFFF",
         },
         secondary: {
           DEFAULT: "#1E3A8A", // Deep navy blue
+          50: '#E6EBF4',
+          100: '#CCD7E9',
+          200: '#99AFD3',
+          300: '#6687BD',
+          400: '#335FA7',
+          500: '#1E3A8A',
+          600: '#182E6E',
+          700: '#122353',
+          800: '#0C1737',
+          900: '#060C1C',
           foreground: "#FFFFFF",
         },
         muted: {
@@ -48,6 +68,18 @@ export default {
           DEFAULT: "#00B2FF", // Bright blue from the Navig logo
           foreground: "#FFFFFF",
         }
+      },
+      fontFamily: {
+        sans: ['Inter var', 'sans-serif'],
+        display: ['Plus Jakarta Sans', 'sans-serif'],
+      },
+      fontSize: {
+        'display-2xl': ['4.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        'display-xl': ['3.75rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        'display-lg': ['3rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        'display-md': ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
+        'display-sm': ['1.875rem', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
+        'display-xs': ['1.5rem', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
       },
       borderRadius: {
         lg: "var(--radius)",
