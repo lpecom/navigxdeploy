@@ -8,6 +8,7 @@ import { ptBR } from "date-fns/locale";
 import type { Reservation } from "@/types/reservation";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ReservationCardProps {
   reservation: Reservation;
@@ -16,32 +17,44 @@ interface ReservationCardProps {
 }
 
 export const ReservationCard = ({ reservation, isExpanded, onToggle }: ReservationCardProps) => {
+  const queryClient = useQueryClient();
+
   const handleApprove = async () => {
-    const { error } = await supabase
-      .from('checkout_sessions')
-      .update({ status: 'approved' })
-      .eq('id', reservation.id);
+    try {
+      const { error } = await supabase
+        .from('checkout_sessions')
+        .update({ status: 'approved' })
+        .eq('id', reservation.id);
 
-    if (error) {
+      if (error) throw error;
+
+      toast.success('Reserva aprovada com sucesso');
+      // Invalidate and refetch reservations
+      await queryClient.invalidateQueries({ queryKey: ['reservations'] });
+      onToggle(); // Close the expanded view
+    } catch (error) {
+      console.error('Error approving reservation:', error);
       toast.error('Erro ao aprovar reserva');
-      return;
     }
-
-    toast.success('Reserva aprovada com sucesso');
   };
 
   const handleReject = async () => {
-    const { error } = await supabase
-      .from('checkout_sessions')
-      .update({ status: 'rejected' })
-      .eq('id', reservation.id);
+    try {
+      const { error } = await supabase
+        .from('checkout_sessions')
+        .update({ status: 'rejected' })
+        .eq('id', reservation.id);
 
-    if (error) {
+      if (error) throw error;
+
+      toast.success('Reserva rejeitada com sucesso');
+      // Invalidate and refetch reservations
+      await queryClient.invalidateQueries({ queryKey: ['reservations'] });
+      onToggle(); // Close the expanded view
+    } catch (error) {
+      console.error('Error rejecting reservation:', error);
       toast.error('Erro ao rejeitar reserva');
-      return;
     }
-
-    toast.success('Reserva rejeitada com sucesso');
   };
 
   const getRiskBadge = (score: number) => {
