@@ -2,8 +2,6 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { CarSlider } from "./CarSlider";
 
 interface Category {
@@ -13,25 +11,26 @@ interface Category {
   badge_text: string | null;
 }
 
-interface CarCategoryCardProps {
-  category: Category;
+interface Car {
+  id: string;
+  name: string;
+  image: string;
+  year: string;
+  mileage?: string;
 }
 
-export const CarCategoryCard = ({ category }: CarCategoryCardProps) => {
+interface CarCategoryCardProps {
+  category: Category;
+  cars: Car[];
+}
+
+export const CarCategoryCard = ({ category, cars }: CarCategoryCardProps) => {
   const navigate = useNavigate();
 
-  const { data: cars } = useQuery({
-    queryKey: ["category-cars", category.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("car_models")
-        .select("*")
-        .eq("category_id", category.id);
-      
-      if (error) throw error;
-      return data;
-    },
-  });
+  const handleCategorySelect = () => {
+    sessionStorage.setItem('selectedCategory', JSON.stringify(category));
+    navigate('/plans');
+  };
 
   return (
     <motion.div
@@ -40,11 +39,10 @@ export const CarCategoryCard = ({ category }: CarCategoryCardProps) => {
     >
       <Card 
         className="relative overflow-hidden h-full cursor-pointer group transition-all duration-300 hover:shadow-xl bg-white"
-        onClick={() => navigate(`/category/${category.id}`)}
+        onClick={handleCategorySelect}
       >
-        {/* Car Slider */}
         <div className="relative h-48 overflow-hidden">
-          <CarSlider cars={cars || []} category={category.name} />
+          <CarSlider cars={cars} category={category.name} />
           {category.badge_text && (
             <Badge 
               variant="secondary" 
@@ -66,8 +64,8 @@ export const CarCategoryCard = ({ category }: CarCategoryCardProps) => {
             </p>
           )}
           
-          <div className="mt-6 flex items-center text-navig">
-            <span className="text-sm font-medium tracking-wide uppercase">Saiba mais</span>
+          <div className="mt-auto flex items-center text-navig">
+            <span className="text-sm font-medium tracking-wide uppercase">Ver planos</span>
             <svg 
               className="w-5 h-5 ml-2 transform group-hover:translate-x-2 transition-transform duration-300" 
               fill="none" 
