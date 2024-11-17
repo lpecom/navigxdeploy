@@ -12,6 +12,7 @@ import { CheckoutPage } from "./components/checkout/CheckoutPage";
 import DriverDashboard from "./pages/DriverDashboard";
 import AdminRoutes from "./routes/AdminRoutes";
 import AdminLogin from "./pages/AdminLogin";
+import DriverLogin from "./pages/DriverLogin";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/plans" element={<Plans />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/login" element={<DriverLogin />} />
                 
                 {/* Driver Routes */}
                 <Route path="/driver/*" element={<DriverDashboard />} />

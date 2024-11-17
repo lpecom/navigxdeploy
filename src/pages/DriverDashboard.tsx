@@ -16,44 +16,60 @@ const DriverDashboard = () => {
   const { toast } = useToast();
   const [driverId, setDriverId] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          navigate('/login');
+          return;
+        }
+
+        const { data: driver, error } = await supabase
+          .from('driver_details')
+          .select('id')
+          .eq('auth_user_id', session.user.id)
+          .single();
+
+        if (error || !driver) {
+          toast({
+            title: "Unauthorized",
+            description: "You don't have access to the driver portal.",
+            variant: "destructive",
+          });
+          navigate('/login');
+          return;
+        }
+
+        setDriverId(driver.id);
+      } catch (error) {
+        console.error("Auth error:", error);
         navigate('/login');
-        return;
-      }
-
-      const { data: drivers, error } = await supabase
-        .from('driver_details')
-        .select('id')
-        .eq('email', session.user.email)
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      if (error) {
-        toast({
-          title: "Erro",
-          description: "Não foi possível carregar seus dados.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (drivers && drivers.length > 0) {
-        setDriverId(drivers[0].id);
-      } else {
-        toast({
-          title: "Erro",
-          description: "Perfil de motorista não encontrado.",
-          variant: "destructive",
-        });
+      } finally {
+        setIsLoading(false);
       }
     };
 
     checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || !session) {
+        navigate("/login");
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [navigate, toast]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   if (!driverId) return null;
 
