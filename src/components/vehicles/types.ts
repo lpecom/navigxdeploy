@@ -8,9 +8,6 @@ export interface CarModel {
   optionals: Record<string, any> | null;
   created_at: string | null;
   updated_at: string | null;
-  category?: {
-    name: string;
-  };
 }
 
 export interface FleetVehicle {
@@ -27,5 +24,6 @@ export interface FleetVehicle {
   car_model?: {
     name: string;
     year: string;
+    image_url?: string | null;
   };
 }

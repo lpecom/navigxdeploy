@@ -29,7 +29,8 @@ export const FleetListView = () => {
           *,
           car_model:car_models(
             name,
-            year
+            year,
+            image_url
           )
         `)
         .order('created_at', { ascending: false });
