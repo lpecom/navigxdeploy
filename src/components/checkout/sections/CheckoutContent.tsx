@@ -7,6 +7,7 @@ import { PaymentSection } from "./PaymentSection"
 import { SuccessSection } from "./SuccessSection"
 import { SupportCard } from "./SupportCard"
 import { createCheckoutSession } from "../CheckoutSessionHandler"
+import { supabase } from "@/integrations/supabase/client"
 
 interface CheckoutContentProps {
   step: number
