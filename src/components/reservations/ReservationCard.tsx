@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { ChevronDown, ChevronUp, Calendar, Clock, MapPin } from "lucide-react"
 import { ReservationExpandedContent } from "./ReservationExpandedContent"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
@@ -60,46 +60,59 @@ const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: Reserva
   const formattedDate = format(pickupDate, "dd 'de' MMMM", { locale: ptBR })
 
   return (
-    <Card className="bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+    <Card className="bg-white shadow-sm hover:shadow-md transition-all duration-200">
       <CardContent className="p-4">
-        <div className="flex justify-between items-start">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm font-medium">{reservation.customerName}</h3>
-              <span className="text-xs text-muted-foreground">#{reservation.reservationNumber}</span>
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="text-base font-medium text-gray-900 truncate">
+                {reservation.customerName}
+              </h3>
+              <Badge variant="outline" className="text-xs">
+                #{reservation.reservationNumber}
+              </Badge>
             </div>
-            <p className="text-xs text-muted-foreground">{reservation.email}</p>
-            <p className="text-xs text-muted-foreground">CPF: {reservation.cpf}</p>
+            
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600">
+              <div className="flex items-center gap-1.5">
+                <Calendar className="w-4 h-4 text-gray-400" />
+                <span>{formattedDate}</span>
+              </div>
+              {reservation.pickupTime && (
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-gray-400" />
+                  <span>{reservation.pickupTime}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-gray-400" />
+                <span className="truncate">{reservation.address || 'Endereço não informado'}</span>
+              </div>
+            </div>
           </div>
+
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={onToggle}
-            className="hover:bg-gray-100"
+            className="shrink-0"
           >
-            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4 text-gray-500" />
+            ) : (
+              <ChevronDown className="h-4 w-4 text-gray-500" />
+            )}
           </Button>
         </div>
 
-        <div className="mt-2 flex flex-wrap gap-2">
-          <Badge variant="outline" className="text-xs">
-            {reservation.carCategory}
-          </Badge>
-          <Badge variant="outline" className="text-xs">
-            {formattedDate}
-          </Badge>
-          {reservation.pickupTime && (
-            <Badge variant="outline" className="text-xs">
-              {reservation.pickupTime}
-            </Badge>
-          )}
-        </div>
-
-        <div className="mt-3 flex items-center justify-between border-t pt-3">
-          <div className="text-xs">
-            Total: <span className="font-medium text-primary">R$ {reservation.weeklyFare.toFixed(2)}</span>
-          </div>
-          {!isExpanded && (
+        {!isExpanded && (
+          <div className="mt-4 flex items-center justify-between border-t pt-4">
+            <div className="flex items-baseline gap-1">
+              <span className="text-lg font-semibold text-primary">
+                R$ {reservation.weeklyFare.toFixed(2)}
+              </span>
+              <span className="text-sm text-gray-500">/semana</span>
+            </div>
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -117,8 +130,8 @@ const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: Reserva
                 Aprovar
               </Button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </CardContent>
       {isExpanded && (
         <ReservationExpandedContent 

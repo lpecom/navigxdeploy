@@ -4,6 +4,7 @@ import type { Reservation, PickupFilter } from "@/types/reservation"
 import { ReservationCard } from "./ReservationCard"
 import { supabase } from "@/integrations/supabase/client"
 import { startOfWeek, endOfWeek, addWeeks, format } from "date-fns"
+import { Car } from "lucide-react"
 
 interface ReservationsListProps {
   filter: "pending" | PickupFilter
@@ -97,15 +98,19 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
   const renderedReservations = useMemo(() => {
     if (error) {
       console.error('Error fetching reservations:', error)
-      return <div className="text-center py-4 text-red-600">Erro ao carregar reservas.</div>
+      return (
+        <div className="text-center py-8 text-gray-500">
+          Ocorreu um erro ao carregar as reservas.
+        </div>
+      )
     }
 
     if (isLoading) {
       return (
-        <div className="space-y-2">
+        <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="animate-pulse">
-              <div className="h-24 bg-gray-100 rounded-lg"></div>
+              <div className="h-32 bg-gray-100 rounded-lg"></div>
             </div>
           ))}
         </div>
@@ -114,24 +119,31 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
 
     if (!reservations?.length) {
       return (
-        <div className="text-center py-4 text-muted-foreground">
-          Nenhuma reserva encontrada.
+        <div className="text-center py-12">
+          <Car className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500 font-medium">
+            Nenhuma reserva encontrada
+          </p>
         </div>
       )
     }
 
-    return reservations.map((reservation) => (
-      <ReservationCard
-        key={reservation.id}
-        reservation={reservation}
-        isExpanded={!!expandedCards[reservation.id]}
-        onToggle={() => toggleCard(reservation.id)}
-      />
-    ))
+    return (
+      <div className="space-y-4">
+        {reservations.map((reservation) => (
+          <ReservationCard
+            key={reservation.id}
+            reservation={reservation}
+            isExpanded={!!expandedCards[reservation.id]}
+            onToggle={() => toggleCard(reservation.id)}
+          />
+        ))}
+      </div>
+    )
   }, [reservations, isLoading, error, expandedCards, toggleCard])
 
   return (
-    <div className="space-y-2 max-w-3xl mx-auto">
+    <div className="max-w-3xl mx-auto">
       {renderedReservations}
     </div>
   )

@@ -52,15 +52,15 @@ export const ReservationExpandedContent = ({
       transition={{ duration: 0.2 }}
       className="border-t"
     >
-      <div className="p-4 space-y-4">
-        <div className="grid gap-4">
+      <div className="p-6 space-y-6">
+        <div className="grid gap-6">
           <CustomerDetails customer={customerData} />
           <ReservationDetails reservation={reservationData} />
         </div>
 
         <Separator />
 
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-end gap-3">
           <Button
             variant="outline"
             onClick={handleReject}
