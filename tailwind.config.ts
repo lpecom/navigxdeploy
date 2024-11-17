@@ -1,13 +1,39 @@
 import type { Config } from "tailwindcss";
 
+const colors = {
+  primary: {
+    DEFAULT: "#00B2FF",
+    50: '#E6F7FF',
+    100: '#CCF0FF',
+    200: '#99E0FF',
+    300: '#66D1FF',
+    400: '#33C1FF',
+    500: '#00B2FF',
+    600: '#008ECC',
+    700: '#006B99',
+    800: '#004766',
+    900: '#002433',
+    foreground: "#FFFFFF",
+  },
+  secondary: {
+    DEFAULT: "#1E3A8A",
+    50: '#E6EBF4',
+    100: '#CCD7E9',
+    200: '#99AFD3',
+    300: '#6687BD',
+    400: '#335FA7',
+    500: '#1E3A8A',
+    600: '#182E6E',
+    700: '#122353',
+    800: '#0C1737',
+    900: '#060C1C',
+    foreground: "#FFFFFF",
+  }
+};
+
 export default {
   darkMode: ["class"],
-  content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-  ],
+  content: ["./src/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
     container: {
@@ -19,55 +45,25 @@ export default {
     },
     extend: {
       colors: {
+        ...colors,
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "#00B2FF", // Navig bright blue
-          50: '#E6F7FF',
-          100: '#CCF0FF',
-          200: '#99E0FF',
-          300: '#66D1FF',
-          400: '#33C1FF',
-          500: '#00B2FF',
-          600: '#008ECC',
-          700: '#006B99',
-          800: '#004766',
-          900: '#002433',
-          foreground: "#FFFFFF",
-        },
-        secondary: {
-          DEFAULT: "#1E3A8A", // Deep navy blue
-          50: '#E6EBF4',
-          100: '#CCD7E9',
-          200: '#99AFD3',
-          300: '#6687BD',
-          400: '#335FA7',
-          500: '#1E3A8A',
-          600: '#182E6E',
-          700: '#122353',
-          800: '#0C1737',
-          900: '#060C1C',
-          foreground: "#FFFFFF",
-        },
         muted: {
-          DEFAULT: "#F8FAFC", // Very light blue-gray
+          DEFAULT: "#F8FAFC",
           foreground: "#475569",
         },
         accent: {
-          DEFAULT: "#E0F2FF", // Light blue
+          DEFAULT: "#E0F2FF",
           foreground: "#0A4B75",
         },
         success: {
-          DEFAULT: "#10B981", // Green
+          DEFAULT: "#10B981",
           foreground: "#FFFFFF",
         },
-        navig: {
-          DEFAULT: "#00B2FF", // Bright blue from the Navig logo
-          foreground: "#FFFFFF",
-        }
+        navig: colors.primary,
       },
       fontFamily: {
         sans: ['Inter var', 'sans-serif'],
