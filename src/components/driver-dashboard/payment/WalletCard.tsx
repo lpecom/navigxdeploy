@@ -19,7 +19,20 @@ export const WalletCard = ({ driverId }: WalletCardProps) => {
         .eq('driver_id', driverId)
         .single()
 
-      if (error) throw error
+      if (error) {
+        // If no wallet exists, create one
+        if (error.code === 'PGRST116') {
+          const { data: newWallet, error: createError } = await supabase
+            .from('wallet')
+            .insert([{ driver_id: driverId, balance: 0 }])
+            .select()
+            .single()
+
+          if (createError) throw createError
+          return newWallet as WalletType
+        }
+        throw error
+      }
       return data as WalletType
     }
   })
