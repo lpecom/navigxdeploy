@@ -52,9 +52,11 @@ export const createCheckoutSession = async ({
 
     if (sessionError) throw sessionError;
 
+    // IMPORTANT: The cart_items table expects 'car' instead of 'car_group'
+    // This conversion is necessary to match the database constraints
     const cartItemsData = cartItems.map(item => ({
       checkout_session_id: session.id,
-      item_type: item.type === 'car_group' ? 'car' : item.type, // Convert 'car_group' to 'car'
+      item_type: item.type === 'car_group' ? 'car' : item.type,  // Required: Convert 'car_group' to 'car' for database compatibility
       item_id: getValidUUID(item.id),
       quantity: item.quantity,
       unit_price: item.unitPrice,
