@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { CartItem } from "@/contexts/CartContext";
+import { CartItem } from "@/types/cart";
 
 interface CheckoutSessionHandlerProps {
   driverId: string;
@@ -8,15 +8,6 @@ interface CheckoutSessionHandlerProps {
   onSuccess: (sessionId: string) => void;
 }
 
-// Helper function to generate a valid UUID
-const generateValidUUID = () => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-};
-
 export const createCheckoutSession = async ({
   driverId,
   cartItems,
@@ -24,13 +15,19 @@ export const createCheckoutSession = async ({
   onSuccess,
 }: CheckoutSessionHandlerProps) => {
   try {
-    const selectedCar = cartItems.find(item => item.type === 'car');
+    const selectedGroup = cartItems.find(item => item.type === 'car_group');
     const selectedOptionals = cartItems.filter(item => item.type === 'optional');
 
     const sessionData = {
       driver_id: driverId,
-      selected_car: selectedCar ? JSON.parse(JSON.stringify(selectedCar)) : null,
-      selected_optionals: JSON.parse(JSON.stringify(selectedOptionals)),
+      selected_car: selectedGroup ? {
+        group_id: selectedGroup.id,
+        name: selectedGroup.name,
+        category: selectedGroup.category,
+        price: selectedGroup.unitPrice,
+        period: selectedGroup.period
+      } : null,
+      selected_optionals: selectedOptionals,
       total_amount: totalAmount,
       status: 'pending'
     };
@@ -43,11 +40,10 @@ export const createCheckoutSession = async ({
 
     if (sessionError) throw sessionError;
 
-    // Map cart items to the correct format with valid UUIDs
     const cartItemsData = cartItems.map(item => ({
       checkout_session_id: session.id,
       item_type: item.type,
-      item_id: generateValidUUID(), // Generate a new valid UUID for each item
+      item_id: item.id,
       quantity: item.quantity,
       unit_price: item.unitPrice,
       total_price: item.totalPrice

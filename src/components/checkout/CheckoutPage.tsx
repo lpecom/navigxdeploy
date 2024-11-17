@@ -1,29 +1,19 @@
 import { useState } from "react"
 import { useCart } from "@/contexts/CartContext"
 import { useToast } from "@/components/ui/use-toast"
-import { CustomerForm } from "./sections/CustomerForm"
-import { PickupScheduler } from "./sections/PickupScheduler"
-import { OptionalsList } from "@/components/optionals/OptionalsList"
-import { Card } from "@/components/ui/card"
-import { handleCustomerData } from "./handlers/CustomerHandler"
-import { createDriverDetails } from "./handlers/DriverHandler"
-import { createCheckoutSession } from "./CheckoutSessionHandler"
+import { supabase } from "@/integrations/supabase/client"
 import { CheckoutLayout } from "./ui/CheckoutLayout"
 import { EmptyCartMessage } from "./ui/EmptyCartMessage"
-import { PaymentSection } from "./sections/PaymentSection"
 import { motion } from "framer-motion"
-import { SupportCard } from "./sections/SupportCard"
-import { CheckoutAuth } from "./sections/auth/CheckoutAuth"
-import { supabase } from "@/integrations/supabase/client"
-import { Button } from "@/components/ui/button"
-import { ShoppingCart } from "lucide-react"
 import { CheckoutProgress } from "./sections/CheckoutProgress"
 import { EnhancedSummary } from "./sections/EnhancedSummary"
+import { CheckoutSteps } from "./sections/CheckoutSteps"
+import { SupportCard } from "./sections/SupportCard"
+import { createCheckoutSession } from "./CheckoutSessionHandler"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
   const [customerId, setCustomerId] = useState<string | null>(null)
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("credit")
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const { toast } = useToast()
   const { state: cartState, dispatch } = useCart()
@@ -58,11 +48,8 @@ export const CheckoutPage = () => {
 
   const handleCustomerSubmit = async (customerData: any) => {
     try {
-      const customer = await handleCustomerData(customerData)
-      const driverData = await createDriverDetails(customer)
-
       const session = await createCheckoutSession({
-        driverId: driverData.id,
+        driverId: customerData.id,
         cartItems: cartState.items,
         totalAmount: cartState.total,
         onSuccess: (sessionId) => {
@@ -70,7 +57,7 @@ export const CheckoutPage = () => {
         }
       })
 
-      setCustomerId(customer.id)
+      setCustomerId(customerData.id)
       setStep(2)
       
       toast({
@@ -148,71 +135,16 @@ export const CheckoutPage = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           <div className="lg:col-span-2 space-y-6">
-            {step === 1 && !isLoggedIn && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <CheckoutAuth onLoginSuccess={handleLoginSuccess} />
-                <CustomerForm onSubmit={handleCustomerSubmit} />
-              </motion.div>
-            )}
-
-            {step === 2 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-                className="space-y-6"
-              >
-                <PickupScheduler onSubmit={handleScheduleSubmit} />
-                <Card className="p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <ShoppingCart className="w-5 h-5 text-primary" />
-                    Opcionais Disponíveis
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Aproveite para adicionar itens que tornarão sua experiência ainda melhor:
-                  </p>
-                  <OptionalsList />
-                </Card>
-              </motion.div>
-            )}
-
-            {step === 3 && customerId && cartState.checkoutSessionId && (
-              <PaymentSection
-                selectedMethod={selectedPaymentMethod}
-                onMethodChange={setSelectedPaymentMethod}
-                onPaymentSuccess={handlePaymentSuccess}
-                amount={cartState.total}
-                driverId={customerId}
-              />
-            )}
-
-            {step === 4 && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Card className="p-8 text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-500 mb-6">
-                    <ShoppingCart className="w-8 h-8" />
-                  </div>
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-4">Reserva Confirmada!</h2>
-                  <p className="text-gray-600 mb-8">
-                    Sua reserva foi recebida com sucesso. Em breve nossa equipe entrará em contato para confirmar os detalhes.
-                  </p>
-                  <Button
-                    onClick={() => window.location.href = '/'}
-                    className="w-full sm:w-auto"
-                  >
-                    Voltar para Home
-                  </Button>
-                </Card>
-              </motion.div>
-            )}
+            <CheckoutSteps
+              step={step}
+              isLoggedIn={isLoggedIn}
+              customerId={customerId}
+              checkoutSessionId={cartState.checkoutSessionId}
+              onLoginSuccess={handleLoginSuccess}
+              onCustomerSubmit={handleCustomerSubmit}
+              onScheduleSubmit={handleScheduleSubmit}
+              onPaymentSuccess={handlePaymentSuccess}
+            />
           </div>
 
           <div className="space-y-6">

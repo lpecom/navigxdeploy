@@ -8,22 +8,25 @@ import { Calendar, Car, Package2 } from "lucide-react"
 export const EnhancedSummary = () => {
   const { state } = useCart()
 
-  const carItem = state.items.find(item => item.type === 'car')
+  const carGroupItem = state.items.find(item => item.type === 'car_group')
   const optionalItems = state.items.filter(item => item.type === 'optional')
 
-  const { data: carModel } = useQuery({
-    queryKey: ['car-model', carItem?.id],
+  const { data: carGroup } = useQuery({
+    queryKey: ['car-group', carGroupItem?.id],
     queryFn: async () => {
-      if (!carItem?.id) return null
+      if (!carGroupItem?.id) return null
       const { data, error } = await supabase
-        .from('car_models')
-        .select('*')
-        .eq('id', carItem.id)
+        .from('car_groups')
+        .select(`
+          *,
+          car_models (*)
+        `)
+        .eq('id', carGroupItem.id)
         .single()
       if (error) throw error
       return data
     },
-    enabled: !!carItem?.id
+    enabled: !!carGroupItem?.id
   })
 
   return (
@@ -35,20 +38,22 @@ export const EnhancedSummary = () => {
       <Card className="p-6 bg-gradient-to-br from-white to-gray-50">
         <h2 className="text-xl font-semibold mb-6">Resumo da Reserva</h2>
         
-        {carModel && (
+        {carGroup && (
           <div className="mb-6">
-            <div className="aspect-video rounded-lg overflow-hidden mb-4">
-              <img 
-                src={carModel.image_url || '/placeholder.svg'} 
-                alt={carModel.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
+            {carGroup.car_models?.[0]?.image_url && (
+              <div className="aspect-video rounded-lg overflow-hidden mb-4">
+                <img 
+                  src={carGroup.car_models[0].image_url} 
+                  alt={carGroup.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
             <div className="flex items-start gap-4">
               <Car className="w-5 h-5 text-primary mt-1" />
               <div>
-                <h3 className="font-medium">{carModel.name}</h3>
-                <p className="text-sm text-gray-600">{carModel.description}</p>
+                <h3 className="font-medium">{carGroup.name}</h3>
+                <p className="text-sm text-gray-600">{carGroup.description}</p>
               </div>
             </div>
           </div>
