@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { ArrowRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -13,39 +14,56 @@ const AdminLogin = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate('/admin');
-      }
-    };
-    checkSession();
-  }, [navigate]);
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const { data: { session }, error } = await supabase.auth.signInWithPassword({
+      // First check if the user exists
+      const { data: userExists, error: userCheckError } = await supabase
+        .from('driver_details')
+        .select('id, crm_status')
+        .eq('email', email)
+        .single();
+
+      if (userCheckError || !userExists) {
+        throw new Error('Usuário não encontrado. Verifique suas credenciais.');
+      }
+
+      // Then attempt to sign in
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (authError) throw authError;
 
-      if (session) {
-        navigate("/admin");
-        toast({
-          title: "Login successful",
-          description: "Welcome back to the admin dashboard!",
-        });
+      if (!authData.user) {
+        throw new Error('Falha na autenticação');
       }
+
+      // Update auth_user_id if not already set
+      if (!userExists.auth_user_id) {
+        const { error: updateError } = await supabase
+          .from('driver_details')
+          .update({ auth_user_id: authData.user.id })
+          .eq('id', userExists.id);
+
+        if (updateError) {
+          console.error('Error updating driver details:', updateError);
+        }
+      }
+
+      toast({
+        title: "Login realizado com sucesso",
+        description: "Bem-vindo ao painel administrativo!",
+      });
+      
+      navigate("/admin");
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Erro no login",
+        description: error.message || "Credenciais inválidas. Por favor, verifique seus dados.",
         variant: "destructive",
       });
     } finally {
@@ -54,53 +72,69 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md">
-        <div className="bg-white px-8 py-12 shadow-lg rounded-lg">
-          <div className="mb-8 text-center">
-            <img 
-              src="https://i.imghippo.com/files/uafE3798xA.png" 
-              alt="Navig Logo" 
-              className="h-8 w-auto mx-auto mb-4"
-            />
-            <h2 className="text-2xl font-bold text-gray-900">Admin Login</h2>
-          </div>
-
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <Input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <Input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Logging in..." : "Login"}
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <Link 
-              to="/login" 
-              className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
-            >
-              Acessar Portal do Motorista
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <Card className="w-full max-w-md p-8 space-y-6">
+        <div className="text-center space-y-2">
+          <img
+            src="https://i.imghippo.com/files/uafE3798xA.png"
+            alt="Navig Logo"
+            className="h-12 mx-auto"
+          />
+          <h1 className="text-2xl font-semibold">Painel Administrativo</h1>
+          <p className="text-gray-600">
+            Entre com suas credenciais para acessar o painel
+          </p>
         </div>
-      </div>
+
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="seu@email.com"
+              required
+              className="w-full"
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Senha
+            </label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              className="w-full"
+              disabled={isLoading}
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Entrando...</span>
+              </div>
+            ) : (
+              "Entrar"
+            )}
+          </Button>
+        </form>
+      </Card>
     </div>
   );
 };
