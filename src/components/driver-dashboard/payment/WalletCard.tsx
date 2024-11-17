@@ -17,22 +17,22 @@ export const WalletCard = ({ driverId }: WalletCardProps) => {
         .from('wallet')
         .select('*')
         .eq('driver_id', driverId)
-        .single()
+        .maybeSingle()
 
-      if (error) {
-        // If no wallet exists, create one
-        if (error.code === 'PGRST116') {
-          const { data: newWallet, error: createError } = await supabase
-            .from('wallet')
-            .insert([{ driver_id: driverId, balance: 0 }])
-            .select()
-            .single()
+      if (error) throw error
 
-          if (createError) throw createError
-          return newWallet as WalletType
-        }
-        throw error
+      // If no wallet exists, create one
+      if (!data) {
+        const { data: newWallet, error: createError } = await supabase
+          .from('wallet')
+          .insert([{ driver_id: driverId, balance: 0 }])
+          .select()
+          .single()
+
+        if (createError) throw createError
+        return newWallet as WalletType
       }
+
       return data as WalletType
     }
   })
