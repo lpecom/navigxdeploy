@@ -27,25 +27,36 @@ const DriverDashboard = () => {
           return;
         }
 
-        const { data: driver, error } = await supabase
+        // Query driver details using auth_user_id
+        const { data: drivers, error } = await supabase
           .from('driver_details')
           .select('id')
           .eq('auth_user_id', session.user.id)
-          .single();
+          .limit(1);
 
-        if (error || !driver) {
+        if (error) {
+          console.error("Database error:", error);
+          throw new Error("Failed to fetch driver details");
+        }
+
+        if (!drivers || drivers.length === 0) {
           toast({
-            title: "Unauthorized",
-            description: "You don't have access to the driver portal.",
+            title: "Access Denied",
+            description: "No driver profile found for this account.",
             variant: "destructive",
           });
           navigate('/login');
           return;
         }
 
-        setDriverId(driver.id);
-      } catch (error) {
+        setDriverId(drivers[0].id);
+      } catch (error: any) {
         console.error("Auth error:", error);
+        toast({
+          title: "Error",
+          description: error.message || "An error occurred while checking authentication",
+          variant: "destructive",
+        });
         navigate('/login');
       } finally {
         setIsLoading(false);
