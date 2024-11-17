@@ -16,9 +16,7 @@ interface HeroSettings {
 
 interface WebsiteSettingsData {
   id: string;
-  settings: {
-    hero: HeroSettings;
-  };
+  settings: Record<string, unknown>;
 }
 
 export const WebsiteSettings = () => {
@@ -37,7 +35,7 @@ export const WebsiteSettings = () => {
         .upsert({
           id: 'hero',
           settings: { hero: heroSettings }
-        } as WebsiteSettingsData);
+        } satisfies WebsiteSettingsData);
 
       if (error) throw error;
 
@@ -121,8 +119,6 @@ export const WebsiteSettings = () => {
             </CardContent>
           </Card>
         </TabsContent>
-
-        {/* Additional tabs will be implemented similarly */}
       </Tabs>
     </div>
   );
