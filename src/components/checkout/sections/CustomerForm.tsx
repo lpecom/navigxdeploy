@@ -8,6 +8,7 @@ import { AuthSection } from "./auth/AuthSection"
 import { PersonalInfoSection } from "./personal/PersonalInfoSection"
 import { AddressSection } from "./address/AddressSection"
 import { motion } from "framer-motion"
+import { Card } from "@/components/ui/card"
 
 const customerSchema = z.object({
   full_name: z.string().min(3, "Nome completo é obrigatório"),
@@ -54,7 +55,6 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
   }, [form])
 
   const handleFormSubmit = async (data: CustomerFormValues) => {
-    // Remove password from customer data if not needed
     const { password, ...customerData } = data
     onSubmit(customerData)
   }
@@ -64,32 +64,33 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="space-y-6"
     >
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
-          <AuthSection 
-            form={form}
-            hasAccount={hasAccount}
-            onHasAccountChange={setHasAccount}
-          />
-          
-          <PersonalInfoSection form={form} />
-          
-          <AddressSection 
-            form={form}
-            isLoadingAddress={isLoadingAddress}
-            onPostalCodeChange={handleAddressSelect}
-          />
+      <Card className="p-6 shadow-sm">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+            <AuthSection 
+              form={form}
+              hasAccount={hasAccount}
+              onHasAccountChange={setHasAccount}
+            />
+            
+            <PersonalInfoSection form={form} />
+            
+            <AddressSection 
+              form={form}
+              isLoadingAddress={isLoadingAddress}
+              onPostalCodeChange={handleAddressSelect}
+            />
 
-          <Button 
-            type="submit" 
-            className="w-full hover:scale-105 transition-transform"
-          >
-            Continuar
-          </Button>
-        </form>
-      </Form>
+            <Button 
+              type="submit" 
+              className="w-full h-12 text-lg font-medium transition-all duration-200 hover:scale-[1.02]"
+            >
+              Continuar
+            </Button>
+          </form>
+        </Form>
+      </Card>
     </motion.div>
   )
 }

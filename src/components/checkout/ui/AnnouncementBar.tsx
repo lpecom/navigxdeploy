@@ -1,14 +1,20 @@
 import { Info } from "lucide-react";
+import { motion } from "framer-motion";
 
 export const AnnouncementBar = () => {
   return (
-    <div className="bg-primary text-white py-2 px-4">
-      <div className="container mx-auto">
-        <div className="flex items-center justify-center gap-2 text-sm">
+    <motion.div 
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="fixed top-0 left-0 right-0 z-50 bg-primary text-white"
+    >
+      <div className="container mx-auto py-2 px-4">
+        <div className="flex items-center justify-center gap-2 text-sm font-medium">
           <Info className="w-4 h-4" />
           <p>Aproveite nossas condições especiais para motoristas de aplicativo</p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
