@@ -30,26 +30,22 @@ const DriverDashboard = () => {
         // First, try to find the driver details by email
         const { data: driversByEmail, error: emailError } = await supabase
           .from('driver_details')
-          .select('id')
+          .select('id, auth_user_id')
           .eq('email', session.user.email)
           .maybeSingle();
 
-        if (emailError) {
-          console.error("Database error:", emailError);
-          throw new Error("Failed to fetch driver details");
-        }
+        if (emailError) throw emailError;
 
-        // If we found a driver by email but auth_user_id is not set, update it
+        // If we found a driver by email and auth_user_id is not set, update it
         if (driversByEmail) {
-          const { error: updateError } = await supabase
-            .from('driver_details')
-            .update({ auth_user_id: session.user.id })
-            .eq('id', driversByEmail.id);
+          if (!driversByEmail.auth_user_id) {
+            const { error: updateError } = await supabase
+              .from('driver_details')
+              .update({ auth_user_id: session.user.id })
+              .eq('id', driversByEmail.id);
 
-          if (updateError) {
-            console.error("Failed to update auth_user_id:", updateError);
+            if (updateError) throw updateError;
           }
-
           setDriverId(driversByEmail.id);
           setIsLoading(false);
           return;
@@ -62,18 +58,15 @@ const DriverDashboard = () => {
           .eq('auth_user_id', session.user.id)
           .maybeSingle();
 
-        if (authError) {
-          console.error("Database error:", authError);
-          throw new Error("Failed to fetch driver details");
-        }
+        if (authError) throw authError;
 
         if (!driversByAuthId) {
-          await supabase.auth.signOut();
           toast({
             title: "Access Denied",
             description: "No driver profile found for this account.",
             variant: "destructive",
           });
+          await supabase.auth.signOut();
           navigate('/login');
           return;
         }
