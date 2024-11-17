@@ -34,27 +34,39 @@ const demoCarModels: CarModel[] = [
     created_at: null,
     updated_at: null,
   },
-    {
-      id: '3',
-      name: 'Onix Joy',
-      image_url: 'https://raw.githubusercontent.com/navigcars/cars/main/onix.png',
-      year: '2019',
-      description: 'Hatch • Completo'
-    },
-    {
-      id: '4',
-      name: 'Renault Kwid',
-      image_url: 'https://raw.githubusercontent.com/navigcars/cars/main/kwid.png',
-      year: '2020',
-      description: 'Compacto e econômico'
-    },
-    {
-      id: '5',
-      name: 'Hyundai HB20',
-      image_url: 'https://raw.githubusercontent.com/navigcars/cars/main/hb20.png',
-      year: '2021',
-      description: 'Hatch • Completo'
-    }
+  {
+    id: '3',
+    name: 'Onix Joy',
+    image_url: 'https://raw.githubusercontent.com/navigcars/cars/main/onix.png',
+    year: '2019',
+    description: 'Hatch • Completo',
+    category_id: null,
+    optionals: null,
+    created_at: null,
+    updated_at: null,
+  },
+  {
+    id: '4',
+    name: 'Renault Kwid',
+    image_url: 'https://raw.githubusercontent.com/navigcars/cars/main/kwid.png',
+    year: '2020',
+    description: 'Compacto e econômico',
+    category_id: null,
+    optionals: null,
+    created_at: null,
+    updated_at: null,
+  },
+  {
+    id: '5',
+    name: 'Hyundai HB20',
+    image_url: 'https://raw.githubusercontent.com/navigcars/cars/main/hb20.png',
+    year: '2021',
+    description: 'Hatch • Completo',
+    category_id: null,
+    optionals: null,
+    created_at: null,
+    updated_at: null,
+  }
 ];
 
 const Optionals = () => {
