@@ -1,27 +1,25 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { motion } from "framer-motion"
 import { Car, Calendar, User, ShoppingCart } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useToast } from "@/components/ui/use-toast"
-import { Steps } from "./Steps"
 import { CustomerForm } from "./sections/CustomerForm"
 import { PickupScheduler } from "./sections/PickupScheduler"
 import { CheckoutSummary } from "./sections/CheckoutSummary"
 import { OptionalsList } from "@/components/optionals/OptionalsList"
 import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { handleCustomerData } from "./handlers/CustomerHandler"
 import { createDriverDetails } from "./handlers/DriverHandler"
 import { createCheckoutSession } from "./CheckoutSessionHandler"
 import { supabase } from "@/integrations/supabase/client"
+import { CheckoutLayout } from "./ui/CheckoutLayout"
+import { ProgressSteps } from "./ui/ProgressSteps"
+import { EmptyCartMessage } from "./ui/EmptyCartMessage"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
   const [customerId, setCustomerId] = useState<string | null>(null)
   const { toast } = useToast()
   const { state: cartState, dispatch } = useCart()
-  const navigate = useNavigate()
 
   const steps = [
     { number: 1, title: "Seus Dados", icon: User },
@@ -95,126 +93,75 @@ export const CheckoutPage = () => {
 
   if (cartState.items.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-8">
-        <div className="container mx-auto px-4 max-w-6xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Car className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-            <h2 className="text-2xl font-semibold mb-4">Seu carrinho está vazio</h2>
-            <p className="text-gray-600 mb-6">Adicione itens ao seu carrinho para continuar com a reserva.</p>
-            <Button onClick={() => navigate('/')} className="hover:scale-105 transition-transform">
-              Voltar para a página inicial
-            </Button>
-          </motion.div>
-        </div>
-      </div>
+      <CheckoutLayout>
+        <EmptyCartMessage />
+      </CheckoutLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-8">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
-        >
-          <CheckoutSummary />
-        </motion.div>
+    <CheckoutLayout>
+      <CheckoutSummary />
+      <ProgressSteps currentStep={step} steps={steps} />
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+        <div className="lg:col-span-2 space-y-6">
+          {step === 1 && (
+            <CustomerForm onSubmit={handleCustomerSubmit} />
+          )}
 
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <Steps currentStep={step} steps={steps} />
-        </motion.div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-          <motion.div 
-            className="lg:col-span-2 space-y-6"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            {step === 1 && (
-              <CustomerForm onSubmit={handleCustomerSubmit} />
-            )}
-
-            {step === 2 && (
-              <>
-                <PickupScheduler onSubmit={handleScheduleSubmit} />
-                <Card className="p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <ShoppingCart className="w-5 h-5 text-primary" />
-                    Opcionais Disponíveis
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Aproveite para adicionar itens que tornarão sua experiência ainda melhor:
-                  </p>
-                  <OptionalsList />
-                </Card>
-              </>
-            )}
-
-            {step === 3 && (
-              <Card className="p-6">
-                <div className="text-center space-y-4">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-500 mb-4">
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 200, damping: 10 }}
-                    >
-                      <Car className="w-8 h-8" />
-                    </motion.div>
-                  </div>
-                  <h2 className="text-2xl font-semibold">Reserva Confirmada!</h2>
-                  <p className="text-gray-600">
-                    Sua reserva foi recebida com sucesso. Em breve nossa equipe entrará em contato para confirmar os detalhes.
-                  </p>
-                  <Button
-                    onClick={() => navigate('/')}
-                    className="mt-4 hover:scale-105 transition-transform"
-                  >
-                    Voltar para a página inicial
-                  </Button>
-                </div>
-              </Card>
-            )}
-          </motion.div>
-
-          <motion.div 
-            className="space-y-6"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            {step < 3 && (
+          {step === 2 && (
+            <>
+              <PickupScheduler onSubmit={handleScheduleSubmit} />
               <Card className="p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100">
-                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                  <User className="w-5 h-5 text-primary" />
-                  Precisa de ajuda?
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <ShoppingCart className="w-5 h-5 text-primary" />
+                  Opcionais Disponíveis
                 </h3>
-                <p className="text-sm text-gray-600">
-                  Nossa equipe está disponível para te ajudar pelo WhatsApp. Clique no botão abaixo para iniciar uma conversa.
+                <p className="text-sm text-gray-600 mb-4">
+                  Aproveite para adicionar itens que tornarão sua experiência ainda melhor:
                 </p>
-                <Button 
-                  variant="outline"
-                  className="w-full mt-4 bg-white hover:bg-gray-50"
-                  onClick={() => window.open('https://wa.me/seu-numero', '_blank')}
-                >
-                  Falar com Suporte
-                </Button>
+                <OptionalsList />
               </Card>
-            )}
-          </motion.div>
+            </>
+          )}
+
+          {step === 3 && (
+            <Card className="p-6">
+              <div className="text-center space-y-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-500 mb-4">
+                  <Car className="w-8 h-8" />
+                </div>
+                <h2 className="text-2xl font-semibold">Reserva Confirmada!</h2>
+                <p className="text-gray-600">
+                  Sua reserva foi recebida com sucesso. Em breve nossa equipe entrará em contato para confirmar os detalhes.
+                </p>
+              </div>
+            </Card>
+          )}
+        </div>
+
+        <div className="space-y-6">
+          {step < 3 && (
+            <Card className="p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100 sticky top-4">
+              <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                <User className="w-5 h-5 text-primary" />
+                Precisa de ajuda?
+              </h3>
+              <p className="text-sm text-gray-600">
+                Nossa equipe está disponível para te ajudar pelo WhatsApp. Clique no botão abaixo para iniciar uma conversa.
+              </p>
+              <Button 
+                variant="outline"
+                className="w-full mt-4 bg-white hover:bg-gray-50"
+                onClick={() => window.open('https://wa.me/seu-numero', '_blank')}
+              >
+                Falar com Suporte
+              </Button>
+            </Card>
+          )}
         </div>
       </div>
-    </div>
+    </CheckoutLayout>
   )
 }
