@@ -12,7 +12,7 @@ interface AuthSectionProps {
 
 export const AuthSection = ({ form, hasAccount, onHasAccountChange }: AuthSectionProps) => {
   return (
-    <Card className="p-6 mb-6 bg-gradient-to-br from-white to-blue-50">
+    <Card className="p-6 mb-6">
       <div className="flex items-center gap-2 mb-4">
         <Lock className="w-5 h-5 text-primary" />
         <h3 className="text-lg font-semibold">Conta Navig</h3>
