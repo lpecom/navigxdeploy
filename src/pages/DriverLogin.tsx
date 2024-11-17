@@ -40,11 +40,13 @@ const DriverLogin = () => {
         throw new Error('Authentication failed');
       }
 
-      // Find driver details
+      // Find most recent driver details
       const { data: driverData, error: driverError } = await supabase
         .from('driver_details')
         .select('id, crm_status')
         .eq('email', email)
+        .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (driverError) throw driverError;
