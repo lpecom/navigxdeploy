@@ -14,7 +14,14 @@ import AdminRoutes from "./routes/AdminRoutes";
 import AdminLogin from "./pages/AdminLogin";
 import DriverLogin from "./pages/DriverLogin";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => {
   return (
@@ -33,12 +40,15 @@ const App = () => {
                 {/* Driver Routes */}
                 <Route path="/driver/*" element={<DriverDashboard />} />
                 
-                {/* Admin Routes - Separate Authentication Context */}
+                {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin/*" element={<AdminRoutes />} />
                 
                 {/* Legacy route redirect */}
                 <Route path="/dashboard/*" element={<Navigate to="/admin" replace />} />
+                
+                {/* Catch all redirect */}
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
               <Toaster />
               <Sonner />

@@ -22,48 +22,23 @@ const DriverDashboard = () => {
     const checkAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        
         if (!session) {
           navigate('/login');
           return;
         }
 
-        // First, try to find the driver details by email
-        const { data: driversByEmail, error: emailError } = await supabase
-          .from('driver_details')
-          .select('id, auth_user_id')
-          .eq('email', session.user.email)
-          .maybeSingle();
-
-        if (emailError) throw emailError;
-
-        // If we found a driver by email and auth_user_id is not set, update it
-        if (driversByEmail) {
-          if (!driversByEmail.auth_user_id) {
-            const { error: updateError } = await supabase
-              .from('driver_details')
-              .update({ auth_user_id: session.user.id })
-              .eq('id', driversByEmail.id);
-
-            if (updateError) throw updateError;
-          }
-          setDriverId(driversByEmail.id);
-          setIsLoading(false);
-          return;
-        }
-
-        // If no driver found by email, try by auth_user_id as fallback
-        const { data: driversByAuthId, error: authError } = await supabase
+        // Find driver by email
+        const { data: driver, error: driverError } = await supabase
           .from('driver_details')
           .select('id')
-          .eq('auth_user_id', session.user.id)
-          .maybeSingle();
+          .eq('email', session.user.email)
+          .single();
 
-        if (authError) throw authError;
-
-        if (!driversByAuthId) {
+        if (driverError || !driver) {
           toast({
-            title: "Access Denied",
-            description: "No driver profile found for this account.",
+            title: "Acesso Negado",
+            description: "Perfil de motorista não encontrado.",
             variant: "destructive",
           });
           await supabase.auth.signOut();
@@ -71,12 +46,12 @@ const DriverDashboard = () => {
           return;
         }
 
-        setDriverId(driversByAuthId.id);
+        setDriverId(driver.id);
       } catch (error: any) {
         console.error("Auth error:", error);
         toast({
-          title: "Error",
-          description: error.message || "An error occurred while checking authentication",
+          title: "Erro",
+          description: "Ocorreu um erro ao verificar sua autenticação",
           variant: "destructive",
         });
         navigate('/login');
