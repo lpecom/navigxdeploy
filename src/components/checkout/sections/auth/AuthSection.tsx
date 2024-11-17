@@ -17,18 +17,24 @@ interface AuthSectionProps {
   isLoggingIn: boolean;
 }
 
-export const AuthSection = ({ form, hasAccount, onHasAccountChange, onLogin, isLoggingIn }: AuthSectionProps) => {
+export const AuthSection = ({ 
+  form, 
+  hasAccount, 
+  onHasAccountChange, 
+  onLogin, 
+  isLoggingIn 
+}: AuthSectionProps) => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const { toast } = useToast()
-  const { state } = useCart()
+  const { state: cartState } = useCart()
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    e.stopPropagation() // Prevent form bubbling
     
     try {
-      // Verify if cart has items before proceeding
-      if (state.items.length === 0) {
+      if (cartState.items.length === 0 && !cartState.checkoutSessionId) {
         toast({
           title: "Carrinho vazio",
           description: "Adicione itens ao carrinho antes de fazer login.",
@@ -37,37 +43,7 @@ export const AuthSection = ({ form, hasAccount, onHasAccountChange, onLogin, isL
         return
       }
 
-      const { data: { user }, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (authError) throw authError
-
-      if (!user) {
-        throw new Error('Authentication failed')
-      }
-
-      // Get driver details after successful authentication
-      const { data: driverData, error: driverError } = await supabase
-        .from('driver_details')
-        .select('*')
-        .eq('auth_user_id', user.id)
-        .single()
-
-      if (driverError) throw driverError
-
-      if (!driverData) {
-        throw new Error('No driver profile found')
-      }
-
-      // Call onLogin with email and password to maintain the existing flow
       onLogin(email, password)
-
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Suas informações foram carregadas.",
-      })
     } catch (error: any) {
       console.error('Login error:', error)
       toast({
@@ -107,7 +83,7 @@ export const AuthSection = ({ form, hasAccount, onHasAccountChange, onLogin, isL
       </div>
 
       {hasAccount ? (
-        <form onSubmit={handleLogin} className="space-y-4">
+        <div className="space-y-4">
           <div>
             <FormLabel className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
@@ -137,7 +113,7 @@ export const AuthSection = ({ form, hasAccount, onHasAccountChange, onLogin, isL
           </div>
 
           <Button 
-            type="submit" 
+            onClick={handleLoginSubmit}
             className="w-full"
             disabled={isLoggingIn}
           >
@@ -150,7 +126,7 @@ export const AuthSection = ({ form, hasAccount, onHasAccountChange, onLogin, isL
               "Entrar"
             )}
           </Button>
-        </form>
+        </div>
       ) : (
         <div className="space-y-4">
           <FormField

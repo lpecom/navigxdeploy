@@ -36,7 +36,7 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
   const [hasAccount, setHasAccount] = useState(false)
   const [isLoggingIn, setIsLoggingIn] = useState(false)
   const { toast } = useToast()
-  const { state } = useCart()
+  const { state: cartState } = useCart()
   
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
@@ -45,16 +45,6 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
   const handleLogin = async (email: string, password: string) => {
     setIsLoggingIn(true)
     try {
-      // Verify cart has items
-      if (state.items.length === 0) {
-        toast({
-          title: "Carrinho vazio",
-          description: "Adicione itens ao carrinho antes de fazer login.",
-          variant: "destructive",
-        })
-        return
-      }
-
       const { data: { user }, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -75,7 +65,6 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
       if (driverError) throw driverError
 
       if (driverDetails) {
-        // Submit the driver details to continue with checkout
         onSubmit({
           full_name: driverDetails.full_name,
           email: driverDetails.email,
@@ -92,7 +81,6 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
           title: "Login realizado com sucesso!",
           description: "Suas informações foram carregadas automaticamente.",
         })
-        return
       }
     } catch (error: any) {
       console.error('Login error:', error)
@@ -107,8 +95,7 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
   }
 
   const handleFormSubmit = async (data: CustomerFormValues) => {
-    // Verify cart has items
-    if (state.items.length === 0) {
+    if (cartState.items.length === 0 && !cartState.checkoutSessionId) {
       toast({
         title: "Carrinho vazio",
         description: "Adicione itens ao carrinho antes de continuar.",
@@ -129,7 +116,7 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
     >
       <Card className="p-6 shadow-sm">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+          <div className="space-y-6">
             <AuthSection 
               form={form}
               hasAccount={hasAccount}
@@ -162,18 +149,16 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
                     }
                   }}
                 />
+
+                <Button 
+                  onClick={form.handleSubmit(handleFormSubmit)}
+                  className="w-full h-12 text-lg font-medium transition-all duration-200 hover:scale-[1.02]"
+                >
+                  Continuar
+                </Button>
               </>
             )}
-
-            {!hasAccount && (
-              <Button 
-                type="submit" 
-                className="w-full h-12 text-lg font-medium transition-all duration-200 hover:scale-[1.02]"
-              >
-                Continuar
-              </Button>
-            )}
-          </form>
+          </div>
         </Form>
       </Card>
     </motion.div>
