@@ -54,7 +54,7 @@ export const CheckoutSteps = ({
 
       {step === 3 && customerId && checkoutSessionId && (
         <PaymentSection
-          amount={0} // This will be passed from parent
+          amount={0}
           driverId={customerId}
           onPaymentSuccess={onPaymentSuccess}
         />

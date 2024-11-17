@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { CartItem } from "@/types/cart";
+import { Json } from "@/integrations/supabase/types";
 
 interface CheckoutSessionHandlerProps {
   driverId: string;
@@ -26,8 +27,8 @@ export const createCheckoutSession = async ({
         category: selectedGroup.category,
         price: selectedGroup.unitPrice,
         period: selectedGroup.period
-      } : null,
-      selected_optionals: selectedOptionals,
+      } as Json : {} as Json,
+      selected_optionals: selectedOptionals as unknown as Json,
       total_amount: totalAmount,
       status: 'pending'
     };

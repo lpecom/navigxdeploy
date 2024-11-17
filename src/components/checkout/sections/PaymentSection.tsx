@@ -4,22 +4,21 @@ import { CreditCardForm } from "../CreditCardForm"
 import { PixPayment } from "../PixPayment"
 import { BoletoPayment } from "../BoletoPayment"
 import { motion } from "framer-motion"
+import { useState } from "react"
 
 interface PaymentSectionProps {
-  selectedMethod: string
-  onMethodChange: (method: string) => void
   onPaymentSuccess: (id: string) => void
   amount: number
   driverId: string
 }
 
 export const PaymentSection = ({
-  selectedMethod,
-  onMethodChange,
   onPaymentSuccess,
   amount,
   driverId,
 }: PaymentSectionProps) => {
+  const [selectedMethod, setSelectedMethod] = useState("credit")
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -31,7 +30,7 @@ export const PaymentSection = ({
         <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Método de Pagamento</h2>
         <PaymentMethodSelector
           selectedMethod={selectedMethod}
-          onMethodChange={onMethodChange}
+          onMethodChange={setSelectedMethod}
         />
       </Card>
 
