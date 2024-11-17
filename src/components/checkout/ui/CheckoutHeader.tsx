@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import navigLogo from "@/assets/navig-logo.png";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -14,7 +13,7 @@ export const CheckoutHeader = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
-              src={navigLogo}
+              src="/navig-logo.png"
               alt="Navig Logo" 
               className="h-6 sm:h-8 w-auto"
             />
