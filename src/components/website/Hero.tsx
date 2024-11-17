@@ -20,13 +20,13 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-center lg:text-left"
           >
-            <div className="inline-block px-4 py-2 rounded-full bg-red-500/10 text-red-500 font-medium text-sm mb-6">
+            <div className="inline-block px-4 py-2 rounded-full bg-primary-500/10 text-primary-500 font-medium text-sm mb-6">
               BLACK FRIDAY NAVIG 2023
             </div>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
               Aluguel de carros com{" "}
-              <span className="text-red-500">R$1.200 de desconto!</span>
+              <span className="text-primary-500">R$1.200 de desconto!</span>
             </h1>
             
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto lg:mx-0">
@@ -37,7 +37,7 @@ export const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Button 
                 size="lg"
-                className="bg-red-500 hover:bg-red-600 text-white px-8 py-6 text-lg rounded-full"
+                className="bg-primary-500 hover:bg-primary-600 text-white px-8 py-6 text-lg rounded-full"
               >
                 Ver ofertas
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -72,7 +72,7 @@ export const Hero = () => {
               />
               
               {/* Floating Badge */}
-              <div className="absolute -top-6 -right-6 w-32 h-32 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-xl p-4 rotate-12 shadow-lg">
+              <div className="absolute -top-6 -right-6 w-32 h-32 bg-primary-500 rounded-full flex items-center justify-center text-white font-bold text-xl p-4 rotate-12 shadow-lg">
                 <div className="text-center leading-tight">
                   <div className="text-sm">ATÉ</div>
                   <div className="text-2xl">50%</div>
@@ -82,8 +82,8 @@ export const Hero = () => {
             </div>
 
             {/* Decorative Elements */}
-            <div className="absolute -bottom-8 -left-8 w-64 h-64 bg-red-500/20 rounded-full blur-3xl" />
-            <div className="absolute -top-8 -right-8 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl" />
+            <div className="absolute -bottom-8 -left-8 w-64 h-64 bg-primary-500/20 rounded-full blur-3xl" />
+            <div className="absolute -top-8 -right-8 w-64 h-64 bg-secondary-500/20 rounded-full blur-3xl" />
           </motion.div>
         </div>
       </div>
