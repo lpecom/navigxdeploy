@@ -27,6 +27,10 @@ const Plans = () => {
       return;
     }
 
+    // First clear any existing items
+    dispatch({ type: 'CLEAR_CART' });
+
+    // Then add the new car group item
     dispatch({
       type: 'ADD_ITEM',
       payload: {
@@ -42,7 +46,11 @@ const Plans = () => {
     });
 
     sessionStorage.setItem('selectedPlan', planType);
-    navigate('/checkout');
+    
+    // Use a small timeout to ensure the cart is updated before navigation
+    setTimeout(() => {
+      navigate('/optionals');
+    }, 100);
   };
 
   if (!selectedCar?.category) {
