@@ -18,6 +18,18 @@ const DriverLogin = () => {
     setIsLoading(true);
 
     try {
+      // First check if the driver exists in driver_details
+      const { data: driverData, error: driverError } = await supabase
+        .from('driver_details')
+        .select('id, email')
+        .eq('email', email)
+        .single();
+
+      if (driverError || !driverData) {
+        throw new Error('Driver not found. Please contact support.');
+      }
+
+      // Proceed with authentication
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
