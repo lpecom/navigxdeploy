@@ -3,6 +3,7 @@ import { Wallet } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Wallet as WalletType } from "@/types/payment"
 
 interface WalletCardProps {
   driverId: string;
@@ -19,7 +20,7 @@ export const WalletCard = ({ driverId }: WalletCardProps) => {
         .single()
 
       if (error) throw error
-      return data
+      return data as WalletType
     }
   })
 

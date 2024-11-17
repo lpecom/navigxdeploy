@@ -5,6 +5,7 @@ import { CreditCard, QrCode } from "lucide-react"
 import { Invoice } from "@/types/payment"
 import { CreditCardForm } from "@/components/checkout/CreditCardForm"
 import { PixPayment } from "@/components/checkout/PixPayment"
+import { supabase } from "@/integrations/supabase/client"
 
 interface PaymentDialogProps {
   invoice: Invoice;
