@@ -32,23 +32,23 @@ const Home = () => {
           *,
           car_group:car_groups(name)
         `)
-        .eq("category", "Premium")
-        .limit(1)
-        .single();
+        .limit(1);
       
       if (error) throw error;
+      if (!data || data.length === 0) return null;
       
+      const vehicle = data[0];
       return {
-        id: data.id,
-        name: data.name,
-        category: data.car_group?.name || "Premium",
+        id: vehicle.id,
+        name: vehicle.name,
+        category: vehicle.car_group?.name || vehicle.category,
         price: 934,
         period: "semana",
-        image_url: data.image_url,
+        image_url: vehicle.image_url,
         specs: {
-          passengers: data.passengers,
-          transmission: data.transmission,
-          consumption: data.consumption,
+          passengers: vehicle.passengers,
+          transmission: vehicle.transmission,
+          consumption: vehicle.consumption,
           plan: "Flex"
         }
       };
@@ -60,27 +60,27 @@ const Home = () => {
       <Hero />
       <Features />
       
-      <section className="py-32 bg-white">
-        <div className="container mx-auto px-4">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <span className="text-navig font-medium tracking-wide uppercase text-sm mb-4 block">
-              Alugue Agora
-            </span>
-            <h2 className="text-[3.5rem] font-medium tracking-tight text-gray-900 mb-6 leading-none">
-              Veículo em Destaque
-            </h2>
-            <p className="text-xl font-light text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Comece sua jornada com nosso veículo mais popular
-            </p>
-          </motion.div>
+      {selectedCar && (
+        <section className="py-32 bg-white">
+          <div className="container mx-auto px-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <span className="text-navig font-medium tracking-wide uppercase text-sm mb-4 block">
+                Alugue Agora
+              </span>
+              <h2 className="text-[3.5rem] font-medium tracking-tight text-gray-900 mb-6 leading-none">
+                Veículo em Destaque
+              </h2>
+              <p className="text-xl font-light text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                Comece sua jornada com nosso veículo mais popular
+              </p>
+            </motion.div>
 
-          {selectedCar && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -90,9 +90,9 @@ const Home = () => {
             >
               <StoreWindow selectedCar={selectedCar} />
             </motion.div>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
       
       <section className="py-32">
         <div className="container mx-auto px-4">
