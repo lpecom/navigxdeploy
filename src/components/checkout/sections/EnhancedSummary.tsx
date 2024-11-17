@@ -16,8 +16,10 @@ export const EnhancedSummary = () => {
     queryFn: async () => {
       if (!carGroupItem?.id) return null
       
-      // Extract the base ID without any suffix
-      const baseId = carGroupItem.id.split('-')[0]
+      // Get the full UUID before any suffix
+      const baseId = carGroupItem.id.includes('-') ? 
+        carGroupItem.id.substring(0, 36) : // UUIDs are 36 characters long
+        carGroupItem.id
       
       const { data, error } = await supabase
         .from('car_groups')
