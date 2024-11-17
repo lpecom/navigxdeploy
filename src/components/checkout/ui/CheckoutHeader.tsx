@@ -13,7 +13,7 @@ export const CheckoutHeader = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
-              src="/navig-logo.png"
+              src="https://i.imghippo.com/files/uafE3798xA.png"
               alt="Navig Logo" 
               className="h-6 sm:h-8 w-auto"
             />

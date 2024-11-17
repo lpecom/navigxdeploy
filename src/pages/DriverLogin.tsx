@@ -88,7 +88,7 @@ const DriverLogin = () => {
       <Card className="w-full max-w-md p-6 space-y-6">
         <div className="text-center">
           <img
-            src="/navig-logo.png"
+            src="https://i.imghippo.com/files/uafE3798xA.png"
             alt="Navig Logo"
             className="h-12 mx-auto mb-4"
           />
