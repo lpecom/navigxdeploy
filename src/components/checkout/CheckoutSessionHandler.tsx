@@ -54,7 +54,7 @@ export const createCheckoutSession = async ({
 
     const cartItemsData = cartItems.map(item => ({
       checkout_session_id: session.id,
-      item_type: item.type,
+      item_type: item.type === 'car_group' ? 'car' : item.type, // Convert 'car_group' to 'car'
       item_id: getValidUUID(item.id),
       quantity: item.quantity,
       unit_price: item.unitPrice,
