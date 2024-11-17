@@ -22,5 +22,10 @@ export interface FleetVehicle {
   next_revision_date: string;
   plate: string;
   is_available: boolean;
-  car_model?: CarModel;
+  created_at?: string;
+  updated_at?: string;
+  car_model?: {
+    name: string;
+    year: string;
+  };
 }
