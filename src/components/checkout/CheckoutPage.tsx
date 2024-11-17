@@ -18,6 +18,7 @@ import { Steps } from "./Steps"
 import { SupportCard } from "./sections/SupportCard"
 import { CheckoutAuth } from "./sections/auth/CheckoutAuth"
 import { supabase } from "@/integrations/supabase/client"
+import { Button } from "@/components/ui/button" // Added import for Button
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
