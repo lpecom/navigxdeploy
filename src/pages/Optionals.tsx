@@ -79,7 +79,7 @@ const Optionals = () => {
   }, [navigate]);
 
   const handleContinue = () => {
-    if (cartState.items.length === 0) {
+    if (!cartState.items.find(item => item.type === 'car_group')) {
       toast({
         title: "Carrinho vazio",
         description: "Por favor, selecione um plano antes de continuar.",
@@ -89,7 +89,16 @@ const Optionals = () => {
       return;
     }
 
-    navigate('/checkout');
+    // Ensure we have a valid cart before proceeding
+    if (cartState.items.length > 0 && cartState.total > 0) {
+      navigate('/checkout');
+    } else {
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao processar seu carrinho. Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (!selectedCar) {

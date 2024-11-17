@@ -27,18 +27,19 @@ const Plans = () => {
       return;
     }
 
-    // First clear any existing items
+    // Clear cart and add new item
     dispatch({ type: 'CLEAR_CART' });
 
-    // Then add the new car group item
+    const carPrice = parseFloat(selectedCar.price.replace(/[^0-9.]/g, ''));
+    
     dispatch({
       type: 'ADD_ITEM',
       payload: {
         id: `${selectedCar.category}-${planType}`,
         type: 'car_group',
         quantity: 1,
-        unitPrice: parseFloat(selectedCar.price),
-        totalPrice: parseFloat(selectedCar.price),
+        unitPrice: carPrice,
+        totalPrice: carPrice,
         name: `${selectedCar.category} - Plano ${planType}`,
         category: selectedCar.category,
         period: planType
@@ -46,11 +47,7 @@ const Plans = () => {
     });
 
     sessionStorage.setItem('selectedPlan', planType);
-    
-    // Use a small timeout to ensure the cart is updated before navigation
-    setTimeout(() => {
-      navigate('/optionals');
-    }, 100);
+    navigate('/optionals');
   };
 
   if (!selectedCar?.category) {
