@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Car, Calendar, User, ShoppingCart } from "lucide-react"
+import { Car, Calendar, User, ShoppingCart, CreditCard } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
@@ -15,17 +15,21 @@ import { supabase } from "@/integrations/supabase/client"
 import { CheckoutLayout } from "./ui/CheckoutLayout"
 import { ProgressSteps } from "./ui/ProgressSteps"
 import { EmptyCartMessage } from "./ui/EmptyCartMessage"
+import { PaymentSection } from "./sections/PaymentSection"
+import { motion } from "framer-motion"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
   const [customerId, setCustomerId] = useState<string | null>(null)
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("credit")
   const { toast } = useToast()
   const { state: cartState, dispatch } = useCart()
 
   const steps = [
     { number: 1, title: "Seus Dados", icon: User },
     { number: 2, title: "Agendamento", icon: Calendar },
-    { number: 3, title: "Confirmação", icon: ShoppingCart }
+    { number: 3, title: "Pagamento", icon: CreditCard },
+    { number: 4, title: "Confirmação", icon: ShoppingCart }
   ]
 
   const handleCustomerSubmit = async (customerData: any) => {
@@ -46,8 +50,8 @@ export const CheckoutPage = () => {
       setStep(2)
       
       toast({
-        title: "Dados salvos",
-        description: "Seus dados foram salvos com sucesso.",
+        title: "Dados salvos com sucesso!",
+        description: "Seus dados foram salvos. Vamos agendar sua retirada.",
       })
     } catch (error: any) {
       console.error('Error saving customer details:', error)
@@ -79,7 +83,7 @@ export const CheckoutPage = () => {
       setStep(3)
       
       toast({
-        title: "Agendamento confirmado",
+        title: "Agendamento confirmado!",
         description: "Seu horário foi agendado com sucesso.",
       })
     } catch (error: any) {
@@ -92,6 +96,14 @@ export const CheckoutPage = () => {
     }
   }
 
+  const handlePaymentSuccess = (paymentId: string) => {
+    setStep(4)
+    toast({
+      title: "Pagamento confirmado!",
+      description: "Seu pagamento foi processado com sucesso.",
+    })
+  }
+
   if (cartState.items.length === 0) {
     return (
       <CheckoutLayout>
@@ -102,67 +114,90 @@ export const CheckoutPage = () => {
 
   return (
     <CheckoutLayout>
-      <CheckoutSummary />
-      <ProgressSteps currentStep={step} steps={steps} />
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-        <div className="lg:col-span-2 space-y-6">
-          {step === 1 && (
-            <CustomerForm onSubmit={handleCustomerSubmit} />
-          )}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+      >
+        <CheckoutSummary />
+        <ProgressSteps currentStep={step} steps={steps} />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+          <div className="lg:col-span-2 space-y-6">
+            {step === 1 && (
+              <CustomerForm onSubmit={handleCustomerSubmit} />
+            )}
 
-          {step === 2 && (
-            <>
-              <PickupScheduler onSubmit={handleScheduleSubmit} />
-              <Card className="p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <ShoppingCart className="w-5 h-5 text-primary" />
-                  Opcionais Disponíveis
-                </h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Aproveite para adicionar itens que tornarão sua experiência ainda melhor:
-                </p>
-                <OptionalsList />
-              </Card>
-            </>
-          )}
+            {step === 2 && (
+              <>
+                <PickupScheduler onSubmit={handleScheduleSubmit} />
+                <Card className="p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <ShoppingCart className="w-5 h-5 text-primary" />
+                    Opcionais Disponíveis
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Aproveite para adicionar itens que tornarão sua experiência ainda melhor:
+                  </p>
+                  <OptionalsList />
+                </Card>
+              </>
+            )}
 
-          {step === 3 && (
-            <Card className="p-6">
-              <div className="text-center space-y-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-500 mb-4">
-                  <Car className="w-8 h-8" />
+            {step === 3 && customerId && cartState.checkoutSessionId && (
+              <PaymentSection
+                selectedMethod={selectedPaymentMethod}
+                onMethodChange={setSelectedPaymentMethod}
+                onPaymentSuccess={handlePaymentSuccess}
+                amount={cartState.total}
+                driverId={customerId}
+              />
+            )}
+
+            {step === 4 && (
+              <Card className="p-6">
+                <div className="text-center space-y-4">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-500 mb-4">
+                    <Car className="w-8 h-8" />
+                  </div>
+                  <h2 className="text-2xl font-semibold text-gray-800">Reserva Confirmada!</h2>
+                  <p className="text-gray-600">
+                    Sua reserva foi recebida com sucesso. Em breve nossa equipe entrará em contato para confirmar os detalhes.
+                  </p>
+                  <Button
+                    onClick={() => window.location.href = '/'}
+                    className="mt-6"
+                  >
+                    Voltar para Home
+                  </Button>
                 </div>
-                <h2 className="text-2xl font-semibold">Reserva Confirmada!</h2>
-                <p className="text-gray-600">
-                  Sua reserva foi recebida com sucesso. Em breve nossa equipe entrará em contato para confirmar os detalhes.
-                </p>
-              </div>
-            </Card>
-          )}
-        </div>
+              </Card>
+            )}
+          </div>
 
-        <div className="space-y-6">
-          {step < 3 && (
-            <Card className="p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100 sticky top-4">
-              <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                <User className="w-5 h-5 text-primary" />
-                Precisa de ajuda?
-              </h3>
-              <p className="text-sm text-gray-600">
-                Nossa equipe está disponível para te ajudar pelo WhatsApp. Clique no botão abaixo para iniciar uma conversa.
-              </p>
-              <Button 
-                variant="outline"
-                className="w-full mt-4 bg-white hover:bg-gray-50"
-                onClick={() => window.open('https://wa.me/seu-numero', '_blank')}
-              >
-                Falar com Suporte
-              </Button>
-            </Card>
-          )}
+          <div className="space-y-6">
+            {step < 4 && (
+              <Card className="p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100 sticky top-4">
+                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                  <User className="w-5 h-5 text-primary" />
+                  Precisa de ajuda?
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Nossa equipe está disponível para te ajudar pelo WhatsApp. Clique no botão abaixo para iniciar uma conversa.
+                </p>
+                <Button 
+                  variant="outline"
+                  className="w-full mt-4 bg-white hover:bg-gray-50"
+                  onClick={() => window.open('https://wa.me/seu-numero', '_blank')}
+                >
+                  Falar com Suporte
+                </Button>
+              </Card>
+            )}
+          </div>
         </div>
-      </div>
+      </motion.div>
     </CheckoutLayout>
   )
 }

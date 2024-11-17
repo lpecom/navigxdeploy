@@ -3,6 +3,7 @@ import { PaymentMethodSelector } from "../PaymentMethodSelector"
 import { CreditCardForm } from "../CreditCardForm"
 import { PixPayment } from "../PixPayment"
 import { BoletoPayment } from "../BoletoPayment"
+import { motion } from "framer-motion"
 
 interface PaymentSectionProps {
   selectedMethod: string
@@ -20,7 +21,12 @@ export const PaymentSection = ({
   driverId,
 }: PaymentSectionProps) => {
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
       <Card className="p-6">
         <h2 className="text-xl font-semibold mb-6">Método de Pagamento</h2>
         <PaymentMethodSelector
@@ -52,6 +58,6 @@ export const PaymentSection = ({
           />
         )}
       </Card>
-    </div>
+    </motion.div>
   )
 }
