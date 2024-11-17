@@ -14,7 +14,7 @@ export const FleetVehicleCard = ({ vehicle }: FleetVehicleCardProps) => {
         <CardTitle className="text-xl">
           {vehicle.car_model?.name} - {vehicle.plate}
         </CardTitle>
-        <Badge variant={vehicle.is_available ? "success" : "destructive"}>
+        <Badge variant={vehicle.is_available ? "default" : "destructive"}>
           {vehicle.is_available ? "Disponível" : "Indisponível"}
         </Badge>
       </CardHeader>
