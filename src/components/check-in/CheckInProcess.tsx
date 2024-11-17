@@ -7,8 +7,9 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Camera, Image, CheckCircle, FileText, Printer } from "lucide-react";
 import { toast } from "sonner";
+import { PhotoCategory, CheckInReservation, PhotosState } from "./types";
 
-const PHOTO_CATEGORIES = [
+const PHOTO_CATEGORIES: PhotoCategory[] = [
   { id: 'front', label: 'Frente' },
   { id: 'back', label: 'Traseira' },
   { id: 'left', label: 'Lateral Esquerda' },
@@ -22,7 +23,7 @@ const CheckInProcess = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('photos');
-  const [photos, setPhotos] = useState<Record<string, string[]>>({});
+  const [photos, setPhotos] = useState<PhotosState>({});
   
   const { data: reservation, isLoading } = useQuery({
     queryKey: ['check-in-reservation', id],
@@ -37,7 +38,7 @@ const CheckInProcess = () => {
         .single();
       
       if (error) throw error;
-      return data;
+      return data as CheckInReservation;
     },
   });
 

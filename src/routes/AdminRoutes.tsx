@@ -15,6 +15,8 @@ import Customers from "@/pages/Customers";
 import CustomerDetails from "@/pages/CustomerDetails";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
+import CheckInList from "@/components/check-in/CheckInList";
+import CheckInProcess from "@/components/check-in/CheckInProcess";
 
 const AdminRoutes = () => {
   const navigate = useNavigate();
@@ -106,3 +108,4 @@ const AdminRoutes = () => {
 };
 
 export default AdminRoutes;
+
