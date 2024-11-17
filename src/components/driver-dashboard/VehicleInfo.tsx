@@ -58,9 +58,9 @@ export const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
 
         if (!data) return null;
 
-        // Safely type cast the data
+        // First cast to unknown, then to the specific type
         const selectedCar = data.selected_car as unknown as SelectedCar;
-        const fleetVehicles = data.fleet_vehicles as { car_model: CarModelDetails }[];
+        const fleetVehicles = data.fleet_vehicles as unknown as { car_model: CarModelDetails }[];
 
         return {
           selected_car: selectedCar,
