@@ -10,14 +10,14 @@ const Plans = () => {
   const navigate = useNavigate();
   const { dispatch } = useCart();
   const { toast } = useToast();
-  const selectedCar = JSON.parse(sessionStorage.getItem('selectedCar') || '{}');
-
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   const handlePlanSelect = (planType: 'flex' | 'monthly' | 'black') => {
-    if (!selectedCar?.category) {
+    const selectedCarStr = sessionStorage.getItem('selectedCar');
+    if (!selectedCarStr) {
       toast({
         title: "Erro",
         description: "Por favor, selecione um carro primeiro.",
@@ -27,47 +27,51 @@ const Plans = () => {
       return;
     }
 
-    // Clear cart and add new item
-    dispatch({ type: 'CLEAR_CART' });
-    
-    // Ensure price is a number and handle potential type issues
-    const carPrice = typeof selectedCar.price === 'string' 
-      ? parseFloat(selectedCar.price.replace(/[^0-9.]/g, ''))
-      : typeof selectedCar.price === 'number' 
-        ? selectedCar.price 
-        : 0;
+    try {
+      const selectedCar = JSON.parse(selectedCarStr);
+      
+      if (!selectedCar?.category) {
+        throw new Error("Invalid car data");
+      }
 
-    if (carPrice === 0) {
+      // Clear cart before adding new item
+      dispatch({ type: 'CLEAR_CART' });
+      
+      // Get base prices for each plan type
+      const basePrices = {
+        flex: 529,
+        monthly: 729,
+        black: 1299
+      };
+
+      const basePrice = basePrices[planType];
+      
+      dispatch({
+        type: 'ADD_ITEM',
+        payload: {
+          id: `${selectedCar.category}-${planType}`,
+          type: 'car_group',
+          quantity: 1,
+          unitPrice: basePrice,
+          totalPrice: basePrice,
+          name: `${selectedCar.category} - Plano ${planType}`,
+          category: selectedCar.category,
+          period: planType
+        }
+      });
+
+      sessionStorage.setItem('selectedPlan', planType);
+      navigate('/optionals');
+    } catch (error) {
+      console.error('Error processing plan selection:', error);
       toast({
         title: "Erro",
-        description: "Preço inválido para o carro selecionado.",
+        description: "Ocorreu um erro ao selecionar o plano. Por favor, tente novamente.",
         variant: "destructive",
       });
-      return;
+      navigate('/');
     }
-    
-    dispatch({
-      type: 'ADD_ITEM',
-      payload: {
-        id: `${selectedCar.category}-${planType}`,
-        type: 'car_group',
-        quantity: 1,
-        unitPrice: carPrice,
-        totalPrice: carPrice,
-        name: `${selectedCar.category} - Plano ${planType}`,
-        category: selectedCar.category,
-        period: planType
-      }
-    });
-
-    sessionStorage.setItem('selectedPlan', planType);
-    navigate('/optionals');
   };
-
-  if (!selectedCar?.category) {
-    navigate('/');
-    return null;
-  }
 
   return (
     <div className="min-h-screen">

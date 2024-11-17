@@ -18,14 +18,19 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     case 'ADD_ITEM': {
       const existingItem = state.items.find(item => item.id === action.payload.id);
       if (existingItem) {
+        const updatedItems = state.items.map(item =>
+          item.id === action.payload.id
+            ? {
+                ...item,
+                quantity: item.quantity + 1,
+                totalPrice: (item.quantity + 1) * item.unitPrice
+              }
+            : item
+        );
         return {
           ...state,
-          items: state.items.map(item =>
-            item.id === action.payload.id
-              ? { ...item, quantity: item.quantity + 1, totalPrice: (item.quantity + 1) * item.unitPrice }
-              : item
-          ),
-          total: state.total + action.payload.unitPrice
+          items: updatedItems,
+          total: updatedItems.reduce((sum, item) => sum + item.totalPrice, 0)
         };
       }
       return {
@@ -36,33 +41,28 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     }
 
     case 'REMOVE_ITEM': {
-      const itemToRemove = state.items.find(item => item.id === action.payload);
+      const updatedItems = state.items.filter(item => item.id !== action.payload);
       return {
         ...state,
-        items: state.items.filter(item => item.id !== action.payload),
-        total: state.total - (itemToRemove?.totalPrice || 0)
+        items: updatedItems,
+        total: updatedItems.reduce((sum, item) => sum + item.totalPrice, 0)
       };
     }
 
     case 'UPDATE_QUANTITY': {
-      return {
-        ...state,
-        items: state.items.map(item => {
-          if (item.id === action.payload.id) {
-            return {
+      const updatedItems = state.items.map(item =>
+        item.id === action.payload.id
+          ? {
               ...item,
               quantity: action.payload.quantity,
               totalPrice: action.payload.quantity * item.unitPrice
-            };
-          }
-          return item;
-        }),
-        total: state.items.reduce((acc, item) => {
-          if (item.id === action.payload.id) {
-            return acc + (action.payload.quantity * item.unitPrice);
-          }
-          return acc + item.totalPrice;
-        }, 0)
+            }
+          : item
+      );
+      return {
+        ...state,
+        items: updatedItems,
+        total: updatedItems.reduce((sum, item) => sum + item.totalPrice, 0)
       };
     }
 
