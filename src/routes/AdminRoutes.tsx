@@ -13,10 +13,11 @@ import Reservations from "@/pages/Reservations";
 import Dashboard from "@/pages/Dashboard";
 import Customers from "@/pages/Customers";
 import CustomerDetails from "@/pages/CustomerDetails";
+import { CheckInList } from "@/components/check-in/CheckInList";
+import { CheckInProcess } from "@/components/check-in/CheckInProcess";
+import { WebsiteSettings } from "@/components/website-manager/WebsiteSettings";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
-import CheckInList from "@/components/check-in/CheckInList";
-import CheckInProcess from "@/components/check-in/CheckInProcess";
 
 const AdminRoutes = () => {
   const navigate = useNavigate();
@@ -88,6 +89,7 @@ const AdminRoutes = () => {
                 <Route index element={<CheckInList />} />
                 <Route path=":id" element={<CheckInProcess />} />
               </Route>
+              <Route path="website-settings" element={<WebsiteSettings />} />
               <Route path="offers" element={<Offers />} />
               <Route path="accessories" element={<Accessories />} />
               <Route path="analytics" element={<Analytics />} />
@@ -108,4 +110,3 @@ const AdminRoutes = () => {
 };
 
 export default AdminRoutes;
-

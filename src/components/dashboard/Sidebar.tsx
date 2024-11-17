@@ -10,6 +10,7 @@ import {
   ChevronDown,
   ChevronRight,
   Users,
+  Globe,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -42,7 +43,7 @@ const Sidebar = () => {
     );
   };
 
-  const menuItems: MenuItem[] = [
+  const menuItems = [
     { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
     { to: "/admin/customers", icon: Users, label: "Clientes" },
     {
@@ -80,6 +81,7 @@ const Sidebar = () => {
       ]
     },
     { to: "/admin/accessories", icon: Package, label: "Opcionais" },
+    { to: "/admin/website-settings", icon: Globe, label: "Website" },
   ];
 
   return (
