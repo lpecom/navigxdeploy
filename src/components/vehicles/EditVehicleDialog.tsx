@@ -59,7 +59,9 @@ export const EditVehicleDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Editar Veículo</DialogTitle>
+          <DialogTitle>
+            {editingCar ? 'Editar Veículo' : 'Adicionar Veículo'}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -120,7 +122,7 @@ export const EditVehicleDialog = ({
           </div>
 
           <Button type="submit" className="w-full">
-            Salvar Alterações
+            {editingCar ? 'Salvar Alterações' : 'Adicionar Veículo'}
           </Button>
         </form>
       </DialogContent>

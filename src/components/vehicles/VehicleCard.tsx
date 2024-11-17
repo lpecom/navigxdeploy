@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Pencil } from "lucide-react";
-import { CarModel } from "./types";
+import { Pencil, Car, Calendar, Gauge } from "lucide-react";
+import type { CarModel } from "./types";
 
 interface VehicleCardProps {
   car: CarModel;
@@ -29,30 +29,28 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
               src={car.image_url}
               alt={car.name}
               className="w-full h-full object-cover rounded-md"
-              onError={() => {
-                console.error('Falha ao carregar imagem:', car.image_url);
-              }}
             />
           </div>
         )}
         <div className="space-y-2">
-          <p className="text-sm text-gray-500">Categoria: {car.category?.name || 'Sem categoria'}</p>
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Car className="w-4 h-4" />
+            <span>Categoria: {car.category?.name || 'Sem categoria'}</span>
+          </div>
           {car.year && (
-            <p className="text-sm text-gray-500">Ano: {car.year}</p>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Calendar className="w-4 h-4" />
+              <span>Ano: {car.year}</span>
+            </div>
           )}
           {car.description && (
             <p className="text-sm text-gray-500">{car.description}</p>
           )}
-          {car.optionals && Object.entries(car.optionals).filter(([key]) => 
-            !key.includes('power_steering') && 
-            !key.includes('air_conditioning') && 
-            !key.includes('abs') && 
-            !key.includes('power_windows')
-          ).map(([key, value]) => (
+          {car.optionals && Object.entries(car.optionals).map(([key, value]) => (
             <Badge 
               key={key}
               variant="secondary"
-              className="text-sm"
+              className="mr-2 text-sm"
             >
               {`${key}: ${value}`}
             </Badge>

@@ -24,7 +24,3 @@ export interface FleetVehicle {
   is_available: boolean;
   car_model?: CarModel;
 }
-
-export interface CarModelResponse extends Omit<CarModel, 'optionals'> {
-  optionals: Record<string, any> | null;
-}

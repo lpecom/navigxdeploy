@@ -1,52 +1,52 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Upload, X } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ImageUploadProps {
   currentImage?: string | null;
-  onImageChange: (imageUrl: string) => void;
+  onImageChange: (url: string) => void;
 }
 
-export const ImageUpload = ({
-  currentImage,
-  onImageChange,
-}: ImageUploadProps) => {
-  const { toast } = useToast();
+export const ImageUpload = ({ currentImage, onImageChange }: ImageUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
+  const { toast } = useToast();
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
     try {
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${crypto.randomUUID()}.${fileExt}`;
+      setIsUploading(true);
 
-      const { error: uploadError } = await supabase.storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError, data } = await supabase.storage
         .from('vehicle-images')
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('vehicle-images')
         .getPublicUrl(filePath);
 
       onImageChange(publicUrl);
-      
+
       toast({
-        title: "Success",
-        description: "Image uploaded successfully",
+        title: "Imagem enviada",
+        description: "A imagem foi enviada com sucesso.",
       });
     } catch (error) {
-      console.error('Upload error:', error instanceof Error ? error.message : 'Unknown error');
+      console.error('Error uploading image:', error);
       toast({
-        title: "Error",
-        description: "Failed to upload image",
+        title: "Erro ao enviar imagem",
+        description: "Ocorreu um erro ao enviar a imagem. Tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -54,52 +54,42 @@ export const ImageUpload = ({
     }
   };
 
-  const removeImage = () => {
-    onImageChange("");
+  const handleRemove = () => {
+    onImageChange('');
   };
 
   return (
     <div className="space-y-4">
       {currentImage ? (
-        <div className="relative aspect-video">
+        <div className="relative">
           <img
             src={currentImage}
-            alt="Vehicle preview"
-            className="w-full h-full rounded-lg object-cover"
-            onError={() => {
-              console.error('Failed to load preview image:', currentImage);
-            }}
+            alt="Vehicle"
+            className="w-full h-48 object-cover rounded-lg"
           />
           <Button
             variant="destructive"
             size="icon"
             className="absolute top-2 right-2"
-            onClick={removeImage}
+            onClick={handleRemove}
           >
-            <X className="w-4 h-4" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
       ) : (
-        <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center">
-          <Input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
-            id="vehicle-image-upload"
-            disabled={isUploading}
-          />
-          <label
-            htmlFor="vehicle-image-upload"
-            className="cursor-pointer flex flex-col items-center"
-          >
-            <Upload className="w-8 h-8 mb-2 text-gray-400" />
-            <span className="text-sm text-gray-600">
-              {isUploading ? "Uploading..." : "Click to upload vehicle image"}
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+          <label className="flex flex-col items-center justify-center cursor-pointer">
+            <Upload className="h-8 w-8 text-gray-400" />
+            <span className="mt-2 text-sm text-gray-500">
+              {isUploading ? "Enviando..." : "Clique para enviar"}
             </span>
-            <span className="text-xs text-gray-400 mt-1">
-              Recommended size: 1920x1080px
-            </span>
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*"
+              onChange={handleUpload}
+              disabled={isUploading}
+            />
           </label>
         </div>
       )}
