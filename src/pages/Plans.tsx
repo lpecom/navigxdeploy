@@ -29,8 +29,22 @@ const Plans = () => {
 
     // Clear cart and add new item
     dispatch({ type: 'CLEAR_CART' });
+    
+    // Ensure price is a number and handle potential type issues
+    const carPrice = typeof selectedCar.price === 'string' 
+      ? parseFloat(selectedCar.price.replace(/[^0-9.]/g, ''))
+      : typeof selectedCar.price === 'number' 
+        ? selectedCar.price 
+        : 0;
 
-    const carPrice = parseFloat(selectedCar.price.replace(/[^0-9.]/g, ''));
+    if (carPrice === 0) {
+      toast({
+        title: "Erro",
+        description: "Preço inválido para o carro selecionado.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     dispatch({
       type: 'ADD_ITEM',
