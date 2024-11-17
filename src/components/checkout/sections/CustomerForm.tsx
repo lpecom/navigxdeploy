@@ -9,6 +9,8 @@ import { PersonalInfoSection } from "./personal/PersonalInfoSection"
 import { AddressSection } from "./address/AddressSection"
 import { motion } from "framer-motion"
 import { Card } from "@/components/ui/card"
+import { supabase } from "@/integrations/supabase/client"
+import { useToast } from "@/components/ui/use-toast"
 
 const customerSchema = z.object({
   full_name: z.string().min(3, "Nome completo é obrigatório"),
@@ -31,6 +33,8 @@ interface CustomerFormProps {
 export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
   const [isLoadingAddress, setIsLoadingAddress] = useState(false)
   const [hasAccount, setHasAccount] = useState(false)
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const { toast } = useToast()
   
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
@@ -54,6 +58,57 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
     }
   }, [form])
 
+  const handleLogin = async (email: string, password: string) => {
+    setIsLoggingIn(true)
+    try {
+      const { data: { user }, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      if (error) throw error
+
+      if (user) {
+        const { data: driverDetails, error: driverError } = await supabase
+          .from('driver_details')
+          .select('*')
+          .eq('auth_user_id', user.id)
+          .single()
+
+        if (driverError) throw driverError
+
+        if (driverDetails) {
+          onSubmit({
+            full_name: driverDetails.full_name,
+            email: driverDetails.email,
+            cpf: driverDetails.cpf,
+            phone: driverDetails.phone,
+            address: driverDetails.address || '',
+            city: driverDetails.city || '',
+            state: driverDetails.state || '',
+            postal_code: driverDetails.postal_code || '',
+            auth_user_id: user.id
+          })
+          
+          toast({
+            title: "Login realizado com sucesso!",
+            description: "Suas informações foram carregadas automaticamente.",
+          })
+          return
+        }
+      }
+    } catch (error: any) {
+      console.error('Login error:', error)
+      toast({
+        title: "Erro no login",
+        description: "Verifique suas credenciais e tente novamente.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoggingIn(false)
+    }
+  }
+
   const handleFormSubmit = async (data: CustomerFormValues) => {
     const { password, ...customerData } = data
     onSubmit(customerData)
@@ -72,22 +127,29 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
               form={form}
               hasAccount={hasAccount}
               onHasAccountChange={setHasAccount}
+              onLogin={handleLogin}
+              isLoggingIn={isLoggingIn}
             />
             
-            <PersonalInfoSection form={form} />
-            
-            <AddressSection 
-              form={form}
-              isLoadingAddress={isLoadingAddress}
-              onPostalCodeChange={handleAddressSelect}
-            />
+            {!hasAccount && (
+              <>
+                <PersonalInfoSection form={form} />
+                <AddressSection 
+                  form={form}
+                  isLoadingAddress={isLoadingAddress}
+                  onPostalCodeChange={handleAddressSelect}
+                />
+              </>
+            )}
 
-            <Button 
-              type="submit" 
-              className="w-full h-12 text-lg font-medium transition-all duration-200 hover:scale-[1.02]"
-            >
-              Continuar
-            </Button>
+            {!hasAccount && (
+              <Button 
+                type="submit" 
+                className="w-full h-12 text-lg font-medium transition-all duration-200 hover:scale-[1.02]"
+              >
+                Continuar
+              </Button>
+            )}
           </form>
         </Form>
       </Card>

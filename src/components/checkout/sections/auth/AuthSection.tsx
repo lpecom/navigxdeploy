@@ -3,14 +3,26 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Lock, Mail } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { useState } from "react"
 
 interface AuthSectionProps {
   form: any;
   hasAccount: boolean;
   onHasAccountChange: (checked: boolean) => void;
+  onLogin: (email: string, password: string) => void;
+  isLoggingIn: boolean;
 }
 
-export const AuthSection = ({ form, hasAccount, onHasAccountChange }: AuthSectionProps) => {
+export const AuthSection = ({ form, hasAccount, onHasAccountChange, onLogin, isLoggingIn }: AuthSectionProps) => {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault()
+    onLogin(email, password)
+  }
+
   return (
     <Card className="p-6 mb-6">
       <div className="flex items-center gap-2 mb-4">
@@ -39,45 +51,92 @@ export const AuthSection = ({ form, hasAccount, onHasAccountChange }: AuthSectio
         </label>
       </div>
 
-      <div className="space-y-4">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Email
-              </FormLabel>
-              <FormControl>
-                <Input type="email" placeholder="seu@email.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      {hasAccount ? (
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <FormLabel className="flex items-center gap-2">
+              <Mail className="w-4 h-4" />
+              Email
+            </FormLabel>
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="seu@email.com"
+              required
+            />
+          </div>
 
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex items-center gap-2">
-                <Lock className="w-4 h-4" />
-                {hasAccount ? "Senha da conta Navig" : "Crie uma senha"}
-              </FormLabel>
-              <FormControl>
-                <Input 
-                  type="password" 
-                  placeholder={hasAccount ? "Digite sua senha" : "Mínimo 6 caracteres"}
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+          <div>
+            <FormLabel className="flex items-center gap-2">
+              <Lock className="w-4 h-4" />
+              Senha
+            </FormLabel>
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <Button 
+            type="submit" 
+            className="w-full"
+            disabled={isLoggingIn}
+          >
+            {isLoggingIn ? (
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Entrando...</span>
+              </div>
+            ) : (
+              "Entrar"
+            )}
+          </Button>
+        </form>
+      ) : (
+        <div className="space-y-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  Email
+                </FormLabel>
+                <FormControl>
+                  <Input type="email" placeholder="seu@email.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <Lock className="w-4 h-4" />
+                  Crie uma senha
+                </FormLabel>
+                <FormControl>
+                  <Input 
+                    type="password" 
+                    placeholder="Mínimo 6 caracteres"
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+      )}
     </Card>
   )
 }
