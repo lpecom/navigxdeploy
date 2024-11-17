@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface StoreWindowProps {
   selectedCar: {
@@ -24,6 +24,7 @@ interface StoreWindowProps {
 export const StoreWindow = ({ selectedCar }: StoreWindowProps) => {
   const navigate = useNavigate();
   const { dispatch } = useCart();
+  const { toast } = useToast();
 
   const handleAddToCart = () => {
     if (!selectedCar) return;
@@ -41,8 +42,7 @@ export const StoreWindow = ({ selectedCar }: StoreWindowProps) => {
     });
 
     toast({
-      title: "Carro adicionado ao carrinho",
-      description: "Você será redirecionado para o checkout",
+      description: "Carro adicionado ao carrinho. Você será redirecionado para o checkout.",
     });
 
     setTimeout(() => {
