@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
-import { useState, useCallback } from "react"
+import { useState } from "react"
 import { AuthSection } from "./auth/AuthSection"
 import { PersonalInfoSection } from "./personal/PersonalInfoSection"
 import { AddressSection } from "./address/AddressSection"
@@ -40,68 +40,53 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
     resolver: zodResolver(customerSchema),
   })
 
-  const handleAddressSelect = useCallback(async (postal_code: string) => {
-    setIsLoadingAddress(true)
-    try {
-      const response = await fetch(`https://viacep.com.br/ws/${postal_code}/json/`)
-      const data = await response.json()
-      
-      if (!data.erro) {
-        form.setValue('address', data.logradouro)
-        form.setValue('city', data.localidade)
-        form.setValue('state', data.uf)
-      }
-    } catch (error) {
-      console.error('Error fetching address:', error)
-    } finally {
-      setIsLoadingAddress(false)
-    }
-  }, [form])
-
   const handleLogin = async (email: string, password: string) => {
     setIsLoggingIn(true)
     try {
-      const { data: { user }, error } = await supabase.auth.signInWithPassword({
+      const { data: { user }, error: authError } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password,
       })
 
-      if (error) throw error
+      if (authError) throw authError
 
-      if (user) {
-        const { data: driverDetails, error: driverError } = await supabase
-          .from('driver_details')
-          .select('*')
-          .eq('auth_user_id', user.id)
-          .single()
+      if (!user) {
+        throw new Error('Authentication failed')
+      }
 
-        if (driverError) throw driverError
+      const { data: driverDetails, error: driverError } = await supabase
+        .from('driver_details')
+        .select('*')
+        .eq('auth_user_id', user.id)
+        .single()
 
-        if (driverDetails) {
-          onSubmit({
-            full_name: driverDetails.full_name,
-            email: driverDetails.email,
-            cpf: driverDetails.cpf,
-            phone: driverDetails.phone,
-            address: driverDetails.address || '',
-            city: driverDetails.city || '',
-            state: driverDetails.state || '',
-            postal_code: driverDetails.postal_code || '',
-            auth_user_id: user.id
-          })
-          
-          toast({
-            title: "Login realizado com sucesso!",
-            description: "Suas informações foram carregadas automaticamente.",
-          })
-          return
-        }
+      if (driverError) throw driverError
+
+      if (driverDetails) {
+        // Submit the driver details to continue with checkout
+        onSubmit({
+          full_name: driverDetails.full_name,
+          email: driverDetails.email,
+          cpf: driverDetails.cpf,
+          phone: driverDetails.phone,
+          address: driverDetails.address || '',
+          city: driverDetails.city || '',
+          state: driverDetails.state || '',
+          postal_code: driverDetails.postal_code || '',
+          auth_user_id: user.id
+        })
+        
+        toast({
+          title: "Login realizado com sucesso!",
+          description: "Suas informações foram carregadas automaticamente.",
+        })
+        return
       }
     } catch (error: any) {
       console.error('Login error:', error)
       toast({
         title: "Erro no login",
-        description: "Verifique suas credenciais e tente novamente.",
+        description: error.message || "Falha ao realizar login",
         variant: "destructive",
       })
     } finally {
@@ -137,7 +122,23 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
                 <AddressSection 
                   form={form}
                   isLoadingAddress={isLoadingAddress}
-                  onPostalCodeChange={handleAddressSelect}
+                  onPostalCodeChange={async (postal_code: string) => {
+                    setIsLoadingAddress(true)
+                    try {
+                      const response = await fetch(`https://viacep.com.br/ws/${postal_code}/json/`)
+                      const data = await response.json()
+                      
+                      if (!data.erro) {
+                        form.setValue('address', data.logradouro)
+                        form.setValue('city', data.localidade)
+                        form.setValue('state', data.uf)
+                      }
+                    } catch (error) {
+                      console.error('Error fetching address:', error)
+                    } finally {
+                      setIsLoadingAddress(false)
+                    }
+                  }}
                 />
               </>
             )}

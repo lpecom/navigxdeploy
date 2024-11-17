@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/card"
 import { Lock, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
+import { supabase } from "@/integrations/supabase/client"
+import { useToast } from "@/components/ui/use-toast"
 
 interface AuthSectionProps {
   form: any;
@@ -17,10 +19,51 @@ interface AuthSectionProps {
 export const AuthSection = ({ form, hasAccount, onHasAccountChange, onLogin, isLoggingIn }: AuthSectionProps) => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const { toast } = useToast()
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    onLogin(email, password)
+    
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (authError) throw authError
+
+      if (!user) {
+        throw new Error('Authentication failed')
+      }
+
+      // Get driver details after successful authentication
+      const { data: driverData, error: driverError } = await supabase
+        .from('driver_details')
+        .select('*')
+        .eq('auth_user_id', user.id)
+        .single()
+
+      if (driverError) throw driverError
+
+      if (!driverData) {
+        throw new Error('No driver profile found')
+      }
+
+      // Call onLogin with email and password to maintain the existing flow
+      onLogin(email, password)
+
+      toast({
+        title: "Login realizado com sucesso!",
+        description: "Suas informações foram carregadas.",
+      })
+    } catch (error: any) {
+      console.error('Login error:', error)
+      toast({
+        title: "Erro no login",
+        description: error.message || "Falha ao realizar login",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
