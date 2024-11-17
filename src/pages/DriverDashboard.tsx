@@ -28,18 +28,18 @@ const DriverDashboard = () => {
         }
 
         // Query driver details using auth_user_id
-        const { data: drivers, error } = await supabase
+        const { data: drivers, error: dbError } = await supabase
           .from('driver_details')
           .select('id')
-          .eq('auth_user_id', session.user.id)
-          .limit(1);
+          .eq('auth_user_id', session.user.id);
 
-        if (error) {
-          console.error("Database error:", error);
+        if (dbError) {
+          console.error("Database error:", dbError);
           throw new Error("Failed to fetch driver details");
         }
 
         if (!drivers || drivers.length === 0) {
+          await supabase.auth.signOut();
           toast({
             title: "Access Denied",
             description: "No driver profile found for this account.",

@@ -28,22 +28,24 @@ const DriverLogin = () => {
     setIsLoading(true);
 
     try {
-      const { data: { session }, error } = await supabase.auth.signInWithPassword({
+      const { data: { session }, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (authError) throw authError;
 
       if (session) {
         // Check if user is a driver
-        const { data: driver } = await supabase
+        const { data: drivers, error: dbError } = await supabase
           .from('driver_details')
           .select('id')
-          .eq('auth_user_id', session.user.id)
-          .single();
+          .eq('auth_user_id', session.user.id);
 
-        if (!driver) {
+        if (dbError) throw dbError;
+
+        if (!drivers || drivers.length === 0) {
+          await supabase.auth.signOut();
           throw new Error("Unauthorized access. This portal is for drivers only.");
         }
 
