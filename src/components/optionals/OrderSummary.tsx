@@ -33,7 +33,7 @@ export const OrderSummary = () => {
             {state.items.map((item) => (
               <div key={item.id} className="flex justify-between">
                 <span className="text-gray-600">
-                  {item.type === 'car' ? 'Veículo' : getAccessoryName(item.id)}
+                  {item.type === 'car_group' ? 'Veículo' : getAccessoryName(item.id)}
                   {item.quantity > 1 && ` (${item.quantity}x)`}
                 </span>
                 <span>R$ {item.totalPrice.toFixed(2)}</span>
