@@ -92,22 +92,22 @@ const Optionals = () => {
               <CarSlider cars={cars} category="Economy" />
               <div className="mt-4 grid grid-cols-2 gap-4 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
-                  <span>Passageiros: {selectedCar.specs.passengers}</span>
+                  <span>Passageiros: {selectedCar.specs?.passengers}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span>Transmissão: {selectedCar.specs.transmission}</span>
+                  <span>Transmissão: {selectedCar.specs?.transmission}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span>Plano: {selectedCar.specs.plan}</span>
+                  <span>Plano: {selectedCar.specs?.plan}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span>Consumo: {selectedCar.specs.consumption}</span>
+                  <span>Consumo: {selectedCar.specs?.consumption}</span>
                 </div>
               </div>
               <div className="mt-4 text-2xl font-bold text-blue-500">
                 R$ {selectedCar.price}
                 <span className="text-base font-normal text-gray-600 ml-1">
-                  /{selectedCar.period}
+                  /{selectedCar.period || 'semana'}
                 </span>
               </div>
             </div>
