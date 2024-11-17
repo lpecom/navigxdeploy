@@ -22,7 +22,7 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      // First check if the user exists - get the most recent record
+      // First check if the user exists in driver_details
       const { data: userExists, error: userCheckError } = await supabase
         .from('driver_details')
         .select('id, crm_status, auth_user_id')
@@ -31,19 +31,26 @@ const AdminLogin = () => {
         .limit(1)
         .maybeSingle();
 
-      if (userCheckError) throw userCheckError;
+      if (userCheckError) {
+        throw new Error('Erro ao verificar usuário. Por favor, tente novamente.');
+      }
 
       if (!userExists) {
         throw new Error('Usuário não encontrado. Verifique suas credenciais.');
       }
 
-      // Then attempt to sign in
+      // Then attempt to sign in with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        if (authError.message === 'Invalid login credentials') {
+          throw new Error('Senha incorreta. Por favor, verifique suas credenciais.');
+        }
+        throw authError;
+      }
 
       if (!authData.user) {
         throw new Error('Falha na autenticação');
@@ -56,7 +63,7 @@ const AdminLogin = () => {
           .update({ auth_user_id: authData.user.id })
           .eq('id', userExists.id);
 
-        if (updateError) {
+        if (updateError && !updateError.message.includes('duplicate key value')) {
           console.error('Error updating driver details:', updateError);
         }
       }
