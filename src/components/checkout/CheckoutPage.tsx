@@ -39,7 +39,17 @@ export const CheckoutPage = () => {
 
           if (driverDetails) {
             setCustomerId(driverDetails.id)
-            // If user is logged in and has driver details, skip to step 2
+            // Create checkout session for logged-in user
+            if (cartState.items.length > 0 && !cartState.checkoutSessionId) {
+              await createCheckoutSession({
+                driverId: driverDetails.id,
+                cartItems: cartState.items,
+                totalAmount: cartState.total,
+                onSuccess: (sessionId) => {
+                  dispatch({ type: 'SET_CHECKOUT_SESSION', payload: sessionId })
+                }
+              })
+            }
             setStep(2)
           }
         } catch (error) {
@@ -49,7 +59,7 @@ export const CheckoutPage = () => {
     }
 
     checkSession()
-  }, [session])
+  }, [session, cartState.items, cartState.total, cartState.checkoutSessionId, dispatch])
 
   // Prevent empty cart access
   useEffect(() => {
