@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VehicleCard } from "./VehicleCard";
 import { FleetVehicleCard } from "./FleetVehicleCard";
 import { EditVehicleDialog } from "./EditVehicleDialog";
+import { FleetListView } from "./FleetListView";
 import type { CarModel, FleetVehicle } from "./types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -15,7 +16,7 @@ interface VehicleListProps {
 
 const VehicleList = ({ view }: VehicleListProps) => {
   const { toast } = useToast();
-  const [isEditing, setIsEditing] = useState(false);
+  const [isAddingVehicle, setIsAddingVehicle] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<CarModel | null>(null);
   const queryClient = useQueryClient();
 
@@ -51,7 +52,7 @@ const VehicleList = ({ view }: VehicleListProps) => {
 
   const handleEdit = (vehicle: CarModel) => {
     setSelectedVehicle(vehicle);
-    setIsEditing(true);
+    setIsAddingVehicle(true);
   };
 
   if (modelsLoading || fleetLoading) {
@@ -72,6 +73,7 @@ const VehicleList = ({ view }: VehicleListProps) => {
       <TabsList>
         <TabsTrigger value="models">Modelos</TabsTrigger>
         <TabsTrigger value="fleet">Frota</TabsTrigger>
+        <TabsTrigger value="list">Lista da Frota</TabsTrigger>
       </TabsList>
 
       <TabsContent value="models" className="mt-6">
@@ -97,43 +99,18 @@ const VehicleList = ({ view }: VehicleListProps) => {
         </div>
       </TabsContent>
 
+      <TabsContent value="list" className="mt-6">
+        <FleetListView />
+      </TabsContent>
+
       <EditVehicleDialog
-        open={isEditing}
-        onOpenChange={setIsEditing}
+        open={isAddingVehicle}
+        onOpenChange={setIsAddingVehicle}
         editingCar={selectedVehicle}
         setEditingCar={setSelectedVehicle}
         onSubmit={async (e) => {
           e.preventDefault();
-          if (!selectedVehicle) return;
-
-          try {
-            const { error } = await supabase
-              .from('car_models')
-              .update({
-                name: selectedVehicle.name,
-                description: selectedVehicle.description,
-                category_id: selectedVehicle.category_id,
-                image_url: selectedVehicle.image_url,
-                year: selectedVehicle.year,
-              })
-              .eq('id', selectedVehicle.id);
-
-            if (error) throw error;
-
-            await queryClient.invalidateQueries({ queryKey: ['car-models'] });
-
-            toast({
-              title: "Veículo atualizado",
-              description: "Os detalhes do veículo foram salvos com sucesso.",
-            });
-            setIsEditing(false);
-          } catch (error) {
-            toast({
-              title: "Erro",
-              description: "Falha ao atualizar os detalhes do veículo.",
-              variant: "destructive",
-            });
-          }
+          setIsAddingVehicle(false);
         }}
       />
     </Tabs>
