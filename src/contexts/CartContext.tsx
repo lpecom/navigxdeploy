@@ -1,19 +1,5 @@
 import { createContext, useContext, useReducer, ReactNode } from 'react';
-
-export interface CartItem {
-  id: string;
-  type: 'car' | 'optional';
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  name?: string;
-}
-
-interface CartState {
-  items: CartItem[];
-  total: number;
-  checkoutSessionId?: string;
-}
+import { CartItem, CartState } from '@/types/cart';
 
 type CartAction =
   | { type: 'ADD_ITEM'; payload: CartItem }
