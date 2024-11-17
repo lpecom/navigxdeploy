@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bluetooth, AlertCircle } from "lucide-react";
+import { Bluetooth } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { BluetoothDeviceWithGATT, BluetoothRemoteGATTCharacteristic } from "./bluetooth/types";
 
 interface OBDData {
   rpm?: number;
@@ -12,24 +13,22 @@ interface OBDData {
 }
 
 export const OBDInterface = () => {
-  const [device, setDevice] = useState<BluetoothDevice | null>(null);
+  const [device, setDevice] = useState<BluetoothDeviceWithGATT | null>(null);
   const [characteristic, setCharacteristic] = useState<BluetoothRemoteGATTCharacteristic | null>(null);
   const [obdData, setOBDData] = useState<OBDData>({});
   const { toast } = useToast();
 
   const connectToOBD = async () => {
     try {
-      // Request Bluetooth device with specific service
       const device = await navigator.bluetooth.requestDevice({
-        filters: [{ services: ['FFE0'] }] // Common service UUID for ELM327
-      });
+        filters: [{ services: ['FFE0'] }]
+      }) as BluetoothDeviceWithGATT;
 
       toast({
         title: "Conectando ao dispositivo...",
         description: "Por favor, aguarde.",
       });
 
-      // Connect to GATT server
       const server = await device.gatt?.connect();
       const service = await server?.getPrimaryService('FFE0');
       const characteristic = await service?.getCharacteristic('FFE1');
@@ -38,9 +37,12 @@ export const OBDInterface = () => {
         setDevice(device);
         setCharacteristic(characteristic);
         
-        // Start notifications
         await characteristic.startNotifications();
-        characteristic.addEventListener('characteristicvaluechanged', handleOBDData);
+        characteristic.addEventListener('characteristicvaluechanged', 
+          (event: { target: { value: DataView } }) => {
+            handleOBDData(event);
+          }
+        );
         
         toast({
           title: "Conectado com sucesso!",
@@ -57,8 +59,8 @@ export const OBDInterface = () => {
     }
   };
 
-  const handleOBDData = (event: Event) => {
-    const value = (event.target as BluetoothRemoteGATTCharacteristic).value;
+  const handleOBDData = (event: { target: { value: DataView } }) => {
+    const value = event.target.value;
     if (!value) return;
 
     // Parse the received data
@@ -70,8 +72,6 @@ export const OBDInterface = () => {
   };
 
   const parseOBDResponse = (data: string) => {
-    // Basic parsing example - would need to be expanded based on specific PIDs
-    // This is a simplified version
     setOBDData(prevData => ({
       ...prevData,
       // Add parsed values here
@@ -79,10 +79,8 @@ export const OBDInterface = () => {
   };
 
   const disconnect = async () => {
-    if (device) {
-      if (device.gatt?.connected) {
-        device.gatt.disconnect();
-      }
+    if (device?.gatt?.connected) {
+      device.gatt.disconnect();
       setDevice(null);
       setCharacteristic(null);
       setOBDData({});
