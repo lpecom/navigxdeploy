@@ -40,11 +40,12 @@ const DriverLogin = () => {
         const { data: drivers, error: dbError } = await supabase
           .from('driver_details')
           .select('id')
-          .eq('auth_user_id', session.user.id);
+          .eq('email', session.user.email)
+          .maybeSingle();
 
         if (dbError) throw dbError;
 
-        if (!drivers || drivers.length === 0) {
+        if (!drivers) {
           await supabase.auth.signOut();
           throw new Error("Unauthorized access. This portal is for drivers only.");
         }
