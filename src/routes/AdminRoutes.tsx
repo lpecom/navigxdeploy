@@ -82,6 +82,10 @@ const AdminRoutes = () => {
                 <Route index element={<Customers />} />
                 <Route path=":id" element={<CustomerDetails />} />
               </Route>
+              <Route path="check-in">
+                <Route index element={<CheckInList />} />
+                <Route path=":id" element={<CheckInProcess />} />
+              </Route>
               <Route path="offers" element={<Offers />} />
               <Route path="accessories" element={<Accessories />} />
               <Route path="analytics" element={<Analytics />} />

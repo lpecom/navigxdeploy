@@ -51,6 +51,7 @@ const Sidebar = () => {
       subItems: [
         { to: "/admin/reservations/pending", label: "Pendentes" },
         { to: "/admin/reservations/pickup", label: "Retirada" },
+        { to: "/admin/check-in", label: "Check-in" },
       ]
     },
     {
