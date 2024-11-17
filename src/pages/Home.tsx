@@ -1,3 +1,4 @@
+import { Navigation } from "@/components/website/Navigation";
 import { Hero } from "@/components/website/Hero";
 import { Features } from "@/components/website/Features";
 import { Testimonials } from "@/components/website/Testimonials";
@@ -55,7 +56,8 @@ const Home = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-[#111] to-gray-900">
+      <Navigation />
       <Hero />
       <Features />
       
