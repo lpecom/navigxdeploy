@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { ArrowRight } from "lucide-react";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -12,7 +13,6 @@ const AdminLogin = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check if already logged in
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -93,9 +93,10 @@ const AdminLogin = () => {
           <div className="mt-6 text-center">
             <Link 
               to="/login" 
-              className="text-sm text-primary hover:underline"
+              className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
             >
-              Acessar Portal do Motorista →
+              Acessar Portal do Motorista
+              <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
