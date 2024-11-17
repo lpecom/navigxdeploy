@@ -23,32 +23,31 @@ const Home = () => {
     },
   });
 
-  const { data: selectedCar } = useQuery({
+  const { data: featuredCar } = useQuery({
     queryKey: ["featured-car"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("vehicles")
+        .from("car_models")
         .select(`
           *,
-          car_group:car_groups(name)
+          category:categories(name)
         `)
-        .limit(1);
+        .limit(1)
+        .single();
       
-      if (error) throw error;
-      if (!data || data.length === 0) return null;
+      if (error) return null;
       
-      const vehicle = data[0];
       return {
-        id: vehicle.id,
-        name: vehicle.name,
-        category: vehicle.car_group?.name || vehicle.category,
+        id: data.id,
+        name: data.name,
+        category: data.category?.name || "Premium",
         price: 934,
         period: "semana",
-        image_url: vehicle.image_url,
+        image_url: data.image_url,
         specs: {
-          passengers: vehicle.passengers,
-          transmission: vehicle.transmission,
-          consumption: vehicle.consumption,
+          passengers: 5,
+          transmission: "Automático",
+          consumption: "12.5 km/l",
           plan: "Flex"
         }
       };
@@ -60,7 +59,7 @@ const Home = () => {
       <Hero />
       <Features />
       
-      {selectedCar && (
+      {featuredCar && (
         <section className="py-32 bg-white">
           <div className="container mx-auto px-4">
             <motion.div 
@@ -88,7 +87,7 @@ const Home = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="max-w-6xl mx-auto"
             >
-              <StoreWindow selectedCar={selectedCar} />
+              <StoreWindow selectedCar={featuredCar} />
             </motion.div>
           </div>
         </section>
@@ -115,15 +114,15 @@ const Home = () => {
           </motion.div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-[1400px] mx-auto">
-            {categories?.map((category, index) => (
+            {categories?.map((category) => (
               <motion.div
                 key={category.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ duration: 0.5 }}
               >
-                <CarCategoryCard category={category} index={index} />
+                <CarCategoryCard category={category} />
               </motion.div>
             ))}
           </div>

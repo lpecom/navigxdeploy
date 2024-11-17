@@ -2,7 +2,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Users, Calendar, Car } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { CarSlider } from "./CarSlider";
 
 interface Category {
   id: string;
@@ -13,22 +15,23 @@ interface Category {
 
 interface CarCategoryCardProps {
   category: Category;
-  index: number;
 }
 
-// Array of placeholder images from Unsplash
-const categoryImages = [
-  "photo-1488590528505-98d2b5aba04b",
-  "photo-1581091226825-a6a2a5aee158",
-  "photo-1513836279014-a89f7a76ae86",
-  "photo-1504893524553-b855bce32c67",
-  "photo-1615729947596-a598e5de0ab3",
-  "photo-1582562124811-c09040d0a901"
-];
-
-export const CarCategoryCard = ({ category, index }: CarCategoryCardProps) => {
+export const CarCategoryCard = ({ category }: CarCategoryCardProps) => {
   const navigate = useNavigate();
-  const imageUrl = `https://images.unsplash.com/${categoryImages[index % categoryImages.length]}?auto=format&fit=crop&w=800&q=80`;
+
+  const { data: cars } = useQuery({
+    queryKey: ["category-cars", category.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("car_models")
+        .select("*")
+        .eq("category_id", category.id);
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   return (
     <motion.div
@@ -39,17 +42,13 @@ export const CarCategoryCard = ({ category, index }: CarCategoryCardProps) => {
         className="relative overflow-hidden h-full cursor-pointer group transition-all duration-300 hover:shadow-xl bg-white"
         onClick={() => navigate(`/category/${category.id}`)}
       >
-        {/* Category Image */}
+        {/* Car Slider */}
         <div className="relative h-48 overflow-hidden">
-          <img 
-            src={imageUrl} 
-            alt={category.name}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-          />
+          <CarSlider cars={cars || []} category={category.name} />
           {category.badge_text && (
             <Badge 
               variant="secondary" 
-              className="absolute top-4 right-4 bg-white/90 text-navig hover:bg-white font-medium tracking-wide px-3 py-1"
+              className="absolute top-4 right-4 z-10 bg-white/90 text-navig hover:bg-white font-medium tracking-wide px-3 py-1"
             >
               {category.badge_text}
             </Badge>
@@ -66,22 +65,6 @@ export const CarCategoryCard = ({ category, index }: CarCategoryCardProps) => {
               {category.description}
             </p>
           )}
-          
-          {/* Category Stats */}
-          <div className="mt-auto space-y-2">
-            <div className="flex items-center text-sm text-gray-600">
-              <Users className="w-4 h-4 mr-2 text-navig" />
-              <span>4-5 Passageiros</span>
-            </div>
-            <div className="flex items-center text-sm text-gray-600">
-              <Calendar className="w-4 h-4 mr-2 text-navig" />
-              <span>Disponível Imediatamente</span>
-            </div>
-            <div className="flex items-center text-sm text-gray-600">
-              <Car className="w-4 h-4 mr-2 text-navig" />
-              <span>Câmbio Automático</span>
-            </div>
-          </div>
           
           <div className="mt-6 flex items-center text-navig">
             <span className="text-sm font-medium tracking-wide uppercase">Saiba mais</span>
