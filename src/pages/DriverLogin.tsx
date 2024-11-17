@@ -18,32 +18,51 @@ const DriverLogin = () => {
     setIsLoading(true);
 
     try {
-      // First check if the driver exists in driver_details
-      const { data: driverData, error: driverError } = await supabase
-        .from('driver_details')
-        .select('id, email')
-        .eq('email', email)
-        .single();
-
-      if (driverError || !driverData) {
-        throw new Error('Driver not found. Please contact support.');
-      }
-
-      // Proceed with authentication
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // First attempt to authenticate
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (authError) throw authError;
 
-      if (data.user) {
-        toast({
-          title: "Login successful",
-          description: "Welcome back!",
-        });
-        navigate("/driver");
+      if (!authData.user) {
+        throw new Error('Authentication failed');
       }
+
+      // Then find or update driver details
+      const { data: driverData, error: driverError } = await supabase
+        .from('driver_details')
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (driverError) throw driverError;
+
+      if (!driverData) {
+        throw new Error('No driver profile found for this email.');
+      }
+
+      // Update the auth_user_id if not already set
+      if (driverData) {
+        const { error: updateError } = await supabase
+          .from('driver_details')
+          .update({ auth_user_id: authData.user.id })
+          .eq('id', driverData.id)
+          .eq('email', email)
+          .is('auth_user_id', null);
+
+        // We don't throw on update error since it might mean the auth_user_id is already set
+        if (updateError && !updateError.message.includes('duplicate key value')) {
+          console.error('Error updating driver details:', updateError);
+        }
+      }
+
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
+      navigate("/driver");
     } catch (error: any) {
       toast({
         title: "Error",
