@@ -7,6 +7,7 @@ import { CarCategoryCard } from "@/components/home/CarCategoryCard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
+import type { CarModel } from "@/components/vehicles/types";
 
 const Home = () => {
   const { data: categories } = useQuery({
@@ -23,7 +24,7 @@ const Home = () => {
     },
   });
 
-  const { data: carModels } = useQuery({
+  const { data: carModels } = useQuery<CarModel[]>({
     queryKey: ["car-models"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -31,7 +32,7 @@ const Home = () => {
         .select("*");
       
       if (error) throw error;
-      return data;
+      return data as CarModel[];
     },
   });
 

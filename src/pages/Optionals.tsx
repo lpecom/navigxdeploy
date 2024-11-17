@@ -8,39 +8,32 @@ import { useEffect, useState } from "react";
 import { CarSlider } from "@/components/home/CarSlider";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/components/ui/use-toast";
+import type { CarModel } from "@/components/vehicles/types";
 import type { SelectedCar } from "@/types/car";
 
-interface Car {
-  id: string;
-  name: string;
-  image_url: string;
-  year: string;
-  description: string;
-  note?: string;
-}
-
-const Optionals = () => {
-  const navigate = useNavigate();
-  const { state: cartState } = useCart();
-  const { toast } = useToast();
-  const [selectedCar, setSelectedCar] = useState<SelectedCar | null>(null);
-
-  const cars: Car[] = [
-    {
-      id: '1',
-      name: 'HB20 1.0',
-      image_url: 'https://www.kovi.com.br/hubfs/HB20%20Sense%20-%20Branco%20-%20Hatch_web.webp',
-      year: '2021',
-      description: 'Hatch • *Carro com até 6 mil kms rodados.',
-      note: 'Aproveite! Restam poucas unidades para entrega imediata.'
-    },
-    {
-      id: '2',
-      name: 'Ford Ka SE',
-      image_url: 'https://raw.githubusercontent.com/navigcars/cars/main/ford-ka.png',
-      year: '2021',
-      description: 'Equipado com pneus Remold.'
-    },
+const demoCarModels: CarModel[] = [
+  {
+    id: '1',
+    name: 'HB20 1.0',
+    image_url: 'https://www.kovi.com.br/hubfs/HB20%20Sense%20-%20Branco%20-%20Hatch_web.webp',
+    year: '2021',
+    description: 'Hatch • *Carro com até 6 mil kms rodados.',
+    category_id: null,
+    optionals: null,
+    created_at: null,
+    updated_at: null,
+  },
+  {
+    id: '2',
+    name: 'Ford Ka SE',
+    image_url: 'https://raw.githubusercontent.com/navigcars/cars/main/ford-ka.png',
+    year: '2021',
+    description: 'Equipado com pneus Remold.',
+    category_id: null,
+    optionals: null,
+    created_at: null,
+    updated_at: null,
+  },
     {
       id: '3',
       name: 'Onix Joy',
@@ -62,7 +55,13 @@ const Optionals = () => {
       year: '2021',
       description: 'Hatch • Completo'
     }
-  ];
+];
+
+const Optionals = () => {
+  const navigate = useNavigate();
+  const { state: cartState } = useCart();
+  const { toast } = useToast();
+  const [selectedCar, setSelectedCar] = useState<SelectedCar | null>(null);
 
   useEffect(() => {
     const carData = sessionStorage.getItem('selectedCar');
@@ -89,7 +88,6 @@ const Optionals = () => {
       return;
     }
 
-    // Ensure we have a valid cart before proceeding
     if (cartState.items.length > 0 && cartState.total > 0) {
       navigate('/checkout');
     } else {
@@ -112,7 +110,7 @@ const Optionals = () => {
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4">{selectedCar.category}</h2>
             <div className="bg-slate-50 rounded-lg p-4">
-              <CarSlider cars={cars} category="Economy" />
+              <CarSlider cars={demoCarModels} category="Economy" />
               <div className="mt-4 grid grid-cols-2 gap-4 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <span>Passageiros: {selectedCar.specs?.passengers}</span>

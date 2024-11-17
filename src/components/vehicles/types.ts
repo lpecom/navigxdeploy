@@ -8,6 +8,8 @@ export interface CarModel {
   optionals: Record<string, any> | null;
   created_at: string | null;
   updated_at: string | null;
+  engine_size?: string;
+  transmission?: string;
 }
 
 export interface FleetVehicle {
