@@ -13,6 +13,18 @@ export interface CarModel {
   };
 }
 
+export interface FleetVehicle {
+  id: string;
+  car_model_id: string;
+  year: string;
+  current_km: number;
+  last_revision_date: string;
+  next_revision_date: string;
+  plate: string;
+  is_available: boolean;
+  car_model?: CarModel;
+}
+
 export interface CarModelResponse extends Omit<CarModel, 'optionals'> {
   optionals: Record<string, any> | null;
 }

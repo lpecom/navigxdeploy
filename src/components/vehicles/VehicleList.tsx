@@ -3,8 +3,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { EditVehicleDialog } from "./EditVehicleDialog";
 import { VehicleCard } from "./VehicleCard";
-import type { CarModel, CarModelResponse } from "./types";
+import { FleetVehicleCard } from "./FleetVehicleCard";
+import type { CarModel, FleetVehicle } from "./types";
 import { supabase } from "@/integrations/supabase/client";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface VehicleListProps {
   view: 'fleet' | 'rentals' | 'customers';
@@ -16,8 +18,8 @@ const VehicleList = ({ view }: VehicleListProps) => {
   const [selectedVehicle, setSelectedVehicle] = useState<CarModel | null>(null);
   const queryClient = useQueryClient();
 
-  const { data: vehicles, isLoading } = useQuery({
-    queryKey: ['vehicles'],
+  const { data: carModels, isLoading: modelsLoading } = useQuery({
+    queryKey: ['car-models'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('car_models')
@@ -27,11 +29,22 @@ const VehicleList = ({ view }: VehicleListProps) => {
         `);
       
       if (error) throw error;
+      return data as CarModel[];
+    }
+  });
+
+  const { data: fleetVehicles, isLoading: fleetLoading } = useQuery({
+    queryKey: ['fleet-vehicles'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('fleet_vehicles')
+        .select(`
+          *,
+          car_model:car_models(*)
+        `);
       
-      return (data as CarModelResponse[]).map(vehicle => ({
-        ...vehicle,
-        optionals: vehicle.optionals as Record<string, any> | null
-      }));
+      if (error) throw error;
+      return data as FleetVehicle[];
     }
   });
 
@@ -40,19 +53,39 @@ const VehicleList = ({ view }: VehicleListProps) => {
     setIsEditing(true);
   };
 
-  if (isLoading) {
-    return <div>Carregando veículos...</div>;
+  if (modelsLoading || fleetLoading) {
+    return <div>Carregando...</div>;
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {vehicles?.map((vehicle) => (
-        <VehicleCard 
-          key={vehicle.id} 
-          car={vehicle}
-          onEdit={() => handleEdit(vehicle)}
-        />
-      ))}
+    <Tabs defaultValue="models" className="w-full">
+      <TabsList>
+        <TabsTrigger value="models">Modelos</TabsTrigger>
+        <TabsTrigger value="fleet">Frota</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="models" className="mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {carModels?.map((vehicle) => (
+            <VehicleCard 
+              key={vehicle.id} 
+              car={vehicle}
+              onEdit={() => handleEdit(vehicle)}
+            />
+          ))}
+        </div>
+      </TabsContent>
+
+      <TabsContent value="fleet" className="mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {fleetVehicles?.map((vehicle) => (
+            <FleetVehicleCard 
+              key={vehicle.id} 
+              vehicle={vehicle}
+            />
+          ))}
+        </div>
+      </TabsContent>
 
       <EditVehicleDialog
         open={isEditing}
@@ -77,7 +110,7 @@ const VehicleList = ({ view }: VehicleListProps) => {
 
             if (error) throw error;
 
-            await queryClient.invalidateQueries({ queryKey: ['vehicles'] });
+            await queryClient.invalidateQueries({ queryKey: ['car-models'] });
 
             toast({
               title: "Veículo atualizado",
@@ -93,7 +126,7 @@ const VehicleList = ({ view }: VehicleListProps) => {
           }
         }}
       />
-    </div>
+    </Tabs>
   );
 };
 
