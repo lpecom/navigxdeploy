@@ -4,12 +4,17 @@ import { useToast } from "@/components/ui/use-toast";
 import { Navigation } from "@/components/website/Navigation";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const Plans = () => {
   const navigate = useNavigate();
   const { dispatch } = useCart();
   const { toast } = useToast();
   const selectedCar = JSON.parse(sessionStorage.getItem('selectedCar') || '{}');
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handlePlanSelect = (planType: 'flex' | 'monthly' | 'black') => {
     if (!selectedCar?.category) {

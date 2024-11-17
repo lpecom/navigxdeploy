@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { CheckoutHeader } from "./CheckoutHeader";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { motion } from "framer-motion";
@@ -8,6 +8,10 @@ interface CheckoutLayoutProps {
 }
 
 export const CheckoutLayout = ({ children }: CheckoutLayoutProps) => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <>
       <AnnouncementBar />
