@@ -1,16 +1,15 @@
-import { CustomerInfo } from "./CustomerInfo";
-import { StreetView } from "./StreetView";
-import { PricingInfo } from "./PricingInfo";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Check, X } from "lucide-react";
-import type { Reservation } from "@/types/reservation";
+import { CustomerDetails } from "../checkout/sections/CustomerDetails"
+import { ReservationDetails } from "../checkout/sections/ReservationDetails"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { Check, X } from "lucide-react"
+import type { Reservation } from "@/types/reservation"
 
 interface ReservationExpandedContentProps {
-  reservation: Reservation;
-  onApprove: () => void;
-  onReject: () => void;
+  reservation: Reservation
+  onApprove: () => void
+  onReject: () => void
 }
 
 export const ReservationExpandedContent = ({
@@ -20,47 +19,37 @@ export const ReservationExpandedContent = ({
 }: ReservationExpandedContentProps) => {
   const handleApprove = () => {
     if (window.confirm("Tem certeza que deseja aprovar esta reserva?")) {
-      onApprove();
+      onApprove()
     }
-  };
+  }
 
   const handleReject = () => {
     if (window.confirm("Tem certeza que deseja rejeitar esta reserva?")) {
-      onReject();
+      onReject()
     }
-  };
+  }
 
-  // Convert reservation data to customer format
   const customerData = {
-    id: reservation.id,
     full_name: reservation.customerName,
     email: reservation.email,
     cpf: reservation.cpf,
     phone: reservation.phone,
     address: reservation.address,
-    created_at: reservation.createdAt,
-    status: 'active',
-    total_rentals: 0
-  };
+  }
+
+  const reservationData = {
+    pickupDate: reservation.pickupDate,
+    pickupTime: reservation.pickupTime || "",
+    carCategory: reservation.carCategory,
+    totalAmount: reservation.weeklyFare,
+  }
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Informações do Cliente</h3>
-          <CustomerInfo customer={customerData} />
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Localização</h3>
-          <StreetView address={reservation.address} />
-        </Card>
+        <CustomerDetails customer={customerData} />
+        <ReservationDetails reservation={reservationData} />
       </div>
-
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Detalhes do Pagamento</h3>
-        <PricingInfo reservation={reservation} />
-      </Card>
 
       <Separator className="my-6" />
 
@@ -79,5 +68,5 @@ export const ReservationExpandedContent = ({
         </Button>
       </div>
     </div>
-  );
-};
+  )
+}
