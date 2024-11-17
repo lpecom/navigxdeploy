@@ -32,6 +32,7 @@ const Home = () => {
           *,
           car_group:car_groups(name)
         `)
+        .eq("category", "Premium")
         .limit(1)
         .single();
       
