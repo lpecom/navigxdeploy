@@ -6,9 +6,6 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
-import type { Database } from "@/integrations/supabase/types";
-
-type DriverDetails = Database['public']['Tables']['driver_details']['Row'];
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -22,51 +19,20 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      // First attempt to sign in with Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      const { data: { user }, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (authError) {
         if (authError.message.includes('Invalid login credentials')) {
-          throw new Error('Email ou senha incorretos. Por favor, verifique suas credenciais.');
+          throw new Error('Email ou senha incorretos');
         }
         throw authError;
       }
 
-      if (!authData.user) {
+      if (!user) {
         throw new Error('Falha na autenticação');
-      }
-
-      // Then check if the user exists in driver_details
-      const { data: driverDetails, error: driverCheckError } = await supabase
-        .from('driver_details')
-        .select('id, crm_status')
-        .eq('email', email)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (driverCheckError) {
-        throw new Error('Erro ao verificar perfil do motorista. Por favor, tente novamente.');
-      }
-
-      if (!driverDetails) {
-        // If authentication succeeded but no driver profile exists
-        await supabase.auth.signOut(); // Sign out the authenticated user
-        throw new Error('Perfil de motorista não encontrado para este email.');
-      }
-
-      // Update auth_user_id if not already set
-      const { error: updateError } = await supabase
-        .from('driver_details')
-        .update({ auth_user_id: authData.user.id })
-        .eq('id', driverDetails.id)
-        .is('auth_user_id', null);
-
-      if (updateError && !updateError.message.includes('duplicate key value')) {
-        console.error('Error updating driver details:', updateError);
       }
 
       toast({
@@ -78,7 +44,7 @@ const AdminLogin = () => {
     } catch (error: any) {
       toast({
         title: "Erro no login",
-        description: error.message || "Credenciais inválidas. Por favor, verifique seus dados.",
+        description: error.message || "Credenciais inválidas",
         variant: "destructive",
       });
     } finally {
