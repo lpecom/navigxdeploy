@@ -4,6 +4,8 @@ import MaintenanceHistory from "./MaintenanceHistory";
 import { Button } from "@/components/ui/button";
 import { Wrench, AlertCircle, Calendar, Fuel, Gauge } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { VehicleDiagnostics } from "./VehicleDiagnostics";
 
 interface DriverVehicleProps {
   driverId: string;
@@ -29,67 +31,83 @@ export const DriverVehicle = ({ driverId }: DriverVehicleProps) => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Informações do Veículo</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <VehicleInfo driverId={driverId} />
-            </CardContent>
-          </Card>
-        </div>
+      <Tabs defaultValue="info" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="info">Informações</TabsTrigger>
+          <TabsTrigger value="diagnostics">Diagnóstico</TabsTrigger>
+          <TabsTrigger value="maintenance">Manutenção</TabsTrigger>
+        </TabsList>
 
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Status do Veículo</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">Próxima Revisão</span>
-                  </div>
-                  <span className="text-sm font-medium">Em 3 meses</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Gauge className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">Quilometragem</span>
-                  </div>
-                  <span className="text-sm font-medium">15.000 km</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Fuel className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">Combustível</span>
-                  </div>
-                  <span className="text-sm font-medium text-green-600">75%</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="info">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Informações do Veículo</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <VehicleInfo driverId={driverId} />
+                </CardContent>
+              </Card>
+            </div>
 
-          <Card className="bg-yellow-50 border-yellow-200">
-            <CardContent className="pt-6">
-              <div className="flex items-center space-x-4">
-                <AlertCircle className="w-6 h-6 text-yellow-600" />
-                <div>
-                  <h3 className="font-medium text-yellow-900">Lembrete</h3>
-                  <p className="text-sm text-yellow-800">
-                    Sua próxima revisão está agendada para 15/05/2024
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Status do Veículo</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm">Próxima Revisão</span>
+                      </div>
+                      <span className="text-sm font-medium">Em 3 meses</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Gauge className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm">Quilometragem</span>
+                      </div>
+                      <span className="text-sm font-medium">15.000 km</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Fuel className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm">Combustível</span>
+                      </div>
+                      <span className="text-sm font-medium text-green-600">75%</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-      <MaintenanceHistory driverId={driverId} />
+              <Card className="bg-yellow-50 border-yellow-200">
+                <CardContent className="pt-6">
+                  <div className="flex items-center space-x-4">
+                    <AlertCircle className="w-6 h-6 text-yellow-600" />
+                    <div>
+                      <h3 className="font-medium text-yellow-900">Lembrete</h3>
+                      <p className="text-sm text-yellow-800">
+                        Sua próxima revisão está agendada para 15/05/2024
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="diagnostics">
+          <VehicleDiagnostics driverId={driverId} />
+        </TabsContent>
+
+        <TabsContent value="maintenance">
+          <MaintenanceHistory driverId={driverId} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
