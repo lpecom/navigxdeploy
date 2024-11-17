@@ -27,16 +27,19 @@ const Home = () => {
       <Hero />
       <Features />
       
-      <section className="py-24">
+      <section className="py-32">
         <div className="container mx-auto px-4">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-24"
           >
-            <h2 className="text-[2.75rem] font-medium tracking-tight text-gray-900 mb-4">
+            <span className="text-navig font-medium tracking-wide uppercase text-sm mb-4 block">
+              Escolha seu veículo
+            </span>
+            <h2 className="text-[3.5rem] font-medium tracking-tight text-gray-900 mb-6 leading-none">
               Nossa Frota Premium
             </h2>
             <p className="text-xl font-light text-gray-600 max-w-2xl mx-auto leading-relaxed">
@@ -44,7 +47,7 @@ const Home = () => {
             </p>
           </motion.div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-[1400px] mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-[1400px] mx-auto">
             {categories?.map((category, index) => (
               <motion.div
                 key={category.id}

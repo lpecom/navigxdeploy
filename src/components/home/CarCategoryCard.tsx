@@ -29,17 +29,17 @@ export const CarCategoryCard = ({ category }: CarCategoryCardProps) => {
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white opacity-50 group-hover:opacity-100 transition-opacity duration-300" />
         
-        <div className="relative p-6 flex flex-col h-full">
+        <div className="relative p-8 flex flex-col h-full">
           {category.badge_text && (
             <Badge 
               variant="secondary" 
-              className="absolute top-4 right-4 bg-navig/10 text-navig hover:bg-navig/20 font-medium"
+              className="absolute top-6 right-6 bg-navig/10 text-navig hover:bg-navig/20 font-medium tracking-wide px-3 py-1"
             >
               {category.badge_text}
             </Badge>
           )}
           
-          <h3 className="text-xl font-medium text-gray-900 mb-2 tracking-tight group-hover:text-navig transition-colors duration-300">
+          <h3 className="text-2xl font-medium text-gray-900 mb-3 tracking-tight group-hover:text-navig transition-colors duration-300">
             {category.name}
           </h3>
           
@@ -49,8 +49,8 @@ export const CarCategoryCard = ({ category }: CarCategoryCardProps) => {
             </p>
           )}
           
-          <div className="mt-6 flex items-center text-navig">
-            <span className="text-sm font-medium tracking-wide">Saiba mais</span>
+          <div className="mt-8 flex items-center text-navig">
+            <span className="text-sm font-medium tracking-wide uppercase">Saiba mais</span>
             <svg 
               className="w-5 h-5 ml-2 transform group-hover:translate-x-2 transition-transform duration-300" 
               fill="none" 
