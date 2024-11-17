@@ -121,11 +121,11 @@ export const CheckoutPage = () => {
         transition={{ duration: 0.5 }}
         className="space-y-6"
       >
+        <CheckoutSteps currentStep={step} steps={steps} />
+        
         <div className="mb-6">
           <CheckoutSummary />
         </div>
-        
-        <CheckoutSteps currentStep={step} steps={steps} />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">

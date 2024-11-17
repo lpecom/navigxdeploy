@@ -7,7 +7,7 @@ export const CheckoutHeader = () => {
         <div className="flex items-center justify-center h-full relative">
           <Link to="/" className="absolute left-0">
             <img 
-              src="https://i.imghippo.com/files/uafE3798xA.png" 
+              src="/src/assets/navig-logo.png" 
               alt="Navig Logo" 
               className="h-8 w-auto"
             />
