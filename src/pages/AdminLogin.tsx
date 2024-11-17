@@ -22,14 +22,18 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      // First check if the user exists
+      // First check if the user exists - get the most recent record
       const { data: userExists, error: userCheckError } = await supabase
         .from('driver_details')
         .select('id, crm_status, auth_user_id')
         .eq('email', email)
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-      if (userCheckError || !userExists) {
+      if (userCheckError) throw userCheckError;
+
+      if (!userExists) {
         throw new Error('Usuário não encontrado. Verifique suas credenciais.');
       }
 
