@@ -2,7 +2,6 @@ import { useState } from "react"
 import { User, Calendar, CreditCard, ShoppingCart } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useToast } from "@/components/ui/use-toast"
-import { Button } from "@/components/ui/button"
 import { CustomerForm } from "./sections/CustomerForm"
 import { PickupScheduler } from "./sections/PickupScheduler"
 import { CheckoutSummary } from "./sections/CheckoutSummary"
@@ -11,18 +10,20 @@ import { Card } from "@/components/ui/card"
 import { handleCustomerData } from "./handlers/CustomerHandler"
 import { createDriverDetails } from "./handlers/DriverHandler"
 import { createCheckoutSession } from "./CheckoutSessionHandler"
-import { supabase } from "@/integrations/supabase/client"
 import { CheckoutLayout } from "./ui/CheckoutLayout"
 import { EmptyCartMessage } from "./ui/EmptyCartMessage"
 import { PaymentSection } from "./sections/PaymentSection"
 import { motion } from "framer-motion"
 import { Steps } from "./Steps"
 import { SupportCard } from "./sections/SupportCard"
+import { CheckoutAuth } from "./sections/auth/CheckoutAuth"
+import { supabase } from "@/integrations/supabase/client"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
   const [customerId, setCustomerId] = useState<string | null>(null)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("credit")
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const { toast } = useToast()
   const { state: cartState, dispatch } = useCart()
 
@@ -32,6 +33,34 @@ export const CheckoutPage = () => {
     { number: 3, title: "Pagamento", icon: CreditCard },
     { number: 4, title: "Confirmação", icon: ShoppingCart }
   ]
+
+  const handleLoginSuccess = async (userId: string) => {
+    try {
+      const { data: driverData, error } = await supabase
+        .from('driver_details')
+        .select('*')
+        .eq('auth_user_id', userId)
+        .single()
+
+      if (error) throw error
+
+      setCustomerId(driverData.id)
+      setIsLoggedIn(true)
+      setStep(2)
+
+      toast({
+        title: "Login realizado com sucesso!",
+        description: "Vamos agendar sua retirada.",
+      })
+    } catch (error: any) {
+      console.error('Error fetching driver details:', error)
+      toast({
+        title: "Erro ao carregar dados",
+        description: "Ocorreu um erro ao carregar seus dados. Por favor, tente novamente.",
+        variant: "destructive",
+      })
+    }
+  }
 
   const handleCustomerSubmit = async (customerData: any) => {
     try {
@@ -130,7 +159,10 @@ export const CheckoutPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           <div className="lg:col-span-2 space-y-6">
             {step === 1 && (
-              <CustomerForm onSubmit={handleCustomerSubmit} />
+              <>
+                <CheckoutAuth onLoginSuccess={handleLoginSuccess} />
+                {!isLoggedIn && <CustomerForm onSubmit={handleCustomerSubmit} />}
+              </>
             )}
 
             {step === 2 && (
@@ -155,19 +187,13 @@ export const CheckoutPage = () => {
             )}
 
             {step === 3 && customerId && cartState.checkoutSessionId && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <PaymentSection
-                  selectedMethod={selectedPaymentMethod}
-                  onMethodChange={setSelectedPaymentMethod}
-                  onPaymentSuccess={handlePaymentSuccess}
-                  amount={cartState.total}
-                  driverId={customerId}
-                />
-              </motion.div>
+              <PaymentSection
+                selectedMethod={selectedPaymentMethod}
+                onMethodChange={setSelectedPaymentMethod}
+                onPaymentSuccess={handlePaymentSuccess}
+                amount={cartState.total}
+                driverId={customerId}
+              />
             )}
 
             {step === 4 && (
@@ -201,5 +227,5 @@ export const CheckoutPage = () => {
         </div>
       </motion.div>
     </CheckoutLayout>
-  );
-};
+  )
+}
