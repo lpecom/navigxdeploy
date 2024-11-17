@@ -11,6 +11,7 @@ import { motion } from "framer-motion"
 import { Card } from "@/components/ui/card"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
+import { useCart } from "@/contexts/CartContext"
 
 const customerSchema = z.object({
   full_name: z.string().min(3, "Nome completo é obrigatório"),
@@ -35,6 +36,7 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
   const [hasAccount, setHasAccount] = useState(false)
   const [isLoggingIn, setIsLoggingIn] = useState(false)
   const { toast } = useToast()
+  const { state } = useCart()
   
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
@@ -43,6 +45,16 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
   const handleLogin = async (email: string, password: string) => {
     setIsLoggingIn(true)
     try {
+      // Verify cart has items
+      if (state.items.length === 0) {
+        toast({
+          title: "Carrinho vazio",
+          description: "Adicione itens ao carrinho antes de fazer login.",
+          variant: "destructive",
+        })
+        return
+      }
+
       const { data: { user }, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -95,6 +107,16 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
   }
 
   const handleFormSubmit = async (data: CustomerFormValues) => {
+    // Verify cart has items
+    if (state.items.length === 0) {
+      toast({
+        title: "Carrinho vazio",
+        description: "Adicione itens ao carrinho antes de continuar.",
+        variant: "destructive",
+      })
+      return
+    }
+
     const { password, ...customerData } = data
     onSubmit(customerData)
   }

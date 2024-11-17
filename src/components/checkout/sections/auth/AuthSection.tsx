@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
+import { useCart } from "@/contexts/CartContext"
 
 interface AuthSectionProps {
   form: any;
@@ -20,11 +21,22 @@ export const AuthSection = ({ form, hasAccount, onHasAccountChange, onLogin, isL
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const { toast } = useToast()
+  const { state } = useCart()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     
     try {
+      // Verify if cart has items before proceeding
+      if (state.items.length === 0) {
+        toast({
+          title: "Carrinho vazio",
+          description: "Adicione itens ao carrinho antes de fazer login.",
+          variant: "destructive",
+        })
+        return
+      }
+
       const { data: { user }, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
