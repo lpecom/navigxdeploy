@@ -70,8 +70,11 @@ const Plans = () => {
       }
     });
 
+    // Store selected plan in session storage
     sessionStorage.setItem('selectedPlan', planType);
-    navigate('/optionals');
+    
+    // Navigate to checkout instead of optionals
+    navigate('/checkout');
   };
 
   if (!selectedCategory) return null;
