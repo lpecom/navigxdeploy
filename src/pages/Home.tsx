@@ -114,7 +114,7 @@ const Home = () => {
             </p>
           </motion.div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-[1400px] mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-[1400px] mx-auto">
             {categories?.map((category, index) => (
               <motion.div
                 key={category.id}
@@ -123,7 +123,7 @@ const Home = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <CarCategoryCard category={category} />
+                <CarCategoryCard category={category} index={index} />
               </motion.div>
             ))}
           </div>
