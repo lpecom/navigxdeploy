@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Json } from "@/integrations/supabase/types";
 
 interface HeroSettings {
   title: string;
@@ -16,7 +17,7 @@ interface HeroSettings {
 
 interface WebsiteSettingsData {
   id: string;
-  settings: Record<string, unknown>;
+  settings: Json;
 }
 
 export const WebsiteSettings = () => {
@@ -30,12 +31,14 @@ export const WebsiteSettings = () => {
 
   const handleSave = async () => {
     try {
+      const settingsData: WebsiteSettingsData = {
+        id: 'hero',
+        settings: { hero: heroSettings } as Json
+      };
+
       const { error } = await supabase
         .from('website_settings')
-        .upsert({
-          id: 'hero',
-          settings: { hero: heroSettings }
-        } satisfies WebsiteSettingsData);
+        .upsert(settingsData);
 
       if (error) throw error;
 
