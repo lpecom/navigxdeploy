@@ -7,7 +7,6 @@ import { CarCategoryCard } from "@/components/home/CarCategoryCard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
-import { carsByCategory } from "@/constants/cars";
 
 const Home = () => {
   const { data: categories } = useQuery({
@@ -23,6 +22,22 @@ const Home = () => {
       return data;
     },
   });
+
+  const { data: carModels } = useQuery({
+    queryKey: ["car-models"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("car_models")
+        .select("*");
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const getCarsByCategory = (categoryId: string) => {
+    return carModels?.filter(car => car.category_id === categoryId) || [];
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#111] to-gray-900">
@@ -60,7 +75,7 @@ const Home = () => {
               >
                 <CarCategoryCard 
                   category={category} 
-                  cars={carsByCategory[category.name as keyof typeof carsByCategory] || []}
+                  cars={getCarsByCategory(category.id)}
                 />
               </motion.div>
             ))}
@@ -68,6 +83,7 @@ const Home = () => {
         </div>
       </section>
       
+      <Features />
       <Testimonials />
       <Footer />
     </div>

@@ -2,34 +2,35 @@ import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-interface Car {
-  id: string;
-  name: string;
-  image_url: string | null;
-  year: string | null;
-  description: string | null;
-}
+import type { CarModel } from '@/components/vehicles/types';
 
 interface CarSliderProps {
-  cars: Car[];
+  cars?: CarModel[];
   category: string;
 }
 
-export const CarSlider = ({ cars, category }: CarSliderProps) => {
+export const CarSlider = ({ cars = [], category }: CarSliderProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => 
-      prevIndex === cars.length - 1 ? 0 : prevIndex + 1
+      prevIndex === (cars?.length ?? 1) - 1 ? 0 : prevIndex + 1
     );
   };
 
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? cars.length - 1 : prevIndex - 1
+      prevIndex === 0 ? (cars?.length ?? 1) - 1 : prevIndex - 1
     );
   };
+
+  if (!cars?.length) {
+    return (
+      <div className="relative h-48 md:h-64 overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
+        <p className="text-gray-500">No cars available</p>
+      </div>
+    );
+  }
 
   return (
     <div className="relative group">

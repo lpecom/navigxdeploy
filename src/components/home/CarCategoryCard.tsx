@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { CarSlider } from "./CarSlider";
+import type { CarModel } from '@/components/vehicles/types';
 
 interface Category {
   id: string;
@@ -11,20 +12,12 @@ interface Category {
   badge_text: string | null;
 }
 
-interface Car {
-  id: string;
-  name: string;
-  image: string;
-  year: string;
-  mileage?: string;
-}
-
 interface CarCategoryCardProps {
   category: Category;
-  cars: Car[];
+  cars?: CarModel[];
 }
 
-export const CarCategoryCard = ({ category, cars }: CarCategoryCardProps) => {
+export const CarCategoryCard = ({ category, cars = [] }: CarCategoryCardProps) => {
   const navigate = useNavigate();
 
   const handleCategorySelect = () => {
