@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useCart } from "@/contexts/CartContext"
 import { useToast } from "@/components/ui/use-toast"
 import { supabase } from "@/integrations/supabase/client"
@@ -13,44 +13,55 @@ import { PaymentSection } from "./sections/PaymentSection"
 import { SuccessSection } from "./sections/SuccessSection"
 import { SupportCard } from "./sections/SupportCard"
 import { createCheckoutSession } from "./CheckoutSessionHandler"
-import { useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import { useSession } from "@supabase/auth-helpers-react"
 
 export const CheckoutPage = () => {
   const [step, setStep] = useState(1)
   const [customerId, setCustomerId] = useState<string | null>(null)
   const { toast } = useToast()
   const { state: cartState, dispatch } = useCart()
+  const session = useSession()
+  const navigate = useNavigate()
 
-  // Add effect to check auth state and cart state
+  // Check for existing session and driver details
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
-        // If user is authenticated, get their driver details
-        const { data: driverDetails } = await supabase
-          .from('driver_details')
-          .select('*')
-          .eq('auth_user_id', session.user.id)
-          .single()
+        try {
+          const { data: driverDetails, error } = await supabase
+            .from('driver_details')
+            .select('*')
+            .eq('auth_user_id', session.user.id)
+            .single()
 
-        if (driverDetails) {
-          setCustomerId(driverDetails.id)
+          if (error) throw error
+
+          if (driverDetails) {
+            setCustomerId(driverDetails.id)
+            // If user is logged in and has driver details, skip to step 2
+            setStep(2)
+          }
+        } catch (error) {
+          console.error('Error fetching driver details:', error)
         }
       }
     }
+
     checkSession()
-  }, [])
+  }, [session])
 
   // Prevent empty cart access
   useEffect(() => {
-    if (cartState.items.length === 0) {
+    if (cartState.items.length === 0 && !cartState.checkoutSessionId) {
       toast({
         title: "Carrinho vazio",
         description: "Adicione itens ao carrinho antes de prosseguir.",
         variant: "destructive",
       })
+      navigate('/plans')
     }
-  }, [cartState.items.length, toast])
+  }, [cartState.items.length, cartState.checkoutSessionId, toast, navigate])
 
   const handleCustomerSubmit = async (customerData: any) => {
     try {
