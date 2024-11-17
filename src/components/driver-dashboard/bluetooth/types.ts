@@ -1,20 +1,7 @@
-// Extend Window interface to include bluetooth property
-declare global {
-  interface Navigator {
-    bluetooth: {
-      requestDevice(options: RequestDeviceOptions): Promise<BluetoothDevice>;
-    };
-  }
-
-  interface RequestDeviceOptions {
-    filters: Array<{ services: string[] }>;
-  }
-
-  interface BluetoothDevice {
-    gatt?: BluetoothRemoteGATTServer;
-    id: string;
-    name?: string;
-  }
+export interface BluetoothDevice {
+  gatt?: BluetoothRemoteGATTServer;
+  id: string;
+  name?: string;
 }
 
 export interface BluetoothRemoteGATTServer {

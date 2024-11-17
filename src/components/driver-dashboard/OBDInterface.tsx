@@ -3,19 +3,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Bluetooth } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { BluetoothRemoteGATTCharacteristic, BluetoothDevice } from "./bluetooth/types";
-
-interface OBDData {
-  rpm?: number;
-  speed?: number;
-  coolantTemp?: number;
-  fuelLevel?: number;
-}
+import { 
+  BluetoothDevice, 
+  BluetoothRemoteGATTCharacteristic,
+  DiagnosticData 
+} from "./bluetooth/types";
 
 export const OBDInterface = () => {
   const [device, setDevice] = useState<BluetoothDevice | null>(null);
   const [characteristic, setCharacteristic] = useState<BluetoothRemoteGATTCharacteristic | null>(null);
-  const [obdData, setOBDData] = useState<OBDData>({});
+  const [obdData, setOBDData] = useState<DiagnosticData>({
+    mileage: 0,
+    fuelLevel: 0,
+    engineTemp: 0,
+    engineRpm: 0,
+    vehicleSpeed: 0,
+    throttlePosition: 0,
+    diagnosticCodes: []
+  });
   const { toast } = useToast();
 
   const connectToOBD = async () => {
@@ -83,7 +88,7 @@ export const OBDInterface = () => {
   const parseOBDResponse = (data: string) => {
     setOBDData(prevData => ({
       ...prevData,
-      // Add parsed values here
+      // Add parsed values here based on the OBD protocol
     }));
   };
 
@@ -92,7 +97,15 @@ export const OBDInterface = () => {
       device.gatt.disconnect();
       setDevice(null);
       setCharacteristic(null);
-      setOBDData({});
+      setOBDData({
+        mileage: 0,
+        fuelLevel: 0,
+        engineTemp: 0,
+        engineRpm: 0,
+        vehicleSpeed: 0,
+        throttlePosition: 0,
+        diagnosticCodes: []
+      });
       
       toast({
         title: "Desconectado",
@@ -130,15 +143,15 @@ export const OBDInterface = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 rounded-lg bg-primary/5">
                 <div className="text-sm font-medium">RPM</div>
-                <div className="text-2xl font-bold">{obdData.rpm || '---'}</div>
+                <div className="text-2xl font-bold">{obdData.engineRpm || '---'}</div>
               </div>
               <div className="p-4 rounded-lg bg-primary/5">
                 <div className="text-sm font-medium">Velocidade</div>
-                <div className="text-2xl font-bold">{obdData.speed || '---'} km/h</div>
+                <div className="text-2xl font-bold">{obdData.vehicleSpeed || '---'} km/h</div>
               </div>
               <div className="p-4 rounded-lg bg-primary/5">
                 <div className="text-sm font-medium">Temperatura</div>
-                <div className="text-2xl font-bold">{obdData.coolantTemp || '---'}°C</div>
+                <div className="text-2xl font-bold">{obdData.engineTemp || '---'}°C</div>
               </div>
               <div className="p-4 rounded-lg bg-primary/5">
                 <div className="text-sm font-medium">Nível de Combustível</div>
