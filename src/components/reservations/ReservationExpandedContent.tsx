@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Check, X } from "lucide-react"
 import type { Reservation } from "@/types/reservation"
+import { motion } from "framer-motion"
 
 interface ReservationExpandedContentProps {
   reservation: Reservation
@@ -45,7 +46,13 @@ export const ReservationExpandedContent = ({
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <motion.div 
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-6"
+    >
       <div className="grid gap-6 md:grid-cols-2">
         <CustomerDetails customer={customerData} />
         <ReservationDetails reservation={reservationData} />
@@ -57,16 +64,19 @@ export const ReservationExpandedContent = ({
         <Button
           variant="outline"
           onClick={handleReject}
-          className="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 border-red-200"
+          className="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300 transition-colors"
         >
           <X className="w-4 h-4 mr-2" />
           Rejeitar
         </Button>
-        <Button onClick={handleApprove} className="bg-green-600 hover:bg-green-700">
+        <Button 
+          onClick={handleApprove} 
+          className="bg-green-600 hover:bg-green-700 text-white transition-colors"
+        >
           <Check className="w-4 h-4 mr-2" />
           Aprovar
         </Button>
       </div>
-    </div>
+    </motion.div>
   )
 }
