@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,25 +14,29 @@ const AdminLogin = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/admin");
+      }
+    };
+    checkSession();
+  }, [navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const { data: { user }, error: authError } = await supabase.auth.signInWithPassword({
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (authError) {
-        if (authError.message.includes('Invalid login credentials')) {
-          throw new Error('Email ou senha incorretos');
-        }
-        throw authError;
-      }
-
-      if (!user) {
-        throw new Error('Falha na autenticação');
+      if (signInError) {
+        throw signInError;
       }
 
       toast({
@@ -42,9 +46,10 @@ const AdminLogin = () => {
       
       navigate("/admin");
     } catch (error: any) {
+      console.error('Login error:', error);
       toast({
         title: "Erro no login",
-        description: error.message || "Credenciais inválidas",
+        description: "Email ou senha incorretos",
         variant: "destructive",
       });
     } finally {
