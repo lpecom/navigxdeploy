@@ -16,10 +16,10 @@ const Customers = () => {
     if (!file) return;
 
     // Check file type
-    if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
+    if (!file.name.endsWith('.csv')) {
       toast({
         title: "Erro",
-        description: "Por favor, selecione um arquivo Excel (.xlsx ou .xls)",
+        description: "Por favor, selecione um arquivo CSV",
         variant: "destructive",
       });
       return;
@@ -71,7 +71,7 @@ const Customers = () => {
         <div className="relative">
           <input
             type="file"
-            accept=".xlsx,.xls"
+            accept=".csv"
             onChange={handleFileUpload}
             className="hidden"
             id="customer-file-upload"
