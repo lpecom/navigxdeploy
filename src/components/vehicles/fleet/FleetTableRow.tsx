@@ -39,55 +39,67 @@ export const FleetTableRow = ({
       label: 'N/A'
     };
 
-    status = status.toLowerCase();
+    const statusLower = status.toLowerCase();
     
-    // Available status
-    if (status === 'available' || status === 'disponível') return {
-      variant: 'outline' as const,
-      icon: CheckCircle,
-      label: status === 'available' ? 'Available' : 'Disponível'
-    };
+    if (statusLower === 'available' || statusLower === 'disponível') {
+      return {
+        variant: 'outline' as const,
+        icon: CheckCircle,
+        label: statusLower === 'available' ? 'Available' : 'Disponível',
+        color: 'text-green-600'
+      };
+    }
     
-    // Maintenance status
-    if (status.includes('maintenance') || status.includes('manutenção')) return {
-      variant: 'destructive' as const,
-      icon: Wrench,
-      label: status.includes('maintenance') ? 'Maintenance' : 'Manutenção'
-    };
+    if (statusLower.includes('maintenance') || statusLower.includes('manutenção')) {
+      return {
+        variant: 'warning' as const,
+        icon: Wrench,
+        label: statusLower.includes('maintenance') ? 'Maintenance' : 'Manutenção',
+        color: 'text-yellow-600'
+      };
+    }
     
-    // Rented status
-    if (status === 'rented' || status === 'alugado') return {
-      variant: 'secondary' as const,
-      icon: Clock,
-      label: status === 'rented' ? 'Rented' : 'Alugado'
-    };
+    if (statusLower === 'rented' || statusLower === 'alugado') {
+      return {
+        variant: 'secondary' as const,
+        icon: Clock,
+        label: statusLower === 'rented' ? 'Rented' : 'Alugado',
+        color: 'text-blue-600'
+      };
+    }
 
-    // Body shop status (Funilaria)
-    if (status.includes('funilaria')) return {
-      variant: 'warning' as const,
-      icon: Car,
-      label: 'Funilaria'
-    };
+    if (statusLower.includes('funilaria')) {
+      return {
+        variant: 'warning' as const,
+        icon: Car,
+        label: 'Funilaria',
+        color: 'text-orange-600'
+      };
+    }
 
-    // Disabled status (Desativado)
-    if (status.includes('desativado')) return {
-      variant: 'destructive' as const,
-      icon: XOctagon,
-      label: 'Desativado'
-    };
+    if (statusLower.includes('desativado')) {
+      return {
+        variant: 'destructive' as const,
+        icon: XOctagon,
+        label: 'Desativado',
+        color: 'text-red-600'
+      };
+    }
 
-    // Management status (Diretoria)
-    if (status.includes('diretoria')) return {
-      variant: 'default' as const,
-      icon: Shield,
-      label: 'Diretoria'
-    };
+    if (statusLower.includes('diretoria')) {
+      return {
+        variant: 'default' as const,
+        icon: Shield,
+        label: 'Diretoria',
+        color: 'text-purple-600'
+      };
+    }
 
-    // Default fallback
     return {
       variant: 'outline' as const,
       icon: AlertTriangle,
-      label: status
+      label: status,
+      color: 'text-gray-600'
     };
   };
 
@@ -160,18 +172,16 @@ export const FleetTableRow = ({
             })}
           />
         ) : (
-          <div className="flex items-center gap-2">
-            <Badge 
-              variant={statusInfo.variant} 
-              className="flex items-center gap-1.5 px-2 py-1"
-            >
-              <statusInfo.icon className="w-3 h-3" />
-              <span>{statusInfo.label}</span>
-            </Badge>
-          </div>
+          <Badge 
+            variant={statusInfo.variant}
+            className={`flex items-center gap-1.5 px-2 py-1 ${statusInfo.color}`}
+          >
+            <statusInfo.icon className="w-3 h-3" />
+            <span>{statusInfo.label}</span>
+          </Badge>
         )}
       </TableCell>
-      <TableCell>
+      <TableCell className="text-right">
         {editingId === vehicle.id ? (
           <Button
             size="sm"

@@ -20,7 +20,7 @@ export const FleetListView = () => {
   const { data: fleetVehicles, refetch, isLoading, error } = useQuery({
     queryKey: ['fleet-vehicles-list', searchTerm, statusFilter],
     queryFn: async () => {
-      const query = supabase
+      let query = supabase
         .from('fleet_vehicles')
         .select(`
           *,
@@ -34,23 +34,34 @@ export const FleetListView = () => {
           )
         `);
 
+      // Apply search filter
       if (searchTerm) {
-        query.or(`plate.ilike.%${searchTerm}%,car_models(name).ilike.%${searchTerm}%`);
+        query = query.or(`plate.ilike.%${searchTerm}%,car_models(name).ilike.%${searchTerm}%`);
       }
 
+      // Apply status filter
       if (statusFilter) {
-        if (statusFilter === 'available') {
-          query.or('status.ilike.%available%,status.ilike.%disponível%');
-        } else if (statusFilter === 'maintenance') {
-          query.or('status.ilike.%maintenance%,status.ilike.%manutenção%');
-        } else if (statusFilter === 'rented') {
-          query.or('status.ilike.%rented%,status.ilike.%alugado%');
-        } else if (statusFilter === 'funilaria') {
-          query.ilike('status', '%funilaria%');
-        } else if (statusFilter === 'desativado') {
-          query.ilike('status', '%desativado%');
-        } else if (statusFilter === 'diretoria') {
-          query.ilike('status', '%diretoria%');
+        switch (statusFilter) {
+          case 'available':
+            query = query.or('status.ilike.%available%,status.ilike.%disponível%');
+            break;
+          case 'maintenance':
+            query = query.or('status.ilike.%maintenance%,status.ilike.%manutenção%');
+            break;
+          case 'rented':
+            query = query.or('status.ilike.%rented%,status.ilike.%alugado%');
+            break;
+          case 'funilaria':
+            query = query.ilike('status', '%funilaria%');
+            break;
+          case 'desativado':
+            query = query.ilike('status', '%desativado%');
+            break;
+          case 'diretoria':
+            query = query.ilike('status', '%diretoria%');
+            break;
+          default:
+            break;
         }
       }
       
@@ -58,7 +69,8 @@ export const FleetListView = () => {
       
       if (error) throw error;
       
-      return (data || []).filter(vehicle => vehicle && vehicle.plate) as FleetVehicle[];
+      return (data || [])
+        .filter(vehicle => vehicle && vehicle.plate) as FleetVehicle[];
     },
   });
 
