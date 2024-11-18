@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Plus, Edit2, Trash2 } from "lucide-react";
 import { CategoryForm } from "./CategoryForm";
+import { CategoryModels } from "./CategoryModels";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +18,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 
 interface Category {
   id: string;
@@ -100,9 +107,20 @@ export const CategoryList = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                {category.description || "Sem descrição"}
-              </p>
+              <Tabs defaultValue="details">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="details">Detalhes</TabsTrigger>
+                  <TabsTrigger value="models">Modelos</TabsTrigger>
+                </TabsList>
+                <TabsContent value="details">
+                  <p className="text-sm text-muted-foreground">
+                    {category.description || "Sem descrição"}
+                  </p>
+                </TabsContent>
+                <TabsContent value="models">
+                  <CategoryModels categoryId={category.id} />
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
         ))}
