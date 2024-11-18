@@ -24,7 +24,12 @@ export const FleetImport = () => {
         }
       );
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error details:", error);
+        throw error;
+      }
+
+      console.log("Import response:", data);
 
       toast({
         title: "Success!",
