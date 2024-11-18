@@ -2,25 +2,27 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { Download } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Progress } from "@/components/ui/progress";
 
 export const FleetImport = () => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
   const { toast } = useToast();
 
-  const downloadTemplate = () => {
-    window.open('https://brown-georgeanne-53.tiiny.site/', '_blank');
-  };
-
-  const processHtmlFile = async () => {
+  const processFleetData = async () => {
     setIsProcessing(true);
+    setProgress(10);
 
     try {
       const { data, error } = await supabase.functions.invoke(
         "process-fleet-csv",
         {
-          body: { htmlUrl: 'https://brown-georgeanne-53.tiiny.site/' },
+          body: { 
+            htmlUrl: 'https://brown-georgeanne-53.tiiny.site/',
+            importDate: new Date().toISOString()
+          },
         }
       );
 
@@ -29,45 +31,56 @@ export const FleetImport = () => {
         throw error;
       }
 
+      setProgress(100);
       console.log("Import response:", data);
 
       toast({
-        title: "Success!",
-        description: `Fleet data has been updated successfully. Processed ${data.processed} vehicles.`,
+        title: "Sucesso!",
+        description: `Frota atualizada com sucesso. ${data.processed} veículos processados.`,
       });
     } catch (error) {
-      console.error("Error processing HTML file:", error);
+      console.error("Error processing fleet data:", error);
       toast({
-        title: "Error",
-        description: "Failed to process the fleet data. Please try again.",
+        title: "Erro",
+        description: "Falha ao processar os dados da frota. Tente novamente.",
         variant: "destructive",
       });
     } finally {
       setIsProcessing(false);
+      setProgress(0);
     }
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Import Fleet</CardTitle>
+        <CardTitle>Importar Frota</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
-          <Button onClick={downloadTemplate} variant="outline">
-            <Download className="w-4 h-4 mr-2" />
-            View Template
+          <Button 
+            onClick={processFleetData} 
+            disabled={isProcessing}
+            className="flex items-center gap-2"
+          >
+            <Upload className="w-4 h-4" />
+            {isProcessing ? "Processando..." : "Importar Dados da Frota"}
           </Button>
           <Button 
-            onClick={processHtmlFile} 
-            disabled={isProcessing}
+            variant="outline" 
+            onClick={() => window.open('https://brown-georgeanne-53.tiiny.site/', '_blank')}
+            className="flex items-center gap-2"
           >
-            {isProcessing ? "Processing..." : "Import Fleet Data"}
+            <Download className="w-4 h-4" />
+            Visualizar Template
           </Button>
         </div>
+        {isProcessing && (
+          <Progress value={progress} className="w-full" />
+        )}
         <p className="text-sm text-muted-foreground">
-          View the template to check the format of the fleet data.
-          Click "Import Fleet Data" to process and import the data from the HTML file.
+          Visualize o template para verificar o formato dos dados da frota.
+          Clique em "Importar Dados da Frota" para processar e importar os dados.
         </p>
       </CardContent>
     </Card>
