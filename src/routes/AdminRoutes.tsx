@@ -83,7 +83,6 @@ const AdminRoutes = () => {
                 <Route path="models" element={<Vehicles view="models" />} />
                 <Route path="fleet" element={<Vehicles view="fleet" />} />
                 <Route path="maintenance" element={<Vehicles view="maintenance" />} />
-                <Route path="maintenance/history" element={<Vehicles view="maintenance-history" />} />
               </Route>
               <Route path="customers">
                 <Route index element={<Customers />} />
