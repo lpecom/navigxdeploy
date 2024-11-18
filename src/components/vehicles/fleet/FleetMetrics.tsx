@@ -8,15 +8,18 @@ interface FleetMetricsProps {
 
 export const FleetMetrics = ({ vehicles }: FleetMetricsProps) => {
   const totalVehicles = vehicles.length;
-  const availableVehicles = vehicles.filter(v => v.status === 'available').length;
-  const maintenanceVehicles = vehicles.filter(v => v.status === 'maintenance').length;
-  const upcomingMaintenance = vehicles.filter(v => {
-    if (!v.next_revision_date) return false;
-    const daysUntilMaintenance = Math.ceil(
-      (new Date(v.next_revision_date).getTime() - new Date().getTime()) / (1000 * 3600 * 24)
-    );
-    return daysUntilMaintenance <= 30;
-  }).length;
+  const availableVehicles = vehicles.filter(v => 
+    v.status?.toLowerCase() === 'available' || 
+    v.status?.toLowerCase() === 'disponível'
+  ).length;
+  const maintenanceVehicles = vehicles.filter(v => 
+    v.status?.toLowerCase().includes('maintenance') || 
+    v.status?.toLowerCase().includes('manutenção')
+  ).length;
+  const rentedVehicles = vehicles.filter(v => 
+    v.status?.toLowerCase() === 'rented' || 
+    v.status?.toLowerCase() === 'alugado'
+  ).length;
 
   const metrics = [
     {
@@ -44,10 +47,10 @@ export const FleetMetrics = ({ vehicles }: FleetMetricsProps) => {
       bgColor: "bg-yellow-100",
     },
     {
-      title: "Revisão Próxima",
-      value: upcomingMaintenance,
+      title: "Alugados",
+      value: rentedVehicles,
       icon: Clock,
-      description: "Nos próximos 30 dias",
+      description: "Em uso",
       color: "text-blue-600",
       bgColor: "bg-blue-100",
     },

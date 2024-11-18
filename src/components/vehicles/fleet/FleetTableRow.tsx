@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Edit2, Save } from "lucide-react";
 import type { FleetVehicle } from "../types";
 
@@ -21,12 +22,21 @@ export const FleetTableRow = ({
   onSave,
   onEditFormChange 
 }: FleetTableRowProps) => {
+  const getStatusColor = (status: string | null) => {
+    if (!status) return 'default';
+    status = status.toLowerCase();
+    if (status === 'available' || status === 'disponível') return 'success';
+    if (status.includes('maintenance') || status.includes('manutenção')) return 'warning';
+    if (status === 'rented' || status === 'alugado') return 'secondary';
+    return 'default';
+  };
+
   if (!vehicle.plate || !vehicle.car_model) {
     return null;
   }
 
   return (
-    <TableRow>
+    <TableRow className="hover:bg-muted/50">
       <TableCell>
         {vehicle.car_model?.name} ({vehicle.car_model?.year || 'N/A'})
       </TableCell>
@@ -88,7 +98,9 @@ export const FleetTableRow = ({
             })}
           />
         ) : (
-          vehicle.status || 'N/A'
+          <Badge variant={getStatusColor(vehicle.status)}>
+            {vehicle.status || 'N/A'}
+          </Badge>
         )}
       </TableCell>
       <TableCell>
