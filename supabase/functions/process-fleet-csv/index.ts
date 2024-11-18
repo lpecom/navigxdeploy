@@ -7,26 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const normalizeStatus = (status: string) => {
-  if (!status) return 'AVAILABLE';
-  status = status.toUpperCase().trim();
-  if (status.includes('ELETRICA')) return 'ELECTRICAL';
-  if (status.includes('MECANICA')) return 'MECHANICAL';
-  if (status.includes('PREPARACAO')) return 'PREPARATION';
-  if (status.includes('VENDA') || status.includes('DESATIVACAO')) return 'FOR_SALE';
-  if (status.includes('LOCADO')) return 'RENTED';
-  if (status.includes('MANUTENCOES')) return 'OTHER_MAINTENANCE';
-  return 'AVAILABLE';
-};
-
-const normalizeGroup = (group: string) => {
-  if (!group) return 'HATCH';
-  group = group.toUpperCase().trim();
-  if (group.includes('HATCH')) return 'HATCH';
-  if (group.includes('SEDAN')) return 'SEDAN';
-  return 'HATCH';
-};
-
+// Handle CORS preflight requests
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -66,7 +47,7 @@ serve(async (req) => {
         customer_document: cells[13]?.textContent?.trim(),
         status: cells[14]?.textContent?.trim(),
       };
-    }).filter(data => data.plate); // Only process rows with plate numbers
+    }).filter(data => data.plate);
 
     console.log(`Processing ${fleetData.length} vehicles`);
 
@@ -130,7 +111,7 @@ serve(async (req) => {
             state: vehicle.state,
             chassis_number: vehicle.chassis_number,
             renavam_number: vehicle.renavam_number,
-            status: normalizeStatus(vehicle.status),
+            status: vehicle.status?.toLowerCase().includes('locado') ? 'RENTED' : 'AVAILABLE',
             contract_number: vehicle.contract_number,
             customer_id: customerId,
             current_km: 0,
@@ -158,8 +139,8 @@ serve(async (req) => {
       }),
       { 
         headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
         } 
       }
     )
@@ -168,7 +149,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400 
       }
     )

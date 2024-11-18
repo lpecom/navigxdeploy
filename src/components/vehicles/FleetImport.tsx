@@ -38,6 +38,9 @@ export const FleetImport = () => {
         title: "Sucesso!",
         description: `Frota atualizada com sucesso. ${data.processed} veículos processados.`,
       });
+
+      // Force a page refresh to show the new data
+      window.location.reload();
     } catch (error) {
       console.error("Error processing fleet data:", error);
       toast({
