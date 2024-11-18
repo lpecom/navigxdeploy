@@ -7,22 +7,16 @@ const corsHeaders = {
 }
 
 interface FleetData {
-  Frota: string;
-  Placa: string;
-  Modelo: string;
-  Grupo: string;
-  Cor: string;
-  'UF Emplac.': string;
-  'Número do Chassi': string;
-  'Número do Renavan': string;
-  'Ano do Veículo': string;
-  'Ano do Modelo': string;
-  Fabricante: string;
-  Contrato: string;
-  Cliente: string;
-  'CPF/CNPJ Cliente/Contrato': string;
-  Status: string;
-  Filial: string;
+  customer_name: string;
+  customer_cpf: string;
+  model: string;
+  category: string;
+  color: string;
+  year: string;
+  brand: string;
+  status: string;
+  contract?: string;
+  plate: string;
 }
 
 serve(async (req) => {
@@ -40,64 +34,89 @@ serve(async (req) => {
 
     console.log('Processing fleet data:', csvData.length, 'vehicles')
 
-    // Process each row
     for (const row of csvData) {
       const data = row as FleetData
 
       // Skip empty rows
-      if (!data.Placa) continue
-
-      // Find or create car model
-      const { data: carModel, error: modelError } = await supabase
-        .from('car_models')
-        .select('id')
-        .ilike('name', data.Modelo)
-        .single()
-
-      if (modelError) {
-        console.error('Error finding car model:', modelError)
+      if (!data.plate || !data.model) {
+        console.log('Skipping empty row')
         continue
       }
 
-      // Find customer if exists
+      // 1. Create or update customer if we have customer data
       let customerId = null
-      if (data.Cliente && data['CPF/CNPJ Cliente/Contrato']) {
-        const { data: customer } = await supabase
+      if (data.customer_cpf) {
+        const { data: customer, error: customerError } = await supabase
           .from('customers')
-          .select('id')
-          .eq('cpf', data['CPF/CNPJ Cliente/Contrato'])
+          .upsert({
+            full_name: data.customer_name,
+            cpf: data.customer_cpf,
+            status: 'active'
+          }, {
+            onConflict: 'cpf'
+          })
+          .select()
           .single()
 
-        if (customer) {
-          customerId = customer.id
+        if (customerError) {
+          console.error('Error upserting customer:', customerError)
+          continue
         }
+
+        customerId = customer.id
       }
 
-      // Map status
-      let status = 'available'
-      if (data.Status?.includes('LOCADO')) status = 'rented'
-      else if (data.Status?.includes('MECANICA')) status = 'maintenance'
-      else if (data.Status?.includes('PREPARAÇÃO')) status = 'preparation'
-      else if (data.Status?.includes('PARA VENDA')) status = 'for_sale'
-      else if (data.Status?.includes('OUTRAS')) status = 'other_maintenance'
-      else if (data.Status?.includes('DIRETORIA')) status = 'management'
+      // 2. Ensure we have the category
+      const { data: category, error: categoryError } = await supabase
+        .from('categories')
+        .upsert({
+          name: data.category,
+          description: `${data.category} vehicles`
+        }, {
+          onConflict: 'name'
+        })
+        .select()
+        .single()
 
-      // Upsert fleet vehicle
+      if (categoryError) {
+        console.error('Error upserting category:', categoryError)
+        continue
+      }
+
+      // 3. Create or update car model
+      const { data: carModel, error: modelError } = await supabase
+        .from('car_models')
+        .upsert({
+          name: data.model,
+          category_id: category.id,
+          year: data.year,
+          description: `${data.brand} ${data.model}`
+        }, {
+          onConflict: 'name'
+        })
+        .select()
+        .single()
+
+      if (modelError) {
+        console.error('Error upserting car model:', modelError)
+        continue
+      }
+
+      // 4. Create or update fleet vehicle
       const { error: vehicleError } = await supabase
         .from('fleet_vehicles')
         .upsert({
-          car_model_id: carModel?.id,
-          year: data['Ano do Veículo'],
-          plate: data.Placa,
-          color: data.Cor,
-          state: data['UF Emplac.'],
-          chassis_number: data['Número do Chassi'],
-          renavam_number: data['Número do Renavan'],
-          status,
-          contract_number: data.Contrato,
+          car_model_id: carModel.id,
+          year: data.year,
+          plate: data.plate,
+          color: data.color,
+          status: data.status.toLowerCase(),
+          contract_number: data.contract,
           customer_id: customerId,
-          branch: data.Filial,
-          is_available: status === 'available'
+          current_km: 0,
+          last_revision_date: new Date().toISOString(),
+          next_revision_date: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString(),
+          is_available: data.status.toLowerCase() === 'available'
         }, {
           onConflict: 'plate'
         })

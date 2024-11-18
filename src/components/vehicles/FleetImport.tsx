@@ -12,23 +12,18 @@ export const FleetImport = () => {
 
   const downloadTemplate = () => {
     const headers = [
-      "Frota",
-      "Placa",
-      "Modelo",
-      "Grupo",
-      "Cor",
-      "UF Emplac.",
-      "Número do Chassi",
-      "Número do Renavan",
-      "Ano do Veículo",
-      "Ano do Modelo",
-      "Fabricante",
-      "Contrato",
-      "Cliente",
-      "CPF/CNPJ Cliente/Contrato",
-      "Status",
-      "Filial"
+      "customer_name",
+      "customer_cpf",
+      "model",
+      "category",
+      "color",
+      "year",
+      "brand",
+      "status",
+      "contract",
+      "plate"
     ];
+    
     const csvContent = Papa.unparse([headers]);
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
@@ -116,8 +111,8 @@ export const FleetImport = () => {
         </div>
         <p className="text-sm text-muted-foreground">
           Faça o download do template e preencha com os dados da sua frota.
-          O arquivo deve conter informações como: Placa, Modelo, Cor, Chassi,
-          Renavam, Status e outros dados do veículo.
+          O arquivo deve conter informações como: Nome do Cliente, CPF, 
+          Modelo, Categoria, Cor, Ano, Marca, Status, Contrato e Placa.
         </p>
       </CardContent>
     </Card>
