@@ -32,7 +32,7 @@ const StatsPanel = () => {
       const { count: maintenanceCount, error: maintenanceError } = await supabase
         .from('fleet_vehicles')
         .select('*', { count: 'exact', head: true })
-        .ilike('status', '%manutenção%');
+        .eq('status', 'manutenção');
 
       if (maintenanceError) {
         console.error('Error fetching maintenance vehicles:', maintenanceError);
@@ -43,7 +43,7 @@ const StatsPanel = () => {
       const { count: bodyShopCount, error: bodyShopError } = await supabase
         .from('fleet_vehicles')
         .select('*', { count: 'exact', head: true })
-        .ilike('status', '%funilaria%');
+        .eq('status', 'funilaria');
 
       if (bodyShopError) {
         console.error('Error fetching body shop vehicles:', bodyShopError);
@@ -54,7 +54,7 @@ const StatsPanel = () => {
       const { count: deactivatedCount, error: deactivatedError } = await supabase
         .from('fleet_vehicles')
         .select('*', { count: 'exact', head: true })
-        .ilike('status', '%desativado%');
+        .eq('status', 'desativado');
 
       if (deactivatedError) {
         console.error('Error fetching deactivated vehicles:', deactivatedError);
@@ -65,7 +65,7 @@ const StatsPanel = () => {
       const { count: managementCount, error: managementError } = await supabase
         .from('fleet_vehicles')
         .select('*', { count: 'exact', head: true })
-        .ilike('status', '%diretoria%');
+        .eq('status', 'diretoria');
 
       if (managementError) {
         console.error('Error fetching management vehicles:', managementError);
