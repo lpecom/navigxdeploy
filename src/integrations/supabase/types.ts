@@ -426,38 +426,62 @@ export type Database = {
       }
       fleet_vehicles: {
         Row: {
+          branch: string | null
           car_model_id: string | null
+          chassis_number: string | null
+          color: string | null
+          contract_number: string | null
           created_at: string | null
           current_km: number
+          customer_id: string | null
           id: string
           is_available: boolean | null
           last_revision_date: string
           next_revision_date: string
           plate: string
+          renavam_number: string | null
+          state: string | null
+          status: string | null
           updated_at: string | null
           year: string
         }
         Insert: {
+          branch?: string | null
           car_model_id?: string | null
+          chassis_number?: string | null
+          color?: string | null
+          contract_number?: string | null
           created_at?: string | null
           current_km: number
+          customer_id?: string | null
           id?: string
           is_available?: boolean | null
           last_revision_date: string
           next_revision_date: string
           plate: string
+          renavam_number?: string | null
+          state?: string | null
+          status?: string | null
           updated_at?: string | null
           year: string
         }
         Update: {
+          branch?: string | null
           car_model_id?: string | null
+          chassis_number?: string | null
+          color?: string | null
+          contract_number?: string | null
           created_at?: string | null
           current_km?: number
+          customer_id?: string | null
           id?: string
           is_available?: boolean | null
           last_revision_date?: string
           next_revision_date?: string
           plate?: string
+          renavam_number?: string | null
+          state?: string | null
+          status?: string | null
           updated_at?: string | null
           year?: string
         }
@@ -467,6 +491,13 @@ export type Database = {
             columns: ["car_model_id"]
             isOneToOne: false
             referencedRelation: "car_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_vehicles_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
         ]
