@@ -8,14 +8,22 @@ interface FleetVehicleCardProps {
 }
 
 export const FleetVehicleCard = ({ vehicle }: FleetVehicleCardProps) => {
+  const getStatusColor = (status: string) => {
+    status = status.toLowerCase();
+    if (status.includes('disponivel') || status === 'available') return 'default';
+    if (status.includes('manutencao') || status.includes('maintenance')) return 'destructive';
+    if (status.includes('locado') || status === 'rented') return 'secondary';
+    return 'default';
+  };
+
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-xl">
-          {vehicle.car_model?.name} - {vehicle.plate}
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-xl font-semibold">
+          {vehicle.plate}
         </CardTitle>
-        <Badge variant={vehicle.is_available ? "default" : "destructive"}>
-          {vehicle.is_available ? "Disponível" : "Indisponível"}
+        <Badge variant={getStatusColor(vehicle.status)}>
+          {vehicle.status}
         </Badge>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -28,20 +36,18 @@ export const FleetVehicleCard = ({ vehicle }: FleetVehicleCardProps) => {
             />
           </div>
         )}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Car className="w-4 h-4" />
-              <span>Ano: {vehicle.year}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Gauge className="w-4 h-4" />
-              <span>KM: {vehicle.current_km.toLocaleString()}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Calendar className="w-4 h-4" />
-              <span>Próxima Revisão: {new Date(vehicle.next_revision_date).toLocaleDateString()}</span>
-            </div>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Car className="w-4 h-4" />
+            <span>{vehicle.car_model?.name} ({vehicle.car_model?.year})</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Gauge className="w-4 h-4" />
+            <span>KM: {vehicle.current_km?.toLocaleString()}</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Calendar className="w-4 h-4" />
+            <span>Próxima Revisão: {new Date(vehicle.next_revision_date).toLocaleDateString()}</span>
           </div>
         </div>
       </CardContent>
