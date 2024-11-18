@@ -4,10 +4,12 @@ import { Upload } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
+import { Progress } from "@/components/ui/progress";
 
 const Customers = () => {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -24,6 +26,7 @@ const Customers = () => {
     }
 
     setIsUploading(true);
+    setProgress(10);
 
     try {
       const formData = new FormData();
@@ -38,6 +41,7 @@ const Customers = () => {
 
       if (error) throw error;
 
+      setProgress(100);
       toast({
         title: "Sucesso!",
         description: `${data.processed} clientes importados com sucesso.${
@@ -56,6 +60,7 @@ const Customers = () => {
       });
     } finally {
       setIsUploading(false);
+      setProgress(0);
     }
   };
 
@@ -81,6 +86,9 @@ const Customers = () => {
           </Button>
         </div>
       </div>
+      {isUploading && (
+        <Progress value={progress} className="w-full" />
+      )}
       <CustomerList />
     </div>
   );
