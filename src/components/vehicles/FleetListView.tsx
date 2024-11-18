@@ -45,6 +45,12 @@ export const FleetListView = () => {
           query.or('status.ilike.%maintenance%,status.ilike.%manutenção%');
         } else if (statusFilter === 'rented') {
           query.or('status.ilike.%rented%,status.ilike.%alugado%');
+        } else if (statusFilter === 'funilaria') {
+          query.ilike('status', '%funilaria%');
+        } else if (statusFilter === 'desativado') {
+          query.ilike('status', '%desativado%');
+        } else if (statusFilter === 'diretoria') {
+          query.ilike('status', '%diretoria%');
         }
       }
       

@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Car, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { Car, AlertTriangle, CheckCircle, Clock, Wrench, XOctagon, Shield } from "lucide-react";
 import type { FleetVehicle } from "../types";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +22,15 @@ export const FleetMetrics = ({ vehicles, onFilterChange, activeFilter }: FleetMe
   const rentedVehicles = vehicles.filter(v => 
     v.status?.toLowerCase() === 'rented' || 
     v.status?.toLowerCase() === 'alugado'
+  ).length;
+  const bodyShopVehicles = vehicles.filter(v => 
+    v.status?.toLowerCase().includes('funilaria')
+  ).length;
+  const deactivatedVehicles = vehicles.filter(v => 
+    v.status?.toLowerCase().includes('desativado')
+  ).length;
+  const managementVehicles = vehicles.filter(v => 
+    v.status?.toLowerCase().includes('diretoria')
   ).length;
 
   const metrics = [
@@ -46,7 +55,7 @@ export const FleetMetrics = ({ vehicles, onFilterChange, activeFilter }: FleetMe
     {
       title: "Em Manutenção",
       value: maintenanceVehicles,
-      icon: AlertTriangle,
+      icon: Wrench,
       description: "Em serviço",
       color: "text-yellow-600",
       bgColor: "bg-yellow-100",
@@ -61,6 +70,33 @@ export const FleetMetrics = ({ vehicles, onFilterChange, activeFilter }: FleetMe
       bgColor: "bg-blue-100",
       filterValue: "rented"
     },
+    {
+      title: "Funilaria",
+      value: bodyShopVehicles,
+      icon: Car,
+      description: "Em reparo",
+      color: "text-orange-600",
+      bgColor: "bg-orange-100",
+      filterValue: "funilaria"
+    },
+    {
+      title: "Desativados",
+      value: deactivatedVehicles,
+      icon: XOctagon,
+      description: "Fora de serviço",
+      color: "text-red-600",
+      bgColor: "bg-red-100",
+      filterValue: "desativado"
+    },
+    {
+      title: "Diretoria",
+      value: managementVehicles,
+      icon: Shield,
+      description: "Uso exclusivo",
+      color: "text-purple-600",
+      bgColor: "bg-purple-100",
+      filterValue: "diretoria"
+    }
   ];
 
   return (
@@ -70,7 +106,7 @@ export const FleetMetrics = ({ vehicles, onFilterChange, activeFilter }: FleetMe
           key={metric.title} 
           className={cn(
             "hover:border-primary/20 transition-colors cursor-pointer",
-            activeFilter === metric.filterValue && "border-primary"
+            activeFilter === metric.filterValue && "border-primary bg-muted/50"
           )}
           onClick={() => onFilterChange(metric.filterValue)}
         >
