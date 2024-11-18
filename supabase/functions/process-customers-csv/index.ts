@@ -9,13 +9,11 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    // Ensure request is POST
     if (req.method !== 'POST') {
       throw new Error('Method not allowed')
     }
@@ -34,11 +32,9 @@ serve(async (req) => {
       throw new Error('Empty CSV file')
     }
 
-    // Parse header row to get column names and normalize them
     const headers = lines[0].toLowerCase().split(',').map(h => h.trim())
     console.log('Original headers:', headers)
 
-    // Create a mapping for common variations of field names
     const fieldMappings: { [key: string]: string[] } = {
       cpf: ['cpf', 'cpf/passport', 'document', 'documento', 'cpf/passaporte'],
       full_name: ['full_name', 'name', 'nome', 'full name', 'nome completo'],
@@ -50,14 +46,12 @@ serve(async (req) => {
       postal_code: ['postal_code', 'cep', 'zip', 'zip code']
     }
 
-    // Function to find the actual column name in the CSV for a given field
     const findColumnName = (field: string): string | undefined => {
       const variations = fieldMappings[field]
       if (!variations) return undefined
       return headers.find(header => variations.includes(header))
     }
 
-    // Parse CSV content
     const rows = await csv.parse(text, {
       skipFirstRow: true,
       columns: headers,
@@ -75,7 +69,6 @@ serve(async (req) => {
     const BATCH_SIZE = 5
     const BATCH_DELAY = 300
 
-    // Find the actual column names in the CSV
     const cpfColumn = findColumnName('cpf')
     const nameColumn = findColumnName('full_name')
     const emailColumn = findColumnName('email')
@@ -96,11 +89,22 @@ serve(async (req) => {
       postalCodeColumn
     })
 
+    // First, get all customers with active rentals from fleet_vehicles
+    const { data: activeRentals } = await supabase
+      .from('fleet_vehicles')
+      .select('customer_id, customers!inner(cpf)')
+      .not('customer_id', 'is', null)
+
+    const activeRentalCpfs = new Set(activeRentals?.map(rental => 
+      rental.customers?.cpf
+    ).filter(Boolean))
+
+    console.log('Active rental CPFs:', activeRentalCpfs)
+
     for (let i = 0; i < rows.length; i += BATCH_SIZE) {
       const batch = rows.slice(i, Math.min(i + BATCH_SIZE, rows.length))
         .map((row: any) => {
           try {
-            // Get CPF from the correct column and clean it
             const cpf = String(row[cpfColumn || 'cpf'] || '').replace(/[^\d]/g, '')
             if (!cpf) {
               throw new Error('CPF is required')
@@ -117,7 +121,7 @@ serve(async (req) => {
               city: row[cityColumn || 'city'] || null,
               state: row[stateColumn || 'state'] || null,
               postal_code: row[postalCodeColumn || 'postal_code'] || null,
-              status: 'active'
+              status: activeRentalCpfs.has(cpf) ? 'active_rental' : 'active'
             }
           } catch (error) {
             console.error(`Error processing row ${i}:`, error)
@@ -145,7 +149,6 @@ serve(async (req) => {
         }
       }
 
-      // Add delay between batches
       await new Promise(resolve => setTimeout(resolve, BATCH_DELAY))
     }
 
