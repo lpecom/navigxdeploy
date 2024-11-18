@@ -9,12 +9,17 @@ interface FleetVehicleCardProps {
 
 export const FleetVehicleCard = ({ vehicle }: FleetVehicleCardProps) => {
   const getStatusColor = (status: string) => {
+    if (!status) return 'default';
     status = status.toLowerCase();
     if (status.includes('disponivel') || status === 'available') return 'default';
     if (status.includes('manutencao') || status.includes('maintenance')) return 'destructive';
     if (status.includes('locado') || status === 'rented') return 'secondary';
     return 'default';
   };
+
+  if (!vehicle.plate || !vehicle.car_model) {
+    return null;
+  }
 
   return (
     <Card>
@@ -23,7 +28,7 @@ export const FleetVehicleCard = ({ vehicle }: FleetVehicleCardProps) => {
           {vehicle.plate}
         </CardTitle>
         <Badge variant={getStatusColor(vehicle.status)}>
-          {vehicle.status}
+          {vehicle.status || 'N/A'}
         </Badge>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -39,15 +44,15 @@ export const FleetVehicleCard = ({ vehicle }: FleetVehicleCardProps) => {
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Car className="w-4 h-4" />
-            <span>{vehicle.car_model?.name} ({vehicle.car_model?.year})</span>
+            <span>{vehicle.car_model?.name} ({vehicle.car_model?.year || 'N/A'})</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Gauge className="w-4 h-4" />
-            <span>KM: {vehicle.current_km?.toLocaleString()}</span>
+            <span>KM: {vehicle.current_km?.toLocaleString() || 'N/A'}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Calendar className="w-4 h-4" />
-            <span>Próxima Revisão: {new Date(vehicle.next_revision_date).toLocaleDateString()}</span>
+            <span>Próxima Revisão: {vehicle.next_revision_date ? new Date(vehicle.next_revision_date).toLocaleDateString() : 'N/A'}</span>
           </div>
         </div>
       </CardContent>

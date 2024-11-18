@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -22,10 +21,14 @@ export const FleetTableRow = ({
   onSave,
   onEditFormChange 
 }: FleetTableRowProps) => {
+  if (!vehicle.plate || !vehicle.car_model) {
+    return null;
+  }
+
   return (
     <TableRow>
       <TableCell>
-        {vehicle.car_model?.name} ({vehicle.car_model?.year})
+        {vehicle.car_model?.name} ({vehicle.car_model?.year || 'N/A'})
       </TableCell>
       <TableCell>{vehicle.plate}</TableCell>
       <TableCell>
@@ -40,7 +43,7 @@ export const FleetTableRow = ({
             className="w-24"
           />
         ) : (
-          vehicle.current_km?.toLocaleString()
+          vehicle.current_km?.toLocaleString() || 'N/A'
         )}
       </TableCell>
       <TableCell>
@@ -54,7 +57,7 @@ export const FleetTableRow = ({
             })}
           />
         ) : (
-          new Date(vehicle.last_revision_date).toLocaleDateString()
+          vehicle.last_revision_date ? new Date(vehicle.last_revision_date).toLocaleDateString() : 'N/A'
         )}
       </TableCell>
       <TableCell>
@@ -68,7 +71,7 @@ export const FleetTableRow = ({
             })}
           />
         ) : (
-          new Date(vehicle.next_revision_date).toLocaleDateString()
+          vehicle.next_revision_date ? new Date(vehicle.next_revision_date).toLocaleDateString() : 'N/A'
         )}
       </TableCell>
       <TableCell>
@@ -85,7 +88,7 @@ export const FleetTableRow = ({
             })}
           />
         ) : (
-          vehicle.status
+          vehicle.status || 'N/A'
         )}
       </TableCell>
       <TableCell>

@@ -32,7 +32,7 @@ const VehicleList = ({ view }: VehicleListProps) => {
         .order('name');
       
       if (error) throw error;
-      return data as unknown as CarModel[];
+      return (data || []) as CarModel[];
     }
   });
 
@@ -43,12 +43,22 @@ const VehicleList = ({ view }: VehicleListProps) => {
         .from('fleet_vehicles')
         .select(`
           *,
-          car_model:car_models(*)
+          car_model:car_models(
+            name,
+            year,
+            image_url
+          )
         `)
         .order('plate');
       
       if (error) throw error;
-      return data as unknown as FleetVehicle[];
+      
+      // Filter out invalid entries
+      return (data || []).filter(vehicle => 
+        vehicle && 
+        vehicle.plate && 
+        vehicle.car_model
+      ) as FleetVehicle[];
     }
   });
 
