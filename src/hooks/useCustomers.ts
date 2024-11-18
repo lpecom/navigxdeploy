@@ -6,43 +6,38 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
   const { data: fleetVehicles } = useQuery({
     queryKey: ['fleet-vehicles'],
     queryFn: async () => {
-      // First, let's check all fleet vehicles with customers
-      const { data: allVehicles, error } = await supabase
+      const { data, error } = await supabase
         .from('fleet_vehicles')
         .select(`
           id,
           plate,
           customer_id,
           status,
-          customers (
-            id,
-            full_name,
-            email,
-            cpf
-          )
+          car_model:car_models(name)
         `)
-        .eq('status', 'rented');
+        .eq('status', 'rented')
+        .not('customer_id', 'is', null);
       
-      if (error) {
-        console.error('Error fetching fleet vehicles:', error);
-        throw error;
-      }
-      
-      console.log('All fleet vehicles:', allVehicles);
-      return allVehicles || [];
+      if (error) throw error;
+      return data || [];
     },
   });
 
-  // Get array of customer IDs with active rentals
-  const activeRentalCustomerIds = fleetVehicles
-    ?.filter(v => v.customer_id && v.customers)
-    .map(v => v.customer_id) || [];
-
-  console.log('Active rental customer IDs:', activeRentalCustomerIds);
+  // Get array of customer IDs with active rentals and their vehicle info
+  const customerVehicleMap = new Map(
+    fleetVehicles?.map(vehicle => [
+      vehicle.customer_id,
+      {
+        vehicleId: vehicle.id,
+        plate: vehicle.plate,
+        model: vehicle.car_model?.name
+      }
+    ]) || []
+  );
 
   // Then fetch all customers and update their status based on fleet data
   const { data: customers, isLoading } = useQuery({
-    queryKey: ['customers', activeRentalCustomerIds, searchTerm, statusFilter],
+    queryKey: ['customers', customerVehicleMap, searchTerm, statusFilter],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('customers')
@@ -51,17 +46,12 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
       
       if (error) throw error;
 
-      const mappedCustomers = data?.map(customer => ({
+      return data?.map(customer => ({
         ...customer,
-        status: activeRentalCustomerIds.includes(customer.id) 
-          ? 'active_rental'
-          : customer.status || 'active'
+        status: customerVehicleMap.has(customer.id) ? 'active_rental' : (customer.status || 'active'),
+        rented_vehicle: customerVehicleMap.get(customer.id)
       }));
-
-      console.log('Mapped customers:', mappedCustomers);
-      return mappedCustomers;
     },
-    enabled: true, // Always run this query
   });
 
   // Filter customers based on search and status
@@ -73,7 +63,9 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
     const matchesSearch = !searchTerm || 
       customer.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.cpf?.includes(searchTerm);
+      customer.cpf?.includes(searchTerm) ||
+      customer.rented_vehicle?.plate?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.rented_vehicle?.model?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = statusFilter.length === 0 || statusFilter.includes(customer.status);
 

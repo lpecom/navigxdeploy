@@ -33,6 +33,7 @@ export const CustomerTableView = ({ customers }: CustomerTableViewProps) => {
             <TableHead>Email</TableHead>
             <TableHead>CPF</TableHead>
             <TableHead>Telefone</TableHead>
+            <TableHead>Veículo Alugado</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Ações</TableHead>
           </TableRow>
@@ -44,6 +45,16 @@ export const CustomerTableView = ({ customers }: CustomerTableViewProps) => {
               <TableCell>{customer.email}</TableCell>
               <TableCell>{customer.cpf}</TableCell>
               <TableCell>{customer.phone}</TableCell>
+              <TableCell>
+                {customer.rented_vehicle ? (
+                  <div className="text-sm">
+                    <div>{customer.rented_vehicle.model}</div>
+                    <div className="text-gray-500">{customer.rented_vehicle.plate}</div>
+                  </div>
+                ) : (
+                  '-'
+                )}
+              </TableCell>
               <TableCell>
                 {getStatusBadge(customer.status)}
               </TableCell>
