@@ -12,13 +12,22 @@ export const FleetImport = () => {
 
   const downloadTemplate = () => {
     const headers = [
-      "CAR MODEL",
-      "YEAR",
-      "CURRENT KM",
-      "LAST REVISION",
-      "NEXT REVISION",
-      "PLATE",
-      "AVAILABLE",
+      "Frota",
+      "Placa",
+      "Modelo",
+      "Grupo",
+      "Cor",
+      "UF Emplac.",
+      "Número do Chassi",
+      "Número do Renavan",
+      "Ano do Veículo",
+      "Ano do Modelo",
+      "Fabricante",
+      "Contrato",
+      "Cliente",
+      "CPF/CNPJ Cliente/Contrato",
+      "Status",
+      "Filial"
     ];
     const csvContent = Papa.unparse([headers]);
     const blob = new Blob([csvContent], { type: "text/csv" });
@@ -49,9 +58,6 @@ export const FleetImport = () => {
             throw new Error("Error parsing CSV file");
           }
 
-          const formData = new FormData();
-          formData.append("file", file);
-
           const { data: uploadData, error: uploadError } = await supabase.functions.invoke(
             "process-fleet-csv",
             {
@@ -65,9 +71,6 @@ export const FleetImport = () => {
             title: "Sucesso!",
             description: "Frota atualizada com sucesso.",
           });
-
-          // Refresh the vehicles list if needed
-          // queryClient.invalidateQueries(["fleet-vehicles"]);
         },
         error: (error) => {
           throw error;
@@ -82,7 +85,6 @@ export const FleetImport = () => {
       });
     } finally {
       setIsUploading(false);
-      // Reset the input
       event.target.value = "";
     }
   };
@@ -114,8 +116,8 @@ export const FleetImport = () => {
         </div>
         <p className="text-sm text-muted-foreground">
           Faça o download do template e preencha com os dados da sua frota.
-          O arquivo deve conter: Modelo, Ano, KM atual, Última revisão,
-          Próxima revisão, Placa e Disponibilidade.
+          O arquivo deve conter informações como: Placa, Modelo, Cor, Chassi,
+          Renavam, Status e outros dados do veículo.
         </p>
       </CardContent>
     </Card>
