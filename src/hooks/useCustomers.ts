@@ -6,31 +6,39 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
   const { data: fleetVehicles } = useQuery({
     queryKey: ['fleet-vehicles'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First, let's check all fleet vehicles with customers
+      const { data: allVehicles, error } = await supabase
         .from('fleet_vehicles')
         .select(`
           id,
           plate,
           customer_id,
           status,
-          customers!inner (
+          customers (
             id,
             full_name,
             email,
             cpf
           )
         `)
-        .eq('status', 'rented')  // Only get vehicles that are currently rented
-        .not('customer_id', 'is', null);
+        .eq('status', 'rented');
       
-      if (error) throw error;
-      console.log('Fleet vehicles with customers:', data);
-      return data;
+      if (error) {
+        console.error('Error fetching fleet vehicles:', error);
+        throw error;
+      }
+      
+      console.log('All fleet vehicles:', allVehicles);
+      return allVehicles || [];
     },
   });
 
   // Get array of customer IDs with active rentals
-  const activeRentalCustomerIds = fleetVehicles?.map(v => v.customer_id) || [];
+  const activeRentalCustomerIds = fleetVehicles
+    ?.filter(v => v.customer_id && v.customers)
+    .map(v => v.customer_id) || [];
+
+  console.log('Active rental customer IDs:', activeRentalCustomerIds);
 
   // Then fetch all customers and update their status based on fleet data
   const { data: customers, isLoading } = useQuery({
@@ -43,15 +51,17 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
       
       if (error) throw error;
 
-      return data?.map(customer => ({
+      const mappedCustomers = data?.map(customer => ({
         ...customer,
-        // If customer has an active rental in fleet_vehicles, mark them as active_rental
         status: activeRentalCustomerIds.includes(customer.id) 
           ? 'active_rental'
           : customer.status || 'active'
       }));
+
+      console.log('Mapped customers:', mappedCustomers);
+      return mappedCustomers;
     },
-    enabled: !!fleetVehicles, // Only run after we have fleet data
+    enabled: true, // Always run this query
   });
 
   // Filter customers based on search and status
