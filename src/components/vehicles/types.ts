@@ -21,11 +21,12 @@ export interface FleetVehicle {
   next_revision_date: string;
   plate: string;
   is_available: boolean;
-  created_at?: string;
-  updated_at?: string;
+  status: string;
   car_model?: {
     name: string;
     year: string;
-    image_url?: string | null;
+  };
+  customer?: {
+    full_name: string;
   };
 }
