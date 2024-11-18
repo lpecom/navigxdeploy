@@ -8,7 +8,7 @@ const corsHeaders = {
 }
 
 const normalizeStatus = (status: string) => {
-  status = status.toUpperCase();
+  status = status.toUpperCase().trim();
   if (status.includes('MECANICA')) return 'MECHANICAL';
   if (status.includes('ELETRICA')) return 'ELECTRICAL';
   if (status.includes('PREPARACAO')) return 'PREPARATION';
@@ -20,6 +20,16 @@ const normalizeStatus = (status: string) => {
   if (status.includes('DISPONIVEL')) return 'AVAILABLE';
   if (status.includes('MANUTENCOES')) return 'OTHER_MAINTENANCE';
   return 'MAINTENANCE';
+};
+
+const normalizeGroup = (group: string) => {
+  if (!group) return null;
+  group = group.toUpperCase().trim();
+  if (group.includes('HATCH')) return 'HATCH';
+  if (group.includes('SEDAN')) return 'SEDAN';
+  if (group.includes('SUV')) return 'SUV';
+  if (group.includes('PREMIUM')) return 'PREMIUM';
+  return 'OTHER';
 };
 
 serve(async (req) => {
@@ -67,6 +77,24 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
+    // First, ensure we have all car groups
+    const carGroups = [...new Set(fleetData.map(row => normalizeGroup(row.group)))].filter(Boolean);
+    for (const groupName of carGroups) {
+      const { error: groupError } = await supabase
+        .from('car_groups')
+        .upsert({
+          name: groupName,
+          description: `${groupName} vehicles group`,
+          is_active: true
+        }, {
+          onConflict: 'name'
+        });
+
+      if (groupError) {
+        console.error('Error upserting car group:', groupError);
+      }
+    }
+
     for (const row of fleetData) {
       // Create or update customer if we have customer data
       let customerId = null;
@@ -76,20 +104,29 @@ serve(async (req) => {
           .upsert({
             full_name: row.customer_name,
             cpf: row.customer_document,
-            status: 'active'
+            status: 'active',
+            total_rentals: 1,
+            last_rental_date: new Date().toISOString()
           }, {
             onConflict: 'cpf'
           })
           .select()
-          .single()
+          .single();
 
         if (customerError) {
-          console.error('Error upserting customer:', customerError)
-          continue
+          console.error('Error upserting customer:', customerError);
+          continue;
         }
 
-        customerId = customer.id
+        customerId = customer.id;
       }
+
+      // Get car group
+      const { data: carGroup } = await supabase
+        .from('car_groups')
+        .select('id')
+        .eq('name', normalizeGroup(row.group))
+        .single();
 
       // Get or create car model
       const { data: carModel, error: modelError } = await supabase
@@ -97,16 +134,17 @@ serve(async (req) => {
         .upsert({
           name: row.model,
           year: row.model_year,
-          description: `${row.manufacturer} ${row.model}`
+          description: `${row.manufacturer} ${row.model}`,
+          category_id: carGroup?.id || null
         }, {
           onConflict: 'name'
         })
         .select()
-        .single()
+        .single();
 
       if (modelError) {
-        console.error('Error upserting car model:', modelError)
-        continue
+        console.error('Error upserting car model:', modelError);
+        continue;
       }
 
       // Create or update fleet vehicle
@@ -130,20 +168,20 @@ serve(async (req) => {
           is_available: (row.status || '').toLowerCase().includes('disponivel')
         }, {
           onConflict: 'plate'
-        })
+        });
 
       if (vehicleError) {
-        console.error('Error upserting vehicle:', vehicleError)
-        continue
+        console.error('Error upserting vehicle:', vehicleError);
+        continue;
       }
     }
 
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, processed: fleetData.length }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
-    console.error('Error processing fleet data:', error)
+    console.error('Error processing fleet data:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }

@@ -17,7 +17,7 @@ export const FleetImport = () => {
     setIsProcessing(true);
 
     try {
-      const { error } = await supabase.functions.invoke(
+      const { data, error } = await supabase.functions.invoke(
         "process-fleet-csv",
         {
           body: { htmlUrl: 'https://brown-georgeanne-53.tiiny.site/' },
@@ -28,13 +28,13 @@ export const FleetImport = () => {
 
       toast({
         title: "Success!",
-        description: "Fleet data has been updated successfully.",
+        description: `Fleet data has been updated successfully. Processed ${data.processed} vehicles.`,
       });
     } catch (error) {
       console.error("Error processing HTML file:", error);
       toast({
         title: "Error",
-        description: "Failed to process the fleet data.",
+        description: "Failed to process the fleet data. Please try again.",
         variant: "destructive",
       });
     } finally {
