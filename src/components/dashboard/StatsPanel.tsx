@@ -19,23 +19,57 @@ const StatsPanel = () => {
 
       // Get count of active rentals
       const { count: activeRentals, error: rentalsError } = await supabase
-        .from('checkout_sessions')
+        .from('fleet_vehicles')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
+        .eq('status', 'alugado');
 
       if (rentalsError) {
         console.error('Error fetching rentals:', rentalsError);
         throw rentalsError;
       }
 
-      // Get total number of customers
-      const { count: totalCustomers, error: customersError } = await supabase
-        .from('driver_details')
-        .select('*', { count: 'exact', head: true });
+      // Get count of vehicles in maintenance
+      const { count: maintenanceCount, error: maintenanceError } = await supabase
+        .from('fleet_vehicles')
+        .select('*', { count: 'exact', head: true })
+        .ilike('status', '%manutenção%');
 
-      if (customersError) {
-        console.error('Error fetching customers:', customersError);
-        throw customersError;
+      if (maintenanceError) {
+        console.error('Error fetching maintenance vehicles:', maintenanceError);
+        throw maintenanceError;
+      }
+
+      // Get count of vehicles in body shop (funilaria)
+      const { count: bodyShopCount, error: bodyShopError } = await supabase
+        .from('fleet_vehicles')
+        .select('*', { count: 'exact', head: true })
+        .ilike('status', '%funilaria%');
+
+      if (bodyShopError) {
+        console.error('Error fetching body shop vehicles:', bodyShopError);
+        throw bodyShopError;
+      }
+
+      // Get count of deactivated vehicles
+      const { count: deactivatedCount, error: deactivatedError } = await supabase
+        .from('fleet_vehicles')
+        .select('*', { count: 'exact', head: true })
+        .ilike('status', '%desativado%');
+
+      if (deactivatedError) {
+        console.error('Error fetching deactivated vehicles:', deactivatedError);
+        throw deactivatedError;
+      }
+
+      // Get count of management vehicles (diretoria)
+      const { count: managementCount, error: managementError } = await supabase
+        .from('fleet_vehicles')
+        .select('*', { count: 'exact', head: true })
+        .ilike('status', '%diretoria%');
+
+      if (managementError) {
+        console.error('Error fetching management vehicles:', managementError);
+        throw managementError;
       }
 
       const totalRevenue = payments?.reduce((acc, payment) => acc + Number(payment.amount), 0) || 0;
@@ -43,7 +77,10 @@ const StatsPanel = () => {
       return {
         revenue: totalRevenue,
         activeRentals: activeRentals || 0,
-        customers: totalCustomers || 0,
+        maintenanceCount: maintenanceCount || 0,
+        bodyShopCount: bodyShopCount || 0,
+        deactivatedCount: deactivatedCount || 0,
+        managementCount: managementCount || 0,
       };
     },
   });
@@ -62,10 +99,28 @@ const StatsPanel = () => {
       icon: Car,
     },
     {
-      label: "Total de Clientes",
-      value: stats?.customers.toString() || "0",
+      label: "Em Manutenção",
+      value: stats?.maintenanceCount.toString() || "0",
       change: "+7%",
       icon: Users,
+    },
+    {
+      label: "Funilaria",
+      value: stats?.bodyShopCount.toString() || "0",
+      change: "+2%",
+      icon: Car,
+    },
+    {
+      label: "Desativados",
+      value: stats?.deactivatedCount.toString() || "0",
+      change: "-5%",
+      icon: Car,
+    },
+    {
+      label: "Diretoria",
+      value: stats?.managementCount.toString() || "0",
+      change: "0%",
+      icon: Car,
     },
   ];
 
