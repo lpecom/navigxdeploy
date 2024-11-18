@@ -278,15 +278,30 @@ export type Database = {
       customers: {
         Row: {
           address: string | null
+          birth_date: string | null
           city: string | null
+          commercial_address: Json | null
+          contract_count: number | null
+          correspondence_address: string | null
           cpf: string
           created_at: string | null
+          drivers_license: Json | null
           email: string
           full_name: string
+          gender: string | null
           id: string
           last_rental_date: string | null
+          mobile_phone: string | null
+          nationality: string | null
+          other_phone: string | null
           phone: string
           postal_code: string | null
+          registration_code: string | null
+          registration_date: string | null
+          registration_type: string | null
+          rental_days_count: number | null
+          residential_address: Json | null
+          rg: string | null
           state: string | null
           status: string | null
           total_rentals: number | null
@@ -294,15 +309,30 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          birth_date?: string | null
           city?: string | null
+          commercial_address?: Json | null
+          contract_count?: number | null
+          correspondence_address?: string | null
           cpf: string
           created_at?: string | null
+          drivers_license?: Json | null
           email: string
           full_name: string
+          gender?: string | null
           id?: string
           last_rental_date?: string | null
+          mobile_phone?: string | null
+          nationality?: string | null
+          other_phone?: string | null
           phone: string
           postal_code?: string | null
+          registration_code?: string | null
+          registration_date?: string | null
+          registration_type?: string | null
+          rental_days_count?: number | null
+          residential_address?: Json | null
+          rg?: string | null
           state?: string | null
           status?: string | null
           total_rentals?: number | null
@@ -310,15 +340,30 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          birth_date?: string | null
           city?: string | null
+          commercial_address?: Json | null
+          contract_count?: number | null
+          correspondence_address?: string | null
           cpf?: string
           created_at?: string | null
+          drivers_license?: Json | null
           email?: string
           full_name?: string
+          gender?: string | null
           id?: string
           last_rental_date?: string | null
+          mobile_phone?: string | null
+          nationality?: string | null
+          other_phone?: string | null
           phone?: string
           postal_code?: string | null
+          registration_code?: string | null
+          registration_date?: string | null
+          registration_type?: string | null
+          rental_days_count?: number | null
+          residential_address?: Json | null
+          rg?: string | null
           state?: string | null
           status?: string | null
           total_rentals?: number | null
