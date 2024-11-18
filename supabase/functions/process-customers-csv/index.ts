@@ -34,7 +34,8 @@ serve(async (req) => {
 
     let processedCount = 0
     const errors = []
-    const BATCH_SIZE = 10
+    const BATCH_SIZE = 5 // Reduced batch size
+    const BATCH_DELAY = 300 // Increased delay between batches
 
     for (let i = 0; i < data.length; i += BATCH_SIZE) {
       const batch = data.slice(i, Math.min(i + BATCH_SIZE, data.length))
@@ -45,25 +46,37 @@ serve(async (req) => {
               throw new Error('CPF is required')
             }
 
-            const phone = String(row['Celular'] || row['Fone Residencial'] || '')
-              .replace(/[^\d]/g, '')
+            // Clean and format phone numbers
+            const cleanPhone = (phone: string) => phone?.replace(/[^\d]/g, '') || ''
+            const phone = cleanPhone(row['Celular']) || cleanPhone(row['Fone Residencial']) || ''
             
-            const address = row['Endereço Residencial'] ? 
-              `${row['Endereço Residencial']}, ${row['Num.']}${row['Complemento'] ? ' ' + row['Complemento'] : ''}` : 
-              null
+            // Build complete address
+            const address = [
+              row['Endereço Residencial'],
+              row['Num.'],
+              row['Complemento']
+            ].filter(Boolean).join(' ')
+
+            // Parse date with better error handling
+            const parseBirthDate = (dateStr: string) => {
+              if (!dateStr) return null
+              const [day, month, year] = dateStr.split('/').map(Number)
+              if (!day || !month || !year) return null
+              return new Date(year, month - 1, day).toISOString()
+            }
 
             return {
               full_name: (row['Cliente'] || '').trim(),
               email: row['Email'] || `${cpf}@placeholder.com`,
               cpf: cpf,
               phone: phone,
-              address: address,
+              address: address || null,
               city: row['Cidade'] || null,
               state: row['Estado'] || null,
               postal_code: (row['CEP'] || '').replace(/[^\d]/g, ''),
               gender: row['Sexo'] === 'M' ? 'male' : row['Sexo'] === 'F' ? 'female' : null,
               rg: (row['RG'] || '').replace(/[^\d]/g, ''),
-              birth_date: row['Data Nascimento'] ? new Date(row['Data Nascimento'].split('/').reverse().join('-')) : null,
+              birth_date: parseBirthDate(row['Data Nascimento']),
               nationality: (row['Nacionalidade'] || '').trim(),
               registration_type: row['Tipo Cadastro'] || null,
               status: 'active'
@@ -92,7 +105,7 @@ serve(async (req) => {
           }
 
           processedCount += batch.length
-          console.log(`Processed ${processedCount} records`)
+          console.log(`Processed ${processedCount}/${data.length} records`)
         } catch (error) {
           console.error('Unexpected error:', error)
           errors.push(`Unexpected error: ${error.message}`)
@@ -100,7 +113,7 @@ serve(async (req) => {
       }
 
       // Add delay between batches to prevent resource exhaustion
-      await new Promise(resolve => setTimeout(resolve, 200))
+      await new Promise(resolve => setTimeout(resolve, BATCH_DELAY))
     }
 
     return new Response(
