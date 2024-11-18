@@ -28,14 +28,17 @@ const DriverDashboard = () => {
           return;
         }
 
-        // Find driver by email
-        const { data: driver, error: driverError } = await supabase
+        // Find driver by email, order by created_at to get the most recent one
+        const { data: drivers, error: driverError } = await supabase
           .from('driver_details')
           .select('id')
           .eq('email', session.user.email)
-          .single();
+          .order('created_at', { ascending: false })
+          .limit(1);
 
-        if (driverError || !driver) {
+        if (driverError) throw driverError;
+
+        if (!drivers || drivers.length === 0) {
           toast({
             title: "Acesso Negado",
             description: "Perfil de motorista não encontrado.",
@@ -46,7 +49,7 @@ const DriverDashboard = () => {
           return;
         }
 
-        setDriverId(driver.id);
+        setDriverId(drivers[0].id);
       } catch (error: any) {
         console.error("Auth error:", error);
         toast({
