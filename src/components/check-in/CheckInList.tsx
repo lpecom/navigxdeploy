@@ -45,16 +45,16 @@ const CheckInList = () => {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Car className="w-5 h-5 text-primary" />
-                  <h3 className="font-medium">{reservation.selected_car.name}</h3>
+                  <h3 className="font-medium">{reservation.selected_car?.name || 'Veículo não especificado'}</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {reservation.driver.full_name}
+                  {reservation.driver?.full_name || 'Motorista não especificado'}
                 </p>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="w-4 h-4" />
                   <span>
-                    {new Date(reservation.pickup_date).toLocaleDateString('pt-BR')} às{' '}
-                    {reservation.pickup_time}
+                    {reservation.pickup_date ? new Date(reservation.pickup_date).toLocaleDateString('pt-BR') : 'Data não especificada'} às{' '}
+                    {reservation.pickup_time || 'Horário não especificado'}
                   </span>
                 </div>
               </div>
