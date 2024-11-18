@@ -7,26 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const columnMappings = {
-  'Cliente': 'full_name',
-  'CPF/Passaporte': 'cpf',
-  'Email': 'email',
-  'Sexo': 'gender',
-  'RG': 'rg',
-  'Data Nascimento': 'birth_date',
-  'Nacionalidade': 'nationality',
-  'Endereço Residencial': 'address',
-  'Num.': 'number',
-  'Complemento': 'complement',
-  'Bairro': 'neighborhood',
-  'CEP': 'postal_code',
-  'Cidade': 'city',
-  'Estado': 'state',
-  'Fone Residencial': 'phone',
-  'Celular': 'mobile_phone',
-  'Outro Fone': 'other_phone',
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -35,20 +15,17 @@ serve(async (req) => {
   try {
     const formData = await req.formData()
     const file = formData.get('file')
-
+    
     if (!file) {
       throw new Error('No file uploaded')
     }
 
     const buffer = await file.arrayBuffer()
-    const workbook = XLSX.read(new Uint8Array(buffer), { 
-      type: 'array',
-      raw: true,
-      cellDates: true
-    })
-    
+    const workbook = XLSX.read(new Uint8Array(buffer), { type: 'array' })
     const worksheet = workbook.Sheets[workbook.SheetNames[0]]
     const data = XLSX.utils.sheet_to_json(worksheet)
+
+    console.log(`Processing ${data.length} customers`)
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -57,7 +34,7 @@ serve(async (req) => {
 
     let processedCount = 0
     const errors = []
-    const BATCH_SIZE = 5 // Very small batch size for stability
+    const BATCH_SIZE = 10
 
     for (let i = 0; i < data.length; i += BATCH_SIZE) {
       const batch = data.slice(i, Math.min(i + BATCH_SIZE, data.length))
@@ -68,43 +45,28 @@ serve(async (req) => {
               throw new Error('CPF is required')
             }
 
-            const residentialAddress = {
-              address: row['Endereço Residencial'] || '',
-              number: row['Num.'] || '',
-              complement: row['Complemento'] || '',
-              neighborhood: row['Bairro'] || '',
-              postal_code: row['CEP']?.replace(/[^\d]/g, '') || '',
-              city: row['Cidade'] || '',
-              state: row['Estado'] || '',
-              phone: row['Fone Residencial'] || ''
-            }
-
-            const commercialAddress = {
-              address: row['Endereço Comercial'] || '',
-              number: row['Num.2'] || '',
-              complement: '',
-              neighborhood: '',
-              postal_code: '',
-              city: '',
-              state: '',
-              phone: ''
-            }
+            const phone = String(row['Celular'] || row['Fone Residencial'] || '')
+              .replace(/[^\d]/g, '')
+            
+            const address = row['Endereço Residencial'] ? 
+              `${row['Endereço Residencial']}, ${row['Num.']}${row['Complemento'] ? ' ' + row['Complemento'] : ''}` : 
+              null
 
             return {
               full_name: (row['Cliente'] || '').trim(),
-              email: (row['Email'] || `${cpf}@placeholder.com`).trim(),
+              email: row['Email'] || `${cpf}@placeholder.com`,
               cpf: cpf,
-              phone: (row['Celular'] || row['Fone Residencial'] || '').replace(/[^\d]/g, ''),
+              phone: phone,
+              address: address,
+              city: row['Cidade'] || null,
+              state: row['Estado'] || null,
+              postal_code: (row['CEP'] || '').replace(/[^\d]/g, ''),
               gender: row['Sexo'] === 'M' ? 'male' : row['Sexo'] === 'F' ? 'female' : null,
               rg: (row['RG'] || '').replace(/[^\d]/g, ''),
-              birth_date: row['Data Nascimento'] ? new Date(row['Data Nascimento']) : null,
+              birth_date: row['Data Nascimento'] ? new Date(row['Data Nascimento'].split('/').reverse().join('-')) : null,
               nationality: (row['Nacionalidade'] || '').trim(),
-              residential_address: residentialAddress,
-              commercial_address: commercialAddress,
-              mobile_phone: (row['Celular'] || '').replace(/[^\d]/g, ''),
-              other_phone: (row['Outro Fone'] || '').replace(/[^\d]/g, ''),
-              status: 'active',
-              registration_type: row['Tipo Cadastro'] || 'Interno - Físico'
+              registration_type: row['Tipo Cadastro'] || null,
+              status: 'active'
             }
           } catch (error) {
             console.error(`Error processing row ${i}:`, error)
@@ -137,22 +99,22 @@ serve(async (req) => {
         }
       }
 
-      // Longer delay between batches
-      await new Promise(resolve => setTimeout(resolve, 300))
+      // Add delay between batches to prevent resource exhaustion
+      await new Promise(resolve => setTimeout(resolve, 200))
     }
 
     return new Response(
       JSON.stringify({ 
-        message: 'Customers processed successfully',
+        success: true,
         processed: processedCount,
-        errors: errors
+        errors: errors,
+        message: `Successfully processed ${processedCount} customers` 
       }),
       { 
         headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        },
-        status: 200 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        } 
       }
     )
   } catch (error) {
@@ -163,10 +125,7 @@ serve(async (req) => {
         details: error.message 
       }),
       { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400 
       }
     )
