@@ -7,6 +7,26 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const columnMappings = {
+  'Cliente': 'full_name',
+  'CPF/Passaporte': 'cpf',
+  'Email': 'email',
+  'Sexo': 'gender',
+  'RG': 'rg',
+  'Data Nascimento': 'birth_date',
+  'Nacionalidade': 'nationality',
+  'Endereço Residencial': 'address',
+  'Num.': 'number',
+  'Complemento': 'complement',
+  'Bairro': 'neighborhood',
+  'CEP': 'postal_code',
+  'Cidade': 'city',
+  'Estado': 'state',
+  'Fone Residencial': 'phone',
+  'Celular': 'mobile_phone',
+  'Outro Fone': 'other_phone',
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -20,22 +40,15 @@ serve(async (req) => {
       throw new Error('No file uploaded')
     }
 
-    // Read file with minimal memory usage
     const buffer = await file.arrayBuffer()
     const workbook = XLSX.read(new Uint8Array(buffer), { 
       type: 'array',
-      cellDates: true,
-      cellNF: false,
-      cellText: false
-    })
-    const worksheet = workbook.Sheets[workbook.SheetNames[0]]
-    
-    // Convert to JSON with minimal options
-    const data = XLSX.utils.sheet_to_json(worksheet, { 
       raw: true,
-      defval: '',
-      header: 'A'
+      cellDates: true
     })
+    
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]]
+    const data = XLSX.utils.sheet_to_json(worksheet)
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -44,30 +57,57 @@ serve(async (req) => {
 
     let processedCount = 0
     const errors = []
-    const BATCH_SIZE = 10 // Further reduced batch size
+    const BATCH_SIZE = 5 // Very small batch size for stability
 
-    // Process in smaller batches with minimal memory allocation
     for (let i = 0; i < data.length; i += BATCH_SIZE) {
       const batch = data.slice(i, Math.min(i + BATCH_SIZE, data.length))
         .map((row: any) => {
           try {
-            const cpf = row.cpf || row.CPF || row.C || ''
+            const cpf = String(row['CPF/Passaporte'] || '').replace(/[^\d]/g, '')
             if (!cpf) {
               throw new Error('CPF is required')
             }
-            
+
+            const residentialAddress = {
+              address: row['Endereço Residencial'] || '',
+              number: row['Num.'] || '',
+              complement: row['Complemento'] || '',
+              neighborhood: row['Bairro'] || '',
+              postal_code: row['CEP']?.replace(/[^\d]/g, '') || '',
+              city: row['Cidade'] || '',
+              state: row['Estado'] || '',
+              phone: row['Fone Residencial'] || ''
+            }
+
+            const commercialAddress = {
+              address: row['Endereço Comercial'] || '',
+              number: row['Num.2'] || '',
+              complement: '',
+              neighborhood: '',
+              postal_code: '',
+              city: '',
+              state: '',
+              phone: ''
+            }
+
             return {
-              full_name: (row.full_name || row.name || row.Nome || row.A || '').trim(),
-              email: (row.email || row.Email || row.B || `${cpf}@placeholder.com`).trim(),
-              cpf: cpf.trim(),
-              phone: (row.phone || row.telefone || row.Phone || row.D || '').trim(),
-              address: (row.address || row.endereco || row.Address || row.E || '').trim(),
-              city: (row.city || row.cidade || row.City || row.F || '').trim(),
-              state: (row.state || row.estado || row.State || row.G || '').trim(),
-              postal_code: (row.postal_code || row.cep || row.CEP || row.H || '').trim(),
-              status: 'active'
+              full_name: (row['Cliente'] || '').trim(),
+              email: (row['Email'] || `${cpf}@placeholder.com`).trim(),
+              cpf: cpf,
+              phone: (row['Celular'] || row['Fone Residencial'] || '').replace(/[^\d]/g, ''),
+              gender: row['Sexo'] === 'M' ? 'male' : row['Sexo'] === 'F' ? 'female' : null,
+              rg: (row['RG'] || '').replace(/[^\d]/g, ''),
+              birth_date: row['Data Nascimento'] ? new Date(row['Data Nascimento']) : null,
+              nationality: (row['Nacionalidade'] || '').trim(),
+              residential_address: residentialAddress,
+              commercial_address: commercialAddress,
+              mobile_phone: (row['Celular'] || '').replace(/[^\d]/g, ''),
+              other_phone: (row['Outro Fone'] || '').replace(/[^\d]/g, ''),
+              status: 'active',
+              registration_type: row['Tipo Cadastro'] || 'Interno - Físico'
             }
           } catch (error) {
+            console.error(`Error processing row ${i}:`, error)
             errors.push(`Row ${i + 1}: ${error.message}`)
             return null
           }
@@ -90,6 +130,7 @@ serve(async (req) => {
           }
 
           processedCount += batch.length
+          console.log(`Processed ${processedCount} records`)
         } catch (error) {
           console.error('Unexpected error:', error)
           errors.push(`Unexpected error: ${error.message}`)
@@ -97,7 +138,7 @@ serve(async (req) => {
       }
 
       // Longer delay between batches
-      await new Promise(resolve => setTimeout(resolve, 200))
+      await new Promise(resolve => setTimeout(resolve, 300))
     }
 
     return new Response(
