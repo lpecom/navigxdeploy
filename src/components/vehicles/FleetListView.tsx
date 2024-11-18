@@ -34,7 +34,7 @@ export const FleetListView = () => {
         `);
 
       if (searchTerm) {
-        query.or(`plate.ilike.%${searchTerm}%,car_model->name.ilike.%${searchTerm}%`);
+        query.or(`plate.ilike.%${searchTerm}%,car_models(name).ilike.%${searchTerm}%`);
       }
       
       const { data, error } = await query;
