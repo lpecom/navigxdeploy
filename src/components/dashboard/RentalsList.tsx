@@ -34,9 +34,11 @@ const RentalsList = () => {
         .order('created_at', { ascending: false })
         .limit(5);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching rentals:', error);
+        throw error;
+      }
       
-      // Type assertion to ensure the selected_car matches SelectedCar type
       return (data || []).map(item => ({
         ...item,
         selected_car: item.selected_car as unknown as SelectedCar
@@ -91,7 +93,7 @@ const RentalsList = () => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="font-medium text-gray-900">{rental.driver?.full_name}</p>
+                    <p className="font-medium text-gray-900">{rental.driver?.full_name || 'Cliente não identificado'}</p>
                     <Badge variant="secondary" className="font-medium">
                       Ativo
                     </Badge>
@@ -99,7 +101,7 @@ const RentalsList = () => {
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <div className="flex items-center gap-1.5">
                       <Car className="w-4 h-4" />
-                      <span>{rental.selected_car.name}</span>
+                      <span>{rental.selected_car?.name || 'Veículo não especificado'}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <Calendar className="w-4 h-4" />

@@ -6,19 +6,37 @@ const StatsPanel = () => {
   const { data: stats } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
-      const { data: payments } = await supabase
+      // Get total revenue from completed payments
+      const { data: payments, error: paymentsError } = await supabase
         .from('payments')
         .select('amount')
         .eq('status', 'completed');
 
-      const { count: activeRentals } = await supabase
+      if (paymentsError) {
+        console.error('Error fetching payments:', paymentsError);
+        throw paymentsError;
+      }
+
+      // Get count of active rentals
+      const { count: activeRentals, error: rentalsError } = await supabase
         .from('checkout_sessions')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'active');
 
-      const { count: totalCustomers } = await supabase
+      if (rentalsError) {
+        console.error('Error fetching rentals:', rentalsError);
+        throw rentalsError;
+      }
+
+      // Get total number of customers
+      const { count: totalCustomers, error: customersError } = await supabase
         .from('driver_details')
         .select('*', { count: 'exact', head: true });
+
+      if (customersError) {
+        console.error('Error fetching customers:', customersError);
+        throw customersError;
+      }
 
       const totalRevenue = payments?.reduce((acc, payment) => acc + Number(payment.amount), 0) || 0;
 
