@@ -12,6 +12,7 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
           id,
           plate,
           customer_id,
+          status,
           customers!inner (
             id,
             full_name,
@@ -19,6 +20,7 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
             cpf
           )
         `)
+        .eq('status', 'rented')  // Only get vehicles that are currently rented
         .not('customer_id', 'is', null);
       
       if (error) throw error;
@@ -43,6 +45,7 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
 
       return data?.map(customer => ({
         ...customer,
+        // If customer has an active rental in fleet_vehicles, mark them as active_rental
         status: activeRentalCustomerIds.includes(customer.id) 
           ? 'active_rental'
           : customer.status || 'active'
