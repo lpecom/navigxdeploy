@@ -22,6 +22,8 @@ const demoCarModels: CarModel[] = [
     optionals: null,
     created_at: null,
     updated_at: null,
+    engine_size: '1.0',
+    transmission: 'Manual'
   },
   {
     id: '2',
@@ -33,6 +35,8 @@ const demoCarModels: CarModel[] = [
     optionals: null,
     created_at: null,
     updated_at: null,
+    engine_size: '1.0',
+    transmission: 'Manual'
   },
   {
     id: '3',
@@ -44,6 +48,8 @@ const demoCarModels: CarModel[] = [
     optionals: null,
     created_at: null,
     updated_at: null,
+    engine_size: '1.0',
+    transmission: 'Manual'
   },
   {
     id: '4',
@@ -55,6 +61,8 @@ const demoCarModels: CarModel[] = [
     optionals: null,
     created_at: null,
     updated_at: null,
+    engine_size: '1.0',
+    transmission: 'Manual'
   },
   {
     id: '5',
@@ -66,6 +74,8 @@ const demoCarModels: CarModel[] = [
     optionals: null,
     created_at: null,
     updated_at: null,
+    engine_size: '1.0',
+    transmission: 'Manual'
   }
 ];
 
