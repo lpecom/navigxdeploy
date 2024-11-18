@@ -7,7 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// Handle CORS preflight requests
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -66,7 +65,9 @@ serve(async (req) => {
             .from('customers')
             .upsert({
               full_name: vehicle.customer_name,
+              email: `${vehicle.customer_document}@placeholder.com`, // Generate placeholder email
               cpf: vehicle.customer_document,
+              phone: '11999999999', // Default phone
               status: 'active'
             }, {
               onConflict: 'cpf'
