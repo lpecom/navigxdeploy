@@ -38,19 +38,44 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
   const { data: customers, isLoading } = useQuery({
     queryKey: ['customers', customerVehicleMap, searchTerm, statusFilter],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First, get all customers
+      const { data: allCustomers, error: customersError } = await supabase
         .from('customers')
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
+      if (customersError) throw customersError;
 
-      return data?.map(customer => ({
-        ...customer,
-        status: customerVehicleMap.has(customer.id) ? 'active_rental' : (customer.status || 'active'),
-        rented_vehicle: customerVehicleMap.get(customer.id)
+      // Update customer statuses based on fleet data
+      const updatedCustomers = await Promise.all((allCustomers || []).map(async (customer) => {
+        const hasActiveRental = customerVehicleMap.has(customer.id);
+        const newStatus = hasActiveRental ? 'active_rental' : (customer.status || 'active');
+
+        // If status needs to be updated in the database
+        if (customer.status !== newStatus) {
+          const { error: updateError } = await supabase
+            .from('customers')
+            .update({ 
+              status: newStatus,
+              last_rental_date: hasActiveRental ? new Date().toISOString() : customer.last_rental_date
+            })
+            .eq('id', customer.id);
+
+          if (updateError) {
+            console.error('Error updating customer status:', updateError);
+          }
+        }
+
+        return {
+          ...customer,
+          status: newStatus,
+          rented_vehicle: customerVehicleMap.get(customer.id)
+        };
       }));
+
+      return updatedCustomers;
     },
+    refetchInterval: 30000, // Refetch every 30 seconds to keep statuses in sync
   });
 
   // Filter customers based on search and status

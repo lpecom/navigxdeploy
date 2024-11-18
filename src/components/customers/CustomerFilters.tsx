@@ -31,9 +31,27 @@ export const CustomerFilters = ({
   counts
 }: CustomerFiltersProps) => {
   const statusOptions = [
-    { label: 'Com Aluguel Ativo', value: 'active_rental', count: counts.activeRental, color: 'bg-blue-100 text-blue-800' },
-    { label: 'Ativos', value: 'active', count: counts.active, color: 'bg-green-100 text-green-800' },
-    { label: 'Inativos', value: 'inactive', count: counts.inactive, color: 'bg-gray-100 text-gray-800' }
+    { 
+      label: 'Com Aluguel Ativo', 
+      value: 'active_rental', 
+      count: counts.activeRental, 
+      color: 'bg-blue-100 text-blue-800',
+      description: 'Clientes com veículos alugados atualmente'
+    },
+    { 
+      label: 'Ativos', 
+      value: 'active', 
+      count: counts.active, 
+      color: 'bg-green-100 text-green-800',
+      description: 'Clientes sem aluguéis ativos'
+    },
+    { 
+      label: 'Inativos', 
+      value: 'inactive', 
+      count: counts.inactive, 
+      color: 'bg-gray-100 text-gray-800',
+      description: 'Clientes sem atividade recente'
+    }
   ];
 
   return (
@@ -60,7 +78,7 @@ export const CustomerFilters = ({
               )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="w-[300px]">
             <DropdownMenuLabel>Status do Cliente</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {statusOptions.map((option) => (
@@ -75,9 +93,14 @@ export const CustomerFilters = ({
                   );
                 }}
               >
-                <div className="flex items-center justify-between w-full">
-                  <span>{option.label}</span>
-                  <Badge className={option.color}>{option.count}</Badge>
+                <div className="flex flex-col w-full">
+                  <div className="flex items-center justify-between">
+                    <span>{option.label}</span>
+                    <Badge className={option.color}>{option.count}</Badge>
+                  </div>
+                  <span className="text-xs text-muted-foreground mt-1">
+                    {option.description}
+                  </span>
                 </div>
               </DropdownMenuCheckboxItem>
             ))}
@@ -86,14 +109,19 @@ export const CustomerFilters = ({
       </div>
 
       {/* Status Summary */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-4 flex-wrap">
         {statusOptions.map((option) => (
           <div
             key={option.value}
-            className="flex items-center gap-2 px-3 py-1 rounded-lg bg-gray-50"
+            className="flex flex-col gap-1 px-4 py-2 rounded-lg bg-gray-50"
           >
-            <Badge className={option.color}>{option.count}</Badge>
-            <span className="text-sm text-muted-foreground">{option.label}</span>
+            <div className="flex items-center gap-2">
+              <Badge className={option.color}>{option.count}</Badge>
+              <span className="font-medium">{option.label}</span>
+            </div>
+            <span className="text-xs text-muted-foreground">
+              {option.description}
+            </span>
           </div>
         ))}
       </div>
