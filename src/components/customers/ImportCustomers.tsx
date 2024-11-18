@@ -31,7 +31,7 @@ export const ImportCustomers = () => {
       formData.append('file', file)
 
       const { data, error } = await supabase.functions.invoke(
-        "process-customers-csv",
+        'process-customers-csv',
         {
           body: formData,
           headers: {

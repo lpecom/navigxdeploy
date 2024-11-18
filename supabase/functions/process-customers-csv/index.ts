@@ -5,14 +5,21 @@ import * as csv from 'https://deno.land/std@0.170.0/encoding/csv.ts'
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
+    // Ensure request is POST
+    if (req.method !== 'POST') {
+      throw new Error('Method not allowed')
+    }
+
     const formData = await req.formData()
     const file = formData.get('file')
     
@@ -21,24 +28,23 @@ serve(async (req) => {
     }
 
     const text = await file.text()
-    console.log('CSV Content Preview:', text.substring(0, 200))
-
-    const lines = text.split('\n')
+    const lines = text.split('\n').filter(line => line.trim())
+    
     if (lines.length === 0) {
       throw new Error('Empty CSV file')
     }
 
-    const headerRow = lines[0].trim()
-    console.log('Header row:', headerRow)
+    // Parse header row to get column names
+    const headers = lines[0].toLowerCase().split(',').map(h => h.trim())
+    console.log('Headers:', headers)
 
+    // Parse CSV content
     const rows = await csv.parse(text, {
       skipFirstRow: true,
+      columns: headers,
     })
 
     console.log(`Processing ${rows.length} customers`)
-    if (rows.length > 0) {
-      console.log('Sample row:', rows[0])
-    }
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -50,18 +56,11 @@ serve(async (req) => {
     const BATCH_SIZE = 5
     const BATCH_DELAY = 300
 
-    const headers = headerRow.split(',').map(h => h.trim().toLowerCase())
-
     for (let i = 0; i < rows.length; i += BATCH_SIZE) {
       const batch = rows.slice(i, Math.min(i + BATCH_SIZE, rows.length))
-        .map((row: string[]) => {
+        .map((row: any) => {
           try {
-            const rowData = headers.reduce((acc: any, header, index) => {
-              acc[header] = row[index]?.trim() || null
-              return acc
-            }, {})
-
-            const cpf = String(rowData.cpf || '').replace(/[^\d]/g, '')
+            const cpf = String(row.cpf || '').replace(/[^\d]/g, '')
             if (!cpf) {
               throw new Error('CPF is required')
             }
@@ -69,14 +68,14 @@ serve(async (req) => {
             const cleanPhone = (phone: string) => phone?.replace(/[^\d]/g, '') || ''
 
             return {
-              full_name: rowData.full_name || rowData.name || rowData.nome || '',
-              email: rowData.email || `${cpf}@placeholder.com`,
+              full_name: row.full_name || row.name || row.nome || '',
+              email: row.email || `${cpf}@placeholder.com`,
               cpf,
-              phone: cleanPhone(rowData.phone || rowData.telefone),
-              address: rowData.address || rowData.endereco || null,
-              city: rowData.city || rowData.cidade || null,
-              state: rowData.state || rowData.estado || null,
-              postal_code: rowData.postal_code || rowData.cep || null,
+              phone: cleanPhone(row.phone || row.telefone),
+              address: row.address || row.endereco || null,
+              city: row.city || row.cidade || null,
+              state: row.state || row.estado || null,
+              postal_code: row.postal_code || row.cep || null,
               status: 'active'
             }
           } catch (error) {
@@ -105,6 +104,7 @@ serve(async (req) => {
         }
       }
 
+      // Add delay between batches
       await new Promise(resolve => setTimeout(resolve, BATCH_DELAY))
     }
 
