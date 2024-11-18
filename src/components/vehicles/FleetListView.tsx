@@ -15,9 +15,10 @@ export const FleetListView = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<FleetVehicle>>({});
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
   const { data: fleetVehicles, refetch, isLoading, error } = useQuery({
-    queryKey: ['fleet-vehicles-list', searchTerm],
+    queryKey: ['fleet-vehicles-list', searchTerm, statusFilter],
     queryFn: async () => {
       const query = supabase
         .from('fleet_vehicles')
@@ -35,6 +36,16 @@ export const FleetListView = () => {
 
       if (searchTerm) {
         query.or(`plate.ilike.%${searchTerm}%,car_models(name).ilike.%${searchTerm}%`);
+      }
+
+      if (statusFilter) {
+        if (statusFilter === 'available') {
+          query.or('status.ilike.%available%,status.ilike.%disponível%');
+        } else if (statusFilter === 'maintenance') {
+          query.or('status.ilike.%maintenance%,status.ilike.%manutenção%');
+        } else if (statusFilter === 'rented') {
+          query.or('status.ilike.%rented%,status.ilike.%alugado%');
+        }
       }
       
       const { data, error } = await query;
@@ -82,6 +93,10 @@ export const FleetListView = () => {
     }
   };
 
+  const handleFilterChange = (status: string | null) => {
+    setStatusFilter(status === statusFilter ? null : status);
+  };
+
   if (isLoading) {
     return (
       <Card className="p-6">
@@ -112,7 +127,11 @@ export const FleetListView = () => {
 
   return (
     <div className="space-y-6">
-      <FleetMetrics vehicles={fleetVehicles || []} />
+      <FleetMetrics 
+        vehicles={fleetVehicles || []} 
+        onFilterChange={handleFilterChange}
+        activeFilter={statusFilter}
+      />
       
       <div className="flex items-center justify-between gap-4">
         <FleetSearchBar
@@ -137,7 +156,7 @@ export const FleetListView = () => {
         <Card className="p-6">
           <div className="text-center text-muted-foreground">
             Nenhum veículo encontrado
-            {searchTerm && " para a busca realizada"}
+            {(searchTerm || statusFilter) && " para os filtros selecionados"}
           </div>
         </Card>
       )}
