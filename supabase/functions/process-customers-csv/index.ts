@@ -20,11 +20,22 @@ serve(async (req) => {
       throw new Error('No file uploaded')
     }
 
-    // Process file in smaller chunks
+    // Read file with minimal memory usage
     const buffer = await file.arrayBuffer()
-    const workbook = XLSX.read(new Uint8Array(buffer), { type: 'array', cellDates: true })
+    const workbook = XLSX.read(new Uint8Array(buffer), { 
+      type: 'array',
+      cellDates: true,
+      cellNF: false,
+      cellText: false
+    })
     const worksheet = workbook.Sheets[workbook.SheetNames[0]]
-    const data = XLSX.utils.sheet_to_json(worksheet, { raw: false })
+    
+    // Convert to JSON with minimal options
+    const data = XLSX.utils.sheet_to_json(worksheet, { 
+      raw: true,
+      defval: '',
+      header: 'A'
+    })
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -33,54 +44,60 @@ serve(async (req) => {
 
     let processedCount = 0
     const errors = []
-    const BATCH_SIZE = 25 // Reduced batch size
+    const BATCH_SIZE = 10 // Further reduced batch size
 
-    // Process in smaller batches
+    // Process in smaller batches with minimal memory allocation
     for (let i = 0; i < data.length; i += BATCH_SIZE) {
       const batch = data.slice(i, Math.min(i + BATCH_SIZE, data.length))
         .map((row: any) => {
           try {
-            if (!row.cpf && !row.CPF) {
+            const cpf = row.cpf || row.CPF || row.C || ''
+            if (!cpf) {
               throw new Error('CPF is required')
             }
             
             return {
-              full_name: row.full_name || row.name || row.Nome || '',
-              email: row.email || row.Email || `${row.cpf || row.CPF}@placeholder.com`,
-              cpf: row.cpf || row.CPF || '',
-              phone: row.phone || row.telefone || row.Phone || '',
-              address: row.address || row.endereco || row.Address || '',
-              city: row.city || row.cidade || row.City || '',
-              state: row.state || row.estado || row.State || '',
-              postal_code: row.postal_code || row.cep || row.CEP || '',
-              status: 'active',
+              full_name: (row.full_name || row.name || row.Nome || row.A || '').trim(),
+              email: (row.email || row.Email || row.B || `${cpf}@placeholder.com`).trim(),
+              cpf: cpf.trim(),
+              phone: (row.phone || row.telefone || row.Phone || row.D || '').trim(),
+              address: (row.address || row.endereco || row.Address || row.E || '').trim(),
+              city: (row.city || row.cidade || row.City || row.F || '').trim(),
+              state: (row.state || row.estado || row.State || row.G || '').trim(),
+              postal_code: (row.postal_code || row.cep || row.CEP || row.H || '').trim(),
+              status: 'active'
             }
           } catch (error) {
-            errors.push(`Row ${i}: ${error.message}`)
+            errors.push(`Row ${i + 1}: ${error.message}`)
             return null
           }
         })
         .filter(Boolean)
 
       if (batch.length > 0) {
-        const { error } = await supabase
-          .from('customers')
-          .upsert(batch, {
-            onConflict: 'cpf',
-            ignoreDuplicates: false
-          })
+        try {
+          const { error } = await supabase
+            .from('customers')
+            .upsert(batch, {
+              onConflict: 'cpf',
+              ignoreDuplicates: false
+            })
 
-        if (error) {
-          console.error('Batch error:', error)
-          errors.push(`Batch error: ${error.message}`)
-          continue
+          if (error) {
+            console.error('Batch error:', error)
+            errors.push(`Batch error: ${error.message}`)
+            continue
+          }
+
+          processedCount += batch.length
+        } catch (error) {
+          console.error('Unexpected error:', error)
+          errors.push(`Unexpected error: ${error.message}`)
         }
-
-        processedCount += batch.length
       }
 
-      // Small delay between batches to prevent resource exhaustion
-      await new Promise(resolve => setTimeout(resolve, 100))
+      // Longer delay between batches
+      await new Promise(resolve => setTimeout(resolve, 200))
     }
 
     return new Response(
