@@ -2,7 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Edit2, Save, CheckCircle, AlertTriangle, Clock, Wrench } from "lucide-react";
+import { 
+  Edit2, 
+  Save, 
+  CheckCircle, 
+  AlertTriangle, 
+  Clock, 
+  Wrench,
+  Car,
+  XOctagon,
+  Shield
+} from "lucide-react";
 import type { FleetVehicle } from "../types";
 
 interface FleetTableRowProps {
@@ -31,24 +41,49 @@ export const FleetTableRow = ({
 
     status = status.toLowerCase();
     
+    // Available status
     if (status === 'available' || status === 'disponível') return {
       variant: 'outline' as const,
       icon: CheckCircle,
       label: status === 'available' ? 'Available' : 'Disponível'
     };
     
+    // Maintenance status
     if (status.includes('maintenance') || status.includes('manutenção')) return {
       variant: 'destructive' as const,
       icon: Wrench,
       label: status.includes('maintenance') ? 'Maintenance' : 'Manutenção'
     };
     
+    // Rented status
     if (status === 'rented' || status === 'alugado') return {
       variant: 'secondary' as const,
       icon: Clock,
       label: status === 'rented' ? 'Rented' : 'Alugado'
     };
 
+    // Body shop status (Funilaria)
+    if (status.includes('funilaria')) return {
+      variant: 'warning' as const,
+      icon: Car,
+      label: 'Funilaria'
+    };
+
+    // Disabled status (Desativado)
+    if (status.includes('desativado')) return {
+      variant: 'destructive' as const,
+      icon: XOctagon,
+      label: 'Desativado'
+    };
+
+    // Management status (Diretoria)
+    if (status.includes('diretoria')) return {
+      variant: 'default' as const,
+      icon: Shield,
+      label: 'Diretoria'
+    };
+
+    // Default fallback
     return {
       variant: 'outline' as const,
       icon: AlertTriangle,
@@ -126,7 +161,10 @@ export const FleetTableRow = ({
           />
         ) : (
           <div className="flex items-center gap-2">
-            <Badge variant={statusInfo.variant} className="flex items-center gap-1.5">
+            <Badge 
+              variant={statusInfo.variant} 
+              className="flex items-center gap-1.5 px-2 py-1"
+            >
               <statusInfo.icon className="w-3 h-3" />
               <span>{statusInfo.label}</span>
             </Badge>
