@@ -17,10 +17,10 @@ export const FleetListView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
-  const { data: fleetVehicles, refetch, isLoading, error } = useQuery({
-    queryKey: ['fleet-vehicles-list', searchTerm, statusFilter],
+  const { data: allVehicles, refetch, isLoading, error } = useQuery({
+    queryKey: ['fleet-vehicles-list'],
     queryFn: async () => {
-      let query = supabase
+      const { data, error } = await supabase
         .from('fleet_vehicles')
         .select(`
           *,
@@ -33,45 +33,41 @@ export const FleetListView = () => {
             full_name
           )
         `);
-
-      // Apply search filter
-      if (searchTerm) {
-        query = query.or(`plate.ilike.%${searchTerm}%,car_models(name).ilike.%${searchTerm}%`);
-      }
-
-      // Apply status filter
-      if (statusFilter) {
-        switch (statusFilter) {
-          case 'available':
-            query = query.or('status.ilike.%available%,status.ilike.%disponível%');
-            break;
-          case 'maintenance':
-            query = query.or('status.ilike.%maintenance%,status.ilike.%manutenção%');
-            break;
-          case 'rented':
-            query = query.or('status.ilike.%rented%,status.ilike.%alugado%');
-            break;
-          case 'funilaria':
-            query = query.ilike('status', '%funilaria%');
-            break;
-          case 'desativado':
-            query = query.ilike('status', '%desativado%');
-            break;
-          case 'diretoria':
-            query = query.ilike('status', '%diretoria%');
-            break;
-          default:
-            break;
-        }
-      }
-      
-      const { data, error } = await query;
       
       if (error) throw error;
       
       return (data || [])
         .filter(vehicle => vehicle && vehicle.plate) as FleetVehicle[];
     },
+  });
+
+  // Filter vehicles based on search term and status
+  const filteredVehicles = allVehicles?.filter(vehicle => {
+    const matchesSearch = !searchTerm || 
+      vehicle.plate?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehicle.car_model?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus = !statusFilter || (() => {
+      const status = vehicle.status?.toLowerCase();
+      switch (statusFilter) {
+        case 'available':
+          return status === 'available' || status === 'disponível';
+        case 'maintenance':
+          return status?.includes('maintenance') || status?.includes('manutenção');
+        case 'rented':
+          return status === 'rented' || status === 'alugado';
+        case 'funilaria':
+          return status?.includes('funilaria');
+        case 'desativado':
+          return status?.includes('desativado');
+        case 'diretoria':
+          return status?.includes('diretoria');
+        default:
+          return true;
+      }
+    })();
+
+    return matchesSearch && matchesStatus;
   });
 
   const handleEdit = (vehicle: FleetVehicle) => {
@@ -146,7 +142,7 @@ export const FleetListView = () => {
   return (
     <div className="space-y-6">
       <FleetMetrics 
-        vehicles={fleetVehicles || []} 
+        vehicles={allVehicles || []} 
         onFilterChange={handleFilterChange}
         activeFilter={statusFilter}
       />
@@ -157,13 +153,13 @@ export const FleetListView = () => {
           onSearchChange={setSearchTerm}
         />
         <div className="text-sm text-muted-foreground">
-          Total: {fleetVehicles?.length || 0} veículos
+          Total filtrado: {filteredVehicles?.length || 0} de {allVehicles?.length || 0} veículos
         </div>
       </div>
 
-      {fleetVehicles && fleetVehicles.length > 0 ? (
+      {filteredVehicles && filteredVehicles.length > 0 ? (
         <FleetTable
-          vehicles={fleetVehicles}
+          vehicles={filteredVehicles}
           editingId={editingId}
           editForm={editForm}
           onEdit={handleEdit}
