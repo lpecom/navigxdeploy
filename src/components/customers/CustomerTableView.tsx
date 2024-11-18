@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Eye } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import { Badge } from "@/components/ui/badge"
 
 interface CustomerTableViewProps {
   customers: any[]
@@ -9,6 +10,19 @@ interface CustomerTableViewProps {
 
 export const CustomerTableView = ({ customers }: CustomerTableViewProps) => {
   const navigate = useNavigate()
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active_rental':
+        return <Badge className="bg-blue-100 text-blue-800">Aluguel Ativo</Badge>
+      case 'active':
+        return <Badge className="bg-green-100 text-green-800">Ativo</Badge>
+      case 'inactive':
+        return <Badge className="bg-gray-100 text-gray-800">Inativo</Badge>
+      default:
+        return <Badge variant="secondary">{status}</Badge>
+    }
+  }
 
   return (
     <div className="rounded-md border">
@@ -31,13 +45,7 @@ export const CustomerTableView = ({ customers }: CustomerTableViewProps) => {
               <TableCell>{customer.cpf}</TableCell>
               <TableCell>{customer.phone}</TableCell>
               <TableCell>
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  customer.status === 'active' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {customer.status === 'active' ? 'Ativo' : 'Inativo'}
-                </span>
+                {getStatusBadge(customer.status)}
               </TableCell>
               <TableCell>
                 <Button

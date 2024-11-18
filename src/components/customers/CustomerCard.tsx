@@ -29,14 +29,16 @@ interface CustomerCardProps {
 }
 
 export const CustomerCard = ({ customer, isExpanded, onToggle, onViewDetails }: CustomerCardProps) => {
-  const getStatusColor = (status: string) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
+      case 'active_rental':
+        return <Badge className="bg-blue-100 text-blue-800">Aluguel Ativo</Badge>;
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return <Badge className="bg-green-100 text-green-800">Ativo</Badge>;
       case 'inactive':
-        return 'bg-gray-100 text-gray-800';
+        return <Badge className="bg-gray-100 text-gray-800">Inativo</Badge>;
       default:
-        return 'bg-blue-100 text-blue-800';
+        return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
@@ -48,9 +50,7 @@ export const CustomerCard = ({ customer, isExpanded, onToggle, onViewDetails }: 
           <p className="text-sm text-muted-foreground">CPF: {customer.cpf}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge className={getStatusColor(customer.status)}>
-            {customer.status === 'active' ? 'Ativo' : 'Inativo'}
-          </Badge>
+          {getStatusBadge(customer.status)}
           <Button
             variant="ghost"
             size="icon"
