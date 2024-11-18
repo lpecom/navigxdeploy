@@ -19,7 +19,6 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
             cpf
           )
         `)
-        .eq('status', 'RENTED')
         .not('customer_id', 'is', null);
       
       if (error) throw error;
@@ -29,13 +28,11 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
   });
 
   // Get array of customer IDs with active rentals
-  const activeRentalCustomerIds = fleetVehicles
-    ?.filter(v => v.customer_id && v.customers)
-    .map(v => v.customer_id) || [];
+  const activeRentalCustomerIds = fleetVehicles?.map(v => v.customer_id) || [];
 
-  // Fetch all customers and update their status based on fleet data
+  // Then fetch all customers and update their status based on fleet data
   const { data: customers, isLoading } = useQuery({
-    queryKey: ['customers', activeRentalCustomerIds],
+    queryKey: ['customers', activeRentalCustomerIds, searchTerm, statusFilter],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('customers')
@@ -47,26 +44,30 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
       return data?.map(customer => ({
         ...customer,
         status: activeRentalCustomerIds.includes(customer.id) 
-          ? 'active_rental' 
-          : (customer.status || 'active')
+          ? 'active_rental'
+          : customer.status || 'active'
       }));
     },
+    enabled: !!fleetVehicles, // Only run after we have fleet data
   });
 
-  // Filter customers based on search term and status
+  // Filter customers based on search and status
   const filteredCustomers = customers?.filter(customer => {
-    const matchesSearch = 
+    // Filter out placeholder emails unless explicitly searching for them
+    const isPlaceholder = customer.email?.includes('@placeholder.com');
+    if (isPlaceholder && !searchTerm) return false;
+
+    const matchesSearch = !searchTerm || 
       customer.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.cpf?.includes(searchTerm);
 
-    const matchesStatus = statusFilter.length === 0 || statusFilter.includes(customer.status || 'active');
-    const isValidCustomer = !customer.email?.includes('@placeholder.com');
+    const matchesStatus = statusFilter.length === 0 || statusFilter.includes(customer.status);
 
-    return matchesSearch && matchesStatus && isValidCustomer;
+    return matchesSearch && matchesStatus;
   });
 
-  // Get customer counts by status
+  // Calculate counts excluding placeholder emails
   const validCustomers = customers?.filter(c => !c.email?.includes('@placeholder.com')) || [];
   const counts = {
     activeRental: validCustomers.filter(c => c.status === 'active_rental').length,
