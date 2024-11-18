@@ -16,6 +16,7 @@ import CustomerDetails from "@/pages/CustomerDetails";
 import CheckInList from "@/components/check-in/CheckInList";
 import CheckInProcess from "@/components/check-in/CheckInProcess";
 import { WebsiteSettings } from "@/components/website-manager/WebsiteSettings";
+import Changelog from "@/pages/Changelog";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 
@@ -92,6 +93,7 @@ const AdminRoutes = () => {
                 <Route path=":id" element={<CheckInProcess />} />
               </Route>
               <Route path="website-settings" element={<WebsiteSettings />} />
+              <Route path="changelog" element={<Changelog />} />
               <Route path="offers" element={<Offers />} />
               <Route path="accessories" element={<Accessories />} />
               <Route path="analytics" element={<Analytics />} />

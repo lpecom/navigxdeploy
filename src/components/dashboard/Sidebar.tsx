@@ -14,6 +14,7 @@ import {
   Wrench,
   CarFront,
   Grid,
+  History,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -60,6 +61,7 @@ const menuItems = [
   },
   { to: "/admin/accessories", icon: Package, label: "Opcionais" },
   { to: "/admin/website-settings", icon: Globe, label: "Website" },
+  { to: "/admin/changelog", icon: History, label: "Changelog" },
 ];
 
 const Sidebar = () => {
