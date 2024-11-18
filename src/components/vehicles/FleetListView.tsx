@@ -29,14 +29,16 @@ export const FleetListView = () => {
           *,
           car_model:car_models(
             name,
-            year,
-            image_url
+            year
+          ),
+          customer:customers(
+            full_name
           )
         `)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data as unknown as FleetVehicle[];
+      return data;
     }
   });
 
@@ -53,7 +55,8 @@ export const FleetListView = () => {
           current_km: editForm.current_km,
           last_revision_date: editForm.last_revision_date,
           next_revision_date: editForm.next_revision_date,
-          is_available: editForm.is_available
+          is_available: editForm.is_available,
+          status: editForm.status
         })
         .eq('id', id);
 
@@ -85,6 +88,7 @@ export const FleetListView = () => {
             <TableHead>KM Atual</TableHead>
             <TableHead>Última Revisão</TableHead>
             <TableHead>Próxima Revisão</TableHead>
+            <TableHead>Cliente</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Ações</TableHead>
           </TableRow>
@@ -108,7 +112,7 @@ export const FleetListView = () => {
                     className="w-24"
                   />
                 ) : (
-                  vehicle.current_km.toLocaleString()
+                  vehicle.current_km?.toLocaleString()
                 )}
               </TableCell>
               <TableCell>
@@ -140,18 +144,20 @@ export const FleetListView = () => {
                 )}
               </TableCell>
               <TableCell>
+                {vehicle.customer?.full_name || '-'}
+              </TableCell>
+              <TableCell>
                 {editingId === vehicle.id ? (
                   <Input
-                    type="checkbox"
-                    checked={editForm.is_available}
+                    type="text"
+                    value={editForm.status || ''}
                     onChange={(e) => setEditForm({
                       ...editForm,
-                      is_available: e.target.checked
+                      status: e.target.value
                     })}
-                    className="w-4 h-4"
                   />
                 ) : (
-                  vehicle.is_available ? "Disponível" : "Indisponível"
+                  vehicle.status
                 )}
               </TableCell>
               <TableCell>
