@@ -8,8 +8,12 @@ export interface CarModel {
   optionals: Record<string, any> | null;
   created_at: string | null;
   updated_at: string | null;
-  engine_size?: string;
-  transmission?: string;
+  engine_size: string;
+  transmission: string;
+}
+
+export interface CarModelResponse extends Omit<CarModel, 'optionals'> {
+  optionals: Record<string, any> | null;
 }
 
 export interface FleetVehicle {
@@ -25,6 +29,7 @@ export interface FleetVehicle {
   car_model?: {
     name: string;
     year: string;
+    image_url: string | null;
   };
   customer?: {
     full_name: string;
