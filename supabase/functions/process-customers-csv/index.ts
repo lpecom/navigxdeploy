@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
-import * as XLSX from 'https://esm.sh/xlsx@0.18.5'
+import * as csv from 'https://deno.land/std@0.170.0/encoding/csv.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,12 +20,18 @@ serve(async (req) => {
       throw new Error('No file uploaded')
     }
 
-    const buffer = await file.arrayBuffer()
-    const workbook = XLSX.read(new Uint8Array(buffer), { type: 'array' })
-    const worksheet = workbook.Sheets[workbook.SheetNames[0]]
-    const data = XLSX.utils.sheet_to_json(worksheet)
+    const text = await file.text()
+    const rows = await csv.parse(text, {
+      skipFirstRow: true,
+      columns: [
+        'code', 'registration_type', 'full_name', 'cpf', 'col1', 'gender',
+        'rg', 'birth_date', 'email', 'nationality', 'address', 'number',
+        'complement', 'neighborhood', 'postal_code', 'city', 'state',
+        'residential_phone', 'mobile_phone', 'other_phone'
+      ],
+    })
 
-    console.log(`Processing ${data.length} customers`)
+    console.log(`Processing ${rows.length} customers`)
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -37,24 +43,24 @@ serve(async (req) => {
     const BATCH_SIZE = 5 // Reduced batch size
     const BATCH_DELAY = 300 // Increased delay between batches
 
-    for (let i = 0; i < data.length; i += BATCH_SIZE) {
-      const batch = data.slice(i, Math.min(i + BATCH_SIZE, data.length))
+    for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+      const batch = rows.slice(i, Math.min(i + BATCH_SIZE, rows.length))
         .map((row: any) => {
           try {
-            const cpf = String(row['CPF/Passaporte'] || '').replace(/[^\d]/g, '')
+            const cpf = String(row.cpf || '').replace(/[^\d]/g, '')
             if (!cpf) {
               throw new Error('CPF is required')
             }
 
             // Clean and format phone numbers
             const cleanPhone = (phone: string) => phone?.replace(/[^\d]/g, '') || ''
-            const phone = cleanPhone(row['Celular']) || cleanPhone(row['Fone Residencial']) || ''
+            const phone = cleanPhone(row.mobile_phone) || cleanPhone(row.residential_phone) || ''
             
             // Build complete address
             const address = [
-              row['Endereço Residencial'],
-              row['Num.'],
-              row['Complemento']
+              row.address,
+              row.number,
+              row.complement
             ].filter(Boolean).join(' ')
 
             // Parse date with better error handling
@@ -66,19 +72,19 @@ serve(async (req) => {
             }
 
             return {
-              full_name: (row['Cliente'] || '').trim(),
-              email: row['Email'] || `${cpf}@placeholder.com`,
+              full_name: (row.full_name || '').trim(),
+              email: row.email || `${cpf}@placeholder.com`,
               cpf: cpf,
               phone: phone,
               address: address || null,
-              city: row['Cidade'] || null,
-              state: row['Estado'] || null,
-              postal_code: (row['CEP'] || '').replace(/[^\d]/g, ''),
-              gender: row['Sexo'] === 'M' ? 'male' : row['Sexo'] === 'F' ? 'female' : null,
-              rg: (row['RG'] || '').replace(/[^\d]/g, ''),
-              birth_date: parseBirthDate(row['Data Nascimento']),
-              nationality: (row['Nacionalidade'] || '').trim(),
-              registration_type: row['Tipo Cadastro'] || null,
+              city: row.city || null,
+              state: row.state || null,
+              postal_code: (row.postal_code || '').replace(/[^\d]/g, ''),
+              gender: row.gender === 'M' ? 'male' : row.gender === 'F' ? 'female' : null,
+              rg: (row.rg || '').replace(/[^\d]/g, ''),
+              birth_date: parseBirthDate(row.birth_date),
+              nationality: (row.nationality || '').trim(),
+              registration_type: row.registration_type || null,
               status: 'active'
             }
           } catch (error) {
@@ -105,7 +111,7 @@ serve(async (req) => {
           }
 
           processedCount += batch.length
-          console.log(`Processed ${processedCount}/${data.length} records`)
+          console.log(`Processed ${processedCount}/${rows.length} records`)
         } catch (error) {
           console.error('Unexpected error:', error)
           errors.push(`Unexpected error: ${error.message}`)

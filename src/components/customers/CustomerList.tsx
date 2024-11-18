@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CustomerCard } from "./CustomerCard";
-import { Search, Table, Grid, Eye } from "lucide-react";
+import { Search, Table, Grid, Eye, Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Table as UITable,
   TableBody,
@@ -14,14 +15,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Progress } from "@/components/ui/progress";
 
 export const CustomerList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedCustomerId, setExpandedCustomerId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const { data: customers, isLoading } = useQuery({
+  const { data: customers, isLoading, refetch } = useQuery({
     queryKey: ['customers'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -33,6 +38,61 @@ export const CustomerList = () => {
       return data;
     },
   });
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Check file type
+    if (!file.name.endsWith('.csv')) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione um arquivo CSV",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadProgress(10);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const { data, error } = await supabase.functions.invoke(
+        "process-customers-csv",
+        {
+          body: formData,
+        }
+      );
+
+      if (error) throw error;
+
+      setUploadProgress(100);
+      toast({
+        title: "Sucesso!",
+        description: `${data.processed} clientes importados com sucesso.${
+          data.errors?.length ? ` ${data.errors.length} erros encontrados.` : ''
+        }`,
+      });
+
+      // Refresh the customers list
+      refetch();
+    } catch (error: any) {
+      console.error("Error importing customers:", error);
+      toast({
+        title: "Erro",
+        description: "Falha ao importar clientes. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+      // Reset the file input
+      event.target.value = '';
+    }
+  };
 
   const filteredCustomers = customers?.filter(customer => 
     customer.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -67,6 +127,21 @@ export const CustomerList = () => {
           />
         </div>
         <div className="flex gap-2">
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleFileUpload}
+            className="hidden"
+            id="customer-file-upload"
+          />
+          <Button 
+            onClick={() => document.getElementById('customer-file-upload')?.click()}
+            disabled={isUploading}
+            className="flex items-center gap-2"
+          >
+            <Upload className="w-4 h-4" />
+            {isUploading ? 'Importando...' : 'Importar CSV'}
+          </Button>
           <Button
             variant={viewMode === 'grid' ? 'default' : 'outline'}
             size="icon"
@@ -83,6 +158,10 @@ export const CustomerList = () => {
           </Button>
         </div>
       </div>
+
+      {isUploading && (
+        <Progress value={uploadProgress} className="w-full" />
+      )}
 
       {viewMode === 'table' ? (
         <div className="rounded-md border">
