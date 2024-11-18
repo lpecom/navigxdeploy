@@ -21,16 +21,27 @@ serve(async (req) => {
     }
 
     const text = await file.text()
-    console.log('CSV Content:', text.substring(0, 500)) // Log first 500 chars for debugging
+    console.log('CSV Content Preview:', text.substring(0, 200))
 
-    // Parse CSV with flexible column mapping
+    // First, parse the header row to get column names
+    const lines = text.split('\n')
+    if (lines.length === 0) {
+      throw new Error('Empty CSV file')
+    }
+
+    const headerRow = lines[0].trim()
+    console.log('Header row:', headerRow)
+
+    // Parse CSV data
     const rows = await csv.parse(text, {
       skipFirstRow: true,
-      columns: true, // This will use the header row to map columns
+      separator: ',',
     })
 
     console.log(`Processing ${rows.length} customers`)
-    console.log('First row sample:', rows[0])
+    if (rows.length > 0) {
+      console.log('Sample row:', rows[0])
+    }
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -42,18 +53,28 @@ serve(async (req) => {
     const BATCH_SIZE = 5
     const BATCH_DELAY = 300
 
+    // Get header columns for mapping
+    const headers = headerRow.split(',').map(h => h.trim().toLowerCase())
+
     for (let i = 0; i < rows.length; i += BATCH_SIZE) {
       const batch = rows.slice(i, Math.min(i + BATCH_SIZE, rows.length))
-        .map((row: any) => {
+        .map((row: string[]) => {
           try {
-            const cpf = String(row.cpf || '').replace(/[^\d]/g, '')
+            // Create an object mapping headers to values
+            const rowData = headers.reduce((acc: any, header, index) => {
+              acc[header] = row[index]
+              return acc
+            }, {})
+
+            // Clean and validate CPF
+            const cpf = String(rowData.cpf || '').replace(/[^\d]/g, '')
             if (!cpf) {
               throw new Error('CPF is required')
             }
 
-            // Clean and format phone numbers
+            // Clean phone numbers
             const cleanPhone = (phone: string) => phone?.replace(/[^\d]/g, '') || ''
-            const phone = cleanPhone(row.phone) || cleanPhone(row.mobile_phone) || ''
+            const phone = cleanPhone(rowData.phone || rowData.telefone)
 
             // Parse date with better error handling
             const parseBirthDate = (dateStr: string) => {
@@ -68,28 +89,28 @@ serve(async (req) => {
               }
             }
 
-            // Map available fields from CSV to customer table structure
+            // Map fields to customer table structure
             return {
-              full_name: (row.full_name || row.name || '').trim(),
-              email: row.email || `${cpf}@placeholder.com`,
+              full_name: (rowData.full_name || rowData.name || rowData.nome || '').trim(),
+              email: rowData.email || `${cpf}@placeholder.com`,
               cpf: cpf,
               phone: phone,
-              address: row.address || null,
-              city: row.city || null,
-              state: row.state || null,
-              postal_code: (row.postal_code || row.cep || '').replace(/[^\d]/g, ''),
-              gender: row.gender === 'M' ? 'male' : row.gender === 'F' ? 'female' : null,
-              rg: (row.rg || '').replace(/[^\d]/g, ''),
-              birth_date: parseBirthDate(row.birth_date || row.data_nascimento),
-              nationality: (row.nationality || '').trim(),
-              registration_type: row.registration_type || null,
-              registration_code: row.registration_code || null,
-              mobile_phone: cleanPhone(row.mobile_phone),
-              other_phone: cleanPhone(row.other_phone),
-              status: row.status || 'active',
-              residential_address: row.residential_address || {},
-              commercial_address: row.commercial_address || {},
-              correspondence_address: row.correspondence_address || null
+              address: rowData.address || rowData.endereco || null,
+              city: rowData.city || rowData.cidade || null,
+              state: rowData.state || rowData.estado || null,
+              postal_code: (rowData.postal_code || rowData.cep || '').replace(/[^\d]/g, ''),
+              gender: rowData.gender === 'M' || rowData.gender === 'Masculino' ? 'male' 
+                : rowData.gender === 'F' || rowData.gender === 'Feminino' ? 'female' 
+                : null,
+              rg: (rowData.rg || '').replace(/[^\d]/g, ''),
+              birth_date: parseBirthDate(rowData.birth_date || rowData.data_nascimento),
+              nationality: (rowData.nationality || rowData.nacionalidade || 'Brasileira').trim(),
+              mobile_phone: cleanPhone(rowData.mobile_phone || rowData.celular),
+              other_phone: cleanPhone(rowData.other_phone || rowData.outro_telefone),
+              status: rowData.status || 'active',
+              residential_address: {},
+              commercial_address: {},
+              correspondence_address: null
             }
           } catch (error) {
             console.error(`Error processing row ${i}:`, error)
@@ -122,6 +143,7 @@ serve(async (req) => {
         }
       }
 
+      // Add delay between batches
       await new Promise(resolve => setTimeout(resolve, BATCH_DELAY))
     }
 
