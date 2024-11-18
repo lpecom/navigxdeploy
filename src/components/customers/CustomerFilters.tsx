@@ -9,6 +9,7 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 
 interface CustomerFiltersProps {
   searchTerm: string;
@@ -30,32 +31,32 @@ export const CustomerFilters = ({
   counts
 }: CustomerFiltersProps) => {
   const statusOptions = [
-    { label: 'Ativos', value: 'active', count: counts.active },
-    { label: 'Aluguel Ativo', value: 'active_rental', count: counts.activeRental },
-    { label: 'Inativos', value: 'inactive', count: counts.inactive }
+    { label: 'Com Aluguel Ativo', value: 'active_rental', count: counts.activeRental, color: 'bg-blue-100 text-blue-800' },
+    { label: 'Ativos', value: 'active', count: counts.active, color: 'bg-green-100 text-green-800' },
+    { label: 'Inativos', value: 'inactive', count: counts.inactive, color: 'bg-gray-100 text-gray-800' }
   ];
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 flex-1">
-      <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-        <Input
-          placeholder="Buscar por nome, email ou CPF..."
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10"
-        />
-      </div>
-      <div className="flex gap-2">
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Input
+            placeholder="Buscar por nome, email, CPF, placa ou modelo do veículo..."
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-10"
+          />
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="gap-2">
               <Filter className="h-4 w-4" />
               Filtros
               {statusFilter.length > 0 && (
-                <span className="ml-1 bg-primary/20 text-primary rounded-full px-2 py-0.5 text-xs">
+                <Badge variant="secondary" className="ml-1">
                   {statusFilter.length}
-                </span>
+                </Badge>
               )}
             </Button>
           </DropdownMenuTrigger>
@@ -74,11 +75,27 @@ export const CustomerFilters = ({
                   );
                 }}
               >
-                {option.label} ({option.count})
+                <div className="flex items-center justify-between w-full">
+                  <span>{option.label}</span>
+                  <Badge className={option.color}>{option.count}</Badge>
+                </div>
               </DropdownMenuCheckboxItem>
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
+
+      {/* Status Summary */}
+      <div className="flex gap-2 flex-wrap">
+        {statusOptions.map((option) => (
+          <div
+            key={option.value}
+            className="flex items-center gap-2 px-3 py-1 rounded-lg bg-gray-50"
+          >
+            <Badge className={option.color}>{option.count}</Badge>
+            <span className="text-sm text-muted-foreground">{option.label}</span>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -15,8 +15,7 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
           status,
           car_model:car_models(name)
         `)
-        .eq('status', 'rented')
-        .not('customer_id', 'is', null);
+        .eq('status', 'rented');
       
       if (error) throw error;
       return data || [];
@@ -56,10 +55,6 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
 
   // Filter customers based on search and status
   const filteredCustomers = customers?.filter(customer => {
-    // Filter out placeholder emails unless explicitly searching for them
-    const isPlaceholder = customer.email?.includes('@placeholder.com');
-    if (isPlaceholder && !searchTerm) return false;
-
     const matchesSearch = !searchTerm || 
       customer.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,12 +67,11 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
     return matchesSearch && matchesStatus;
   });
 
-  // Calculate counts excluding placeholder emails
-  const validCustomers = customers?.filter(c => !c.email?.includes('@placeholder.com')) || [];
+  // Calculate counts
   const counts = {
-    activeRental: validCustomers.filter(c => c.status === 'active_rental').length,
-    active: validCustomers.filter(c => c.status === 'active').length,
-    inactive: validCustomers.filter(c => c.status === 'inactive').length
+    activeRental: customers?.filter(c => c.status === 'active_rental').length || 0,
+    active: customers?.filter(c => c.status === 'active').length || 0,
+    inactive: customers?.filter(c => c.status === 'inactive').length || 0
   };
 
   return {

@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button"
 import { Eye } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { Badge } from "@/components/ui/badge"
+import { formatDistanceToNow } from "date-fns"
+import { ptBR } from "date-fns/locale"
 
 interface CustomerTableViewProps {
   customers: any[]
@@ -29,36 +31,65 @@ export const CustomerTableView = ({ customers }: CustomerTableViewProps) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Nome</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>CPF</TableHead>
-            <TableHead>Telefone</TableHead>
+            <TableHead className="w-[250px]">Nome / CPF</TableHead>
+            <TableHead>Contato</TableHead>
             <TableHead>Veículo Alugado</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Ações</TableHead>
+            <TableHead>Cliente Desde</TableHead>
+            <TableHead>Aluguéis</TableHead>
+            <TableHead className="text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {customers?.map((customer) => (
             <TableRow key={customer.id}>
-              <TableCell className="font-medium">{customer.full_name}</TableCell>
-              <TableCell>{customer.email}</TableCell>
-              <TableCell>{customer.cpf}</TableCell>
-              <TableCell>{customer.phone}</TableCell>
+              <TableCell>
+                <div>
+                  <div className="font-medium">{customer.full_name}</div>
+                  <div className="text-sm text-muted-foreground">{customer.cpf}</div>
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="text-sm">
+                  <div>{customer.email}</div>
+                  <div className="text-muted-foreground">{customer.phone}</div>
+                </div>
+              </TableCell>
               <TableCell>
                 {customer.rented_vehicle ? (
                   <div className="text-sm">
-                    <div>{customer.rented_vehicle.model}</div>
-                    <div className="text-gray-500">{customer.rented_vehicle.plate}</div>
+                    <div className="font-medium">{customer.rented_vehicle.model}</div>
+                    <div className="text-muted-foreground">{customer.rented_vehicle.plate}</div>
                   </div>
                 ) : (
-                  '-'
+                  <span className="text-sm text-muted-foreground">-</span>
                 )}
               </TableCell>
               <TableCell>
                 {getStatusBadge(customer.status)}
               </TableCell>
               <TableCell>
+                <div className="text-sm">
+                  {formatDistanceToNow(new Date(customer.created_at), {
+                    addSuffix: true,
+                    locale: ptBR,
+                  })}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="text-sm">
+                  <div>{customer.total_rentals || 0} aluguéis</div>
+                  {customer.last_rental_date && (
+                    <div className="text-muted-foreground">
+                      Último: {formatDistanceToNow(new Date(customer.last_rental_date), {
+                        addSuffix: true,
+                        locale: ptBR,
+                      })}
+                    </div>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell className="text-right">
                 <Button
                   variant="ghost"
                   size="icon"
