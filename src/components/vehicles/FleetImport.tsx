@@ -12,16 +12,22 @@ export const FleetImport = () => {
 
   const downloadTemplate = () => {
     const headers = [
-      "customer_name",
-      "customer_cpf",
+      "fleet_number",
+      "plate",
       "model",
-      "category",
+      "group",
       "color",
-      "year",
-      "brand",
+      "state",
+      "chassis_number",
+      "renavam_number",
+      "manufacture_year",
+      "model_year",
+      "manufacturer",
+      "contract_number",
+      "customer_name",
+      "customer_document",
       "status",
-      "contract",
-      "plate"
+      "branch"
     ];
     
     const csvContent = Papa.unparse([headers]);
@@ -63,8 +69,8 @@ export const FleetImport = () => {
           if (uploadError) throw uploadError;
 
           toast({
-            title: "Sucesso!",
-            description: "Frota atualizada com sucesso.",
+            title: "Success!",
+            description: "Fleet data has been updated successfully.",
           });
         },
         error: (error) => {
@@ -74,8 +80,8 @@ export const FleetImport = () => {
     } catch (error) {
       console.error("Error uploading fleet data:", error);
       toast({
-        title: "Erro",
-        description: "Não foi possível processar o arquivo CSV.",
+        title: "Error",
+        description: "Failed to process the CSV file.",
         variant: "destructive",
       });
     } finally {
@@ -87,13 +93,13 @@ export const FleetImport = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Importar Frota</CardTitle>
+        <CardTitle>Import Fleet</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <Button onClick={downloadTemplate} variant="outline">
             <Download className="w-4 h-4 mr-2" />
-            Baixar Template
+            Download Template
           </Button>
           <div className="relative">
             <input
@@ -105,14 +111,14 @@ export const FleetImport = () => {
             />
             <Button disabled={isUploading}>
               <Upload className="w-4 h-4 mr-2" />
-              {isUploading ? "Processando..." : "Importar CSV"}
+              {isUploading ? "Processing..." : "Import CSV"}
             </Button>
           </div>
         </div>
         <p className="text-sm text-muted-foreground">
-          Faça o download do template e preencha com os dados da sua frota.
-          O arquivo deve conter informações como: Nome do Cliente, CPF, 
-          Modelo, Categoria, Cor, Ano, Marca, Status, Contrato e Placa.
+          Download the template and fill it with your fleet data.
+          The file should contain information such as: Fleet Number, Plate,
+          Model, Group, Color, State, Chassis Number, etc.
         </p>
       </CardContent>
     </Card>

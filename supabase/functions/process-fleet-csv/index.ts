@@ -6,18 +6,20 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface FleetData {
-  customer_name: string;
-  customer_cpf: string;
-  model: string;
-  category: string;
-  color: string;
-  year: string;
-  brand: string;
-  status: string;
-  contract?: string;
-  plate: string;
-}
+const normalizeStatus = (status: string) => {
+  status = status.toUpperCase();
+  if (status.includes('MECANICA')) return 'MECHANICAL';
+  if (status.includes('ELETRICA')) return 'ELECTRICAL';
+  if (status.includes('PREPARACAO')) return 'PREPARATION';
+  if (status.includes('FUNILARIA')) return 'BODY_SHOP';
+  if (status.includes('VENDA')) return 'FOR_SALE';
+  if (status.includes('DESATIVACAO')) return 'DEACTIVATION';
+  if (status.includes('DIRETORIA')) return 'MANAGEMENT';
+  if (status.includes('LOCADO')) return 'RENTED';
+  if (status.includes('DISPONIVEL')) return 'AVAILABLE';
+  if (status.includes('MANUTENCOES')) return 'OTHER_MAINTENANCE';
+  return 'MAINTENANCE';
+};
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -32,25 +34,15 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    console.log('Processing fleet data:', csvData.length, 'vehicles')
-
     for (const row of csvData) {
-      const data = row as FleetData
-
-      // Skip empty rows
-      if (!data.plate || !data.model) {
-        console.log('Skipping empty row')
-        continue
-      }
-
-      // 1. Create or update customer if we have customer data
-      let customerId = null
-      if (data.customer_cpf) {
+      // Create or update customer if we have customer data
+      let customerId = null;
+      if (row.customer_document) {
         const { data: customer, error: customerError } = await supabase
           .from('customers')
           .upsert({
-            full_name: data.customer_name,
-            cpf: data.customer_cpf,
+            full_name: row.customer_name,
+            cpf: row.customer_document,
             status: 'active'
           }, {
             onConflict: 'cpf'
@@ -66,31 +58,13 @@ serve(async (req) => {
         customerId = customer.id
       }
 
-      // 2. Ensure we have the category
-      const { data: category, error: categoryError } = await supabase
-        .from('categories')
-        .upsert({
-          name: data.category,
-          description: `${data.category} vehicles`
-        }, {
-          onConflict: 'name'
-        })
-        .select()
-        .single()
-
-      if (categoryError) {
-        console.error('Error upserting category:', categoryError)
-        continue
-      }
-
-      // 3. Create or update car model
+      // Get or create car model
       const { data: carModel, error: modelError } = await supabase
         .from('car_models')
         .upsert({
-          name: data.model,
-          category_id: category.id,
-          year: data.year,
-          description: `${data.brand} ${data.model}`
+          name: row.model,
+          year: row.model_year,
+          description: `${row.manufacturer} ${row.model}`
         }, {
           onConflict: 'name'
         })
@@ -102,21 +76,26 @@ serve(async (req) => {
         continue
       }
 
-      // 4. Create or update fleet vehicle
+      // Create or update fleet vehicle
       const { error: vehicleError } = await supabase
         .from('fleet_vehicles')
         .upsert({
           car_model_id: carModel.id,
-          year: data.year,
-          plate: data.plate,
-          color: data.color,
-          status: data.status.toLowerCase(),
-          contract_number: data.contract,
+          year: row.manufacture_year,
+          model_year: row.model_year,
+          plate: row.plate,
+          color: row.color,
+          state: row.state,
+          chassis_number: row.chassis_number,
+          renavam_number: row.renavam_number,
+          status: normalizeStatus(row.status),
+          contract_number: row.contract_number,
           customer_id: customerId,
+          branch: row.branch || 'MATRIZ',
           current_km: 0,
           last_revision_date: new Date().toISOString(),
           next_revision_date: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString(),
-          is_available: data.status.toLowerCase() === 'available'
+          is_available: row.status.toLowerCase().includes('disponivel')
         }, {
           onConflict: 'plate'
         })
