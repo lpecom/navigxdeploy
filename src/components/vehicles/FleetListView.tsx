@@ -6,6 +6,8 @@ import { FleetSearchBar } from "./fleet/FleetSearchBar";
 import { FleetTable } from "./fleet/FleetTable";
 import type { FleetVehicle } from "./types";
 import { Card } from "@/components/ui/card";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export const FleetListView = () => {
   const { toast } = useToast();
@@ -13,7 +15,7 @@ export const FleetListView = () => {
   const [editForm, setEditForm] = useState<Partial<FleetVehicle>>({});
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: fleetVehicles, refetch, isLoading } = useQuery({
+  const { data: fleetVehicles, refetch, isLoading, error } = useQuery({
     queryKey: ['fleet-vehicles-list', searchTerm],
     queryFn: async () => {
       console.log("Fetching fleet vehicles...");
@@ -29,8 +31,7 @@ export const FleetListView = () => {
           customer:customers(
             full_name
           )
-        `)
-        .order('created_at', { ascending: false });
+        `);
 
       if (searchTerm) {
         query.or(`plate.ilike.%${searchTerm}%,car_model->name.ilike.%${searchTerm}%`);
@@ -43,9 +44,22 @@ export const FleetListView = () => {
         throw error;
       }
 
-      console.log("Fetched vehicles:", data?.length || 0);
-      return data as FleetVehicle[];
-    }
+      console.log("Raw response:", data);
+      console.log("Number of vehicles fetched:", data?.length || 0);
+      
+      // Filter out invalid entries and log details about filtered vehicles
+      const validVehicles = (data || []).filter(vehicle => {
+        if (!vehicle || !vehicle.plate) {
+          console.log("Filtered out invalid vehicle:", vehicle);
+          return false;
+        }
+        return true;
+      });
+
+      console.log("Number of valid vehicles after filtering:", validVehicles.length);
+      return validVehicles as FleetVehicle[];
+    },
+    retry: 1
   });
 
   const handleEdit = (vehicle: FleetVehicle) => {
@@ -100,6 +114,19 @@ export const FleetListView = () => {
     );
   }
 
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Erro ao carregar veículos</AlertTitle>
+        <AlertDescription>
+          Não foi possível carregar a lista de veículos. Por favor, tente novamente.
+          {error instanceof Error ? ` Erro: ${error.message}` : ''}
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
@@ -112,14 +139,23 @@ export const FleetListView = () => {
         </div>
       </div>
 
-      <FleetTable
-        vehicles={fleetVehicles || []}
-        editingId={editingId}
-        editForm={editForm}
-        onEdit={handleEdit}
-        onSave={handleSave}
-        onEditFormChange={setEditForm}
-      />
+      {fleetVehicles && fleetVehicles.length > 0 ? (
+        <FleetTable
+          vehicles={fleetVehicles}
+          editingId={editingId}
+          editForm={editForm}
+          onEdit={handleEdit}
+          onSave={handleSave}
+          onEditFormChange={setEditForm}
+        />
+      ) : (
+        <Card className="p-6">
+          <div className="text-center text-muted-foreground">
+            Nenhum veículo encontrado
+            {searchTerm && " para a busca realizada"}
+          </div>
+        </Card>
+      )}
     </div>
   );
 };
