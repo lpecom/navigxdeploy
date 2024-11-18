@@ -21,17 +21,21 @@ serve(async (req) => {
     }
 
     const text = await file.text()
+    console.log('CSV Content:', text.substring(0, 500)) // Log first 500 chars for debugging
+
     const rows = await csv.parse(text, {
       skipFirstRow: true,
       columns: [
-        'code', 'registration_type', 'full_name', 'cpf', 'col1', 'gender',
-        'rg', 'birth_date', 'email', 'nationality', 'address', 'number',
-        'complement', 'neighborhood', 'postal_code', 'city', 'state',
-        'residential_phone', 'mobile_phone', 'other_phone'
+        'full_name', 'email', 'cpf', 'phone', 'address', 
+        'city', 'state', 'postal_code', 'birth_date', 'gender',
+        'rg', 'nationality', 'mobile_phone', 'other_phone',
+        'registration_type', 'registration_code', 'status',
+        'residential_address', 'commercial_address', 'correspondence_address'
       ],
     })
 
     console.log(`Processing ${rows.length} customers`)
+    console.log('First row sample:', rows[0])
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -40,8 +44,8 @@ serve(async (req) => {
 
     let processedCount = 0
     const errors = []
-    const BATCH_SIZE = 5 // Reduced batch size
-    const BATCH_DELAY = 300 // Increased delay between batches
+    const BATCH_SIZE = 5
+    const BATCH_DELAY = 300
 
     for (let i = 0; i < rows.length; i += BATCH_SIZE) {
       const batch = rows.slice(i, Math.min(i + BATCH_SIZE, rows.length))
@@ -54,21 +58,19 @@ serve(async (req) => {
 
             // Clean and format phone numbers
             const cleanPhone = (phone: string) => phone?.replace(/[^\d]/g, '') || ''
-            const phone = cleanPhone(row.mobile_phone) || cleanPhone(row.residential_phone) || ''
-            
-            // Build complete address
-            const address = [
-              row.address,
-              row.number,
-              row.complement
-            ].filter(Boolean).join(' ')
+            const phone = cleanPhone(row.phone) || cleanPhone(row.mobile_phone) || ''
 
             // Parse date with better error handling
             const parseBirthDate = (dateStr: string) => {
               if (!dateStr) return null
-              const [day, month, year] = dateStr.split('/').map(Number)
-              if (!day || !month || !year) return null
-              return new Date(year, month - 1, day).toISOString()
+              try {
+                const [day, month, year] = dateStr.split('/').map(Number)
+                if (!day || !month || !year) return null
+                const date = new Date(year, month - 1, day)
+                return date.toISOString()
+              } catch {
+                return null
+              }
             }
 
             return {
@@ -76,7 +78,7 @@ serve(async (req) => {
               email: row.email || `${cpf}@placeholder.com`,
               cpf: cpf,
               phone: phone,
-              address: address || null,
+              address: row.address || null,
               city: row.city || null,
               state: row.state || null,
               postal_code: (row.postal_code || '').replace(/[^\d]/g, ''),
@@ -85,7 +87,17 @@ serve(async (req) => {
               birth_date: parseBirthDate(row.birth_date),
               nationality: (row.nationality || '').trim(),
               registration_type: row.registration_type || null,
-              status: 'active'
+              registration_code: row.registration_code || null,
+              mobile_phone: cleanPhone(row.mobile_phone),
+              other_phone: cleanPhone(row.other_phone),
+              status: row.status || 'active',
+              residential_address: typeof row.residential_address === 'string' 
+                ? JSON.parse(row.residential_address || '{}') 
+                : row.residential_address || {},
+              commercial_address: typeof row.commercial_address === 'string'
+                ? JSON.parse(row.commercial_address || '{}')
+                : row.commercial_address || {},
+              correspondence_address: row.correspondence_address || null
             }
           } catch (error) {
             console.error(`Error processing row ${i}:`, error)
@@ -118,7 +130,6 @@ serve(async (req) => {
         }
       }
 
-      // Add delay between batches to prevent resource exhaustion
       await new Promise(resolve => setTimeout(resolve, BATCH_DELAY))
     }
 
