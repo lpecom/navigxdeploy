@@ -34,9 +34,28 @@ serve(async (req) => {
       throw new Error('Empty CSV file')
     }
 
-    // Parse header row to get column names
+    // Parse header row to get column names and normalize them
     const headers = lines[0].toLowerCase().split(',').map(h => h.trim())
-    console.log('Headers:', headers)
+    console.log('Original headers:', headers)
+
+    // Create a mapping for common variations of field names
+    const fieldMappings: { [key: string]: string[] } = {
+      cpf: ['cpf', 'cpf/passport', 'document', 'documento', 'cpf/passaporte'],
+      full_name: ['full_name', 'name', 'nome', 'full name', 'nome completo'],
+      email: ['email', 'e-mail', 'correio'],
+      phone: ['phone', 'telefone', 'celular', 'mobile'],
+      address: ['address', 'endereco', 'endereço'],
+      city: ['city', 'cidade'],
+      state: ['state', 'estado', 'uf'],
+      postal_code: ['postal_code', 'cep', 'zip', 'zip code']
+    }
+
+    // Function to find the actual column name in the CSV for a given field
+    const findColumnName = (field: string): string | undefined => {
+      const variations = fieldMappings[field]
+      if (!variations) return undefined
+      return headers.find(header => variations.includes(header))
+    }
 
     // Parse CSV content
     const rows = await csv.parse(text, {
@@ -56,11 +75,33 @@ serve(async (req) => {
     const BATCH_SIZE = 5
     const BATCH_DELAY = 300
 
+    // Find the actual column names in the CSV
+    const cpfColumn = findColumnName('cpf')
+    const nameColumn = findColumnName('full_name')
+    const emailColumn = findColumnName('email')
+    const phoneColumn = findColumnName('phone')
+    const addressColumn = findColumnName('address')
+    const cityColumn = findColumnName('city')
+    const stateColumn = findColumnName('state')
+    const postalCodeColumn = findColumnName('postal_code')
+
+    console.log('Found columns:', {
+      cpfColumn,
+      nameColumn,
+      emailColumn,
+      phoneColumn,
+      addressColumn,
+      cityColumn,
+      stateColumn,
+      postalCodeColumn
+    })
+
     for (let i = 0; i < rows.length; i += BATCH_SIZE) {
       const batch = rows.slice(i, Math.min(i + BATCH_SIZE, rows.length))
         .map((row: any) => {
           try {
-            const cpf = String(row.cpf || '').replace(/[^\d]/g, '')
+            // Get CPF from the correct column and clean it
+            const cpf = String(row[cpfColumn || 'cpf'] || '').replace(/[^\d]/g, '')
             if (!cpf) {
               throw new Error('CPF is required')
             }
@@ -68,14 +109,14 @@ serve(async (req) => {
             const cleanPhone = (phone: string) => phone?.replace(/[^\d]/g, '') || ''
 
             return {
-              full_name: row.full_name || row.name || row.nome || '',
-              email: row.email || `${cpf}@placeholder.com`,
+              full_name: row[nameColumn || 'full_name'] || row[nameColumn || 'name'] || '',
+              email: row[emailColumn || 'email'] || `${cpf}@placeholder.com`,
               cpf,
-              phone: cleanPhone(row.phone || row.telefone),
-              address: row.address || row.endereco || null,
-              city: row.city || row.cidade || null,
-              state: row.state || row.estado || null,
-              postal_code: row.postal_code || row.cep || null,
+              phone: cleanPhone(row[phoneColumn || 'phone']),
+              address: row[addressColumn || 'address'] || null,
+              city: row[cityColumn || 'city'] || null,
+              state: row[stateColumn || 'state'] || null,
+              postal_code: row[postalCodeColumn || 'postal_code'] || null,
               status: 'active'
             }
           } catch (error) {
