@@ -30,16 +30,27 @@ export const CustomerList = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('fleet_vehicles')
-        .select('customer_id')
-        .eq('status', 'RENTED');
+        .select(`
+          customer_id,
+          customers!inner (
+            id,
+            full_name,
+            email,
+            cpf
+          )
+        `)
+        .eq('status', 'RENTED')
+        .not('customer_id', 'is', null);
       
       if (error) throw error;
       return data;
     },
   });
 
-  // Get array of customer IDs with active rentals
-  const activeRentalCustomerIds = fleetVehicles?.map(v => v.customer_id) || [];
+  // Get array of customer IDs with active rentals, filtering out any null values
+  const activeRentalCustomerIds = fleetVehicles
+    ?.filter(v => v.customer_id && v.customers)
+    .map(v => v.customer_id) || [];
 
   const { data: customers, isLoading } = useQuery({
     queryKey: ['customers', activeRentalCustomerIds],
@@ -54,20 +65,25 @@ export const CustomerList = () => {
       // Update customer status based on fleet data
       return data?.map(customer => ({
         ...customer,
-        status: activeRentalCustomerIds.includes(customer.id) ? 'active_rental' : (customer.status || 'active')
+        status: activeRentalCustomerIds.includes(customer.id) 
+          ? 'active_rental' 
+          : (customer.status || 'active')
       }));
     },
   });
 
   const filteredCustomers = customers?.filter(customer => {
     const matchesSearch = 
-      customer.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.cpf.includes(searchTerm);
+      customer.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.cpf?.includes(searchTerm);
 
     const matchesStatus = statusFilter.length === 0 || statusFilter.includes(customer.status || 'active');
 
-    return matchesSearch && matchesStatus;
+    // Filter out customers with placeholder emails (those created during import)
+    const isValidCustomer = !customer.email?.includes('@placeholder.com');
+
+    return matchesSearch && matchesStatus && isValidCustomer;
   });
 
   const statusOptions = [
@@ -86,9 +102,11 @@ export const CustomerList = () => {
     );
   }
 
-  const activeRentalCount = customers?.filter(c => c.status === 'active_rental').length || 0;
-  const activeCount = customers?.filter(c => c.status === 'active').length || 0;
-  const inactiveCount = customers?.filter(c => c.status === 'inactive').length || 0;
+  // Count customers by status, excluding placeholder customers
+  const validCustomers = customers?.filter(c => !c.email?.includes('@placeholder.com')) || [];
+  const activeRentalCount = validCustomers.filter(c => c.status === 'active_rental').length;
+  const activeCount = validCustomers.filter(c => c.status === 'active').length;
+  const inactiveCount = validCustomers.filter(c => c.status === 'inactive').length;
 
   return (
     <div className="space-y-6">
