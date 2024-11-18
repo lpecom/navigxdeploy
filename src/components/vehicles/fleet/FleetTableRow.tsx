@@ -1,19 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Edit2, 
-  Save, 
-  CheckCircle, 
-  AlertTriangle, 
-  Clock, 
-  Wrench,
-  Car,
-  XOctagon,
-  Shield
-} from "lucide-react";
+import { Edit2, Save } from "lucide-react";
 import type { FleetVehicle } from "../types";
+import { StatusBadge } from "./status/StatusBadge";
+import { CustomerSelect } from "./customer/CustomerSelect";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FleetTableRowProps {
   vehicle: FleetVehicle;
@@ -32,82 +25,46 @@ export const FleetTableRow = ({
   onSave,
   onEditFormChange 
 }: FleetTableRowProps) => {
-  const getStatusInfo = (status: string | null) => {
-    if (!status) return {
-      variant: 'outline' as const,
-      icon: AlertTriangle,
-      label: 'N/A'
-    };
+  const { toast } = useToast();
+  const isEditing = editingId === vehicle.id;
 
-    const statusLower = status.toLowerCase();
-    
-    if (statusLower === 'available' || statusLower === 'disponível') {
-      return {
-        variant: 'outline' as const,
-        icon: CheckCircle,
-        label: statusLower === 'available' ? 'Available' : 'Disponível',
-        color: 'text-green-600'
-      };
-    }
-    
-    if (statusLower.includes('maintenance') || statusLower.includes('manutenção')) {
-      return {
-        variant: 'warning' as const,
-        icon: Wrench,
-        label: statusLower.includes('maintenance') ? 'Maintenance' : 'Manutenção',
-        color: 'text-yellow-600'
-      };
-    }
-    
-    if (statusLower === 'rented' || statusLower === 'alugado') {
-      return {
-        variant: 'secondary' as const,
-        icon: Clock,
-        label: statusLower === 'rented' ? 'Rented' : 'Alugado',
-        color: 'text-blue-600'
-      };
+  const handleStatusChange = async (status: string) => {
+    if (status.toLowerCase() === 'rented' && !editForm.customer_id) {
+      toast({
+        title: "Customer Required",
+        description: "Please select a customer when marking a vehicle as rented.",
+        variant: "destructive",
+      });
+      return;
     }
 
-    if (statusLower.includes('funilaria')) {
-      return {
-        variant: 'warning' as const,
-        icon: Car,
-        label: 'Funilaria',
-        color: 'text-orange-600'
-      };
+    // Update customer status if vehicle is being marked as rented
+    if (status.toLowerCase() === 'rented' && editForm.customer_id) {
+      const { error: customerError } = await supabase
+        .from('customers')
+        .update({ status: 'active_rental' })
+        .eq('id', editForm.customer_id);
+
+      if (customerError) {
+        toast({
+          title: "Error",
+          description: "Failed to update customer status.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
-    if (statusLower.includes('desativado')) {
-      return {
-        variant: 'destructive' as const,
-        icon: XOctagon,
-        label: 'Desativado',
-        color: 'text-red-600'
-      };
-    }
-
-    if (statusLower.includes('diretoria')) {
-      return {
-        variant: 'default' as const,
-        icon: Shield,
-        label: 'Diretoria',
-        color: 'text-purple-600'
-      };
-    }
-
-    return {
-      variant: 'outline' as const,
-      icon: AlertTriangle,
-      label: status,
-      color: 'text-gray-600'
-    };
+    onEditFormChange({
+      ...editForm,
+      status,
+      is_available: status.toLowerCase() !== 'rented'
+    });
   };
 
   if (!vehicle.plate || !vehicle.car_model) {
     return null;
   }
-
-  const statusInfo = getStatusInfo(vehicle.status);
 
   return (
     <TableRow className="hover:bg-muted/50">
@@ -116,7 +73,7 @@ export const FleetTableRow = ({
       </TableCell>
       <TableCell>{vehicle.plate}</TableCell>
       <TableCell>
-        {editingId === vehicle.id ? (
+        {isEditing ? (
           <Input
             type="number"
             value={editForm.current_km || ''}
@@ -131,7 +88,7 @@ export const FleetTableRow = ({
         )}
       </TableCell>
       <TableCell>
-        {editingId === vehicle.id ? (
+        {isEditing ? (
           <Input
             type="date"
             value={editForm.last_revision_date || ''}
@@ -145,7 +102,7 @@ export const FleetTableRow = ({
         )}
       </TableCell>
       <TableCell>
-        {editingId === vehicle.id ? (
+        {isEditing ? (
           <Input
             type="date"
             value={editForm.next_revision_date || ''}
@@ -159,30 +116,31 @@ export const FleetTableRow = ({
         )}
       </TableCell>
       <TableCell>
-        {vehicle.customer?.full_name || '-'}
-      </TableCell>
-      <TableCell>
-        {editingId === vehicle.id ? (
-          <Input
-            type="text"
-            value={editForm.status || ''}
-            onChange={(e) => onEditFormChange({
+        {isEditing && editForm.status?.toLowerCase() === 'rented' ? (
+          <CustomerSelect
+            value={editForm.customer_id || ''}
+            onChange={(value) => onEditFormChange({
               ...editForm,
-              status: e.target.value
+              customer_id: value
             })}
           />
         ) : (
-          <Badge 
-            variant={statusInfo.variant}
-            className={`flex items-center gap-1.5 px-2 py-1 ${statusInfo.color}`}
-          >
-            <statusInfo.icon className="w-3 h-3" />
-            <span>{statusInfo.label}</span>
-          </Badge>
+          vehicle.customer?.full_name || '-'
+        )}
+      </TableCell>
+      <TableCell>
+        {isEditing ? (
+          <Input
+            type="text"
+            value={editForm.status || ''}
+            onChange={(e) => handleStatusChange(e.target.value)}
+          />
+        ) : (
+          <StatusBadge status={vehicle.status} />
         )}
       </TableCell>
       <TableCell className="text-right">
-        {editingId === vehicle.id ? (
+        {isEditing ? (
           <Button
             size="sm"
             onClick={() => onSave(vehicle.id)}
