@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Edit2, Save } from "lucide-react";
+import { Edit2, Save, CheckCircle, AlertTriangle, Clock, Wrench } from "lucide-react";
 import type { FleetVehicle } from "../types";
 
 interface FleetTableRowProps {
@@ -22,18 +22,45 @@ export const FleetTableRow = ({
   onSave,
   onEditFormChange 
 }: FleetTableRowProps) => {
-  const getStatusColor = (status: string | null) => {
-    if (!status) return 'default';
+  const getStatusInfo = (status: string | null) => {
+    if (!status) return {
+      variant: 'outline' as const,
+      icon: AlertTriangle,
+      label: 'N/A'
+    };
+
     status = status.toLowerCase();
-    if (status === 'available' || status === 'disponível') return 'success';
-    if (status.includes('maintenance') || status.includes('manutenção')) return 'warning';
-    if (status === 'rented' || status === 'alugado') return 'secondary';
-    return 'default';
+    
+    if (status === 'available' || status === 'disponível') return {
+      variant: 'outline' as const,
+      icon: CheckCircle,
+      label: status === 'available' ? 'Available' : 'Disponível'
+    };
+    
+    if (status.includes('maintenance') || status.includes('manutenção')) return {
+      variant: 'destructive' as const,
+      icon: Wrench,
+      label: status.includes('maintenance') ? 'Maintenance' : 'Manutenção'
+    };
+    
+    if (status === 'rented' || status === 'alugado') return {
+      variant: 'secondary' as const,
+      icon: Clock,
+      label: status === 'rented' ? 'Rented' : 'Alugado'
+    };
+
+    return {
+      variant: 'outline' as const,
+      icon: AlertTriangle,
+      label: status
+    };
   };
 
   if (!vehicle.plate || !vehicle.car_model) {
     return null;
   }
+
+  const statusInfo = getStatusInfo(vehicle.status);
 
   return (
     <TableRow className="hover:bg-muted/50">
@@ -98,9 +125,12 @@ export const FleetTableRow = ({
             })}
           />
         ) : (
-          <Badge variant={getStatusColor(vehicle.status)}>
-            {vehicle.status || 'N/A'}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant={statusInfo.variant} className="flex items-center gap-1.5">
+              <statusInfo.icon className="w-3 h-3" />
+              <span>{statusInfo.label}</span>
+            </Badge>
+          </div>
         )}
       </TableCell>
       <TableCell>
