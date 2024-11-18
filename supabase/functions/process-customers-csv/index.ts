@@ -23,15 +23,10 @@ serve(async (req) => {
     const text = await file.text()
     console.log('CSV Content:', text.substring(0, 500)) // Log first 500 chars for debugging
 
+    // Parse CSV with flexible column mapping
     const rows = await csv.parse(text, {
       skipFirstRow: true,
-      columns: [
-        'full_name', 'email', 'cpf', 'phone', 'address', 
-        'city', 'state', 'postal_code', 'birth_date', 'gender',
-        'rg', 'nationality', 'mobile_phone', 'other_phone',
-        'registration_type', 'registration_code', 'status',
-        'residential_address', 'commercial_address', 'correspondence_address'
-      ],
+      columns: true, // This will use the header row to map columns
     })
 
     console.log(`Processing ${rows.length} customers`)
@@ -73,30 +68,27 @@ serve(async (req) => {
               }
             }
 
+            // Map available fields from CSV to customer table structure
             return {
-              full_name: (row.full_name || '').trim(),
+              full_name: (row.full_name || row.name || '').trim(),
               email: row.email || `${cpf}@placeholder.com`,
               cpf: cpf,
               phone: phone,
               address: row.address || null,
               city: row.city || null,
               state: row.state || null,
-              postal_code: (row.postal_code || '').replace(/[^\d]/g, ''),
+              postal_code: (row.postal_code || row.cep || '').replace(/[^\d]/g, ''),
               gender: row.gender === 'M' ? 'male' : row.gender === 'F' ? 'female' : null,
               rg: (row.rg || '').replace(/[^\d]/g, ''),
-              birth_date: parseBirthDate(row.birth_date),
+              birth_date: parseBirthDate(row.birth_date || row.data_nascimento),
               nationality: (row.nationality || '').trim(),
               registration_type: row.registration_type || null,
               registration_code: row.registration_code || null,
               mobile_phone: cleanPhone(row.mobile_phone),
               other_phone: cleanPhone(row.other_phone),
               status: row.status || 'active',
-              residential_address: typeof row.residential_address === 'string' 
-                ? JSON.parse(row.residential_address || '{}') 
-                : row.residential_address || {},
-              commercial_address: typeof row.commercial_address === 'string'
-                ? JSON.parse(row.commercial_address || '{}')
-                : row.commercial_address || {},
+              residential_address: row.residential_address || {},
+              commercial_address: row.commercial_address || {},
               correspondence_address: row.correspondence_address || null
             }
           } catch (error) {
