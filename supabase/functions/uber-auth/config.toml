@@ -1,4 +1,2 @@
+# A string used as a project reference
 project_id = "frxvpishprygdksbgziz"
-
-[functions.uber-auth]
-verify_jwt = false
