@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { FleetSearchBar } from "./fleet/FleetSearchBar";
 import { FleetTable } from "./fleet/FleetTable";
+import { FleetMetrics } from "./fleet/FleetMetrics";
 import type { FleetVehicle } from "./types";
 import { Card } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
@@ -18,7 +19,6 @@ export const FleetListView = () => {
   const { data: fleetVehicles, refetch, isLoading, error } = useQuery({
     queryKey: ['fleet-vehicles-list', searchTerm],
     queryFn: async () => {
-      console.log("Fetching fleet vehicles...");
       const query = supabase
         .from('fleet_vehicles')
         .select(`
@@ -39,27 +39,10 @@ export const FleetListView = () => {
       
       const { data, error } = await query;
       
-      if (error) {
-        console.error("Error fetching fleet vehicles:", error);
-        throw error;
-      }
-
-      console.log("Raw response:", data);
-      console.log("Number of vehicles fetched:", data?.length || 0);
+      if (error) throw error;
       
-      // Filter out invalid entries and log details about filtered vehicles
-      const validVehicles = (data || []).filter(vehicle => {
-        if (!vehicle || !vehicle.plate) {
-          console.log("Filtered out invalid vehicle:", vehicle);
-          return false;
-        }
-        return true;
-      });
-
-      console.log("Number of valid vehicles after filtering:", validVehicles.length);
-      return validVehicles as FleetVehicle[];
+      return (data || []).filter(vehicle => vehicle && vehicle.plate) as FleetVehicle[];
     },
-    retry: 1
   });
 
   const handleEdit = (vehicle: FleetVehicle) => {
@@ -128,7 +111,9 @@ export const FleetListView = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <FleetMetrics vehicles={fleetVehicles || []} />
+      
       <div className="flex items-center justify-between gap-4">
         <FleetSearchBar
           searchTerm={searchTerm}
