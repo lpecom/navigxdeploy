@@ -16,9 +16,10 @@ const changelogData: ChangelogEntry[] = [
     developer: "Maria Silva",
     type: "feature",
     changes: [
-      "Initial project setup and architecture",
-      "Basic authentication system implementation",
-      "Core dashboard layout"
+      "Initial project setup with Vite and React",
+      "Integration with Supabase for backend services",
+      "Basic project structure and routing setup",
+      "Implementation of shadcn/ui components"
     ]
   },
   {
@@ -27,42 +28,82 @@ const changelogData: ChangelogEntry[] = [
     developer: "João Santos",
     type: "feature",
     changes: [
-      "Vehicle management system",
-      "Fleet overview dashboard",
-      "Vehicle categories and models"
+      "Vehicle management system implementation",
+      "Car categories and models database structure",
+      "Fleet management interface",
+      "Vehicle maintenance tracking system"
     ]
   },
   {
     version: "1.0.2",
     date: "2024-03-20 16:45",
     developer: "Ana Costa",
-    type: "improvement",
+    type: "feature",
     changes: [
-      "Enhanced reservation system",
-      "Improved date picker component",
-      "Added payment integration"
+      "Driver portal implementation",
+      "Authentication system with Supabase",
+      "Driver profile management",
+      "Integration with Uber API"
     ]
   },
   {
     version: "1.0.3",
     date: "2024-03-21 11:20",
     developer: "Lucas Oliveira",
-    type: "fix",
+    type: "feature",
     changes: [
-      "Fixed authentication token refresh",
-      "Resolved vehicle image upload issues",
-      "Fixed reservation date validation"
+      "Payment system integration with Appmax",
+      "Support for credit card, PIX, and boleto",
+      "Invoice generation system",
+      "Payment history tracking"
     ]
   },
   {
     version: "1.0.4",
-    date: "2024-03-22 15:00",
+    date: "2024-03-22 09:00",
     developer: "Pedro Mendes",
     type: "feature",
     changes: [
-      "Driver portal implementation",
-      "Uber integration system",
-      "Driver documentation upload"
+      "Reservation system implementation",
+      "Check-in and check-out process",
+      "Vehicle availability management",
+      "Rental period tracking"
+    ]
+  },
+  {
+    version: "1.0.5",
+    date: "2024-03-22 14:30",
+    developer: "Maria Silva",
+    type: "improvement",
+    changes: [
+      "Website settings management interface",
+      "Dynamic content management",
+      "Hero section customization",
+      "Admin dashboard enhancements"
+    ]
+  },
+  {
+    version: "1.0.6",
+    date: "2024-03-22 16:45",
+    developer: "João Santos",
+    type: "improvement",
+    changes: [
+      "Customer management system",
+      "Customer profile tracking",
+      "Rental history per customer",
+      "Customer analytics dashboard"
+    ]
+  },
+  {
+    version: "1.0.7",
+    date: "2024-03-22 18:00",
+    developer: "Ana Costa",
+    type: "feature",
+    changes: [
+      "Changelog implementation",
+      "Development history tracking",
+      "Version control documentation",
+      "Team contribution tracking"
     ]
   }
 ];
