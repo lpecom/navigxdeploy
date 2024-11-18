@@ -1,23 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Car,
-  Calendar,
-  CreditCard,
-  Tag,
-  LogOut,
-  LayoutDashboard,
-  Bell,
-} from "lucide-react";
+import { LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-
-interface NavItem {
-  icon: any;
-  label: string;
-  href: string;
-}
+import { SidebarMenu } from "@/components/ui/sidebar-menu";
+import { driverMenuItems } from "@/config/navigation";
 
 interface DriverSidebarProps {
   isOpen: boolean;
@@ -28,15 +16,6 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const navItems: NavItem[] = [
-    { icon: LayoutDashboard, label: "Visão Geral", href: "/driver" },
-    { icon: Car, label: "Meu Veículo", href: "/driver/vehicle" },
-    { icon: Calendar, label: "Minhas Reservas", href: "/driver/reservations" },
-    { icon: CreditCard, label: "Financeiro", href: "/driver/financial" },
-    { icon: Tag, label: "Promoções", href: "/driver/promotions" },
-    { icon: Bell, label: "Notificações", href: "/driver/notifications" },
-  ];
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/login');
@@ -44,7 +23,6 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
 
   return (
     <>
-      {/* Mobile overlay */}
       {isOpen && (
         <div 
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -52,15 +30,13 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={cn(
           "fixed top-0 left-0 z-50 flex h-screen w-64 flex-col bg-white border-r border-gray-200",
           "transition-transform duration-300 lg:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        {/* Logo */}
         <div className="p-6 border-b">
           <img 
             src="https://i.imghippo.com/files/uafE3798xA.png" 
@@ -69,27 +45,9 @@ export const DriverSidebar = ({ isOpen, onToggle }: DriverSidebarProps) => {
           />
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 space-y-1 px-3 py-4">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-                location.pathname === item.href
-                  ? "bg-primary/10 text-primary"
-                  : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-              )}
-            >
-              <item.icon className="h-5 w-5" />
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <SidebarMenu items={driverMenuItems} currentPath={location.pathname} />
 
-        {/* Footer */}
-        <div className="p-4 border-t">
+        <div className="p-4 mt-auto border-t">
           <Button
             variant="ghost"
             className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
