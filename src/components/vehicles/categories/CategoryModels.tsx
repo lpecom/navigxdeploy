@@ -5,20 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { EditVehicleDialog } from "@/components/vehicles/EditVehicleDialog";
 import { ModelActions } from "./ModelActions";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { ModelTable } from "./ModelTable";
+import { AddModelDialog } from "./AddModelDialog";
 import { Plus } from "lucide-react";
 import type { CarModel } from "@/types/vehicles";
 
@@ -43,57 +31,6 @@ export const CategoryModels = ({ categoryId }: CategoryModelsProps) => {
       
       if (error) throw error;
       return data as CarModel[];
-    },
-  });
-
-  const { data: availableModels, isLoading: loadingAvailableModels } = useQuery({
-    queryKey: ["available-models"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("car_models")
-        .select("*")
-        .is("category_id", null);
-      
-      if (error) throw error;
-      return data as CarModel[];
-    },
-  });
-
-  const addModelMutation = useMutation({
-    mutationFn: async (modelId: string) => {
-      const { error } = await supabase
-        .from("car_models")
-        .update({ category_id: categoryId })
-        .eq("id", modelId);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["category-models"] });
-      queryClient.invalidateQueries({ queryKey: ["available-models"] });
-      toast({
-        title: "Sucesso",
-        description: "Modelo adicionado à categoria",
-      });
-    },
-  });
-
-  const removeModelMutation = useMutation({
-    mutationFn: async (modelId: string) => {
-      const { error } = await supabase
-        .from("car_models")
-        .update({ category_id: null })
-        .eq("id", modelId);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["category-models"] });
-      queryClient.invalidateQueries({ queryKey: ["available-models"] });
-      toast({
-        title: "Sucesso",
-        description: "Modelo removido da categoria",
-      });
     },
   });
 
@@ -122,14 +59,11 @@ export const CategoryModels = ({ categoryId }: CategoryModelsProps) => {
 
     queryClient.invalidateQueries({ queryKey: ["category-models"] });
     setEditingModel(null);
+    setImageEditModel(null);
     toast({
       title: "Sucesso",
       description: "Modelo atualizado com sucesso",
     });
-  };
-
-  const handleImageEdit = (model: CarModel) => {
-    setImageEditModel(model);
   };
 
   if (loadingCategoryModels) {
@@ -146,70 +80,17 @@ export const CategoryModels = ({ categoryId }: CategoryModelsProps) => {
         </Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nome</TableHead>
-            <TableHead>Ano</TableHead>
-            <TableHead>Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {categoryModels?.map((model) => (
-            <TableRow key={model.id}>
-              <TableCell>{model.name}</TableCell>
-              <TableCell>{model.year}</TableCell>
-              <TableCell>
-                <ModelActions
-                  model={model}
-                  onEdit={setEditingModel}
-                  onImageEdit={handleImageEdit}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <ModelTable 
+        models={categoryModels || []}
+        onEdit={setEditingModel}
+        onImageEdit={setImageEditModel}
+      />
 
-      <Dialog open={isAddingModel} onOpenChange={setIsAddingModel}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Adicionar Modelo à Categoria</DialogTitle>
-          </DialogHeader>
-          {loadingAvailableModels ? (
-            <div>Carregando modelos disponíveis...</div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Ano</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {availableModels?.map((model) => (
-                  <TableRow key={model.id}>
-                    <TableCell>{model.name}</TableCell>
-                    <TableCell>{model.year}</TableCell>
-                    <TableCell>
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          addModelMutation.mutate(model.id);
-                          setIsAddingModel(false);
-                        }}
-                      >
-                        Adicionar
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </DialogContent>
-      </Dialog>
+      <AddModelDialog 
+        categoryId={categoryId}
+        open={isAddingModel}
+        onOpenChange={setIsAddingModel}
+      />
 
       <EditVehicleDialog
         open={!!editingModel}
