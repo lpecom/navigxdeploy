@@ -3,18 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { CategoryList } from "./categories/CategoryList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { VehicleCard } from "./VehicleCard";
-import { FleetVehicleCard } from "./FleetVehicleCard";
 import { EditVehicleDialog } from "./EditVehicleDialog";
 import { FleetListView } from "./FleetListView";
 import { FleetOverview } from "./fleet/overview/FleetOverview";
-import type { CarModel, FleetVehicle } from "@/types/vehicles";
-import { supabase } from "@/integrations/supabase/client";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
-import { Search, Plus } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { VehicleListHeader } from "./sections/VehicleListHeader";
+import { VehicleListContent } from "./sections/VehicleListContent";
+import { supabase } from "@/integrations/supabase/client";
+import type { CarModel, FleetVehicle } from "@/types/vehicles";
 
 interface VehicleListProps {
   view: 'overview' | 'categories' | 'models' | 'fleet' | 'maintenance';
@@ -87,45 +83,11 @@ const VehicleList = ({ view }: VehicleListProps) => {
     return <FleetOverview />;
   }
 
-  const renderLoading = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {[...Array(6)].map((_, i) => (
-        <Card key={i} className="p-6">
-          <Skeleton className="h-48 w-full mb-4" />
-          <Skeleton className="h-6 w-3/4 mb-2" />
-          <Skeleton className="h-4 w-1/2" />
-        </Card>
-      ))}
-    </div>
-  );
-
-  const renderMaintenanceView = () => {
-    if (fleetLoading) return renderLoading();
-
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {fleetVehicles?.map((vehicle) => (
-          <FleetVehicleCard 
-            key={vehicle.id} 
-            vehicle={vehicle}
-          />
-        ))}
-        {(!fleetVehicles || fleetVehicles.length === 0) && (
-          <div className="col-span-full text-center py-12">
-            <p className="text-muted-foreground">
-              Nenhum veículo cadastrado na frota
-            </p>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
     <Card className="p-6">
       <Tabs defaultValue="list" className="w-full">
         <TabsList className="w-full justify-start mb-6">
-          <TabsTrigger value="list">Lista</TabsTrigger>
+          <TabsTrigger value="list">Listagem</TabsTrigger>
           <TabsTrigger value="categories">Categorias</TabsTrigger>
           <TabsTrigger value="models">Modelos</TabsTrigger>
           <TabsTrigger value="fleet">Frota</TabsTrigger>
@@ -140,64 +102,39 @@ const VehicleList = ({ view }: VehicleListProps) => {
 
         <TabsContent value="models">
           <div className="space-y-6">
-            <div className="flex items-center justify-between gap-4">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar modelos..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-              <Button onClick={() => setIsAddingVehicle(true)} className="shrink-0">
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Modelo
-              </Button>
-            </div>
-
+            <VehicleListHeader
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              onAddVehicle={() => setIsAddingVehicle(true)}
+            />
             {modelsLoading ? (
-              renderLoading()
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredModels?.map((vehicle) => (
-                  <VehicleCard 
-                    key={vehicle.id} 
-                    car={vehicle}
-                    onEdit={() => handleEdit(vehicle)}
-                  />
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-48 bg-gray-100 rounded-lg animate-pulse" />
                 ))}
-                {(!filteredModels || filteredModels.length === 0) && (
-                  <div className="col-span-full text-center py-12">
-                    <p className="text-muted-foreground">
-                      {searchTerm ? 'Nenhum modelo encontrado' : 'Nenhum modelo cadastrado'}
-                    </p>
-                  </div>
-                )}
               </div>
+            ) : (
+              <VehicleListContent
+                view="models"
+                vehicles={filteredModels || []}
+                onEdit={handleEdit}
+              />
             )}
           </div>
         </TabsContent>
 
         <TabsContent value="fleet">
           {fleetLoading ? (
-            renderLoading()
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {fleetVehicles?.map((vehicle) => (
-                <FleetVehicleCard 
-                  key={vehicle.id} 
-                  vehicle={vehicle}
-                />
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-48 bg-gray-100 rounded-lg animate-pulse" />
               ))}
-              {(!fleetVehicles || fleetVehicles.length === 0) && (
-                <div className="col-span-full text-center py-12">
-                  <p className="text-muted-foreground">
-                    Nenhum veículo cadastrado na frota
-                  </p>
-                </div>
-              )}
             </div>
+          ) : (
+            <VehicleListContent
+              view="fleet"
+              vehicles={fleetVehicles || []}
+            />
           )}
         </TabsContent>
 
@@ -207,7 +144,10 @@ const VehicleList = ({ view }: VehicleListProps) => {
 
         {view === 'maintenance' && (
           <TabsContent value="maintenance">
-            {renderMaintenanceView()}
+            <VehicleListContent
+              view="fleet"
+              vehicles={fleetVehicles || []}
+            />
           </TabsContent>
         )}
       </Tabs>
