@@ -5,6 +5,12 @@ export interface CarModel {
   image_url: string | null;
   year: string | null;
   brand_logo_url: string | null;
+  description?: string | null;
+  engine_size?: string | null;
+  transmission?: string | null;
+  optionals?: Record<string, any> | null;
+  created_at?: string | null;
+  updated_at?: string | null;
   category?: {
     name: string;
   };
