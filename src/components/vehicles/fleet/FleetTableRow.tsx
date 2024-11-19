@@ -12,11 +12,25 @@ import {
 
 interface FleetTableRowProps {
   vehicle: FleetVehicle;
-  onRentOut: (vehicleId: string) => void;
-  onViewDocs: (vehicleId: string) => void;
+  isEditing?: boolean;
+  editForm?: Partial<FleetVehicle>;
+  onEdit?: (vehicle: FleetVehicle) => void;
+  onSave?: (id: string) => Promise<void>;
+  onEditFormChange?: (form: Partial<FleetVehicle>) => void;
+  onRentOut?: (vehicleId: string) => void;
+  onViewDocs?: (vehicleId: string) => void;
 }
 
-export const FleetTableRow = ({ vehicle, onRentOut, onViewDocs }: FleetTableRowProps) => {
+export const FleetTableRow = ({ 
+  vehicle,
+  isEditing,
+  editForm,
+  onEdit,
+  onSave,
+  onEditFormChange,
+  onRentOut,
+  onViewDocs 
+}: FleetTableRowProps) => {
   return (
     <TableRow className="hover:bg-gray-50/50">
       <TableCell>
