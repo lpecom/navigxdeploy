@@ -4,9 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { FleetSearchBar } from "./fleet/FleetSearchBar";
 import { FleetTable } from "./fleet/FleetTable";
-import { FleetMetrics } from "./FleetMetrics";
-import type { FleetVehicle } from "@/types/vehicles";
-
+import { FleetMetrics } from "./fleet/FleetMetrics";
 import { Card } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -42,12 +40,10 @@ export const FleetListView = () => {
       
       if (error) throw error;
       
-      return (data || [])
-        .filter(vehicle => vehicle && vehicle.plate) as FleetVehicle[];
+      return (data || []).filter(vehicle => vehicle && vehicle.plate) as FleetVehicle[];
     },
   });
 
-  // Filter vehicles based on search term and status
   const filteredVehicles = allVehicles?.filter(vehicle => {
     const matchesSearch = !searchTerm || 
       vehicle.plate?.toLowerCase().includes(searchTerm.toLowerCase()) ||
