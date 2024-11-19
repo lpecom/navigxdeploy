@@ -11,6 +11,9 @@ export interface CarModel {
   updated_at: string | null;
   engine_size: string;
   transmission: string;
+  category?: {
+    name: string;
+  };
 }
 
 export interface CarModelResponse extends Omit<CarModel, 'optionals'> {

@@ -8,7 +8,7 @@ import { FleetVehicleCard } from "./FleetVehicleCard";
 import { EditVehicleDialog } from "./EditVehicleDialog";
 import { FleetListView } from "./FleetListView";
 import { FleetOverview } from "./fleet/overview/FleetOverview";
-import type { CarModel, FleetVehicle } from "./types";
+import type { CarModel, FleetVehicle } from "@/types/vehicles";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
