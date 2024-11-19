@@ -1,144 +1,93 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Pencil, Check, X } from "lucide-react";
-import { useState } from "react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { MoreVertical, ChevronRight } from "lucide-react";
 import type { FleetVehicle } from "@/types/vehicles";
-
-import { FleetVehicleProfileDialog } from "./FleetVehicleProfileDialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface FleetTableRowProps {
   vehicle: FleetVehicle;
-  editingId: string | null;
-  editForm: Partial<FleetVehicle>;
-  onEdit: (vehicle: FleetVehicle) => void;
-  onSave: (id: string) => void;
-  onEditFormChange: (form: Partial<FleetVehicle>) => void;
+  onRentOut: (vehicleId: string) => void;
+  onViewDocs: (vehicleId: string) => void;
 }
 
-export const FleetTableRow = ({
-  vehicle,
-  editingId,
-  editForm,
-  onEdit,
-  onSave,
-  onEditFormChange,
-}: FleetTableRowProps) => {
-  const [showProfile, setShowProfile] = useState(false);
-
-  const getStatusBadge = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'available':
-        return <Badge className="bg-green-100 text-green-800">Disponível</Badge>;
-      case 'maintenance':
-        return <Badge className="bg-yellow-100 text-yellow-800">Manutenção</Badge>;
-      case 'rented':
-        return <Badge className="bg-blue-100 text-blue-800">Alugado</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
-    }
-  };
-
-  const isEditing = editingId === vehicle.id;
-
+export const FleetTableRow = ({ vehicle, onRentOut, onViewDocs }: FleetTableRowProps) => {
   return (
-    <>
-      <TableRow>
-        <TableCell>
-          <div>
-            <div className="font-medium">{vehicle.car_model?.name}</div>
-            <div className="text-sm text-muted-foreground">{vehicle.year}</div>
-          </div>
-        </TableCell>
-        <TableCell>{vehicle.plate}</TableCell>
-        <TableCell>
-          {isEditing ? (
-            <input
-              type="number"
-              value={editForm.current_km || ''}
-              onChange={(e) =>
-                onEditFormChange({ ...editForm, current_km: Number(e.target.value) })
-              }
-              className="w-24 px-2 py-1 border rounded"
+    <TableRow className="hover:bg-gray-50/50">
+      <TableCell>
+        <div className="flex items-center gap-3">
+          {vehicle.car_model?.image_url ? (
+            <img
+              src={vehicle.car_model.image_url}
+              alt={vehicle.car_model?.name}
+              className="w-16 h-12 object-cover rounded-lg"
             />
           ) : (
-            <span>{vehicle.current_km?.toLocaleString()} km</span>
+            <div className="w-16 h-12 bg-gray-100 rounded-lg" />
           )}
-        </TableCell>
-        <TableCell>
-          {format(new Date(vehicle.last_revision_date), "PP", { locale: ptBR })}
-        </TableCell>
-        <TableCell>
-          {format(new Date(vehicle.next_revision_date), "PP", { locale: ptBR })}
-        </TableCell>
-        <TableCell>
-          {vehicle.customer?.full_name || (
-            <span className="text-muted-foreground">-</span>
-          )}
-        </TableCell>
-        <TableCell>
-          {isEditing ? (
-            <select
-              value={editForm.status || ''}
-              onChange={(e) =>
-                onEditFormChange({ ...editForm, status: e.target.value })
-              }
-              className="px-2 py-1 border rounded"
-            >
-              <option value="available">Disponível</option>
-              <option value="maintenance">Manutenção</option>
-              <option value="rented">Alugado</option>
-            </select>
-          ) : (
-            getStatusBadge(vehicle.status || '')
-          )}
-        </TableCell>
-        <TableCell className="text-right">
-          {isEditing ? (
-            <div className="flex items-center justify-end gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onSave(vehicle.id)}
-              >
-                <Check className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onEdit(vehicle)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center justify-end gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowProfile(true)}
-              >
-                <Eye className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onEdit(vehicle)}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-        </TableCell>
-      </TableRow>
-
-      <FleetVehicleProfileDialog
-        vehicleId={vehicle.id}
-        open={showProfile}
-        onOpenChange={setShowProfile}
-      />
-    </>
+          <div>
+            <p className="font-medium text-gray-900">
+              {vehicle.car_model?.name} {vehicle.year}
+            </p>
+            <p className="text-sm text-gray-500">{vehicle.id.slice(0, 8)}</p>
+          </div>
+        </div>
+      </TableCell>
+      <TableCell>
+        <Badge
+          variant={vehicle.status === 'available' ? 'success' : 'secondary'}
+          className="font-medium"
+        >
+          {vehicle.status === 'available' ? 'Active' : vehicle.status}
+        </Badge>
+      </TableCell>
+      <TableCell>
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-gray-900">{vehicle.chassis_number}</p>
+          <p className="text-sm text-gray-500">{vehicle.plate}</p>
+        </div>
+      </TableCell>
+      <TableCell>
+        <Button
+          variant={vehicle.customer ? "outline" : "secondary"}
+          size="sm"
+          onClick={() => onRentOut(vehicle.id)}
+          className="w-24"
+        >
+          Rent out
+        </Button>
+      </TableCell>
+      <TableCell>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onViewDocs(vehicle.id)}
+          className="w-full flex items-center justify-center gap-2"
+        >
+          <span className="sr-only">View documents</span>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </TableCell>
+      <TableCell>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>Edit details</DropdownMenuItem>
+            <DropdownMenuItem>Maintenance history</DropdownMenuItem>
+            <DropdownMenuItem>Delete vehicle</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </TableCell>
+    </TableRow>
   );
 };

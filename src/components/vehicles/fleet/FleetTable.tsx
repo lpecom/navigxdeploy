@@ -1,45 +1,27 @@
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableHeader, TableRow, TableHead, TableBody } from "@/components/ui/table";
 import { FleetTableRow } from "./FleetTableRow";
-import type { FleetVehicle } from "@/types/vehicles";
 import { Card } from "@/components/ui/card";
+import type { FleetVehicle } from "@/types/vehicles";
 
 interface FleetTableProps {
   vehicles: FleetVehicle[];
-  editingId: string | null;
-  editForm: Partial<FleetVehicle>;
-  onEdit: (vehicle: FleetVehicle) => void;
-  onSave: (id: string) => void;
-  onEditFormChange: (form: Partial<FleetVehicle>) => void;
+  onRentOut: (vehicleId: string) => void;
+  onViewDocs: (vehicleId: string) => void;
 }
 
-export const FleetTable = ({
-  vehicles,
-  editingId,
-  editForm,
-  onEdit,
-  onSave,
-  onEditFormChange
-}: FleetTableProps) => {
+export const FleetTable = ({ vehicles, onRentOut, onViewDocs }: FleetTableProps) => {
   return (
-    <Card>
-      <div className="rounded-md border-0">
+    <Card className="border-0">
+      <div className="rounded-md">
         <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead>Modelo</TableHead>
-              <TableHead>Placa</TableHead>
-              <TableHead>KM Atual</TableHead>
-              <TableHead>Última Revisão</TableHead>
-              <TableHead>Próxima Revisão</TableHead>
-              <TableHead>Cliente</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
+          <TableHeader className="bg-gray-50">
+            <TableRow className="hover:bg-gray-50 border-0">
+              <TableHead className="w-[300px] font-medium">Vehicle / ID</TableHead>
+              <TableHead className="w-[120px] font-medium">Status</TableHead>
+              <TableHead className="font-medium">VIN & License plate</TableHead>
+              <TableHead className="w-[150px] font-medium">Driver</TableHead>
+              <TableHead className="w-[120px] font-medium">Vehicle docs</TableHead>
+              <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -47,11 +29,8 @@ export const FleetTable = ({
               <FleetTableRow
                 key={vehicle.id}
                 vehicle={vehicle}
-                editingId={editingId}
-                editForm={editForm}
-                onEdit={onEdit}
-                onSave={onSave}
-                onEditFormChange={onEditFormChange}
+                onRentOut={onRentOut}
+                onViewDocs={onViewDocs}
               />
             ))}
           </TableBody>
