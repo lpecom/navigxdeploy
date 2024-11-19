@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Car, Calendar, Tag } from "lucide-react";
+import { Pencil, Car, Tag, ShoppingBag, CheckCircle2, AlertCircle } from "lucide-react";
 import { getBrandLogo } from "@/utils/brandLogos";
 import type { CarModel } from "./types";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface VehicleCardProps {
   car: CarModel;
@@ -13,6 +15,28 @@ interface VehicleCardProps {
 
 export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
   const brandLogoUrl = getBrandLogo(car.name);
+
+  const { data: fleetStats } = useQuery({
+    queryKey: ['fleet-stats', car.id],
+    queryFn: async () => {
+      const { data: vehicles, error } = await supabase
+        .from('fleet_vehicles')
+        .select('status')
+        .eq('car_model_id', car.id);
+
+      if (error) {
+        console.error('Error fetching fleet stats:', error);
+        return null;
+      }
+
+      return {
+        rented: vehicles?.filter(v => v.status === 'rented').length || 0,
+        available: vehicles?.filter(v => v.status === 'available').length || 0,
+        forSale: vehicles?.filter(v => v.status === 'for_sale').length || 0,
+        total: vehicles?.length || 0
+      };
+    }
+  });
 
   return (
     <motion.div
@@ -32,7 +56,10 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
             ) : (
               <Car className="w-8 h-8 text-muted-foreground" />
             )}
-            <h3 className="font-semibold text-lg">{car.name}</h3>
+            <div>
+              <p className="text-sm text-muted-foreground font-medium">Marca</p>
+              <h3 className="font-semibold text-lg">{car.name.split(' ')[0]}</h3>
+            </div>
           </div>
           <Button
             variant="ghost"
@@ -54,40 +81,42 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
             </div>
           )}
           
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-2">
-              {car.category?.name && (
-                <Badge variant="secondary" className="flex items-center gap-1">
-                  <Tag className="w-3 h-3" />
-                  {car.category.name}
-                </Badge>
-              )}
-              {car.year && (
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3" />
-                  {car.year}
-                </Badge>
-              )}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Modelo</span>
+              <span className="font-medium">{car.name.split(' ').slice(1).join(' ')}</span>
             </div>
-            
-            {car.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {car.description}
-              </p>
-            )}
-            
-            {car.optionals && Object.entries(car.optionals).length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(car.optionals).map(([key, value]) => (
-                  <Badge 
-                    key={key}
-                    variant="secondary"
-                    className="text-xs"
-                  >
-                    {`${key}: ${value}`}
-                  </Badge>
-                ))}
+
+            <div className="grid grid-cols-3 gap-2 pt-2 border-t">
+              <div className="text-center p-2 bg-slate-50 rounded-lg">
+                <div className="flex items-center justify-center gap-1 text-orange-600 mb-1">
+                  <ShoppingBag className="w-4 h-4" />
+                  <span className="text-lg font-semibold">{fleetStats?.rented || 0}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">Alugados</p>
               </div>
+
+              <div className="text-center p-2 bg-slate-50 rounded-lg">
+                <div className="flex items-center justify-center gap-1 text-green-600 mb-1">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="text-lg font-semibold">{fleetStats?.available || 0}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">Disponíveis</p>
+              </div>
+
+              <div className="text-center p-2 bg-slate-50 rounded-lg">
+                <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
+                  <Tag className="w-4 h-4" />
+                  <span className="text-lg font-semibold">{fleetStats?.forSale || 0}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">À Venda</p>
+              </div>
+            </div>
+
+            {car.category?.name && (
+              <Badge variant="secondary" className="w-fit">
+                {car.category.name}
+              </Badge>
             )}
           </div>
         </CardContent>
