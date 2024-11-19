@@ -7,6 +7,7 @@ import { VehicleInfoTab } from "./profile/VehicleInfoTab";
 import { MaintenanceTab } from "./profile/MaintenanceTab";
 import { HistoryTab } from "./profile/HistoryTab";
 import { IncidentsTab } from "./profile/IncidentsTab";
+import type { MaintenanceRecord } from "../types";
 
 interface FleetVehicleProfileProps {
   vehicleId: string;
@@ -48,7 +49,7 @@ export const FleetVehicleProfile = ({ vehicleId }: FleetVehicleProfileProps) => 
         .eq('vehicle_id', vehicleId)
         .order('service_date', { ascending: false });
       
-      return data || [];
+      return (data || []) as MaintenanceRecord[];
     },
   });
 

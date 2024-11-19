@@ -30,7 +30,9 @@ export const FleetListView = () => {
             image_url
           ),
           customer:customers(
-            full_name
+            full_name,
+            email,
+            phone
           )
         `);
       
