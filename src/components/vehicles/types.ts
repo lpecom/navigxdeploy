@@ -4,12 +4,13 @@ export interface CarModel {
   category_id: string | null;
   description: string | null;
   image_url: string | null;
+  brand_logo_url?: string | null;
   year: string | null;
   optionals: Record<string, any> | null;
   created_at: string | null;
   updated_at: string | null;
-  engine_size?: string; // Made optional since demo data doesn't include it
-  transmission?: string; // Made optional since demo data doesn't include it
+  engine_size?: string;
+  transmission?: string;
   category?: {
     name: string;
   };

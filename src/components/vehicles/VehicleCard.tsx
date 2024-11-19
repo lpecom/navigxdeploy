@@ -12,8 +12,17 @@ interface VehicleCardProps {
 export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-xl">{car.name}</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div className="flex items-center gap-3">
+          {car.brand_logo_url && (
+            <img 
+              src={car.brand_logo_url} 
+              alt={`${car.name} brand`}
+              className="w-8 h-8 object-contain"
+            />
+          )}
+          <CardTitle className="text-xl">{car.name}</CardTitle>
+        </div>
         <Button
           variant="ghost"
           size="icon"
