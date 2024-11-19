@@ -12,7 +12,12 @@ interface SidebarMenuProps {
 export const SidebarMenu = ({ items, currentPath }: SidebarMenuProps) => {
   const [openMenus, setOpenMenus] = useState<string[]>([]);
 
-  const isActive = (path?: string) => path && currentPath === path;
+  const isActive = (path?: string) => {
+    if (!path) return false;
+    // Check if current path starts with the menu item path
+    // This ensures parent menus are highlighted when child routes are active
+    return currentPath.startsWith(path);
+  };
 
   const toggleMenu = (label: string) => {
     setOpenMenus(prev => 
@@ -23,27 +28,31 @@ export const SidebarMenu = ({ items, currentPath }: SidebarMenuProps) => {
   };
 
   const renderMenuItem = (item: MenuItem) => {
+    const isMenuActive = item.subItems?.some(subItem => isActive(subItem.to)) || isActive(item.to);
+
     if (item.subItems) {
+      const isOpen = openMenus.includes(item.label);
+      
       return (
         <div key={item.label}>
           <button
             onClick={() => toggleMenu(item.label)}
             className={cn(
               "w-full flex items-center px-4 py-2.5 text-sm rounded-lg transition-colors",
-              openMenus.includes(item.label)
-                ? "text-primary bg-primary/5"
+              isMenuActive || isOpen
+                ? "text-primary bg-primary/5 font-medium"
                 : "text-gray-600 hover:text-primary hover:bg-primary/5"
             )}
           >
             <item.icon className="w-5 h-5 mr-3" />
             {item.label}
-            {openMenus.includes(item.label) ? (
+            {isOpen ? (
               <ChevronDown className="w-4 h-4 ml-auto" />
             ) : (
               <ChevronRight className="w-4 h-4 ml-auto" />
             )}
           </button>
-          {openMenus.includes(item.label) && (
+          {isOpen && (
             <div className="mt-1 ml-4 space-y-1">
               {item.subItems.map((subItem) => (
                 <Link
@@ -56,7 +65,6 @@ export const SidebarMenu = ({ items, currentPath }: SidebarMenuProps) => {
                       : "text-gray-600 hover:text-primary hover:bg-primary/5"
                   )}
                 >
-                  {subItem.icon && <subItem.icon className="w-4 h-4 mr-2" />}
                   {subItem.label}
                 </Link>
               ))}
