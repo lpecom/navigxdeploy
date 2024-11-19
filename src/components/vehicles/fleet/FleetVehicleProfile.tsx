@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Car, Calendar, Tool, AlertTriangle, User } from "lucide-react";
+import { Car, Calendar, Wrench, AlertTriangle, User } from "lucide-react";
 
 interface FleetVehicleProfileProps {
   vehicleId: string;
@@ -120,7 +120,7 @@ export const FleetVehicleProfile = ({ vehicleId }: FleetVehicleProfileProps) => 
             Informações
           </TabsTrigger>
           <TabsTrigger value="maintenance">
-            <Tool className="w-4 h-4 mr-2" />
+            <Wrench className="w-4 h-4 mr-2" />
             Manutenções
           </TabsTrigger>
           <TabsTrigger value="history">
