@@ -44,3 +44,15 @@ export interface FleetVehicle {
     full_name: string;
   };
 }
+
+export interface MaintenanceRecord {
+  id: string;
+  vehicle_id: string;
+  service_type: string;
+  description: string;
+  service_date: string;
+  cost: number;
+  status: 'scheduled' | 'completed';
+  created_at: string;
+  updated_at: string;
+}
