@@ -17,15 +17,88 @@ const BRAND_LOGOS: Record<string, string> = {
   'Peugeot': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/peugeot.svg',
   'Citroen': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/citroen.svg',
   'Iveco': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/iveco.svg',
+  'Jeep': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/jeep.svg',
+  'Mitsubishi': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/mitsubishi.svg',
 };
 
 const BRAND_MAPPINGS: Record<string, string> = {
+  // Fiat models
   'ARGO': 'Fiat',
+  'CRONOS': 'Fiat',
+  'MOBI': 'Fiat',
+  'STRADA': 'Fiat',
+  'TORO': 'Fiat',
+  'PULSE': 'Fiat',
+  'FIORINO': 'Fiat',
+  
+  // Kia models
   'BONGO': 'Kia',
+  'SPORTAGE': 'Kia',
+  'CERATO': 'Kia',
+  
+  // Citroen models
   'C3': 'Citroen',
+  'C4': 'Citroen',
+  'AIRCROSS': 'Citroen',
+  
+  // Hyundai models
   'CRETA': 'Hyundai',
+  'HB20': 'Hyundai',
+  'TUCSON': 'Hyundai',
+  'SANTA FE': 'Hyundai',
+  'IX35': 'Hyundai',
+  
+  // Iveco models
   'DAILY': 'Iveco',
+  
+  // Peugeot models
   '208': 'Peugeot',
+  '2008': 'Peugeot',
+  '3008': 'Peugeot',
+  
+  // Volkswagen models
+  'GOL': 'Volkswagen',
+  'POLO': 'Volkswagen',
+  'VIRTUS': 'Volkswagen',
+  'NIVUS': 'Volkswagen',
+  'T-CROSS': 'Volkswagen',
+  'AMAROK': 'Volkswagen',
+  'SAVEIRO': 'Volkswagen',
+  
+  // Chevrolet models
+  'ONIX': 'Chevrolet',
+  'CRUZE': 'Chevrolet',
+  'S10': 'Chevrolet',
+  'TRACKER': 'Chevrolet',
+  
+  // Renault models
+  'KWID': 'Renault',
+  'SANDERO': 'Renault',
+  'DUSTER': 'Renault',
+  'LOGAN': 'Renault',
+  'CAPTUR': 'Renault',
+  'OROCH': 'Renault',
+  
+  // Jeep models
+  'RENEGADE': 'Jeep',
+  'COMPASS': 'Jeep',
+  'COMMANDER': 'Jeep',
+  
+  // Toyota models
+  'COROLLA': 'Toyota',
+  'HILUX': 'Toyota',
+  'YARIS': 'Toyota',
+  'RAV4': 'Toyota',
+  
+  // Mitsubishi models
+  'L200': 'Mitsubishi',
+  'PAJERO': 'Mitsubishi',
+  'ASX': 'Mitsubishi',
+  
+  // Nissan models
+  'KICKS': 'Nissan',
+  'FRONTIER': 'Nissan',
+  'VERSA': 'Nissan',
 };
 
 export const getBrandFromModel = (modelName: string): string | null => {
