@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LucideIcon } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 interface QuickStatsCardProps {
   title: string;
@@ -10,26 +10,27 @@ interface QuickStatsCardProps {
   iconColor: string;
 }
 
-export const QuickStatsCard = ({ 
-  title, 
-  value, 
-  description, 
+export const QuickStatsCard = ({
+  title,
+  value,
+  description,
   icon: Icon,
-  gradient,
-  iconColor
+  iconColor,
 }: QuickStatsCardProps) => {
   return (
-    <Card className={`${gradient} border-none shadow-sm hover:shadow-md transition-shadow duration-200`}>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium text-secondary-900/80">{title}</CardTitle>
-        <div className={`p-2 rounded-lg bg-white/80 backdrop-blur-sm`}>
-          <Icon className={`h-4 w-4 ${iconColor}`} />
+    <Card className="bg-white hover:shadow-lg transition-shadow duration-300">
+      <div className="p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-gray-500">{title}</p>
+            <p className="text-2xl font-semibold text-gray-900">{value}</p>
+          </div>
+          <div className={`p-3 rounded-full ${iconColor.replace('text-', 'bg-')}/10`}>
+            <Icon className={`w-5 h-5 ${iconColor}`} />
+          </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className={`text-3xl font-bold ${iconColor}`}>{value}</div>
-        <p className="text-xs text-secondary-600 mt-1">{description}</p>
-      </CardContent>
+        <p className="text-sm text-gray-500">{description}</p>
+      </div>
     </Card>
   );
 };

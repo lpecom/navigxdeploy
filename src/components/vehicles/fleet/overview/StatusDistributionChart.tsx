@@ -10,8 +10,10 @@ const COLORS = ['#22c55e', '#eab308', '#3b82f6', '#f97316', '#ef4444', '#8b5cf6'
 export const StatusDistributionChart = ({ data }: StatusDistributionChartProps) => {
   return (
     <Card className="bg-white">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-secondary-900">Distribuição de Status da Frota</CardTitle>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base font-medium text-gray-900">
+          Distribuição de Status da Frota
+        </CardTitle>
       </CardHeader>
       <CardContent className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
