@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { subDays } from "date-fns";
 
 export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
   // First fetch fleet vehicles to get customers with active rentals
@@ -46,10 +47,18 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
       
       if (customersError) throw customersError;
 
-      // Update customer statuses based on fleet data
+      const ninetyDaysAgo = subDays(new Date(), 90);
+
+      // Update customer statuses based on fleet data and last rental date
       const updatedCustomers = await Promise.all((allCustomers || []).map(async (customer) => {
         const hasActiveRental = customerVehicleMap.has(customer.id);
-        const newStatus = hasActiveRental ? 'active_rental' : (customer.status || 'active');
+        let newStatus = 'inactive';
+
+        if (hasActiveRental) {
+          newStatus = 'active_rental';
+        } else if (customer.last_rental_date && new Date(customer.last_rental_date) > ninetyDaysAgo) {
+          newStatus = 'active';
+        }
 
         // If status needs to be updated in the database
         if (customer.status !== newStatus) {

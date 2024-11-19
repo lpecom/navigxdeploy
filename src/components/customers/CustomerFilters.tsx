@@ -39,18 +39,18 @@ export const CustomerFilters = ({
       description: 'Clientes com veículos alugados atualmente'
     },
     { 
-      label: 'Ativos', 
+      label: 'Recentes', 
       value: 'active', 
       count: counts.active, 
       color: 'bg-green-100 text-green-800',
-      description: 'Clientes sem aluguéis ativos'
+      description: 'Clientes ativos nos últimos 90 dias'
     },
     { 
       label: 'Inativos', 
       value: 'inactive', 
       count: counts.inactive, 
       color: 'bg-gray-100 text-gray-800',
-      description: 'Clientes sem atividade recente'
+      description: 'Sem atividade nos últimos 90 dias'
     }
   ];
 
@@ -70,7 +70,7 @@ export const CustomerFilters = ({
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="gap-2">
               <Filter className="h-4 w-4" />
-              Filtros
+              Status
               {statusFilter.length > 0 && (
                 <Badge variant="secondary" className="ml-1">
                   {statusFilter.length}
@@ -111,9 +111,20 @@ export const CustomerFilters = ({
       {/* Status Summary */}
       <div className="flex gap-4 flex-wrap">
         {statusOptions.map((option) => (
-          <div
+          <button
             key={option.value}
-            className="flex flex-col gap-1 px-4 py-2 rounded-lg bg-gray-50"
+            onClick={() => {
+              if (statusFilter.includes(option.value)) {
+                onStatusFilterChange(statusFilter.filter(item => item !== option.value));
+              } else {
+                onStatusFilterChange([...statusFilter, option.value]);
+              }
+            }}
+            className={`flex flex-col gap-1 px-4 py-2 rounded-lg transition-colors ${
+              statusFilter.includes(option.value) 
+                ? 'bg-gray-100 ring-2 ring-primary/20' 
+                : 'bg-gray-50 hover:bg-gray-100'
+            }`}
           >
             <div className="flex items-center gap-2">
               <Badge className={option.color}>{option.count}</Badge>
@@ -122,7 +133,7 @@ export const CustomerFilters = ({
             <span className="text-xs text-muted-foreground">
               {option.description}
             </span>
-          </div>
+          </button>
         ))}
       </div>
     </div>

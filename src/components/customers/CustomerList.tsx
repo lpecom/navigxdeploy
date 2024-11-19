@@ -12,7 +12,8 @@ export const CustomerList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedCustomerId, setExpandedCustomerId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
-  const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  // Set default filter to show active rental customers
+  const [statusFilter, setStatusFilter] = useState<string[]>(['active_rental']);
   const navigate = useNavigate();
 
   const { customers: filteredCustomers, isLoading, counts, fleetVehicles } = useCustomers(searchTerm, statusFilter);
