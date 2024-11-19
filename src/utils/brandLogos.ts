@@ -16,11 +16,30 @@ const BRAND_LOGOS: Record<string, string> = {
   'Nissan': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nissan.svg',
   'Peugeot': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/peugeot.svg',
   'Citroen': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/citroen.svg',
+  'Iveco': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/iveco.svg',
+};
+
+const BRAND_MAPPINGS: Record<string, string> = {
+  'ARGO': 'Fiat',
+  'BONGO': 'Kia',
+  'C3': 'Citroen',
+  'CRETA': 'Hyundai',
+  'DAILY': 'Iveco',
+  '208': 'Peugeot',
 };
 
 export const getBrandFromModel = (modelName: string): string | null => {
   if (!modelName) return null;
   
+  // First try to match from the mappings
+  const modelPrefix = Object.keys(BRAND_MAPPINGS).find(prefix => 
+    modelName.toUpperCase().includes(prefix)
+  );
+  if (modelPrefix) {
+    return BRAND_MAPPINGS[modelPrefix];
+  }
+  
+  // If no mapping found, try direct brand match
   const brand = Object.keys(BRAND_LOGOS).find(brand => 
     modelName.toLowerCase().startsWith(brand.toLowerCase())
   );
