@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Vehicles from "@/pages/Vehicles";
+import VehicleDetails from "@/pages/VehicleDetails";
 import Offers from "@/pages/Offers";
 import Accessories from "@/pages/Accessories";
 import Analytics from "@/pages/Analytics";
@@ -83,6 +84,7 @@ const AdminRoutes = () => {
                 <Route path="models" element={<Vehicles view="models" />} />
                 <Route path="fleet" element={<Vehicles view="fleet" />} />
                 <Route path="maintenance" element={<Vehicles view="maintenance" />} />
+                <Route path=":id" element={<VehicleDetails />} />
               </Route>
               <Route path="customers">
                 <Route index element={<Customers />} />
