@@ -8,13 +8,25 @@ import { MaintenanceTab } from "./profile/MaintenanceTab";
 import { HistoryTab } from "./profile/HistoryTab";
 import { IncidentsTab } from "./profile/IncidentsTab";
 import type { MaintenanceRecord, FleetVehicle, CarModel } from "@/types/vehicles";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface FleetVehicleProfileProps {
   vehicleId: string;
 }
 
 export const FleetVehicleProfile = ({ vehicleId }: FleetVehicleProfileProps) => {
-  const { data: vehicleDetails } = useQuery({
+  // Add validation for vehicleId
+  if (!vehicleId) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>
+          Invalid vehicle ID provided.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  const { data: vehicleDetails, error } = useQuery({
     queryKey: ['fleet-vehicle-details', vehicleId],
     queryFn: async () => {
       const { data: vehicle, error } = await supabase
@@ -53,9 +65,28 @@ export const FleetVehicleProfile = ({ vehicleId }: FleetVehicleProfileProps) => 
         car_model: vehicle.car_model as CarModel | undefined
       } as FleetVehicle;
     },
+    enabled: !!vehicleId, // Only run query if vehicleId is present
   });
 
-  if (!vehicleDetails) return null;
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>
+          Error loading vehicle details: {error.message}
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (!vehicleDetails) {
+    return (
+      <Alert>
+        <AlertDescription>
+          No vehicle found with the provided ID.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div className="space-y-6">
