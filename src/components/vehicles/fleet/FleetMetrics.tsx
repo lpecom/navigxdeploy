@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Car, AlertTriangle, CheckCircle, Clock, Wrench, XOctagon, Shield } from "lucide-react";
+import { Car, AlertTriangle, CheckCircle, Clock, Wrench, XOctagon, Shield, AlertCircle } from "lucide-react";
 import type { FleetVehicle } from "../types";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +31,9 @@ export const FleetMetrics = ({ vehicles, onFilterChange, activeFilter }: FleetMe
   ).length;
   const managementVehicles = vehicles.filter(v => 
     v.status?.toLowerCase().includes('diretoria')
+  ).length;
+  const accidentVehicles = vehicles.filter(v => 
+    v.status?.toLowerCase() === 'accident'
   ).length;
 
   const metrics = [
@@ -78,6 +81,15 @@ export const FleetMetrics = ({ vehicles, onFilterChange, activeFilter }: FleetMe
       color: "text-orange-600",
       bgColor: "bg-orange-100",
       filterValue: "funilaria"
+    },
+    {
+      title: "Acidentes",
+      value: accidentVehicles,
+      icon: AlertCircle,
+      description: "Reportados",
+      color: "text-red-600",
+      bgColor: "bg-red-100",
+      filterValue: "accident"
     },
     {
       title: "Desativados",

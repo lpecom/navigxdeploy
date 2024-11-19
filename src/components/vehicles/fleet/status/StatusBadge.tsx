@@ -1,4 +1,4 @@
-import { AlertTriangle, Car, CheckCircle, Clock, Shield, Wrench, XOctagon } from "lucide-react";
+import { AlertTriangle, Car, CheckCircle, Clock, Shield, Wrench, XOctagon, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface StatusBadgeProps {
@@ -66,6 +66,15 @@ export const getStatusInfo = (status: string | null) => {
       icon: Shield,
       label: 'Diretoria',
       color: 'text-purple-600'
+    };
+  }
+
+  if (statusLower === 'accident') {
+    return {
+      variant: 'destructive' as const,
+      icon: AlertCircle,
+      label: 'Accident',
+      color: 'text-red-600'
     };
   }
 

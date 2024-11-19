@@ -1,10 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Car, Wrench, AlertTriangle, CheckCircle, TrendingUp, Calendar } from "lucide-react";
+import { Car, Wrench, AlertTriangle, CheckCircle, TrendingUp, Calendar, AlertCircle } from "lucide-react";
 import { ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const COLORS = ['#22c55e', '#eab308', '#3b82f6', '#f97316', '#ef4444', '#8b5cf6', '#dc2626'];
 
 export const FleetOverview = () => {
   const { data: fleetStats } = useQuery({
@@ -17,6 +17,9 @@ export const FleetOverview = () => {
           car_model:car_models(
             name,
             year
+          ),
+          customer:customers(
+            full_name
           )
         `);
 
@@ -24,21 +27,28 @@ export const FleetOverview = () => {
 
       const stats = {
         total: vehicles?.length || 0,
-        available: vehicles?.filter(v => v.status === 'available').length || 0,
-        maintenance: vehicles?.filter(v => v.status?.includes('maintenance')).length || 0,
-        rented: vehicles?.filter(v => v.status === 'rented').length || 0,
-        inactive: vehicles?.filter(v => v.status === 'inactive').length || 0,
+        available: vehicles?.filter(v => v.status?.toLowerCase() === 'available').length || 0,
+        maintenance: vehicles?.filter(v => v.status?.toLowerCase()?.includes('maintenance')).length || 0,
+        rented: vehicles?.filter(v => v.status?.toLowerCase() === 'rented').length || 0,
+        accident: vehicles?.filter(v => v.status?.toLowerCase() === 'accident').length || 0,
+        inactive: vehicles?.filter(v => v.status?.toLowerCase() === 'desativado').length || 0,
         maintenanceData: vehicles?.filter(v => v.next_revision_date)
           .map(v => ({
             plate: v.plate,
             date: new Date(v.next_revision_date).toLocaleDateString(),
+            model: v.car_model?.name,
+            customer: v.customer?.full_name
           }))
+          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
           .slice(0, 5) || [],
         statusDistribution: [
-          { name: 'Available', value: vehicles?.filter(v => v.status === 'available').length || 0 },
-          { name: 'Maintenance', value: vehicles?.filter(v => v.status?.includes('maintenance')).length || 0 },
-          { name: 'Rented', value: vehicles?.filter(v => v.status === 'rented').length || 0 },
-          { name: 'Inactive', value: vehicles?.filter(v => v.status === 'inactive').length || 0 },
+          { name: 'Available', value: vehicles?.filter(v => v.status?.toLowerCase() === 'available').length || 0 },
+          { name: 'Maintenance', value: vehicles?.filter(v => v.status?.toLowerCase()?.includes('maintenance')).length || 0 },
+          { name: 'Rented', value: vehicles?.filter(v => v.status?.toLowerCase() === 'rented').length || 0 },
+          { name: 'Body Shop', value: vehicles?.filter(v => v.status?.toLowerCase()?.includes('funilaria')).length || 0 },
+          { name: 'Accident', value: vehicles?.filter(v => v.status?.toLowerCase() === 'accident').length || 0 },
+          { name: 'Management', value: vehicles?.filter(v => v.status?.toLowerCase()?.includes('diretoria')).length || 0 },
+          { name: 'Inactive', value: vehicles?.filter(v => v.status?.toLowerCase() === 'desativado').length || 0 },
         ],
         monthlyStats: [
           { name: 'Jan', rentals: 4, maintenance: 2 },
@@ -95,14 +105,14 @@ export const FleetOverview = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/50 dark:to-purple-800/50">
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/50 dark:to-red-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Rented</CardTitle>
-            <TrendingUp className="h-4 w-4 text-purple-600" />
+            <CardTitle className="text-sm font-medium">Accidents</CardTitle>
+            <AlertCircle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">{fleetStats.rented}</div>
-            <p className="text-xs text-muted-foreground mt-1">Currently in use</p>
+            <div className="text-2xl font-bold text-red-600">{fleetStats.accident}</div>
+            <p className="text-xs text-muted-foreground mt-1">Accident reports</p>
           </CardContent>
         </Card>
       </div>
@@ -117,7 +127,7 @@ export const FleetOverview = () => {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={fleetStats.statusDistribution}
+                  data={fleetStats.statusDistribution.filter(item => item.value > 0)}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -125,7 +135,7 @@ export const FleetOverview = () => {
                   fill="#8884d8"
                   paddingAngle={5}
                   dataKey="value"
-                  label
+                  label={({ name, value }) => `${name}: ${value}`}
                 >
                   {fleetStats.statusDistribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -177,7 +187,10 @@ export const FleetOverview = () => {
                   </div>
                   <div>
                     <p className="font-medium">{item.plate}</p>
-                    <p className="text-sm text-muted-foreground">Next service</p>
+                    <p className="text-sm text-muted-foreground">{item.model}</p>
+                    {item.customer && (
+                      <p className="text-xs text-muted-foreground">Customer: {item.customer}</p>
+                    )}
                   </div>
                 </div>
                 <div className="text-sm font-medium">{item.date}</div>
