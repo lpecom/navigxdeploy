@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { FleetSearchBar } from "./fleet/FleetSearchBar";
 import { FleetTable } from "./fleet/FleetTable";
-import { FleetMetrics } from "./fleet/FleetMetrics";
+import { FleetMetrics } from "./FleetMetrics";
 import type { FleetVehicle } from "@/types/vehicles";
 
 import { Card } from "@/components/ui/card";
@@ -26,9 +26,12 @@ export const FleetListView = () => {
         .select(`
           *,
           car_model:car_models(
+            id,
             name,
             year,
-            image_url
+            image_url,
+            category_id,
+            brand_logo_url
           ),
           customer:customers(
             full_name,

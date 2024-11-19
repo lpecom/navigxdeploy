@@ -5,11 +5,25 @@ import type { FleetVehicle } from "@/types/vehicles";
 
 interface FleetTableProps {
   vehicles: FleetVehicle[];
-  onRentOut: (vehicleId: string) => void;
-  onViewDocs: (vehicleId: string) => void;
+  editingId?: string | null;
+  editForm?: Partial<FleetVehicle>;
+  onEdit?: (vehicle: FleetVehicle) => void;
+  onSave?: (id: string) => Promise<void>;
+  onEditFormChange?: (form: Partial<FleetVehicle>) => void;
+  onRentOut?: (vehicleId: string) => void;
+  onViewDocs?: (vehicleId: string) => void;
 }
 
-export const FleetTable = ({ vehicles, onRentOut, onViewDocs }: FleetTableProps) => {
+export const FleetTable = ({ 
+  vehicles, 
+  editingId,
+  editForm,
+  onEdit,
+  onSave,
+  onEditFormChange,
+  onRentOut,
+  onViewDocs 
+}: FleetTableProps) => {
   return (
     <Card className="border-0">
       <div className="rounded-md">
@@ -29,6 +43,11 @@ export const FleetTable = ({ vehicles, onRentOut, onViewDocs }: FleetTableProps)
               <FleetTableRow
                 key={vehicle.id}
                 vehicle={vehicle}
+                isEditing={editingId === vehicle.id}
+                editForm={editForm}
+                onEdit={onEdit}
+                onSave={onSave}
+                onEditFormChange={onEditFormChange}
                 onRentOut={onRentOut}
                 onViewDocs={onViewDocs}
               />
