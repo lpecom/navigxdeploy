@@ -109,6 +109,7 @@ export type Database = {
       }
       car_models: {
         Row: {
+          brand_logo_url: string | null
           category_id: string | null
           created_at: string | null
           description: string | null
@@ -120,6 +121,7 @@ export type Database = {
           year: string | null
         }
         Insert: {
+          brand_logo_url?: string | null
           category_id?: string | null
           created_at?: string | null
           description?: string | null
@@ -131,6 +133,7 @@ export type Database = {
           year?: string | null
         }
         Update: {
+          brand_logo_url?: string | null
           category_id?: string | null
           created_at?: string | null
           description?: string | null

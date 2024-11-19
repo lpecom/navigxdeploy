@@ -4,6 +4,7 @@ export interface CarModel {
   category_id: string | null;
   description: string | null;
   image_url: string | null;
+  brand_logo_url?: string | null;
   year: string | null;
   optionals: Record<string, any> | null;
   created_at: string | null;
