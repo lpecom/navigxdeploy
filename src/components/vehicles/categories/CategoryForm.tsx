@@ -1,17 +1,19 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Category {
+  id: string;
+  name: string;
+  description: string | null;
+}
 
 interface CategoryFormProps {
-  category?: {
-    id: string;
-    name: string;
-    description: string | null;
-  };
+  category?: Category;
   onSuccess: () => void;
 }
 
@@ -27,15 +29,15 @@ export const CategoryForm = ({ category, onSuccess }: CategoryFormProps) => {
     mutationFn: async (data: typeof formData) => {
       if (category) {
         const { error } = await supabase
-          .from("car_groups")
+          .from("categories")
           .update(data)
           .eq("id", category.id);
         
         if (error) throw error;
       } else {
         const { error } = await supabase
-          .from("car_groups")
-          .insert(data);
+          .from("categories")
+          .insert([data]);
         
         if (error) throw error;
       }
@@ -43,12 +45,19 @@ export const CategoryForm = ({ category, onSuccess }: CategoryFormProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["car-categories"] });
       toast({
-        title: category ? "Categoria atualizada" : "Categoria criada",
-        description: category
-          ? "As alterações foram salvas com sucesso."
-          : "A nova categoria foi criada com sucesso.",
+        title: "Sucesso",
+        description: category 
+          ? "Categoria atualizada com sucesso" 
+          : "Categoria criada com sucesso",
       });
       onSuccess();
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao salvar a categoria",
+        variant: "destructive",
+      });
     },
   });
 
@@ -59,35 +68,23 @@ export const CategoryForm = ({ category, onSuccess }: CategoryFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <label htmlFor="name" className="text-sm font-medium">
-          Nome da Categoria
-        </label>
+      <div>
+        <label className="text-sm font-medium">Nome</label>
         <Input
-          id="name"
           value={formData.name}
-          onChange={(e) =>
-            setFormData({ ...formData, name: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           required
         />
       </div>
-
-      <div className="space-y-2">
-        <label htmlFor="description" className="text-sm font-medium">
-          Descrição
-        </label>
+      <div>
+        <label className="text-sm font-medium">Descrição</label>
         <Textarea
-          id="description"
           value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         />
       </div>
-
       <Button type="submit" className="w-full">
-        {category ? "Salvar Alterações" : "Criar Categoria"}
+        {category ? "Atualizar" : "Criar"} Categoria
       </Button>
     </form>
   );

@@ -41,9 +41,9 @@ export const CategoryList = () => {
     queryKey: ["car-categories"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("car_groups")
+        .from("categories")
         .select("*")
-        .order("name");
+        .order("display_order");
       
       if (error) throw error;
       return data;
@@ -52,8 +52,17 @@ export const CategoryList = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
+      // First update any car_models to remove the category reference
+      const { error: modelsError } = await supabase
+        .from("car_models")
+        .update({ category_id: null })
+        .eq("category_id", id);
+      
+      if (modelsError) throw modelsError;
+
+      // Then delete the category
       const { error } = await supabase
-        .from("car_groups")
+        .from("categories")
         .delete()
         .eq("id", id);
       
