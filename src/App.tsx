@@ -40,17 +40,15 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           title: "Sessão encerrada",
           description: "Por favor, faça login novamente.",
         });
-        // Clear any stored auth data
         await supabase.auth.signOut();
         window.location.href = '/login';
       }
     });
 
-    // Check session validity on mount
     const checkSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) {
-        console.log('Session check failed:', error);
+        console.error('Session check failed:', error);
         await supabase.auth.signOut();
         window.location.href = '/login';
       }

@@ -36,38 +36,38 @@ export const adminMenuItems: MenuItem[] = [
     icon: Calendar,
     label: "Agenda",
     subItems: [
-      { to: "/admin/calendar", label: "Calendário", icon: Calendar },
-      { to: "/admin/reservations/pending", icon: Clock, label: "Pendentes" },
-      { to: "/admin/reservations/pickup", icon: CalendarCheck, label: "Retirada" },
-      { to: "/admin/check-in", icon: CalendarClock, label: "Check-in" },
+      { to: "/admin/calendar", label: "Calendário" },
+      { to: "/admin/reservations/pending", label: "Pendentes" },
+      { to: "/admin/reservations/pickup", label: "Retirada" },
+      { to: "/admin/check-in", label: "Check-in" },
     ]
   },
   {
     icon: Car,
     label: "Frota",
     subItems: [
-      { to: "/admin/vehicles/overview", label: "Visão Geral", icon: Grid },
-      { to: "/admin/vehicles/categories", label: "Categorias", icon: Tag },
-      { to: "/admin/vehicles/models", label: "Modelos", icon: CarFront },
-      { to: "/admin/vehicles/fleet", label: "Veículos", icon: Car },
-      { to: "/admin/vehicles/maintenance", label: "Manutenção", icon: Wrench },
+      { to: "/admin/vehicles/overview", label: "Visão Geral" },
+      { to: "/admin/vehicles/categories", label: "Categorias" },
+      { to: "/admin/vehicles/models", label: "Modelos" },
+      { to: "/admin/vehicles/fleet", label: "Veículos" },
+      { to: "/admin/vehicles/maintenance", label: "Manutenção" },
     ]
   },
   {
     icon: BarChart2,
     label: "Análises",
     subItems: [
-      { to: "/admin/analytics", icon: LineChart, label: "Visão Geral" },
-      { to: "/admin/reports", icon: BarChart, label: "Relatórios" },
-      { to: "/admin/performance", icon: PieChart, label: "Performance" },
+      { to: "/admin/analytics", label: "Visão Geral" },
+      { to: "/admin/reports", label: "Relatórios" },
+      { to: "/admin/performance", label: "Performance" },
     ]
   },
   {
     icon: Tag,
     label: "Marketing",
     subItems: [
-      { to: "/admin/offers", icon: Megaphone, label: "Ofertas" },
-      { to: "/admin/automations", icon: Settings, label: "Automações" },
+      { to: "/admin/offers", label: "Ofertas" },
+      { to: "/admin/automations", label: "Automações" },
     ]
   },
   { to: "/admin/accessories", icon: Package, label: "Opcionais" },

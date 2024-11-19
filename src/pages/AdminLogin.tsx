@@ -1,20 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const AdminLogin = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  // Check if user is already logged in
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -47,8 +44,8 @@ const AdminLogin = () => {
     } catch (error: any) {
       console.error('Login error:', error);
       toast({
-        title: "Erro no login",
-        description: "Email ou senha incorretos",
+        title: "Erro ao fazer login",
+        description: error.message || "Verifique suas credenciais e tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -57,51 +54,46 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-md p-8 space-y-6">
-        <div className="text-center space-y-2">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
           <img
+            className="mx-auto h-12 w-auto"
             src="https://i.imghippo.com/files/uafE3798xA.png"
-            alt="Navig Logo"
-            className="h-12 mx-auto"
+            alt="Logo"
           />
-          <h1 className="text-2xl font-semibold">Painel Administrativo</h1>
-          <p className="text-gray-600">
-            Entre com suas credenciais para acessar o painel
-          </p>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Acesso Administrativo
+          </h2>
         </div>
-
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="seu@email.com"
-              required
-              className="w-full"
-              disabled={isLoading}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Senha
-            </label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              className="w-full"
-              disabled={isLoading}
-            />
+        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+          <div className="rounded-md shadow-sm space-y-4">
+            <div>
+              <label htmlFor="email" className="sr-only">
+                Email
+              </label>
+              <Input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="sr-only">
+                Senha
+              </label>
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Senha"
+              />
+            </div>
           </div>
 
           <Button
@@ -109,17 +101,10 @@ const AdminLogin = () => {
             className="w-full"
             disabled={isLoading}
           >
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Entrando...</span>
-              </div>
-            ) : (
-              "Entrar"
-            )}
+            {isLoading ? "Entrando..." : "Entrar"}
           </Button>
         </form>
-      </Card>
+      </div>
     </div>
   );
 };
