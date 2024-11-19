@@ -20,7 +20,7 @@ export const FleetImport = () => {
         "process-fleet-csv",
         {
           body: { 
-            htmlUrl: 'https://brown-georgeanne-53.tiiny.site/',
+            csvUrl: 'https://raw.githubusercontent.com/navigcars/fleet/main/fleet.csv',
             importDate: new Date().toISOString()
           },
         }
@@ -71,7 +71,7 @@ export const FleetImport = () => {
           </Button>
           <Button 
             variant="outline" 
-            onClick={() => window.open('https://brown-georgeanne-53.tiiny.site/', '_blank')}
+            onClick={() => window.open('https://raw.githubusercontent.com/navigcars/fleet/main/fleet.csv', '_blank')}
             className="flex items-center gap-2"
           >
             <Download className="w-4 h-4" />
