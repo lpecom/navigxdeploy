@@ -8,6 +8,8 @@ import { FleetMetrics } from "./fleet/FleetMetrics";
 import { Card } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import type { FleetVehicle } from "@/types/vehicles";
+import { FleetVehicleProfileDialog } from "./fleet/FleetVehicleProfileDialog";
 
 export const FleetListView = () => {
   const { toast } = useToast();
@@ -15,6 +17,7 @@ export const FleetListView = () => {
   const [editForm, setEditForm] = useState<Partial<FleetVehicle>>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
 
   const { data: allVehicles, refetch, isLoading, error } = useQuery({
     queryKey: ['fleet-vehicles-list'],
@@ -113,6 +116,18 @@ export const FleetListView = () => {
     setStatusFilter(status === statusFilter ? null : status);
   };
 
+  const handleViewDocs = (vehicleId: string) => {
+    setSelectedVehicleId(vehicleId);
+  };
+
+  const handleRentOut = (vehicleId: string) => {
+    // This will be implemented later when rental functionality is added
+    toast({
+      title: "Em desenvolvimento",
+      description: "Funcionalidade de aluguel será implementada em breve.",
+    });
+  };
+
   if (isLoading) {
     return (
       <Card className="p-6">
@@ -167,6 +182,8 @@ export const FleetListView = () => {
           onEdit={handleEdit}
           onSave={handleSave}
           onEditFormChange={setEditForm}
+          onRentOut={handleRentOut}
+          onViewDocs={handleViewDocs}
         />
       ) : (
         <Card className="p-6">
@@ -176,6 +193,12 @@ export const FleetListView = () => {
           </div>
         </Card>
       )}
+
+      <FleetVehicleProfileDialog 
+        vehicleId={selectedVehicleId || ''} 
+        open={!!selectedVehicleId}
+        onOpenChange={(open) => !open && setSelectedVehicleId(null)}
+      />
     </div>
   );
 };
