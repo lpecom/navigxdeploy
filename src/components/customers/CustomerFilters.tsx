@@ -54,6 +54,12 @@ export const CustomerFilters = ({
     }
   ];
 
+  const handleFilterChange = (value: string) => {
+    // If the value is already selected, clear the filter
+    // Otherwise, set it as the only selected filter
+    onStatusFilterChange(statusFilter.includes(value) ? [] : [value]);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4">
@@ -73,7 +79,7 @@ export const CustomerFilters = ({
               Status
               {statusFilter.length > 0 && (
                 <Badge variant="secondary" className="ml-1">
-                  {statusFilter.length}
+                  1
                 </Badge>
               )}
             </Button>
@@ -85,13 +91,7 @@ export const CustomerFilters = ({
               <DropdownMenuCheckboxItem
                 key={option.value}
                 checked={statusFilter.includes(option.value)}
-                onCheckedChange={(checked) => {
-                  onStatusFilterChange(
-                    checked 
-                      ? [...statusFilter, option.value]
-                      : statusFilter.filter(item => item !== option.value)
-                  );
-                }}
+                onCheckedChange={() => handleFilterChange(option.value)}
               >
                 <div className="flex flex-col w-full">
                   <div className="flex items-center justify-between">
@@ -113,13 +113,7 @@ export const CustomerFilters = ({
         {statusOptions.map((option) => (
           <button
             key={option.value}
-            onClick={() => {
-              if (statusFilter.includes(option.value)) {
-                onStatusFilterChange(statusFilter.filter(item => item !== option.value));
-              } else {
-                onStatusFilterChange([...statusFilter, option.value]);
-              }
-            }}
+            onClick={() => handleFilterChange(option.value)}
             className={`flex flex-col gap-1 px-4 py-2 rounded-lg transition-colors ${
               statusFilter.includes(option.value) 
                 ? 'bg-gray-100 ring-2 ring-primary/20' 
