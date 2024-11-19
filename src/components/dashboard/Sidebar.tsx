@@ -6,7 +6,7 @@ const Sidebar = () => {
   const location = useLocation();
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 min-h-screen">
+    <aside className="fixed top-0 left-0 z-40 w-64 h-screen bg-white border-r border-gray-200">
       <div className="p-6">
         <img 
           src="https://i.imghippo.com/files/uafE3798xA.png" 

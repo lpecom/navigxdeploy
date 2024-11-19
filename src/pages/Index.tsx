@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import Header from "@/components/dashboard/Header";
 import StatsPanel from "@/components/dashboard/StatsPanel";
 import RentalsList from "@/components/dashboard/RentalsList";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -42,15 +42,13 @@ const Index = () => {
   }
 
   return (
-    <DashboardLayout
-      title="Dashboard"
-      subtitle="Bem-vindo ao painel de controle"
-    >
-      <StatsPanel />
-      <div className="bg-white rounded-lg border shadow-sm">
+    <main className="flex-1 overflow-y-auto p-6">
+      <Header />
+      <div className="max-w-7xl mx-auto space-y-6">
+        <StatsPanel />
         <RentalsList />
       </div>
-    </DashboardLayout>
+    </main>
   );
 };
 
