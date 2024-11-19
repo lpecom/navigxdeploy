@@ -18,7 +18,9 @@ serve(async (req) => {
       throw new Error('Model name is required')
     }
 
-    // Use Google Custom Search API to find car images
+    console.log('Searching for images of:', modelName)
+
+    // Use Google Custom Search API with the provided client ID
     const searchQuery = encodeURIComponent(`${modelName} car exterior official`)
     const searchUrl = `https://customsearch.googleapis.com/customsearch/v1?` + 
       `key=${Deno.env.get('GOOGLE_SEARCH_API_KEY')}` +
@@ -26,7 +28,10 @@ serve(async (req) => {
       `&q=${searchQuery}` +
       `&searchType=image` +
       `&imgSize=large` +
-      `&num=1`
+      `&num=1` +
+      `&client_id=330440907219-nhojcn329ue7a11s7dmffuuoifd52273.apps.googleusercontent.com`
+
+    console.log('Fetching from URL:', searchUrl)
 
     const response = await fetch(searchUrl)
     const data = await response.json()
@@ -36,6 +41,7 @@ serve(async (req) => {
     }
 
     const imageUrl = data.items[0].link
+    console.log('Found image URL:', imageUrl)
 
     // Initialize Supabase client
     const supabase = createClient(
@@ -60,6 +66,8 @@ serve(async (req) => {
       throw uploadError
     }
 
+    console.log('Image uploaded successfully:', fileName)
+
     // Get public URL
     const { data: { publicUrl } } = supabase.storage
       .from('vehicle-images')
@@ -75,12 +83,15 @@ serve(async (req) => {
       throw updateError
     }
 
+    console.log('Database updated with new image URL:', publicUrl)
+
     return new Response(
       JSON.stringify({ success: true, imageUrl: publicUrl }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
   } catch (error) {
+    console.error('Error in crawl-car-images:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
