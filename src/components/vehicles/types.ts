@@ -47,9 +47,10 @@ export interface FleetVehicle {
     email?: string;
     phone?: string;
   };
-  maintenance_records?: MaintenanceRecord[];
+  maintenance_records?: MaintenanceRecordSummary[];
 }
 
+// Full maintenance record type for detailed views
 export interface MaintenanceRecord {
   id: string;
   vehicle_id: string;
@@ -61,4 +62,12 @@ export interface MaintenanceRecord {
   status: string;
   created_at: string;
   updated_at: string;
+}
+
+// Simplified maintenance record type for list views
+export interface MaintenanceRecordSummary {
+  id: string;
+  service_type: string;
+  service_date: string;
+  status: string;
 }

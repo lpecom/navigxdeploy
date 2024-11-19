@@ -69,7 +69,7 @@ const VehicleList = ({ view }: VehicleListProps) => {
         vehicle && 
         vehicle.plate && 
         vehicle.car_model
-      ) as FleetVehicle[];
+      ) as unknown as FleetVehicle[];
     }
   });
 
