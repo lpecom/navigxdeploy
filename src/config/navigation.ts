@@ -34,8 +34,9 @@ export const adminMenuItems: MenuItem[] = [
   { to: "/admin/customers", icon: Users, label: "Clientes" },
   {
     icon: Calendar,
-    label: "Reservas",
+    label: "Agenda",
     subItems: [
+      { to: "/admin/calendar", label: "Calendário", icon: Calendar },
       { to: "/admin/reservations/pending", icon: Clock, label: "Pendentes" },
       { to: "/admin/reservations/pickup", icon: CalendarCheck, label: "Retirada" },
       { to: "/admin/check-in", icon: CalendarClock, label: "Check-in" },
