@@ -47,6 +47,7 @@ export interface FleetVehicle {
     email?: string;
     phone?: string;
   };
+  maintenance_records?: MaintenanceRecord[];
 }
 
 export interface MaintenanceRecord {

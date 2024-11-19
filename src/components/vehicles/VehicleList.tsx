@@ -53,6 +53,12 @@ const VehicleList = ({ view }: VehicleListProps) => {
             name,
             year,
             image_url
+          ),
+          maintenance_records:maintenance_records(
+            id,
+            service_type,
+            service_date,
+            status
           )
         `)
         .order('plate');
@@ -93,6 +99,28 @@ const VehicleList = ({ view }: VehicleListProps) => {
     </div>
   );
 
+  const renderMaintenanceView = () => {
+    if (fleetLoading) return renderLoading();
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {fleetVehicles?.map((vehicle) => (
+          <FleetVehicleCard 
+            key={vehicle.id} 
+            vehicle={vehicle}
+          />
+        ))}
+        {(!fleetVehicles || fleetVehicles.length === 0) && (
+          <div className="col-span-full text-center py-12">
+            <p className="text-muted-foreground">
+              Nenhum veículo cadastrado na frota
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <Card className="p-6">
       <Tabs defaultValue="categories" className="w-full">
@@ -101,6 +129,9 @@ const VehicleList = ({ view }: VehicleListProps) => {
           <TabsTrigger value="models">Modelos</TabsTrigger>
           <TabsTrigger value="fleet">Frota</TabsTrigger>
           <TabsTrigger value="list">Lista</TabsTrigger>
+          {view === 'maintenance' && (
+            <TabsTrigger value="maintenance">Manutenção</TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="categories">
@@ -173,6 +204,12 @@ const VehicleList = ({ view }: VehicleListProps) => {
         <TabsContent value="list">
           <FleetListView />
         </TabsContent>
+
+        {view === 'maintenance' && (
+          <TabsContent value="maintenance">
+            {renderMaintenanceView()}
+          </TabsContent>
+        )}
       </Tabs>
 
       <EditVehicleDialog
