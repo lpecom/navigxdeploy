@@ -34,11 +34,10 @@ export const adminMenuItems: MenuItem[] = [
   { to: "/admin/customers", icon: Users, label: "Clientes" },
   {
     icon: Calendar,
-    label: "Agenda",
+    label: "Reservas",
     subItems: [
-      { to: "/admin/calendar", icon: CalendarCheck, label: "Calendário" },
       { to: "/admin/reservations/pending", icon: Clock, label: "Pendentes" },
-      { to: "/admin/reservations/pickup", icon: CarFront, label: "Retirada" },
+      { to: "/admin/reservations/pickup", icon: CalendarCheck, label: "Retirada" },
       { to: "/admin/check-in", icon: CalendarClock, label: "Check-in" },
     ]
   },
@@ -46,11 +45,11 @@ export const adminMenuItems: MenuItem[] = [
     icon: Car,
     label: "Frota",
     subItems: [
-      { to: "/admin/vehicles/overview", icon: Grid, label: "Visão Geral" },
-      { to: "/admin/vehicles/categories", icon: Tag, label: "Categorias" },
-      { to: "/admin/vehicles/models", icon: Car, label: "Modelos" },
-      { to: "/admin/vehicles/fleet", icon: CarFront, label: "Veículos" },
-      { to: "/admin/vehicles/maintenance", icon: Wrench, label: "Manutenção" },
+      { to: "/admin/vehicles/overview", label: "Visão Geral", icon: Grid },
+      { to: "/admin/vehicles/categories", label: "Categorias", icon: Tag },
+      { to: "/admin/vehicles/models", label: "Modelos", icon: CarFront },
+      { to: "/admin/vehicles/fleet", label: "Veículos", icon: Car },
+      { to: "/admin/vehicles/maintenance", label: "Manutenção", icon: Wrench },
     ]
   },
   {
@@ -66,8 +65,8 @@ export const adminMenuItems: MenuItem[] = [
     icon: Tag,
     label: "Marketing",
     subItems: [
-      { to: "/admin/offers", icon: Tag, label: "Ofertas" },
-      { to: "/admin/automations", icon: Megaphone, label: "Automações" },
+      { to: "/admin/offers", icon: Megaphone, label: "Ofertas" },
+      { to: "/admin/automations", icon: Settings, label: "Automações" },
     ]
   },
   { to: "/admin/accessories", icon: Package, label: "Opcionais" },

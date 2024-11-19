@@ -31,34 +31,20 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'TOKEN_REFRESHED') {
         console.log('Token refreshed successfully');
       }
       if (event === 'SIGNED_OUT') {
         toast({
-          title: "Sessão encerrada",
+          title: "Sessão expirada",
           description: "Por favor, faça login novamente.",
         });
-        await supabase.auth.signOut();
         window.location.href = '/login';
       }
     });
 
-    const checkSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error('Session check failed:', error);
-        await supabase.auth.signOut();
-        window.location.href = '/login';
-      }
-    };
-    
-    checkSession();
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, [toast]);
 
   return <>{children}</>;
