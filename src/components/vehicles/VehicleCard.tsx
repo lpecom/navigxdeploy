@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Car, Calendar, Gauge } from "lucide-react";
+import { Pencil, Car, Calendar } from "lucide-react";
 import type { CarModel } from "./types";
 
 interface VehicleCardProps {
@@ -14,12 +14,14 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center gap-3">
-          {car.brand_logo_url && (
+          {car.brand_logo_url ? (
             <img 
               src={car.brand_logo_url} 
               alt={`${car.name} brand`}
               className="w-8 h-8 object-contain"
             />
+          ) : (
+            <Car className="w-8 h-8 text-gray-400" />
           )}
           <CardTitle className="text-xl">{car.name}</CardTitle>
         </div>

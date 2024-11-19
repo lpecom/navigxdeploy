@@ -11,7 +11,11 @@ const BRAND_LOGOS: Record<string, string> = {
   'Chevrolet': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/chevrolet.svg',
   'Hyundai': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/hyundai.svg',
   'Kia': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/kia.svg',
-  // Add more brands as needed
+  'Fiat': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/fiat.svg',
+  'Renault': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/renault.svg',
+  'Nissan': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nissan.svg',
+  'Peugeot': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/peugeot.svg',
+  'Citroen': 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/citroen.svg',
 };
 
 export const getBrandFromModel = (modelName: string): string | null => {
@@ -24,6 +28,11 @@ export const getBrandFromModel = (modelName: string): string | null => {
 export const uploadBrandLogo = async (url: string, brand: string): Promise<string | null> => {
   try {
     const response = await fetch(url);
+    if (!response.ok) {
+      console.error('Failed to fetch brand logo:', response.statusText);
+      return null;
+    }
+    
     const blob = await response.blob();
     
     const fileName = `${brand.toLowerCase()}-logo.svg`;
