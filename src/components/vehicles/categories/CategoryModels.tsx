@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { EditVehicleDialog } from "@/components/vehicles/EditVehicleDialog";
+import { ModelActions } from "./ModelActions";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +31,7 @@ export const CategoryModels = ({ categoryId }: CategoryModelsProps) => {
   const queryClient = useQueryClient();
   const [isAddingModel, setIsAddingModel] = useState(false);
   const [editingModel, setEditingModel] = useState<CarModel | null>(null);
+  const [imageEditModel, setImageEditModel] = useState<CarModel | null>(null);
 
   const { data: categoryModels, isLoading: loadingCategoryModels } = useQuery({
     queryKey: ["category-models", categoryId],
@@ -126,6 +128,10 @@ export const CategoryModels = ({ categoryId }: CategoryModelsProps) => {
     });
   };
 
+  const handleImageEdit = (model: CarModel) => {
+    setImageEditModel(model);
+  };
+
   if (loadingCategoryModels) {
     return <div>Carregando modelos...</div>;
   }
@@ -154,22 +160,11 @@ export const CategoryModels = ({ categoryId }: CategoryModelsProps) => {
               <TableCell>{model.name}</TableCell>
               <TableCell>{model.year}</TableCell>
               <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setEditingModel(model)}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => removeModelMutation.mutate(model.id)}
-                  >
-                    Remover
-                  </Button>
-                </div>
+                <ModelActions
+                  model={model}
+                  onEdit={setEditingModel}
+                  onImageEdit={handleImageEdit}
+                />
               </TableCell>
             </TableRow>
           ))}
@@ -222,6 +217,15 @@ export const CategoryModels = ({ categoryId }: CategoryModelsProps) => {
         editingCar={editingModel}
         setEditingCar={setEditingModel}
         onSubmit={handleEditSubmit}
+      />
+
+      <EditVehicleDialog
+        open={!!imageEditModel}
+        onOpenChange={() => setImageEditModel(null)}
+        editingCar={imageEditModel}
+        setEditingCar={setImageEditModel}
+        onSubmit={handleEditSubmit}
+        imageOnly
       />
     </div>
   );
