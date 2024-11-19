@@ -18,7 +18,7 @@ const AdminLogin = () => {
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+      if (session?.user) {
         navigate("/admin");
       }
     };
@@ -30,21 +30,20 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (signInError) {
-        throw signInError;
-      }
+      if (error) throw error;
 
-      toast({
-        title: "Login realizado com sucesso",
-        description: "Bem-vindo ao painel administrativo!",
-      });
-      
-      navigate("/admin");
+      if (data.user) {
+        toast({
+          title: "Login realizado com sucesso",
+          description: "Bem-vindo ao painel administrativo!",
+        });
+        navigate("/admin");
+      }
     } catch (error: any) {
       console.error('Login error:', error);
       toast({

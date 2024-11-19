@@ -35,7 +35,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (event === 'TOKEN_REFRESHED') {
         console.log('Token refreshed successfully');
       }
-      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+      if (event === 'SIGNED_OUT') {
         toast({
           title: "Sessão encerrada",
           description: "Por favor, faça login novamente.",
@@ -49,7 +49,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Check session validity on mount
     const checkSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
-      if (error || !session) {
+      if (error) {
         console.log('Session check failed:', error);
         await supabase.auth.signOut();
         window.location.href = '/login';
