@@ -26,7 +26,7 @@ interface WebsiteSettingsData {
   };
 }
 
-export const WebsiteSettings = () => {
+const WebsiteSettings = () => {
   const { toast } = useToast();
   const [heroSettings, setHeroSettings] = useState<HeroSettings>({
     title: "Alugue o carro perfeito para sua jornada",
@@ -139,3 +139,5 @@ export const WebsiteSettings = () => {
     </div>
   );
 };
+
+export default WebsiteSettings;
