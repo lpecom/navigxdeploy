@@ -31,20 +31,36 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'TOKEN_REFRESHED') {
         console.log('Token refreshed successfully');
       }
-      if (event === 'SIGNED_OUT') {
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
         toast({
-          title: "Sessão expirada",
+          title: "Sessão encerrada",
           description: "Por favor, faça login novamente.",
         });
+        // Clear any stored auth data
+        await supabase.auth.signOut();
         window.location.href = '/login';
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Check session validity on mount
+    const checkSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error || !session) {
+        console.log('Session check failed:', error);
+        await supabase.auth.signOut();
+        window.location.href = '/login';
+      }
+    };
+    
+    checkSession();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [toast]);
 
   return <>{children}</>;
