@@ -21,9 +21,9 @@ const AdminRoutes = () => {
       <Route path="/customers" element={<Customers />} />
       <Route path="/customers/:id" element={<CustomerDetails />} />
       <Route path="/vehicles" element={<Navigate to="/admin/vehicles/overview" replace />} />
-      <Route path="/vehicles/:view" element={<Vehicles />} />
+      <Route path="/vehicles/:view" element={<Vehicles view="overview" />} />
       <Route path="/vehicles/details/:id" element={<VehicleDetails />} />
-      <Route path="/reservations/:filter" element={<Reservations />} />
+      <Route path="/reservations/:filter" element={<Reservations filter="pending" />} />
       <Route path="/calendar" element={<Calendar />} />
       <Route path="/offers" element={<Offers />} />
       <Route path="/accessories" element={<Accessories />} />
