@@ -52,12 +52,16 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
       // Update customer statuses based on fleet data and last rental date
       const updatedCustomers = await Promise.all((allCustomers || []).map(async (customer) => {
         const hasActiveRental = customerVehicleMap.has(customer.id);
-        let newStatus = 'inactive';
+        let newStatus = customer.status;
 
-        if (hasActiveRental) {
-          newStatus = 'active_rental';
-        } else if (customer.last_rental_date && new Date(customer.last_rental_date) > ninetyDaysAgo) {
-          newStatus = 'active';
+        if (customer.status !== 'blocked') {
+          if (hasActiveRental) {
+            newStatus = 'active_rental';
+          } else if (customer.last_rental_date && new Date(customer.last_rental_date) > ninetyDaysAgo) {
+            newStatus = 'active';
+          } else {
+            newStatus = 'inactive';
+          }
         }
 
         // If status needs to be updated in the database
@@ -105,7 +109,8 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
   const counts = {
     activeRental: customers?.filter(c => c.status === 'active_rental').length || 0,
     active: customers?.filter(c => c.status === 'active').length || 0,
-    inactive: customers?.filter(c => c.status === 'inactive').length || 0
+    inactive: customers?.filter(c => c.status === 'inactive').length || 0,
+    blocked: customers?.filter(c => c.status === 'blocked').length || 0
   };
 
   return {

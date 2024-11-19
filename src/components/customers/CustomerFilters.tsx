@@ -20,6 +20,7 @@ interface CustomerFiltersProps {
     activeRental: number;
     active: number;
     inactive: number;
+    blocked?: number;
   };
 }
 
@@ -51,6 +52,13 @@ export const CustomerFilters = ({
       count: counts.inactive, 
       color: 'bg-gray-100 text-gray-800',
       description: 'Sem atividade nos últimos 90 dias'
+    },
+    { 
+      label: 'Bloqueados', 
+      value: 'blocked', 
+      count: counts.blocked || 0, 
+      color: 'bg-red-100 text-red-800',
+      description: 'Clientes com acesso bloqueado'
     }
   ];
 
