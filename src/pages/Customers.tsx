@@ -2,6 +2,7 @@ import { CustomerList } from "@/components/customers/CustomerList";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { Progress } from "@/components/ui/progress";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 
 const Customers = () => {
   const { toast } = useToast();
@@ -9,15 +10,17 @@ const Customers = () => {
   const [progress, setProgress] = useState(0);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold tracking-tight">Clientes</h1>
-      </div>
+    <DashboardLayout
+      title="Clientes"
+      subtitle="Gerencie seus clientes e acompanhe suas atividades"
+    >
       {isUploading && (
         <Progress value={progress} className="w-full" />
       )}
-      <CustomerList />
-    </div>
+      <div className="bg-white rounded-lg border shadow-sm">
+        <CustomerList />
+      </div>
+    </DashboardLayout>
   );
 };
 
