@@ -18,34 +18,36 @@ const Vehicles = ({ view }: VehiclesProps) => {
       title="Gestão da Frota"
       subtitle="Gerencie categorias, modelos e veículos da sua frota"
     >
-      <div className="flex justify-end">
-        {view === 'fleet' && (
-          <Button 
-            onClick={() => setIsAddingVehicle(true)}
-            className="gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Adicionar Veículo
-          </Button>
-        )}
+      <div className="space-y-6">
+        <div className="flex justify-end gap-4">
+          {view === 'fleet' && (
+            <Button 
+              onClick={() => setIsAddingVehicle(true)}
+              className="gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Adicionar Veículo
+            </Button>
+          )}
+        </div>
+
+        {view === 'fleet' && <FleetImport />}
+
+        <div className="bg-white rounded-lg">
+          <VehicleList view={view} />
+        </div>
+
+        <EditVehicleDialog
+          open={isAddingVehicle}
+          onOpenChange={setIsAddingVehicle}
+          editingCar={null}
+          setEditingCar={() => {}}
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setIsAddingVehicle(false);
+          }}
+        />
       </div>
-
-      {view === 'fleet' && <FleetImport />}
-
-      <div className="bg-white rounded-lg border shadow-sm">
-        <VehicleList view={view} />
-      </div>
-
-      <EditVehicleDialog
-        open={isAddingVehicle}
-        onOpenChange={setIsAddingVehicle}
-        editingCar={null}
-        setEditingCar={() => {}}
-        onSubmit={async (e) => {
-          e.preventDefault();
-          setIsAddingVehicle(false);
-        }}
-      />
     </DashboardLayout>
   );
 };
