@@ -2,14 +2,14 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { FleetSearchBar } from "./fleet/FleetSearchBar";
 import { FleetTable } from "./fleet/FleetTable";
 import { FleetMetrics } from "./fleet/FleetMetrics";
-import { Card } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import type { FleetVehicle } from "@/types/vehicles";
+import { FleetHeader } from "./fleet/FleetHeader";
+import { FleetLoadingState } from "./fleet/FleetLoadingState";
+import { FleetErrorState } from "./fleet/FleetErrorState";
+import { FleetEmptyState } from "./fleet/FleetEmptyState";
 import { FleetVehicleProfileDialog } from "./fleet/FleetVehicleProfileDialog";
+import type { FleetVehicle } from "@/types/vehicles";
 
 export const FleetListView = () => {
   const { toast } = useToast();
@@ -121,40 +121,14 @@ export const FleetListView = () => {
   };
 
   const handleRentOut = (vehicleId: string) => {
-    // This will be implemented later when rental functionality is added
     toast({
       title: "Em desenvolvimento",
       description: "Funcionalidade de aluguel será implementada em breve.",
     });
   };
 
-  if (isLoading) {
-    return (
-      <Card className="p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-4 bg-gray-200 rounded"></div>
-            ))}
-          </div>
-        </div>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Erro ao carregar veículos</AlertTitle>
-        <AlertDescription>
-          Não foi possível carregar a lista de veículos. Por favor, tente novamente.
-          {error instanceof Error ? ` Erro: ${error.message}` : ''}
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  if (isLoading) return <FleetLoadingState />;
+  if (error) return <FleetErrorState error={error as Error} />;
 
   return (
     <div className="space-y-6">
@@ -164,15 +138,12 @@ export const FleetListView = () => {
         activeFilter={statusFilter}
       />
       
-      <div className="flex items-center justify-between gap-4">
-        <FleetSearchBar
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-        />
-        <div className="text-sm text-muted-foreground">
-          Total filtrado: {filteredVehicles?.length || 0} de {allVehicles?.length || 0} veículos
-        </div>
-      </div>
+      <FleetHeader
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        totalFiltered={filteredVehicles?.length || 0}
+        totalVehicles={allVehicles?.length || 0}
+      />
 
       {filteredVehicles && filteredVehicles.length > 0 ? (
         <FleetTable
@@ -186,12 +157,7 @@ export const FleetListView = () => {
           onViewDocs={handleViewDocs}
         />
       ) : (
-        <Card className="p-6">
-          <div className="text-center text-muted-foreground">
-            Nenhum veículo encontrado
-            {(searchTerm || statusFilter) && " para os filtros selecionados"}
-          </div>
-        </Card>
+        <FleetEmptyState hasFilters={!!(searchTerm || statusFilter)} />
       )}
 
       <FleetVehicleProfileDialog 
