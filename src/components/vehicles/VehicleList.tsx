@@ -7,6 +7,7 @@ import { VehicleCard } from "./VehicleCard";
 import { FleetVehicleCard } from "./FleetVehicleCard";
 import { EditVehicleDialog } from "./EditVehicleDialog";
 import { FleetListView } from "./FleetListView";
+import { FleetOverview } from "./fleet/overview/FleetOverview";
 import type { CarModel, FleetVehicle } from "./types";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -66,6 +67,10 @@ const VehicleList = ({ view }: VehicleListProps) => {
     setSelectedVehicle(vehicle);
     setIsAddingVehicle(true);
   };
+
+  if (view === 'overview') {
+    return <FleetOverview />;
+  }
 
   if (view === 'categories') {
     return <CategoryList />;
