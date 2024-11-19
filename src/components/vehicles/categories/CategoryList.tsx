@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Plus, Edit2, Trash2 } from "lucide-react";
+import { Plus, Edit2, Trash2, Eye, EyeOff } from "lucide-react";
 import { CategoryForm } from "./CategoryForm";
 import { CategoryModels } from "./CategoryModels";
 import {
@@ -24,11 +24,14 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 interface Category {
   id: string;
   name: string;
   description: string | null;
+  badge_text: string | null;
+  is_active: boolean;
 }
 
 export const CategoryList = () => {
@@ -38,15 +41,36 @@ export const CategoryList = () => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
   const { data: categories, isLoading } = useQuery({
-    queryKey: ["car-categories"],
+    queryKey: ["categories"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("categories")
-        .select("*")
+        .select(`
+          *,
+          car_models:car_models(count)
+        `)
         .order("display_order");
       
       if (error) throw error;
       return data;
+    },
+  });
+
+  const toggleVisibilityMutation = useMutation({
+    mutationFn: async (category: Category) => {
+      const { error } = await supabase
+        .from("categories")
+        .update({ is_active: !category.is_active })
+        .eq("id", category.id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast({
+        title: "Sucesso",
+        description: "Visibilidade da categoria atualizada",
+      });
     },
   });
 
@@ -69,7 +93,7 @@ export const CategoryList = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["car-categories"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast({
         title: "Categoria excluída",
         description: "A categoria foi excluída com sucesso.",
@@ -93,12 +117,28 @@ export const CategoryList = () => {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {categories?.map((category) => (
-          <Card key={category.id}>
+          <Card key={category.id} className={!category.is_active ? "opacity-60" : ""}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {category.name}
-              </CardTitle>
+              <div className="space-y-1">
+                <CardTitle className="text-sm font-medium">
+                  {category.name}
+                </CardTitle>
+                {category.badge_text && (
+                  <Badge variant="secondary">{category.badge_text}</Badge>
+                )}
+              </div>
               <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleVisibilityMutation.mutate(category)}
+                >
+                  {category.is_active ? (
+                    <Eye className="h-4 w-4" />
+                  ) : (
+                    <EyeOff className="h-4 w-4" />
+                  )}
+                </Button>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -109,7 +149,11 @@ export const CategoryList = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => deleteMutation.mutate(category.id)}
+                  onClick={() => {
+                    if (window.confirm("Tem certeza que deseja excluir esta categoria?")) {
+                      deleteMutation.mutate(category.id);
+                    }
+                  }}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -119,7 +163,9 @@ export const CategoryList = () => {
               <Tabs defaultValue="details">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="details">Detalhes</TabsTrigger>
-                  <TabsTrigger value="models">Modelos</TabsTrigger>
+                  <TabsTrigger value="models">
+                    Modelos ({category.car_models?.[0]?.count || 0})
+                  </TabsTrigger>
                 </TabsList>
                 <TabsContent value="details">
                   <p className="text-sm text-muted-foreground">
