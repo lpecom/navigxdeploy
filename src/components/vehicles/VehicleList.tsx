@@ -123,12 +123,12 @@ const VehicleList = ({ view }: VehicleListProps) => {
 
   return (
     <Card className="p-6">
-      <Tabs defaultValue="categories" className="w-full">
+      <Tabs defaultValue="list" className="w-full">
         <TabsList className="w-full justify-start mb-6">
+          <TabsTrigger value="list">Lista</TabsTrigger>
           <TabsTrigger value="categories">Categorias</TabsTrigger>
           <TabsTrigger value="models">Modelos</TabsTrigger>
           <TabsTrigger value="fleet">Frota</TabsTrigger>
-          <TabsTrigger value="list">Lista</TabsTrigger>
           {view === 'maintenance' && (
             <TabsTrigger value="maintenance">Manutenção</TabsTrigger>
           )}
