@@ -662,6 +662,7 @@ export type Database = {
           service_type: string
           status: string
           updated_at: string
+          vehicle_id: string | null
         }
         Insert: {
           cost?: number | null
@@ -673,6 +674,7 @@ export type Database = {
           service_type: string
           status?: string
           updated_at?: string
+          vehicle_id?: string | null
         }
         Update: {
           cost?: number | null
@@ -684,6 +686,7 @@ export type Database = {
           service_type?: string
           status?: string
           updated_at?: string
+          vehicle_id?: string | null
         }
         Relationships: [
           {
@@ -691,6 +694,13 @@ export type Database = {
             columns: ["driver_id"]
             isOneToOne: false
             referencedRelation: "driver_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_records_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_vehicles"
             referencedColumns: ["id"]
           },
         ]

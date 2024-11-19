@@ -45,11 +45,11 @@ export const VehicleInfoTab = ({ vehicleDetails }: VehicleInfoTabProps) => {
               </p>
               <p className="text-sm">
                 <span className="text-muted-foreground">Email:</span>{' '}
-                {vehicleDetails.customer.email}
+                {vehicleDetails.customer.email || 'N/A'}
               </p>
               <p className="text-sm">
                 <span className="text-muted-foreground">Telefone:</span>{' '}
-                {vehicleDetails.customer.phone}
+                {vehicleDetails.customer.phone || 'N/A'}
               </p>
             </div>
           </div>

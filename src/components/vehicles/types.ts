@@ -35,6 +35,8 @@ export interface FleetVehicle {
   color?: string;
   contract_number?: string;
   customer_id?: string;
+  renavam_number?: string;
+  state?: string;
   car_model?: {
     name: string;
     year: string;
@@ -42,6 +44,8 @@ export interface FleetVehicle {
   };
   customer?: {
     full_name: string;
+    email: string;
+    phone: string;
   };
 }
 
@@ -51,7 +55,7 @@ export interface MaintenanceRecord {
   service_type: string;
   description: string;
   service_date: string;
-  cost: number;
+  cost: number | null;
   status: 'scheduled' | 'completed';
   created_at: string;
   updated_at: string;
