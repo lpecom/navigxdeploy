@@ -15,8 +15,14 @@ export const SidebarMenu = ({ items, currentPath }: SidebarMenuProps) => {
   // Check if a path is active, including parent paths
   const isActive = (path?: string) => {
     if (!path) return false;
+    
+    // Special case for dashboard - only active when exact match
+    if (path === '/admin') {
+      return currentPath === '/admin';
+    }
+    
+    // For other routes, check if current path starts with the route path
     if (currentPath === path) return true;
-    // For parent menus, check if any child route is active
     return currentPath.startsWith(path + '/');
   };
 
