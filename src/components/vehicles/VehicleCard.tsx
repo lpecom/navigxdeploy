@@ -1,7 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Car, Tag, ShoppingBag, CheckCircle2, AlertCircle } from "lucide-react";
+import { Car, Tag, ShoppingBag, CheckCircle2 } from "lucide-react";
 import { getBrandLogo } from "@/utils/brandLogos";
 import type { CarModel } from "./types";
 import { motion } from "framer-motion";
@@ -30,9 +29,9 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
       }
 
       return {
-        rented: vehicles?.filter(v => v.status === 'rented').length || 0,
-        available: vehicles?.filter(v => v.status === 'available').length || 0,
-        forSale: vehicles?.filter(v => v.status === 'for_sale').length || 0,
+        rented: vehicles?.filter(v => v.status === 'alugado').length || 0,
+        available: vehicles?.filter(v => v.status === 'disponível').length || 0,
+        forSale: vehicles?.filter(v => v.status === 'venda').length || 0,
         total: vehicles?.length || 0
       };
     }
@@ -61,14 +60,6 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
               <h3 className="font-semibold text-lg">{car.name.split(' ')[0]}</h3>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onEdit(car)}
-            className="opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
         </CardHeader>
         <CardContent className="space-y-4">
           {car.image_url && (
