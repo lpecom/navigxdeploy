@@ -17,7 +17,7 @@ export const FleetVehicleProfile = ({ vehicleId }: FleetVehicleProfileProps) => 
   const { data: vehicleDetails } = useQuery({
     queryKey: ['fleet-vehicle-details', vehicleId],
     queryFn: async () => {
-      const { data: vehicle } = await supabase
+      const { data: vehicle, error } = await supabase
         .from('fleet_vehicles')
         .select(`
           *,
@@ -45,59 +45,13 @@ export const FleetVehicleProfile = ({ vehicleId }: FleetVehicleProfileProps) => 
         .eq('id', vehicleId)
         .single();
 
+      if (error) throw error;
       if (!vehicle) return null;
 
-      // Transform the data to match FleetVehicle type
-      const transformedVehicle: FleetVehicle = {
-        id: vehicle.id,
-        car_model_id: vehicle.car_model_id,
-        car_model: vehicle.car_model ? {
-          id: vehicle.car_model.id,
-          name: vehicle.car_model.name,
-          category_id: vehicle.car_model.category_id,
-          description: vehicle.car_model.description,
-          image_url: vehicle.car_model.image_url,
-          brand_logo_url: vehicle.car_model.brand_logo_url,
-          year: vehicle.car_model.year,
-          optionals: vehicle.car_model.optionals,
-          created_at: vehicle.car_model.created_at,
-          updated_at: vehicle.car_model.updated_at,
-          engine_size: vehicle.car_model.engine_size,
-          transmission: vehicle.car_model.transmission
-        } as CarModel : undefined,
-        year: vehicle.year,
-        current_km: vehicle.current_km,
-        last_revision_date: vehicle.last_revision_date,
-        next_revision_date: vehicle.next_revision_date,
-        plate: vehicle.plate,
-        is_available: vehicle.is_available,
-        created_at: vehicle.created_at,
-        updated_at: vehicle.updated_at,
-        color: vehicle.color,
-        state: vehicle.state,
-        chassis_number: vehicle.chassis_number,
-        renavam_number: vehicle.renavam_number,
-        status: vehicle.status,
-        contract_number: vehicle.contract_number,
-        customer_id: vehicle.customer_id,
-        customer: vehicle.customer,
-        branch: vehicle.branch
-      };
-
-      return transformedVehicle;
-    },
-  });
-
-  const { data: maintenanceHistory } = useQuery({
-    queryKey: ['vehicle-maintenance', vehicleId],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('maintenance_records')
-        .select('*')
-        .eq('vehicle_id', vehicleId)
-        .order('service_date', { ascending: false });
-      
-      return (data || []) as MaintenanceRecord[];
+      return {
+        ...vehicle,
+        car_model: vehicle.car_model as CarModel | undefined
+      } as FleetVehicle;
     },
   });
 
@@ -169,7 +123,7 @@ export const FleetVehicleProfile = ({ vehicleId }: FleetVehicleProfileProps) => 
         </TabsContent>
 
         <TabsContent value="maintenance">
-          <MaintenanceTab maintenanceHistory={maintenanceHistory || []} />
+          <MaintenanceTab maintenanceHistory={[]} />
         </TabsContent>
 
         <TabsContent value="history">

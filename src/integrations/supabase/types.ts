@@ -113,10 +113,12 @@ export type Database = {
           category_id: string | null
           created_at: string | null
           description: string | null
+          engine_size: string | null
           id: string
           image_url: string | null
           name: string
           optionals: Json | null
+          transmission: string | null
           updated_at: string | null
           year: string | null
         }
@@ -125,10 +127,12 @@ export type Database = {
           category_id?: string | null
           created_at?: string | null
           description?: string | null
+          engine_size?: string | null
           id?: string
           image_url?: string | null
           name: string
           optionals?: Json | null
+          transmission?: string | null
           updated_at?: string | null
           year?: string | null
         }
@@ -137,10 +141,12 @@ export type Database = {
           category_id?: string | null
           created_at?: string | null
           description?: string | null
+          engine_size?: string | null
           id?: string
           image_url?: string | null
           name?: string
           optionals?: Json | null
+          transmission?: string | null
           updated_at?: string | null
           year?: string | null
         }
