@@ -51,7 +51,20 @@ export const FleetVehicleProfile = ({ vehicleId }: FleetVehicleProfileProps) => 
       const transformedVehicle: FleetVehicle = {
         id: vehicle.id,
         car_model_id: vehicle.car_model_id,
-        car_model: vehicle.car_model as CarModel,
+        car_model: vehicle.car_model ? {
+          id: vehicle.car_model.id,
+          name: vehicle.car_model.name,
+          category_id: vehicle.car_model.category_id,
+          description: vehicle.car_model.description,
+          image_url: vehicle.car_model.image_url,
+          brand_logo_url: vehicle.car_model.brand_logo_url,
+          year: vehicle.car_model.year,
+          optionals: vehicle.car_model.optionals,
+          created_at: vehicle.car_model.created_at,
+          updated_at: vehicle.car_model.updated_at,
+          engine_size: vehicle.car_model.engine_size,
+          transmission: vehicle.car_model.transmission
+        } as CarModel : undefined,
         year: vehicle.year,
         current_km: vehicle.current_km,
         last_revision_date: vehicle.last_revision_date,
