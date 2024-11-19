@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Car, Tag, ShoppingBag, CheckCircle2 } from "lucide-react";
+import { Car } from "lucide-react";
 import { getBrandLogo } from "@/utils/brandLogos";
 import type { CarModel } from "./types";
 import { motion } from "framer-motion";
@@ -80,31 +80,22 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
               <span className="font-medium">{car.name.split(' ').slice(1).join(' ')}</span>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 pt-2 border-t">
-              <div className="text-center p-2 bg-slate-50 rounded-lg">
-                <div className="flex items-center justify-center gap-1 text-orange-600 mb-1">
-                  <ShoppingBag className="w-4 h-4" />
-                  <span className="text-lg font-semibold">{fleetStats?.rented || 0}</span>
+            {fleetStats && fleetStats.total > 0 && (
+              <div className="space-y-2 pt-2 border-t text-sm">
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Alugados</span>
+                  <span className="font-medium text-orange-600">{fleetStats.rented}</span>
                 </div>
-                <p className="text-xs text-muted-foreground">Alugados</p>
-              </div>
-
-              <div className="text-center p-2 bg-slate-50 rounded-lg">
-                <div className="flex items-center justify-center gap-1 text-green-600 mb-1">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="text-lg font-semibold">{fleetStats?.available || 0}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Disponíveis</span>
+                  <span className="font-medium text-green-600">{fleetStats.available}</span>
                 </div>
-                <p className="text-xs text-muted-foreground">Disponíveis</p>
-              </div>
-
-              <div className="text-center p-2 bg-slate-50 rounded-lg">
-                <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
-                  <Tag className="w-4 h-4" />
-                  <span className="text-lg font-semibold">{fleetStats?.forSale || 0}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">À Venda</span>
+                  <span className="font-medium text-blue-600">{fleetStats.forSale}</span>
                 </div>
-                <p className="text-xs text-muted-foreground">À Venda</p>
               </div>
-            </div>
+            )}
 
             {car.category?.name && (
               <Badge variant="secondary" className="w-fit">
