@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import type { MenuItem } from "@/config/navigation";
 
@@ -12,12 +12,22 @@ interface SidebarMenuProps {
 export const SidebarMenu = ({ items, currentPath }: SidebarMenuProps) => {
   const [openMenus, setOpenMenus] = useState<string[]>([]);
 
+  // Check if a path is active, including parent paths
   const isActive = (path?: string) => {
     if (!path) return false;
-    // Check if current path starts with the menu item path
-    // This ensures parent menus are highlighted when child routes are active
-    return currentPath.startsWith(path);
+    if (currentPath === path) return true;
+    // For parent menus, check if any child route is active
+    return currentPath.startsWith(path + '/');
   };
+
+  // Auto-expand parent menu when child route is active
+  useEffect(() => {
+    items.forEach(item => {
+      if (item.subItems?.some(subItem => isActive(subItem.to))) {
+        setOpenMenus(prev => prev.includes(item.label) ? prev : [...prev, item.label]);
+      }
+    });
+  }, [currentPath, items]);
 
   const toggleMenu = (label: string) => {
     setOpenMenus(prev => 
@@ -29,17 +39,16 @@ export const SidebarMenu = ({ items, currentPath }: SidebarMenuProps) => {
 
   const renderMenuItem = (item: MenuItem) => {
     const isMenuActive = item.subItems?.some(subItem => isActive(subItem.to)) || isActive(item.to);
+    const isOpen = openMenus.includes(item.label);
 
     if (item.subItems) {
-      const isOpen = openMenus.includes(item.label);
-      
       return (
         <div key={item.label}>
           <button
             onClick={() => toggleMenu(item.label)}
             className={cn(
               "w-full flex items-center px-4 py-2.5 text-sm rounded-lg transition-colors",
-              isMenuActive || isOpen
+              isMenuActive
                 ? "text-primary bg-primary/5 font-medium"
                 : "text-gray-600 hover:text-primary hover:bg-primary/5"
             )}
