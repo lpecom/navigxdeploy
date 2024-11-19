@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { CarModel } from "./types";
+import type { CarModel } from "@/types/vehicles";
 import { ImageUpload } from "./ImageUpload";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, Search } from "lucide-react";
@@ -28,6 +27,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useState } from "react";
 
 interface EditVehicleDialogProps {
   open: boolean;

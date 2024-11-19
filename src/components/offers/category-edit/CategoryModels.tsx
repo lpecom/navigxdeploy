@@ -3,6 +3,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { EditVehicleDialog } from "@/components/vehicles/EditVehicleDialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -11,13 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Trash2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Plus } from "lucide-react";
 import type { CarModel } from "@/types/vehicles";
 
 interface CategoryModelsProps {
@@ -28,6 +29,7 @@ export const CategoryModels = ({ categoryId }: CategoryModelsProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isAddingModel, setIsAddingModel] = useState(false);
+  const [editingModel, setEditingModel] = useState<CarModel | null>(null);
 
   const { data: categoryModels, isLoading: loadingCategoryModels } = useQuery({
     queryKey: ["category-models", categoryId],
@@ -93,6 +95,37 @@ export const CategoryModels = ({ categoryId }: CategoryModelsProps) => {
     },
   });
 
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingModel) return;
+
+    const { error } = await supabase
+      .from("car_models")
+      .update({
+        name: editingModel.name,
+        description: editingModel.description,
+        image_url: editingModel.image_url,
+        year: editingModel.year,
+      })
+      .eq("id", editingModel.id);
+
+    if (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar modelo",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    queryClient.invalidateQueries({ queryKey: ["category-models"] });
+    setEditingModel(null);
+    toast({
+      title: "Sucesso",
+      description: "Modelo atualizado com sucesso",
+    });
+  };
+
   if (loadingCategoryModels) {
     return <div>Carregando modelos...</div>;
   }
@@ -121,13 +154,22 @@ export const CategoryModels = ({ categoryId }: CategoryModelsProps) => {
               <TableCell>{model.name}</TableCell>
               <TableCell>{model.year}</TableCell>
               <TableCell>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => removeModelMutation.mutate(model.id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEditingModel(model)}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => removeModelMutation.mutate(model.id)}
+                  >
+                    Remover
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -173,6 +215,14 @@ export const CategoryModels = ({ categoryId }: CategoryModelsProps) => {
           )}
         </DialogContent>
       </Dialog>
+
+      <EditVehicleDialog
+        open={!!editingModel}
+        onOpenChange={() => setEditingModel(null)}
+        editingCar={editingModel}
+        setEditingCar={(car: CarModel | null) => setEditingModel(car)}
+        onSubmit={handleEditSubmit}
+      />
     </div>
   );
 };
