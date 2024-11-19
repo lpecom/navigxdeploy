@@ -28,10 +28,12 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
         return null;
       }
 
+      const statuses = vehicles?.map(v => v.status?.toLowerCase() || '');
+      
       return {
-        rented: vehicles?.filter(v => v.status === 'alugado').length || 0,
-        available: vehicles?.filter(v => v.status === 'disponível').length || 0,
-        forSale: vehicles?.filter(v => v.status === 'venda').length || 0,
+        rented: statuses.filter(s => s.includes('alugado') || s.includes('locado')).length || 0,
+        available: statuses.filter(s => s.includes('disponivel') || s.includes('disponível')).length || 0,
+        forSale: statuses.filter(s => s.includes('venda')).length || 0,
         total: vehicles?.length || 0
       };
     }
