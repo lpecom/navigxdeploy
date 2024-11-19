@@ -7,7 +7,7 @@ import { VehicleInfoTab } from "./profile/VehicleInfoTab";
 import { MaintenanceTab } from "./profile/MaintenanceTab";
 import { HistoryTab } from "./profile/HistoryTab";
 import { IncidentsTab } from "./profile/IncidentsTab";
-import type { MaintenanceRecord } from "@/types/vehicles";
+import type { MaintenanceRecord, FleetVehicle, CarModel } from "@/types/vehicles";
 
 interface FleetVehicleProfileProps {
   vehicleId: string;
@@ -22,9 +22,18 @@ export const FleetVehicleProfile = ({ vehicleId }: FleetVehicleProfileProps) => 
         .select(`
           *,
           car_model:car_models(
+            id,
             name,
             year,
-            image_url
+            image_url,
+            category_id,
+            description,
+            optionals,
+            created_at,
+            updated_at,
+            brand_logo_url,
+            engine_size,
+            transmission
           ),
           customer:customers(
             id,
@@ -36,7 +45,33 @@ export const FleetVehicleProfile = ({ vehicleId }: FleetVehicleProfileProps) => 
         .eq('id', vehicleId)
         .single();
 
-      return vehicle;
+      if (!vehicle) return null;
+
+      // Transform the data to match FleetVehicle type
+      const transformedVehicle: FleetVehicle = {
+        id: vehicle.id,
+        car_model_id: vehicle.car_model_id,
+        car_model: vehicle.car_model as CarModel,
+        year: vehicle.year,
+        current_km: vehicle.current_km,
+        last_revision_date: vehicle.last_revision_date,
+        next_revision_date: vehicle.next_revision_date,
+        plate: vehicle.plate,
+        is_available: vehicle.is_available,
+        created_at: vehicle.created_at,
+        updated_at: vehicle.updated_at,
+        color: vehicle.color,
+        state: vehicle.state,
+        chassis_number: vehicle.chassis_number,
+        renavam_number: vehicle.renavam_number,
+        status: vehicle.status,
+        contract_number: vehicle.contract_number,
+        customer_id: vehicle.customer_id,
+        customer: vehicle.customer,
+        branch: vehicle.branch
+      };
+
+      return transformedVehicle;
     },
   });
 
