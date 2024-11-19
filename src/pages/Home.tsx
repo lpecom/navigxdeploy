@@ -7,7 +7,7 @@ import { CarCategoryCard } from "@/components/home/CarCategoryCard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
-import type { CarModel } from "@/components/vehicles/types";
+import type { CarModel } from "@/types/vehicles";
 
 const Home = () => {
   const { data: categories } = useQuery({

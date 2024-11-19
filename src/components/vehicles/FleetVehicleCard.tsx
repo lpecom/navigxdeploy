@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Car } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import type { FleetVehicle } from "./types";
+import type { FleetVehicle } from "@/types/vehicles";
 
 interface FleetVehicleCardProps {
   vehicle: FleetVehicle;

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Car, AlertTriangle, CheckCircle, Clock, Wrench, XOctagon, Shield, AlertCircle } from "lucide-react";
-import type { FleetVehicle } from "../types";
+import type { FleetVehicle } from "@/types/vehicles";
 import { cn } from "@/lib/utils";
 
 interface FleetMetricsProps {

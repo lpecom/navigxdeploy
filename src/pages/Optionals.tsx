@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { CarSlider } from "@/components/home/CarSlider";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/components/ui/use-toast";
-import type { CarModel } from "@/components/vehicles/types";
+import type { CarModel } from "@/types/vehicles";
 import type { SelectedCar } from "@/types/car";
 
 const demoCarModels: CarModel[] = [

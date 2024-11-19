@@ -5,7 +5,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { FleetSearchBar } from "./fleet/FleetSearchBar";
 import { FleetTable } from "./fleet/FleetTable";
 import { FleetMetrics } from "./fleet/FleetMetrics";
-import type { FleetVehicle } from "./types";
+import type { FleetVehicle } from "@/types/vehicles";
+
 import { Card } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";

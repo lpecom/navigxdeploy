@@ -6,7 +6,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { FleetTableRow } from "./FleetTableRow";
-import type { FleetVehicle } from "../types";
+import type { FleetVehicle } from "@/types/vehicles";
 import { Card } from "@/components/ui/card";
 
 interface FleetTableProps {

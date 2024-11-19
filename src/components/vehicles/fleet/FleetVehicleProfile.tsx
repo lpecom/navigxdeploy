@@ -7,7 +7,7 @@ import { VehicleInfoTab } from "./profile/VehicleInfoTab";
 import { MaintenanceTab } from "./profile/MaintenanceTab";
 import { HistoryTab } from "./profile/HistoryTab";
 import { IncidentsTab } from "./profile/IncidentsTab";
-import type { MaintenanceRecord } from "../types";
+import type { MaintenanceRecord } from "@/types/vehicles";
 
 interface FleetVehicleProfileProps {
   vehicleId: string;

@@ -5,7 +5,8 @@ import { Eye, Pencil, Check, X } from "lucide-react";
 import { useState } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import type { FleetVehicle } from "../types";
+import type { FleetVehicle } from "@/types/vehicles";
+
 import { FleetVehicleProfileDialog } from "./FleetVehicleProfileDialog";
 
 interface FleetTableRowProps {

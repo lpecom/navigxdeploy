@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User } from "lucide-react";
-import type { FleetVehicle } from "../../types";
+import type { FleetVehicle } from "@/types/vehicles";
 
 interface VehicleInfoTabProps {
   vehicleDetails: FleetVehicle;

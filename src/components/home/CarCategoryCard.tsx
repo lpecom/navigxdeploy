@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { CarSlider } from "./CarSlider";
-import type { CarModel } from '@/components/vehicles/types';
+import type { CarModel } from '@/types/vehicles';
 
 interface Category {
   id: string;

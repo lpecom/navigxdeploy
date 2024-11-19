@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { CarModel } from '@/components/vehicles/types';
+import type { CarModel } from '@/types/vehicles';
 
 interface CarSliderProps {
   cars?: CarModel[];
