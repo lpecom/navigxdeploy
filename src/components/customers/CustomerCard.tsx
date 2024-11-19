@@ -37,6 +37,8 @@ export const CustomerCard = ({ customer, isExpanded, onToggle, onViewDetails }: 
         return <Badge className="bg-green-100 text-green-800">Ativo</Badge>;
       case 'inactive':
         return <Badge className="bg-gray-100 text-gray-800">Inativo</Badge>;
+      case 'blocked':
+        return <Badge className="bg-red-100 text-red-800">Bloqueado</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
