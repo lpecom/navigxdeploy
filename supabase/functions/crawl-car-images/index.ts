@@ -20,27 +20,39 @@ serve(async (req) => {
 
     console.log('Searching for images of:', modelName)
 
-    // Use Google Custom Search API with the provided client ID
-    const searchQuery = encodeURIComponent(`${modelName} car exterior official`)
+    // Use Google Custom Search API
+    const searchQuery = encodeURIComponent(`${modelName} carro exterior`)
     const searchUrl = `https://customsearch.googleapis.com/customsearch/v1?` + 
       `key=${Deno.env.get('GOOGLE_SEARCH_API_KEY')}` +
       `&cx=${Deno.env.get('GOOGLE_SEARCH_ENGINE_ID')}` +
       `&q=${searchQuery}` +
       `&searchType=image` +
       `&imgSize=large` +
-      `&num=1` +
-      `&client_id=330440907219-nhojcn329ue7a11s7dmffuuoifd52273.apps.googleusercontent.com`
+      `&num=5` // Increased to get more results
 
     console.log('Fetching from URL:', searchUrl)
 
     const response = await fetch(searchUrl)
     const data = await response.json()
 
-    if (!data.items?.[0]?.link) {
-      throw new Error('No image found')
+    console.log('Search API response:', JSON.stringify(data, null, 2))
+
+    if (!data.items || data.items.length === 0) {
+      throw new Error('No images found for this model')
     }
 
-    const imageUrl = data.items[0].link
+    // Try to find a suitable image from the results
+    const imageUrl = data.items.find(item => 
+      item.link && 
+      (item.link.endsWith('.jpg') || 
+       item.link.endsWith('.jpeg') || 
+       item.link.endsWith('.png'))
+    )?.link || data.items[0].link
+
+    if (!imageUrl) {
+      throw new Error('No suitable image found')
+    }
+
     console.log('Found image URL:', imageUrl)
 
     // Initialize Supabase client
@@ -51,8 +63,11 @@ serve(async (req) => {
 
     // Download image and upload to Supabase Storage
     const imageResponse = await fetch(imageUrl)
+    if (!imageResponse.ok) {
+      throw new Error(`Failed to fetch image: ${imageResponse.statusText}`)
+    }
+
     const imageBlob = await imageResponse.blob()
-    
     const fileName = `${modelName.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.jpg`
     
     const { data: uploadData, error: uploadError } = await supabase.storage
@@ -63,6 +78,7 @@ serve(async (req) => {
       })
 
     if (uploadError) {
+      console.error('Upload error:', uploadError)
       throw uploadError
     }
 
@@ -80,6 +96,7 @@ serve(async (req) => {
       .eq('name', modelName)
 
     if (updateError) {
+      console.error('Update error:', updateError)
       throw updateError
     }
 
@@ -93,8 +110,14 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in crawl-car-images:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+        status: 500 
+      }
     )
   }
 })
