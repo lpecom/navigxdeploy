@@ -1,12 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Edit2, Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Eye, Pencil, Check, X } from "lucide-react";
+import { useState } from "react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import type { FleetVehicle } from "../types";
-import { StatusBadge } from "./status/StatusBadge";
-import { CustomerSelect } from "./customer/CustomerSelect";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { FleetVehicleProfileDialog } from "./FleetVehicleProfileDialog";
 
 interface FleetTableRowProps {
   vehicle: FleetVehicle;
@@ -17,146 +17,127 @@ interface FleetTableRowProps {
   onEditFormChange: (form: Partial<FleetVehicle>) => void;
 }
 
-export const FleetTableRow = ({ 
-  vehicle, 
-  editingId, 
-  editForm, 
-  onEdit, 
+export const FleetTableRow = ({
+  vehicle,
+  editingId,
+  editForm,
+  onEdit,
   onSave,
-  onEditFormChange 
+  onEditFormChange,
 }: FleetTableRowProps) => {
-  const { toast } = useToast();
-  const isEditing = editingId === vehicle.id;
+  const [showProfile, setShowProfile] = useState(false);
 
-  const handleStatusChange = async (status: string) => {
-    if (status.toLowerCase() === 'rented' && !editForm.customer_id) {
-      toast({
-        title: "Customer Required",
-        description: "Please select a customer when marking a vehicle as rented.",
-        variant: "destructive",
-      });
-      return;
+  const getStatusBadge = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'available':
+        return <Badge className="bg-green-100 text-green-800">Disponível</Badge>;
+      case 'maintenance':
+        return <Badge className="bg-yellow-100 text-yellow-800">Manutenção</Badge>;
+      case 'rented':
+        return <Badge className="bg-blue-100 text-blue-800">Alugado</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
     }
-
-    // Update customer status if vehicle is being marked as rented
-    if (status.toLowerCase() === 'rented' && editForm.customer_id) {
-      const { error: customerError } = await supabase
-        .from('customers')
-        .update({ status: 'active_rental' })
-        .eq('id', editForm.customer_id);
-
-      if (customerError) {
-        toast({
-          title: "Error",
-          description: "Failed to update customer status.",
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-
-    onEditFormChange({
-      ...editForm,
-      status,
-      is_available: status.toLowerCase() !== 'rented'
-    });
   };
 
-  if (!vehicle.plate || !vehicle.car_model) {
-    return null;
-  }
+  const isEditing = editingId === vehicle.id;
 
   return (
-    <TableRow className="hover:bg-muted/50">
-      <TableCell>
-        {vehicle.car_model?.name} ({vehicle.car_model?.year || 'N/A'})
-      </TableCell>
-      <TableCell>{vehicle.plate}</TableCell>
-      <TableCell>
-        {isEditing ? (
-          <Input
-            type="number"
-            value={editForm.current_km || ''}
-            onChange={(e) => onEditFormChange({
-              ...editForm,
-              current_km: parseInt(e.target.value)
-            })}
-            className="w-24"
-          />
-        ) : (
-          vehicle.current_km?.toLocaleString() || 'N/A'
-        )}
-      </TableCell>
-      <TableCell>
-        {isEditing ? (
-          <Input
-            type="date"
-            value={editForm.last_revision_date || ''}
-            onChange={(e) => onEditFormChange({
-              ...editForm,
-              last_revision_date: e.target.value
-            })}
-          />
-        ) : (
-          vehicle.last_revision_date ? new Date(vehicle.last_revision_date).toLocaleDateString() : 'N/A'
-        )}
-      </TableCell>
-      <TableCell>
-        {isEditing ? (
-          <Input
-            type="date"
-            value={editForm.next_revision_date || ''}
-            onChange={(e) => onEditFormChange({
-              ...editForm,
-              next_revision_date: e.target.value
-            })}
-          />
-        ) : (
-          vehicle.next_revision_date ? new Date(vehicle.next_revision_date).toLocaleDateString() : 'N/A'
-        )}
-      </TableCell>
-      <TableCell>
-        {isEditing && editForm.status?.toLowerCase() === 'rented' ? (
-          <CustomerSelect
-            value={editForm.customer_id || ''}
-            onChange={(value) => onEditFormChange({
-              ...editForm,
-              customer_id: value
-            })}
-          />
-        ) : (
-          vehicle.customer?.full_name || '-'
-        )}
-      </TableCell>
-      <TableCell>
-        {isEditing ? (
-          <Input
-            type="text"
-            value={editForm.status || ''}
-            onChange={(e) => handleStatusChange(e.target.value)}
-          />
-        ) : (
-          <StatusBadge status={vehicle.status} />
-        )}
-      </TableCell>
-      <TableCell className="text-right">
-        {isEditing ? (
-          <Button
-            size="sm"
-            onClick={() => onSave(vehicle.id)}
-          >
-            <Save className="w-4 h-4" />
-          </Button>
-        ) : (
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => onEdit(vehicle)}
-          >
-            <Edit2 className="w-4 h-4" />
-          </Button>
-        )}
-      </TableCell>
-    </TableRow>
+    <>
+      <TableRow>
+        <TableCell>
+          <div>
+            <div className="font-medium">{vehicle.car_model?.name}</div>
+            <div className="text-sm text-muted-foreground">{vehicle.year}</div>
+          </div>
+        </TableCell>
+        <TableCell>{vehicle.plate}</TableCell>
+        <TableCell>
+          {isEditing ? (
+            <input
+              type="number"
+              value={editForm.current_km || ''}
+              onChange={(e) =>
+                onEditFormChange({ ...editForm, current_km: Number(e.target.value) })
+              }
+              className="w-24 px-2 py-1 border rounded"
+            />
+          ) : (
+            <span>{vehicle.current_km?.toLocaleString()} km</span>
+          )}
+        </TableCell>
+        <TableCell>
+          {format(new Date(vehicle.last_revision_date), "PP", { locale: ptBR })}
+        </TableCell>
+        <TableCell>
+          {format(new Date(vehicle.next_revision_date), "PP", { locale: ptBR })}
+        </TableCell>
+        <TableCell>
+          {vehicle.customer?.full_name || (
+            <span className="text-muted-foreground">-</span>
+          )}
+        </TableCell>
+        <TableCell>
+          {isEditing ? (
+            <select
+              value={editForm.status || ''}
+              onChange={(e) =>
+                onEditFormChange({ ...editForm, status: e.target.value })
+              }
+              className="px-2 py-1 border rounded"
+            >
+              <option value="available">Disponível</option>
+              <option value="maintenance">Manutenção</option>
+              <option value="rented">Alugado</option>
+            </select>
+          ) : (
+            getStatusBadge(vehicle.status || '')
+          )}
+        </TableCell>
+        <TableCell className="text-right">
+          {isEditing ? (
+            <div className="flex items-center justify-end gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onSave(vehicle.id)}
+              >
+                <Check className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onEdit(vehicle)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-end gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowProfile(true)}
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onEdit(vehicle)}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </TableCell>
+      </TableRow>
+
+      <FleetVehicleProfileDialog
+        vehicleId={vehicle.id}
+        open={showProfile}
+        onOpenChange={setShowProfile}
+      />
+    </>
   );
 };
