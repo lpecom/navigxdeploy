@@ -9,8 +9,7 @@ import { FleetLoadingState } from "./FleetLoadingState";
 import { FleetErrorState } from "./FleetErrorState";
 import { FleetEmptyState } from "./FleetEmptyState";
 import { FleetVehicleProfileDialog } from "./FleetVehicleProfileDialog";
-import { Button } from "@/components/ui/button";
-import { RefreshCw, Download, Upload } from "lucide-react";
+import { FleetHeaderActions } from "./FleetHeaderActions";
 import type { FleetVehicle, VehicleStatus } from "@/types/vehicles";
 
 export const FleetListView = () => {
@@ -238,41 +237,13 @@ export const FleetListView = () => {
           onFilterChange={handleFilterChange}
           activeFilter={statusFilter}
         />
-        <div className="flex items-center gap-2">
-          <input
-            type="file"
-            accept=".csv"
-            onChange={handleFileUpload}
-            className="hidden"
-            id="fleet-file-upload"
-          />
-          <Button
-            onClick={() => document.getElementById('fleet-file-upload')?.click()}
-            disabled={isUploading}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <Upload className={`w-4 h-4 ${isUploading ? 'animate-spin' : ''}`} />
-            {isUploading ? 'Importando...' : 'Importar CSV'}
-          </Button>
-          <Button
-            onClick={handleExport}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <Download className="w-4 h-4" />
-            Exportar CSV
-          </Button>
-          <Button
-            onClick={handleSync}
-            disabled={isSyncing}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-            {isSyncing ? 'Sincronizando...' : 'Sincronizar Frota'}
-          </Button>
-        </div>
+        <FleetHeaderActions
+          onSync={handleSync}
+          onExport={handleExport}
+          onFileUpload={handleFileUpload}
+          isSyncing={isSyncing}
+          isUploading={isUploading}
+        />
       </div>
       
       <FleetHeader
