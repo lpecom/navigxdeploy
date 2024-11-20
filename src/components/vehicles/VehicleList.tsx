@@ -9,6 +9,7 @@ import { FleetOverview } from "./fleet/overview/FleetOverview";
 import { Card } from "@/components/ui/card";
 import { VehicleListHeader } from "./sections/VehicleListHeader";
 import { VehicleListContent } from "./sections/VehicleListContent";
+import { FleetImport } from "./FleetImport";
 import { supabase } from "@/integrations/supabase/client";
 import type { CarModel, FleetVehicle } from "@/types/vehicles";
 
@@ -124,6 +125,7 @@ const VehicleList = ({ view }: VehicleListProps) => {
         </TabsContent>
 
         <TabsContent value="fleet">
+          <FleetImport />
           {fleetLoading ? (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3].map((i) => (
