@@ -33,7 +33,19 @@ export interface MaintenanceRecord {
   updated_at: string;
 }
 
-export type VehicleStatus = 'available' | 'rented' | 'maintenance' | 'body_shop' | 'deactivated' | 'management' | 'accident';
+export type VehicleStatus = 
+  | 'available' 
+  | 'rented' 
+  | 'maintenance' 
+  | 'body_shop' 
+  | 'deactivated' 
+  | 'management' 
+  | 'accident'
+  | 'electric'
+  | 'mechanic'
+  | 'other_maintenance'
+  | 'for_sale'
+  | 'preparing';
 
 export interface FleetVehicle {
   id: string;

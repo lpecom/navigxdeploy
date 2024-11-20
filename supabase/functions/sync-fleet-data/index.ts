@@ -17,7 +17,18 @@ const mapVehicleStatus = (status: string): string => {
     'funilaria': 'body_shop',
     'acidente': 'accident',
     'desativado': 'deactivated',
-    'diretoria': 'management'
+    'diretoria': 'management',
+    'elétrico': 'electric',
+    'eletrico': 'electric',
+    'mecânica': 'mechanic',
+    'mecanica': 'mechanic',
+    'outras manutenções': 'other_maintenance',
+    'outras manutencoes': 'other_maintenance',
+    'à venda': 'for_sale',
+    'a venda': 'for_sale',
+    'preparando': 'preparing',
+    'em preparação': 'preparing',
+    'em preparacao': 'preparing'
   }
 
   const normalizedStatus = status.toLowerCase().trim()
@@ -47,10 +58,10 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Parse the CSV data (assuming it's CSV format)
+    // Parse the CSV data
     const rows = fleetData.split('\n')
       .map(row => row.split(','))
-      .filter(row => row.length > 1) // Filter out empty rows
+      .filter(row => row.length > 1)
 
     // Remove header row
     const [headers, ...dataRows] = rows
@@ -60,7 +71,6 @@ serve(async (req) => {
 
     for (const row of dataRows) {
       try {
-        // Map CSV columns to fleet_vehicles table structure
         const rawStatus = row[5]?.trim() || 'available'
         const vehicle = {
           plate: row[0]?.trim(),
@@ -75,7 +85,6 @@ serve(async (req) => {
           updated_at: new Date().toISOString()
         }
 
-        // Skip if required fields are missing
         if (!vehicle.plate) {
           console.warn('Skipping row due to missing plate number')
           continue
