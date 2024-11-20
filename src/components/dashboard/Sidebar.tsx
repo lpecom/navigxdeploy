@@ -7,14 +7,16 @@ const Sidebar = () => {
 
   return (
     <aside className="fixed top-0 left-0 z-40 w-64 h-screen bg-white border-r border-gray-200">
-      <div className="p-6">
+      <div className="h-16 flex items-center px-6 border-b border-gray-200">
         <img 
           src="https://i.imghippo.com/files/uafE3798xA.png" 
           alt="Navig Logo" 
           className="h-8 w-auto"
         />
       </div>
-      <SidebarMenu items={adminMenuItems} currentPath={location.pathname} />
+      <div className="overflow-y-auto">
+        <SidebarMenu items={adminMenuItems} currentPath={location.pathname} />
+      </div>
     </aside>
   );
 };

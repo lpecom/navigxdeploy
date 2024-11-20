@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Plus, Car } from "lucide-react";
+import { Plus } from "lucide-react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import VehicleList from "@/components/vehicles/VehicleList";
 import { FleetImport } from "@/components/vehicles/FleetImport";
@@ -14,10 +14,10 @@ const Vehicles = ({ view }: VehiclesProps) => {
   const [isAddingVehicle, setIsAddingVehicle] = useState(false);
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-gray-50">
       <Sidebar />
-      <div className="flex-1 overflow-auto">
-        <div className="container py-6 space-y-6">
+      <div className="flex-1 pl-64">
+        <div className="p-6 space-y-6">
           <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-gray-900">

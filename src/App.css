@@ -1,7 +1,4 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
@@ -11,9 +8,11 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -69,17 +68,6 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-/* Responsive adjustments */
-@media (max-width: 640px) {
-  #root {
-    padding: 1rem;
-  }
-  
-  .card {
-    padding: 1em;
   }
 }
 
