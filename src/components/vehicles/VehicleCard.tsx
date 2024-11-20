@@ -1,18 +1,20 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Car } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { getBrandLogo } from "@/utils/brandLogos";
+import type { CarModel } from "@/types/vehicles";
+
+import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { CarModel, FleetVehicle } from "@/types/vehicles";
 
 interface VehicleCardProps {
   car: CarModel;
-  onEdit?: (car: CarModel) => void;
+  onEdit: (car: CarModel) => void;
 }
 
 export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
-  const navigate = useNavigate();
+  const brandLogoUrl = getBrandLogo(car.name);
 
   const { data: fleetStats } = useQuery({
     queryKey: ['fleet-stats', car.id],
@@ -27,75 +29,71 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
         return null;
       }
 
-      const statuses = vehicles?.map(v => v.status?.toLowerCase() || '') || [];
+      const statuses = vehicles?.map(v => v.status?.toLowerCase() || '');
       
       return {
-        rented: statuses.filter(s => s === 'rented').length,
-        available: statuses.filter(s => s === 'available').length,
-        forSale: statuses.filter(s => s === 'for_sale').length,
+        rented: statuses.filter(s => s.includes('alugado') || s.includes('locado')).length || 0,
+        available: statuses.filter(s => s.includes('disponivel') || s.includes('disponível')).length || 0,
+        forSale: statuses.filter(s => s.includes('venda')).length || 0,
         total: vehicles?.length || 0
       };
     }
   });
 
-  const handleClick = () => {
-    navigate(`/admin/vehicles/${car.id}`);
-  };
-
   return (
-    <Card className="group overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <CardContent className="p-6">
-        <div className="space-y-4">
-          {car.image_url ? (
-            <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card className="group overflow-hidden hover:shadow-lg transition-shadow duration-300">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex items-center gap-3">
+            {brandLogoUrl ? (
+              <img 
+                src={brandLogoUrl} 
+                alt={`${car.name} brand`}
+                className="w-8 h-8 object-contain"
+              />
+            ) : (
+              <Car className="w-8 h-8 text-muted-foreground" />
+            )}
+            <div>
+              <p className="text-sm text-muted-foreground font-medium">Marca</p>
+              <h3 className="font-semibold text-lg">{car.name.split(' ')[0]}</h3>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {car.image_url && (
+            <div className="relative aspect-video w-full overflow-hidden rounded-md">
               <img
                 src={car.image_url}
                 alt={car.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              {car.brand_logo_url && (
-                <div className="absolute top-2 right-2 bg-white/90 p-1.5 rounded-lg">
-                  <img 
-                    src={car.brand_logo_url} 
-                    alt="Brand logo"
-                    className="w-6 h-6"
-                  />
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="aspect-video w-full bg-gray-100 rounded-lg flex items-center justify-center">
-              <Car className="w-12 h-12 text-gray-400" />
             </div>
           )}
           
-          <div>
-            <h3 className="font-semibold text-lg">{car.name}</h3>
-            {car.year && (
-              <p className="text-sm text-muted-foreground">
-                Ano: {car.year}
-              </p>
-            )}
-          </div>
-
           <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Modelo</span>
+              <span className="font-medium">{car.name.split(' ').slice(1).join(' ')}</span>
+            </div>
+
             {fleetStats && fleetStats.total > 0 && (
-              <div className="space-y-2 pt-2 border-t">
-                <div className="flex justify-between items-center text-sm">
+              <div className="space-y-2 pt-2 border-t text-sm">
+                <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Alugados</span>
                   <span className="font-medium text-orange-600">{fleetStats.rented}</span>
                 </div>
-                <div className="flex justify-between items-center text-sm">
+                <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Disponíveis</span>
                   <span className="font-medium text-green-600">{fleetStats.available}</span>
                 </div>
-                <div className="flex justify-between items-center text-sm">
+                <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">À Venda</span>
                   <span className="font-medium text-blue-600">{fleetStats.forSale}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm font-medium pt-1 border-t">
-                  <span>Total na Frota</span>
-                  <span>{fleetStats.total}</span>
                 </div>
               </div>
             )}
@@ -106,8 +104,8 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
               </Badge>
             )}
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
