@@ -12,49 +12,73 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Starting fleet data sync')
+    
+    // Fetch fleet data from the URL
+    const response = await fetch('https://brown-georgeanne-53.tiiny.site/')
+    if (!response.ok) {
+      throw new Error(`Failed to fetch fleet data: ${response.statusText}`)
+    }
+
+    const fleetData = await response.text()
+    console.log('Fleet data fetched successfully')
+
+    // Initialize Supabase client
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Mock data for demonstration - replace with actual data source
-    const fleetData = [
-      {
-        plate: 'ABC1234',
-        year: '2023',
-        current_km: 15000,
-        last_revision_date: new Date().toISOString().split('T')[0],
-        next_revision_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        status: 'available',
-      },
-      // Add more mock vehicles as needed
-    ]
+    // Parse the CSV data (assuming it's CSV format)
+    const rows = fleetData.split('\n')
+      .map(row => row.split(','))
+      .filter(row => row.length > 1) // Filter out empty rows
 
+    // Remove header row
+    const [headers, ...dataRows] = rows
+    
     let processedCount = 0
     const errors = []
 
-    for (const vehicle of fleetData) {
+    for (const row of dataRows) {
       try {
+        // Map CSV columns to fleet_vehicles table structure
+        const vehicle = {
+          plate: row[0]?.trim(),
+          year: row[1]?.trim(),
+          current_km: parseInt(row[2]?.trim() || '0'),
+          last_revision_date: row[3]?.trim() || new Date().toISOString().split('T')[0],
+          next_revision_date: row[4]?.trim() || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          status: row[5]?.trim()?.toLowerCase() || 'available',
+          chassis_number: row[6]?.trim(),
+          renavam_number: row[7]?.trim(),
+          color: row[8]?.trim(),
+          updated_at: new Date().toISOString()
+        }
+
+        // Skip if required fields are missing
+        if (!vehicle.plate) {
+          console.warn('Skipping row due to missing plate number')
+          continue
+        }
+
         const { error } = await supabase
           .from('fleet_vehicles')
-          .upsert(
-            { 
-              ...vehicle,
-              updated_at: new Date().toISOString()
-            },
-            { 
-              onConflict: 'plate',
-              ignoreDuplicates: false
-            }
-          )
+          .upsert(vehicle, { 
+            onConflict: 'plate',
+            ignoreDuplicates: false 
+          })
 
         if (error) throw error
         processedCount++
+        console.log(`Processed vehicle: ${vehicle.plate}`)
       } catch (error) {
-        console.error('Error processing vehicle:', error)
-        errors.push(`Error processing vehicle ${vehicle.plate}: ${error.message}`)
+        console.error('Error processing vehicle row:', error)
+        errors.push(`Error processing row ${processedCount + 1}: ${error.message}`)
       }
     }
+
+    console.log(`Sync completed. Processed ${processedCount} vehicles`)
 
     return new Response(
       JSON.stringify({
