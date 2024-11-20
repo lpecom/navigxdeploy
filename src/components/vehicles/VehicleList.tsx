@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Plus, Car } from "lucide-react";
+import { Plus } from "lucide-react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { FleetImport } from "@/components/vehicles/FleetImport";
 import { useState } from "react";
 import { EditVehicleDialog } from "@/components/vehicles/EditVehicleDialog";
 import { CarDataActions } from "./CarDataActions";
+import { VehicleListContent } from "./sections/VehicleListContent";
+import { FleetOverview } from "./fleet/overview/FleetOverview";
 
 interface VehiclesProps {
   view: 'overview' | 'categories' | 'models' | 'fleet' | 'maintenance';
@@ -43,7 +45,11 @@ const Vehicles = ({ view }: VehiclesProps) => {
 
           {view === 'fleet' && <FleetImport />}
 
-          <VehicleList view={view} />
+          {view === 'overview' ? (
+            <FleetOverview />
+          ) : (
+            <VehicleListContent view={view} vehicles={[]} />
+          )}
         </div>
       </div>
 
