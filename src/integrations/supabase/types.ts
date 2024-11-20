@@ -1102,6 +1102,7 @@ export type Database = {
         | "body_shop"
         | "deactivated"
         | "management"
+        | "accident"
     }
     CompositeTypes: {
       [_ in never]: never

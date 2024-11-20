@@ -73,7 +73,7 @@ export const getStatusInfo = (status: string | null) => {
     return {
       variant: 'destructive' as const,
       icon: AlertCircle,
-      label: 'Accident',
+      label: 'Acidente',
       color: 'text-red-600'
     };
   }
