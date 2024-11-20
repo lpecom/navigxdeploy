@@ -7,14 +7,27 @@ import { createColumnMappings } from './utils/columnMapper.ts'
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
 serve(async (req) => {
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
+    // Ensure request is POST
+    if (req.method !== 'POST') {
+      throw new Error('Method not allowed')
+    }
+
+    const contentType = req.headers.get('content-type') || ''
+    if (!contentType.includes('multipart/form-data')) {
+      throw new Error('Content-Type must be multipart/form-data')
+    }
+
+    // Get form data
     const formData = await req.formData()
     const file = formData.get('file')
     
@@ -22,6 +35,7 @@ serve(async (req) => {
       throw new Error('No file uploaded')
     }
 
+    console.log('Processing file:', file.name)
     const text = await file.text()
     const lines = text.split('\n').filter(line => line.trim())
     
@@ -30,7 +44,7 @@ serve(async (req) => {
     }
 
     const headers = lines[0].toLowerCase().split(',').map(h => h.trim())
-    console.log('Processing CSV with headers:', headers)
+    console.log('CSV Headers:', headers)
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -87,7 +101,12 @@ serve(async (req) => {
         errors,
         message: `Successfully processed ${processedCount} customers` 
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json'
+        } 
+      }
     )
   } catch (error) {
     console.error('Error processing customers:', error)
@@ -97,7 +116,10 @@ serve(async (req) => {
         details: error.message 
       }),
       { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json'
+        },
         status: 400 
       }
     )

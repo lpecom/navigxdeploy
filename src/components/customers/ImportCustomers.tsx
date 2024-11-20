@@ -32,19 +32,15 @@ export const ImportCustomers = () => {
       const formData = new FormData()
       formData.append('file', file)
 
-      const { data, error } = await supabase.functions.invoke(
-        'process-customers-csv',
-        {
-          body: formData,
-          headers: {
-            'Accept': 'application/json',
-          },
-        }
-      )
+      const response = await supabase.functions.invoke('process-customers-csv', {
+        body: formData,
+      })
 
-      if (error) throw error
+      if (response.error) throw response.error
 
+      const data = response.data
       setUploadProgress(100)
+      
       toast({
         title: "Sucesso!",
         description: `${data.processed} clientes importados com sucesso.${
