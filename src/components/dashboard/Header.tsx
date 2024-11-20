@@ -34,8 +34,8 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 h-16 fixed top-0 right-0 left-64 z-50">
-      <div className="h-full px-6 flex items-center justify-between">
+    <header className="bg-white border-b border-gray-200 h-16 fixed top-0 left-64 right-0 z-40">
+      <div className="h-full px-8 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <div className="relative w-96">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
