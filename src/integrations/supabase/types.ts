@@ -495,7 +495,7 @@ export type Database = {
           plate: string
           renavam_number: string | null
           state: string | null
-          status: string | null
+          status: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at: string | null
           year: string
         }
@@ -515,7 +515,7 @@ export type Database = {
           plate: string
           renavam_number?: string | null
           state?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at?: string | null
           year: string
         }
@@ -535,7 +535,7 @@ export type Database = {
           plate?: string
           renavam_number?: string | null
           state?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at?: string | null
           year?: string
         }
@@ -1095,7 +1095,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      vehicle_status:
+        | "available"
+        | "rented"
+        | "maintenance"
+        | "body_shop"
+        | "deactivated"
+        | "management"
     }
     CompositeTypes: {
       [_ in never]: never
