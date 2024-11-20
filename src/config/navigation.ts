@@ -20,6 +20,7 @@ import {
   PieChart,
   Megaphone,
   Settings,
+  DollarSign,
 } from "lucide-react";
 
 export type MenuItem = {
@@ -53,6 +54,15 @@ export const adminMenuItems: MenuItem[] = [
     ]
   },
   {
+    icon: DollarSign,
+    label: "Tarifas",
+    subItems: [
+      { to: "/admin/accessories", icon: Package, label: "Opcionais" },
+      { to: "/admin/plans", icon: Tag, label: "Planos" },
+      { to: "/admin/fares", icon: DollarSign, label: "Condições" },
+    ]
+  },
+  {
     icon: BarChart2,
     label: "Análises",
     subItems: [
@@ -69,7 +79,6 @@ export const adminMenuItems: MenuItem[] = [
       { to: "/admin/automations", icon: Settings, label: "Automações" },
     ]
   },
-  { to: "/admin/accessories", icon: Package, label: "Opcionais" },
   { to: "/admin/website-settings", icon: Globe, label: "Website" },
   { to: "/admin/changelog", icon: History, label: "Changelog" },
 ];
