@@ -5,7 +5,16 @@ interface StatusDistributionChartProps {
   data: Array<{ name: string; value: number }>;
 }
 
-const COLORS = ['#22c55e', '#eab308', '#3b82f6', '#f97316', '#ef4444', '#8b5cf6', '#dc2626'];
+// Using a monochromatic color scheme based on black
+const COLORS = [
+  '#000000', // Pure black
+  '#1a1a1a', // Very dark gray
+  '#333333', // Dark gray
+  '#4d4d4d', // Medium dark gray
+  '#666666', // Medium gray
+  '#808080', // Gray
+  '#999999'  // Light gray
+];
 
 export const StatusDistributionChart = ({ data }: StatusDistributionChartProps) => {
   return (
@@ -25,16 +34,35 @@ export const StatusDistributionChart = ({ data }: StatusDistributionChartProps) 
               innerRadius={60}
               outerRadius={80}
               fill="#8884d8"
-              paddingAngle={5}
+              paddingAngle={3}
               dataKey="value"
               label={({ name, value }) => `${name}: ${value}`}
+              strokeWidth={1}
+              stroke="#fff"
             >
               {data.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={COLORS[index % COLORS.length]}
+                  className="hover:opacity-80 transition-opacity"
+                />
               ))}
             </Pie>
-            <Tooltip />
-            <Legend />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: 'white',
+                border: '1px solid #e2e8f0',
+                borderRadius: '6px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}
+            />
+            <Legend 
+              verticalAlign="bottom" 
+              height={36}
+              formatter={(value) => (
+                <span className="text-sm text-gray-600">{value}</span>
+              )}
+            />
           </PieChart>
         </ResponsiveContainer>
       </CardContent>

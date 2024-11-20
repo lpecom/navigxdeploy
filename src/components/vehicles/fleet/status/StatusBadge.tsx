@@ -10,7 +10,7 @@ export const getStatusInfo = (status: string | null) => {
     variant: 'outline' as const,
     icon: AlertTriangle,
     label: 'N/A',
-    color: 'text-gray-600'
+    color: 'text-gray-600 bg-gray-50'
   };
 
   const statusLower = status.toLowerCase();
@@ -20,7 +20,7 @@ export const getStatusInfo = (status: string | null) => {
       variant: 'outline' as const,
       icon: CheckCircle,
       label: statusLower === 'available' ? 'Available' : 'Disponível',
-      color: 'text-green-600'
+      color: 'text-emerald-700 bg-emerald-50 border-emerald-200'
     };
   }
   
@@ -29,7 +29,7 @@ export const getStatusInfo = (status: string | null) => {
       variant: 'warning' as const,
       icon: Wrench,
       label: statusLower.includes('maintenance') ? 'Maintenance' : 'Manutenção',
-      color: 'text-yellow-600'
+      color: 'text-amber-700 bg-amber-50 border-amber-200'
     };
   }
   
@@ -38,7 +38,7 @@ export const getStatusInfo = (status: string | null) => {
       variant: 'secondary' as const,
       icon: Clock,
       label: statusLower === 'rented' ? 'Rented' : 'Alugado',
-      color: 'text-blue-600'
+      color: 'text-blue-700 bg-blue-50 border-blue-200'
     };
   }
 
@@ -47,7 +47,7 @@ export const getStatusInfo = (status: string | null) => {
       variant: 'warning' as const,
       icon: Car,
       label: 'Funilaria',
-      color: 'text-orange-600'
+      color: 'text-orange-700 bg-orange-50 border-orange-200'
     };
   }
 
@@ -56,7 +56,7 @@ export const getStatusInfo = (status: string | null) => {
       variant: 'destructive' as const,
       icon: XOctagon,
       label: 'Desativado',
-      color: 'text-red-600'
+      color: 'text-red-700 bg-red-50 border-red-200'
     };
   }
 
@@ -65,7 +65,7 @@ export const getStatusInfo = (status: string | null) => {
       variant: 'default' as const,
       icon: Shield,
       label: 'Diretoria',
-      color: 'text-purple-600'
+      color: 'text-purple-700 bg-purple-50 border-purple-200'
     };
   }
 
@@ -74,7 +74,7 @@ export const getStatusInfo = (status: string | null) => {
       variant: 'destructive' as const,
       icon: AlertCircle,
       label: 'Acidente',
-      color: 'text-red-600'
+      color: 'text-red-700 bg-red-50 border-red-200'
     };
   }
 
@@ -82,7 +82,7 @@ export const getStatusInfo = (status: string | null) => {
     variant: 'outline' as const,
     icon: AlertTriangle,
     label: status,
-    color: 'text-gray-600'
+    color: 'text-gray-700 bg-gray-50 border-gray-200'
   };
 };
 
@@ -91,10 +91,10 @@ export const StatusBadge = ({ status }: StatusBadgeProps) => {
   
   return (
     <Badge 
-      variant={statusInfo.variant}
-      className={`flex items-center gap-1.5 px-2 py-1 ${statusInfo.color}`}
+      variant="outline"
+      className={`flex items-center gap-1.5 px-2.5 py-1 font-medium transition-colors ${statusInfo.color}`}
     >
-      <statusInfo.icon className="w-3 h-3" />
+      <statusInfo.icon className="w-3.5 h-3.5" />
       <span>{statusInfo.label}</span>
     </Badge>
   );
