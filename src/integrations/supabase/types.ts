@@ -1092,7 +1092,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      export_fleet_data: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          car_model_name: string
+          year: string
+          current_km: number
+          last_revision_date: string
+          next_revision_date: string
+          plate: string
+          is_available: boolean
+          color: string
+          state: string
+          chassis_number: string
+          renavam_number: string
+          status: Database["public"]["Enums"]["vehicle_status"]
+          contract_number: string
+          customer_name: string
+          branch: string
+        }[]
+      }
     }
     Enums: {
       vehicle_status:

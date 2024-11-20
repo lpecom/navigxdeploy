@@ -22,6 +22,7 @@ import { VehicleSection } from "./sections/VehicleSection";
 import { TransactionsSection } from "./sections/TransactionsSection";
 import { IncidentsSection } from "./sections/IncidentsSection";
 import { HistorySection } from "./sections/HistorySection";
+import type { VehicleStatus } from "@/types/vehicles";
 
 interface DetailedReservationViewProps {
   reservationId: string;
@@ -45,7 +46,8 @@ const DetailedReservationView = ({ reservationId }: DetailedReservationViewProps
       plate: "ABC-1234",
       mileage: 45000,
       lastService: "2024-02-15",
-      nextServiceDue: "2024-05-15"
+      nextServiceDue: "2024-05-15",
+      status: 'available' as VehicleStatus
     },
     rental: {
       startDate: "2024-03-20",
