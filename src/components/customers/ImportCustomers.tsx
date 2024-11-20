@@ -4,11 +4,13 @@ import { Upload } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/components/ui/use-toast"
 import { supabase } from "@/integrations/supabase/client"
+import { useQueryClient } from "@tanstack/react-query"
 
 export const ImportCustomers = () => {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -50,7 +52,8 @@ export const ImportCustomers = () => {
         }`,
       })
 
-      window.location.reload()
+      // Invalidate and refetch customers data
+      await queryClient.invalidateQueries({ queryKey: ['customers'] })
     } catch (error: any) {
       console.error("Error importing customers:", error)
       toast({
