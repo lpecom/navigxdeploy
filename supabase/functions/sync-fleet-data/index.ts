@@ -6,6 +6,24 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Helper function to map status values
+const mapVehicleStatus = (status: string): string => {
+  const statusMap: Record<string, string> = {
+    'disponível': 'available',
+    'disponivel': 'available',
+    'alugado': 'rented',
+    'manutenção': 'maintenance',
+    'manutencao': 'maintenance',
+    'funilaria': 'body_shop',
+    'acidente': 'accident',
+    'desativado': 'deactivated',
+    'diretoria': 'management'
+  }
+
+  const normalizedStatus = status.toLowerCase().trim()
+  return statusMap[normalizedStatus] || 'available'
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -43,13 +61,14 @@ serve(async (req) => {
     for (const row of dataRows) {
       try {
         // Map CSV columns to fleet_vehicles table structure
+        const rawStatus = row[5]?.trim() || 'available'
         const vehicle = {
           plate: row[0]?.trim(),
           year: row[1]?.trim(),
           current_km: parseInt(row[2]?.trim() || '0'),
           last_revision_date: row[3]?.trim() || new Date().toISOString().split('T')[0],
           next_revision_date: row[4]?.trim() || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          status: row[5]?.trim()?.toLowerCase() || 'available',
+          status: mapVehicleStatus(rawStatus),
           chassis_number: row[6]?.trim(),
           renavam_number: row[7]?.trim(),
           color: row[8]?.trim(),
@@ -62,6 +81,8 @@ serve(async (req) => {
           continue
         }
 
+        console.log(`Processing vehicle: ${vehicle.plate} with status: ${vehicle.status}`)
+
         const { error } = await supabase
           .from('fleet_vehicles')
           .upsert(vehicle, { 
@@ -71,7 +92,7 @@ serve(async (req) => {
 
         if (error) throw error
         processedCount++
-        console.log(`Processed vehicle: ${vehicle.plate}`)
+        console.log(`Successfully processed vehicle: ${vehicle.plate}`)
       } catch (error) {
         console.error('Error processing vehicle row:', error)
         errors.push(`Error processing row ${processedCount + 1}: ${error.message}`)
