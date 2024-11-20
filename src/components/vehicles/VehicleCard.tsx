@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Car } from "lucide-react";
-import { getBrandLogo } from "@/utils/brandLogos";
+import { getBrandLogo, getBrandFromModel } from "@/utils/brandLogos";
 import type { CarModel } from "@/types/vehicles";
 
 import { motion } from "framer-motion";
@@ -15,7 +15,7 @@ interface VehicleCardProps {
 
 export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
   const brandLogoUrl = getBrandLogo(car.name);
-  const brandName = car.name.split(' ')[0];
+  const brandName = getBrandFromModel(car.name);
 
   const { data: fleetStats } = useQuery({
     queryKey: ['fleet-stats', car.id],
@@ -66,7 +66,7 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
             )}
             <div>
               <p className="text-sm text-muted-foreground font-medium">{brandName}</p>
-              <h3 className="font-semibold text-lg">{car.name.split(' ').slice(1).join(' ')}</h3>
+              <h3 className="font-semibold text-lg">{car.name}</h3>
             </div>
           </div>
         </CardHeader>
@@ -84,7 +84,7 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Modelo</span>
-              <span className="font-medium">{car.name.split(' ').slice(1).join(' ')}</span>
+              <span className="font-medium">{car.name}</span>
             </div>
 
             {fleetStats && fleetStats.total > 0 && (
