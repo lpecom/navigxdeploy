@@ -45,7 +45,8 @@ const DetailedReservationView = ({ reservationId }: DetailedReservationViewProps
       plate: "ABC-1234",
       mileage: 45000,
       lastService: "2024-02-15",
-      nextServiceDue: "2024-05-15"
+      nextServiceDue: "2024-05-15",
+      status: "available" as const // Add this line to fix the type error
     },
     rental: {
       startDate: "2024-03-20",
