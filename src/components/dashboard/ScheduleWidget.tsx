@@ -1,29 +1,15 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, AlertCircle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, addWeeks } from "date-fns";
-import { Json } from "@/integrations/supabase/types";
-
-interface SelectedCar {
-  name: string;
-  // Add other properties if needed
-}
-
-interface CheckoutSession {
-  id: string;
-  pickup_date: string;
-  pickup_time: string;
-  driver: {
-    full_name: string;
-  };
-  selected_car: Json;
-}
+import { DashboardCheckoutSession, SelectedCarData } from "@/types/dashboard";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const ScheduleWidget = () => {
-  const { data: schedules, isLoading } = useQuery({
+  const { data: schedules, isLoading, error } = useQuery({
     queryKey: ['upcoming-schedules'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -40,7 +26,7 @@ const ScheduleWidget = () => {
         .limit(10);
 
       if (error) throw error;
-      return data as CheckoutSession[];
+      return data as DashboardCheckoutSession[];
     },
   });
 
@@ -55,6 +41,17 @@ const ScheduleWidget = () => {
     start: startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 }),
     end: endOfWeek(addWeeks(now, 1), { weekStartsOn: 1 }),
   });
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Failed to load schedule. Please try again later.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <Card className="border-0 shadow-none">
@@ -71,7 +68,11 @@ const ScheduleWidget = () => {
             <Button variant="default" size="sm" className="text-sm">Week</Button>
             <Button variant="ghost" size="sm" className="text-sm">Month</Button>
           </div>
-          <Button variant="ghost" className="text-sm text-muted-foreground hover:text-primary">
+          <Button 
+            variant="ghost" 
+            className="text-sm text-muted-foreground hover:text-primary"
+            aria-label="View full schedule"
+          >
             See all <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         </div>
@@ -81,13 +82,13 @@ const ScheduleWidget = () => {
           {isLoading ? (
             <div className="animate-pulse space-y-3">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-20 bg-gray-50 rounded-lg" />
+                <div key={i} className="h-20 bg-gray-50 rounded-lg animate-pulse" />
               ))}
             </div>
           ) : (
             <div className="space-y-6">
               {[weekDays, nextWeekDays].map((days, weekIndex) => (
-                <div key={weekIndex} className="space-y-2">
+                <div key={weekIndex} className="space-y-2 animate-fade-up">
                   <div className="grid grid-cols-7 gap-1">
                     {days.map((day, i) => {
                       const daySchedules = schedules?.filter(
@@ -100,11 +101,17 @@ const ScheduleWidget = () => {
                           <div className="text-xs text-muted-foreground mb-1">
                             {format(day, 'EEE')}
                           </div>
-                          <div className={`
-                            rounded-full w-8 h-8 mx-auto flex items-center justify-center text-sm
-                            ${isToday ? 'bg-primary text-white' : 'hover:bg-gray-100 cursor-pointer'}
-                            ${daySchedules?.length ? 'font-semibold' : ''}
-                          `}>
+                          <div 
+                            className={`
+                              rounded-full w-8 h-8 mx-auto flex items-center justify-center text-sm
+                              transition-colors duration-200
+                              ${isToday ? 'bg-primary text-white' : 'hover:bg-gray-100 cursor-pointer'}
+                              ${daySchedules?.length ? 'font-semibold' : ''}
+                            `}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`${format(day, 'PPPP')}${daySchedules?.length ? `, ${daySchedules.length} schedules` : ''}`}
+                          >
                             {format(day, 'd')}
                           </div>
                         </div>
@@ -117,8 +124,7 @@ const ScheduleWidget = () => {
                         format(d, 'yyyy-MM-dd') === s.pickup_date
                       ))
                       .map((schedule) => {
-                        // First cast to unknown, then to SelectedCar
-                        const selectedCar = schedule.selected_car as unknown as SelectedCar;
+                        const selectedCar = schedule.selected_car as unknown as SelectedCarData;
                         
                         return (
                           <div

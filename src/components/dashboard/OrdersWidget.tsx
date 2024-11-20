@@ -1,30 +1,14 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, Phone } from "lucide-react";
+import { ChevronRight, Phone, AlertCircle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Json } from "@/integrations/supabase/types";
-
-interface SelectedCar {
-  name: string;
-  // Add other properties if needed
-}
-
-interface CheckoutSession {
-  id: string;
-  reservation_number: number;
-  driver: {
-    full_name: string;
-    phone?: string;
-  };
-  created_at: string;
-  status: string;
-  selected_car: Json;
-}
+import { DashboardCheckoutSession, SelectedCarData } from "@/types/dashboard";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const OrdersWidget = () => {
-  const { data: orders, isLoading } = useQuery({
+  const { data: orders, isLoading, error } = useQuery({
     queryKey: ['recent-orders'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -41,9 +25,20 @@ const OrdersWidget = () => {
         .limit(5);
 
       if (error) throw error;
-      return data as CheckoutSession[];
+      return data as DashboardCheckoutSession[];
     },
   });
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Failed to load orders. Please try again later.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <Card className="border-0 shadow-none">
@@ -54,7 +49,11 @@ const OrdersWidget = () => {
             {isLoading ? '...' : orders?.length || 0}
           </Badge>
         </div>
-        <Button variant="ghost" className="text-sm text-muted-foreground hover:text-primary">
+        <Button 
+          variant="ghost" 
+          className="text-sm text-muted-foreground hover:text-primary"
+          aria-label="View all orders"
+        >
           See all <ChevronRight className="w-4 h-4 ml-1" />
         </Button>
       </CardHeader>
@@ -64,24 +63,23 @@ const OrdersWidget = () => {
             <div className="animate-pulse space-y-3">
               {[...Array(3)].map((_, i) => (
                 <div key={i} className="flex items-center gap-4 p-3 rounded-lg bg-gray-50">
-                  <div className="w-10 h-10 bg-gray-200 rounded-lg" />
+                  <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-1/4" />
-                    <div className="h-3 bg-gray-200 rounded w-1/3" />
+                    <div className="h-4 bg-gray-200 rounded w-1/4 animate-pulse" />
+                    <div className="h-3 bg-gray-200 rounded w-1/3 animate-pulse" />
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <>
+            <div className="divide-y divide-gray-100">
               {orders?.map((order) => {
-                // First cast to unknown, then to SelectedCar
-                const selectedCar = order.selected_car as unknown as SelectedCar;
+                const selectedCar = order.selected_car as unknown as SelectedCarData;
                 
                 return (
                   <div
                     key={order.id}
-                    className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors animate-fade-up"
                   >
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
@@ -92,7 +90,10 @@ const OrdersWidget = () => {
                             {selectedCar?.name || 'Vehicle not selected'}
                           </span>
                         </div>
-                        <Badge variant="outline" className="font-medium">
+                        <Badge 
+                          variant={order.status === 'pending' ? 'secondary' : 'default'}
+                          className="font-medium"
+                        >
                           {order.status}
                         </Badge>
                       </div>
@@ -111,7 +112,7 @@ const OrdersWidget = () => {
                   </div>
                 );
               })}
-            </>
+            </div>
           )}
         </div>
       </CardContent>
