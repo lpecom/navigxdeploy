@@ -5,6 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
+interface SelectedCar {
+  name: string;
+  // Add other properties if needed
+}
+
 const OrdersWidget = () => {
   const { data: orders, isLoading } = useQuery({
     queryKey: ['recent-orders'],
@@ -67,7 +72,7 @@ const OrdersWidget = () => {
                         <span className="font-medium">#{order.reservation_number}</span>
                         <span className="text-sm text-muted-foreground">·</span>
                         <span className="text-sm text-muted-foreground">
-                          {order.selected_car?.name || 'Vehicle not selected'}
+                          {(order.selected_car as SelectedCar)?.name || 'Vehicle not selected'}
                         </span>
                       </div>
                       <Badge variant="outline" className="font-medium">

@@ -6,6 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, addWeeks } from "date-fns";
 
+interface SelectedCar {
+  name: string;
+  // Add other properties if needed
+}
+
 const ScheduleWidget = () => {
   const { data: schedules, isLoading } = useQuery({
     queryKey: ['upcoming-schedules'],
@@ -113,7 +118,7 @@ const ScheduleWidget = () => {
                               {schedule.driver?.full_name}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {schedule.selected_car?.name}
+                              {(schedule.selected_car as SelectedCar)?.name}
                             </p>
                           </div>
                         </div>
