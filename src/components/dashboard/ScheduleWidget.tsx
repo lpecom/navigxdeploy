@@ -1,8 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { format, startOfWeek, endOfWeek, eachDayOfInterval, addWeeks } from "date-fns";
 
 const ScheduleWidget = () => {
   const { data: schedules, isLoading } = useQuery({
@@ -14,68 +16,112 @@ const ScheduleWidget = () => {
           id,
           pickup_date,
           pickup_time,
-          driver:driver_details(full_name)
+          driver:driver_details(full_name),
+          selected_car
         `)
         .gte('pickup_date', new Date().toISOString())
         .order('pickup_date', { ascending: true })
-        .limit(5);
+        .limit(10);
 
       if (error) throw error;
       return data;
     },
   });
 
+  const now = new Date();
+  const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+  const weekDays = eachDayOfInterval({
+    start: weekStart,
+    end: endOfWeek(weekStart, { weekStartsOn: 1 }),
+  });
+
+  const nextWeekDays = eachDayOfInterval({
+    start: startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 }),
+    end: endOfWeek(addWeeks(now, 1), { weekStartsOn: 1 }),
+  });
+
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-        <CardTitle className="text-xl font-semibold">Agenda</CardTitle>
-        <Badge variant="secondary" className="font-medium">
-          {isLoading ? '...' : schedules?.length || 0} agendamentos
-        </Badge>
+    <Card className="border-0 shadow-none">
+      <CardHeader className="flex flex-row items-center justify-between pb-2 px-0">
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold">Schedule</h3>
+          <Badge variant="secondary" className="rounded-full">
+            {isLoading ? '...' : schedules?.length || 0}
+          </Badge>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex rounded-lg bg-gray-100 p-1">
+            <Button variant="ghost" size="sm" className="text-sm">Day</Button>
+            <Button variant="default" size="sm" className="text-sm">Week</Button>
+            <Button variant="ghost" size="sm" className="text-sm">Month</Button>
+          </div>
+          <Button variant="ghost" className="text-sm text-muted-foreground hover:text-primary">
+            See all <ChevronRight className="w-4 h-4 ml-1" />
+          </Button>
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-0">
         <div className="space-y-4">
           {isLoading ? (
             <div className="animate-pulse space-y-3">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="flex items-center gap-4 p-3 rounded-lg border">
-                  <div className="w-10 h-10 bg-gray-200 rounded-lg" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-1/4" />
-                    <div className="h-3 bg-gray-200 rounded w-1/3" />
+                <div key={i} className="h-20 bg-gray-50 rounded-lg" />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {[weekDays, nextWeekDays].map((days, weekIndex) => (
+                <div key={weekIndex} className="space-y-2">
+                  <div className="grid grid-cols-7 gap-1">
+                    {days.map((day, i) => {
+                      const daySchedules = schedules?.filter(
+                        s => s.pickup_date === format(day, 'yyyy-MM-dd')
+                      );
+                      const isToday = format(day, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
+
+                      return (
+                        <div key={i} className="text-center">
+                          <div className="text-xs text-muted-foreground mb-1">
+                            {format(day, 'EEE')}
+                          </div>
+                          <div className={`
+                            rounded-full w-8 h-8 mx-auto flex items-center justify-center text-sm
+                            ${isToday ? 'bg-primary text-white' : 'hover:bg-gray-100 cursor-pointer'}
+                            ${daySchedules?.length ? 'font-semibold' : ''}
+                          `}>
+                            {format(day, 'd')}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="space-y-1">
+                    {schedules
+                      ?.filter(s => days.some(d => 
+                        format(d, 'yyyy-MM-dd') === s.pickup_date
+                      ))
+                      .map((schedule) => (
+                        <div
+                          key={schedule.id}
+                          className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="w-12 text-sm text-muted-foreground">
+                            {schedule.pickup_time}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">
+                              {schedule.driver?.full_name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {schedule.selected_car?.name}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
                   </div>
                 </div>
               ))}
             </div>
-          ) : (
-            <>
-              {schedules?.map((schedule) => (
-                <div
-                  key={schedule.id}
-                  className="flex items-center gap-4 p-3 rounded-lg border hover:bg-gray-50 transition-colors"
-                >
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Calendar className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{schedule.driver?.full_name || 'Cliente não identificado'}</p>
-                    <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
-                      <Calendar className="w-4 h-4" />
-                      <span>
-                        {new Date(schedule.pickup_date).toLocaleDateString('pt-BR')}{' '}
-                        {schedule.pickup_time}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {(!schedules || schedules.length === 0) && (
-                <div className="text-center py-6">
-                  <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500">Nenhum agendamento próximo</p>
-                </div>
-              )}
-            </>
           )}
         </div>
       </CardContent>
