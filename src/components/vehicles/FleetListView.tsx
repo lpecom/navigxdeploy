@@ -9,14 +9,14 @@ import { FleetLoadingState } from "./fleet/FleetLoadingState";
 import { FleetErrorState } from "./fleet/FleetErrorState";
 import { FleetEmptyState } from "./fleet/FleetEmptyState";
 import { FleetVehicleProfileDialog } from "./fleet/FleetVehicleProfileDialog";
-import type { FleetVehicle } from "@/types/vehicles";
+import type { FleetVehicle, VehicleStatus } from "@/types/vehicles";
 
 export const FleetListView = () => {
   const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<FleetVehicle>>({});
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<VehicleStatus | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
 
   const { data: allVehicles, refetch, isLoading, error } = useQuery({
@@ -52,25 +52,7 @@ export const FleetListView = () => {
       vehicle.plate?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vehicle.car_model?.name?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = !statusFilter || (() => {
-      const status = vehicle.status?.toLowerCase();
-      switch (statusFilter) {
-        case 'available':
-          return status === 'available' || status === 'disponível';
-        case 'maintenance':
-          return status?.includes('maintenance') || status?.includes('manutenção');
-        case 'rented':
-          return status === 'rented' || status === 'alugado';
-        case 'funilaria':
-          return status?.includes('funilaria');
-        case 'desativado':
-          return status?.includes('desativado');
-        case 'diretoria':
-          return status?.includes('diretoria');
-        default:
-          return true;
-      }
-    })();
+    const matchesStatus = !statusFilter || vehicle.status === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
@@ -112,7 +94,7 @@ export const FleetListView = () => {
     }
   };
 
-  const handleFilterChange = (status: string | null) => {
+  const handleFilterChange = (status: VehicleStatus | null) => {
     setStatusFilter(status === statusFilter ? null : status);
   };
 

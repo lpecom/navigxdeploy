@@ -33,6 +33,8 @@ export interface MaintenanceRecord {
   updated_at: string;
 }
 
+export type VehicleStatus = 'available' | 'rented' | 'maintenance' | 'body_shop' | 'deactivated' | 'management';
+
 export interface FleetVehicle {
   id: string;
   car_model_id?: string;
@@ -49,7 +51,7 @@ export interface FleetVehicle {
   state?: string;
   chassis_number?: string;
   renavam_number?: string;
-  status?: string;
+  status?: VehicleStatus;
   contract_number?: string;
   customer_id?: string;
   customer?: {
