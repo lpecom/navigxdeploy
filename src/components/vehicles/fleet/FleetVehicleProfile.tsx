@@ -7,6 +7,7 @@ import { VehicleInfoTab } from "./profile/VehicleInfoTab";
 import { MaintenanceTab } from "./profile/MaintenanceTab";
 import { HistoryTab } from "./profile/HistoryTab";
 import { IncidentsTab } from "./profile/IncidentsTab";
+import { StatusLabel } from "./status/StatusLabel";
 import type { MaintenanceRecord, FleetVehicle, CarModel } from "@/types/vehicles";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -94,9 +95,12 @@ export const FleetVehicleProfile = ({ vehicleId }: FleetVehicleProfileProps) => 
         <div className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold">
-                {vehicleDetails.car_model?.name}
-              </h2>
+              <div className="flex items-center gap-3 mb-2">
+                <h2 className="text-2xl font-bold">
+                  {vehicleDetails.car_model?.name}
+                </h2>
+                <StatusLabel status={vehicleDetails.status} size="lg" />
+              </div>
               <p className="text-muted-foreground">
                 Placa: {vehicleDetails.plate}
               </p>
