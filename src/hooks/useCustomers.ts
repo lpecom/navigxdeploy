@@ -3,92 +3,60 @@ import { supabase } from "@/integrations/supabase/client";
 import { subDays } from "date-fns";
 
 export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
-  // First fetch fleet vehicles to get customers with active rentals
-  const { data: fleetVehicles } = useQuery({
-    queryKey: ['fleet-vehicles'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('fleet_vehicles')
-        .select(`
-          id,
-          plate,
-          customer_id,
-          status,
-          car_model:car_models(name)
-        `)
-        .eq('status', 'rented');
-      
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
-  // Get array of customer IDs with active rentals and their vehicle info
-  const customerVehicleMap = new Map(
-    fleetVehicles?.map(vehicle => [
-      vehicle.customer_id,
-      {
-        vehicleId: vehicle.id,
-        plate: vehicle.plate,
-        model: vehicle.car_model?.name
-      }
-    ]) || []
-  );
-
-  // Then fetch all customers and update their status based on fleet data
+  // First fetch all customers with their rental status
   const { data: customers, isLoading } = useQuery({
-    queryKey: ['customers', customerVehicleMap, searchTerm, statusFilter],
+    queryKey: ['customers', searchTerm, statusFilter],
     queryFn: async () => {
-      // First, get all customers
-      const { data: allCustomers, error: customersError } = await supabase
+      // Get all customers with their active rentals
+      const { data: customersWithRentals, error: customersError } = await supabase
         .from('customers')
-        .select('*')
+        .select(`
+          *,
+          fleet_vehicles!fleet_vehicles_customer_id_fkey (
+            id,
+            plate,
+            status,
+            car_model:car_models (
+              name
+            )
+          )
+        `)
         .order('created_at', { ascending: false });
       
       if (customersError) throw customersError;
 
       const ninetyDaysAgo = subDays(new Date(), 90);
 
-      // Update customer statuses based on fleet data and last rental date
-      const updatedCustomers = await Promise.all((allCustomers || []).map(async (customer) => {
-        const hasActiveRental = customerVehicleMap.has(customer.id);
-        let newStatus = customer.status;
+      // Process customers to determine their current status
+      return (customersWithRentals || []).map(customer => {
+        const activeRental = customer.fleet_vehicles?.find(
+          vehicle => vehicle.status === 'rented'
+        );
 
+        let status = customer.status;
+        
+        // Only update status if it's not blocked
         if (customer.status !== 'blocked') {
-          if (hasActiveRental) {
-            newStatus = 'active_rental';
+          if (activeRental) {
+            status = 'active_rental';
           } else if (customer.last_rental_date && new Date(customer.last_rental_date) > ninetyDaysAgo) {
-            newStatus = 'active';
+            status = 'active';
           } else {
-            newStatus = 'inactive';
-          }
-        }
-
-        // If status needs to be updated in the database
-        if (customer.status !== newStatus) {
-          const { error: updateError } = await supabase
-            .from('customers')
-            .update({ 
-              status: newStatus,
-              last_rental_date: hasActiveRental ? new Date().toISOString() : customer.last_rental_date
-            })
-            .eq('id', customer.id);
-
-          if (updateError) {
-            console.error('Error updating customer status:', updateError);
+            status = 'inactive';
           }
         }
 
         return {
           ...customer,
-          status: newStatus,
-          rented_vehicle: customerVehicleMap.get(customer.id)
+          status,
+          rented_vehicle: activeRental ? {
+            vehicleId: activeRental.id,
+            plate: activeRental.plate,
+            model: activeRental.car_model?.name
+          } : null
         };
-      }));
-
-      return updatedCustomers;
+      });
     },
-    refetchInterval: 30000, // Refetch every 30 seconds to keep statuses in sync
   });
 
   // Filter customers based on search and status
@@ -105,7 +73,7 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
     return matchesSearch && matchesStatus;
   });
 
-  // Calculate counts
+  // Calculate counts based on actual rental data
   const counts = {
     activeRental: customers?.filter(c => c.status === 'active_rental').length || 0,
     active: customers?.filter(c => c.status === 'active').length || 0,
@@ -116,7 +84,6 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
   return {
     customers: filteredCustomers,
     isLoading,
-    counts,
-    fleetVehicles
+    counts
   };
 };
