@@ -84,7 +84,7 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Categoria</span>
-              <span className="font-medium">{car.category?.name || 'Sem categoria'}</span>
+              <span className="font-medium">{car.category?.name || 'Sem Categoria'}</span>
             </div>
 
             {fleetStats && fleetStats.total > 0 && (
