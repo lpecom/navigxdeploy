@@ -13,7 +13,6 @@ interface VehicleCardProps {
 
 export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
   const navigate = useNavigate();
-  const brandLogoUrl = car.brand_logo_url;
 
   const { data: fleetStats } = useQuery({
     queryKey: ['fleet-stats', car.id],
