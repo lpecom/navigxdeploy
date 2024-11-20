@@ -4,10 +4,23 @@ import { ChevronRight, Phone } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Json } from "@/integrations/supabase/types";
 
 interface SelectedCar {
   name: string;
   // Add other properties if needed
+}
+
+interface CheckoutSession {
+  id: string;
+  reservation_number: number;
+  driver: {
+    full_name: string;
+    phone?: string;
+  };
+  created_at: string;
+  status: string;
+  selected_car: Json;
 }
 
 const OrdersWidget = () => {
@@ -28,7 +41,7 @@ const OrdersWidget = () => {
         .limit(5);
 
       if (error) throw error;
-      return data;
+      return data as CheckoutSession[];
     },
   });
 
@@ -61,38 +74,43 @@ const OrdersWidget = () => {
             </div>
           ) : (
             <>
-              {orders?.map((order) => (
-                <div
-                  key={order.id}
-                  className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">#{order.reservation_number}</span>
-                        <span className="text-sm text-muted-foreground">·</span>
-                        <span className="text-sm text-muted-foreground">
-                          {(order.selected_car as SelectedCar)?.name || 'Vehicle not selected'}
-                        </span>
-                      </div>
-                      <Badge variant="outline" className="font-medium">
-                        {order.status}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-4 mt-2">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span>{order.driver?.full_name}</span>
-                      </div>
-                      {order.driver?.phone && (
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <Phone className="w-3 h-3" />
-                          <span>{order.driver.phone}</span>
+              {orders?.map((order) => {
+                // First cast to unknown, then to SelectedCar
+                const selectedCar = order.selected_car as unknown as SelectedCar;
+                
+                return (
+                  <div
+                    key={order.id}
+                    className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">#{order.reservation_number}</span>
+                          <span className="text-sm text-muted-foreground">·</span>
+                          <span className="text-sm text-muted-foreground">
+                            {selectedCar?.name || 'Vehicle not selected'}
+                          </span>
                         </div>
-                      )}
+                        <Badge variant="outline" className="font-medium">
+                          {order.status}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-4 mt-2">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <span>{order.driver?.full_name}</span>
+                        </div>
+                        {order.driver?.phone && (
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <Phone className="w-3 h-3" />
+                            <span>{order.driver.phone}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </>
           )}
         </div>

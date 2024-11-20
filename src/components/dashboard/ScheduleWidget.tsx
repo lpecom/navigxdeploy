@@ -5,10 +5,21 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, addWeeks } from "date-fns";
+import { Json } from "@/integrations/supabase/types";
 
 interface SelectedCar {
   name: string;
   // Add other properties if needed
+}
+
+interface CheckoutSession {
+  id: string;
+  pickup_date: string;
+  pickup_time: string;
+  driver: {
+    full_name: string;
+  };
+  selected_car: Json;
 }
 
 const ScheduleWidget = () => {
@@ -29,7 +40,7 @@ const ScheduleWidget = () => {
         .limit(10);
 
       if (error) throw error;
-      return data;
+      return data as CheckoutSession[];
     },
   });
 
@@ -105,24 +116,29 @@ const ScheduleWidget = () => {
                       ?.filter(s => days.some(d => 
                         format(d, 'yyyy-MM-dd') === s.pickup_date
                       ))
-                      .map((schedule) => (
-                        <div
-                          key={schedule.id}
-                          className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="w-12 text-sm text-muted-foreground">
-                            {schedule.pickup_time}
+                      .map((schedule) => {
+                        // First cast to unknown, then to SelectedCar
+                        const selectedCar = schedule.selected_car as unknown as SelectedCar;
+                        
+                        return (
+                          <div
+                            key={schedule.id}
+                            className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="w-12 text-sm text-muted-foreground">
+                              {schedule.pickup_time}
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">
+                                {schedule.driver?.full_name}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {selectedCar?.name}
+                              </p>
+                            </div>
                           </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">
-                              {schedule.driver?.full_name}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {(schedule.selected_car as SelectedCar)?.name}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                   </div>
                 </div>
               ))}
