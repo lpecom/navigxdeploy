@@ -53,6 +53,15 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
                 alt={car.name}
                 className="w-full h-full object-cover"
               />
+              {car.brand_logo_url && (
+                <div className="absolute top-2 right-2 bg-white/90 p-1.5 rounded-lg">
+                  <img 
+                    src={car.brand_logo_url} 
+                    alt="Brand logo"
+                    className="w-6 h-6"
+                  />
+                </div>
+              )}
             </div>
           ) : (
             <div className="aspect-video w-full bg-gray-100 rounded-lg flex items-center justify-center">
