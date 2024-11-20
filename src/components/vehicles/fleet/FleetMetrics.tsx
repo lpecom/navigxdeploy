@@ -16,21 +16,20 @@ export const FleetMetrics = ({ vehicles, onFilterChange, activeFilter }: FleetMe
     v.status?.toLowerCase() === 'disponível'
   ).length;
   const maintenanceVehicles = vehicles.filter(v => 
-    v.status?.toLowerCase().includes('maintenance') || 
-    v.status?.toLowerCase().includes('manutenção')
+    v.status?.toLowerCase() === 'maintenance'
   ).length;
   const rentedVehicles = vehicles.filter(v => 
     v.status?.toLowerCase() === 'rented' || 
     v.status?.toLowerCase() === 'alugado'
   ).length;
   const bodyShopVehicles = vehicles.filter(v => 
-    v.status?.toLowerCase().includes('funilaria')
+    v.status?.toLowerCase() === 'body_shop'
   ).length;
   const deactivatedVehicles = vehicles.filter(v => 
     v.status?.toLowerCase().includes('desativado')
   ).length;
   const managementVehicles = vehicles.filter(v => 
-    v.status?.toLowerCase().includes('diretoria')
+    v.status?.toLowerCase() === 'management'
   ).length;
   const accidentVehicles = vehicles.filter(v => 
     v.status?.toLowerCase() === 'accident'
