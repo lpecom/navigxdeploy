@@ -35,6 +35,7 @@ serve(async (req) => {
     const headers = lines[0].toLowerCase().split(',').map(h => h.trim())
     console.log('Original headers:', headers)
 
+    // Extended field mappings to include all possible customer fields
     const fieldMappings: { [key: string]: string[] } = {
       cpf: ['cpf', 'cpf/passport', 'document', 'documento', 'cpf/passaporte'],
       full_name: ['full_name', 'name', 'nome', 'full name', 'nome completo'],
@@ -43,7 +44,17 @@ serve(async (req) => {
       address: ['address', 'endereco', 'endereço'],
       city: ['city', 'cidade'],
       state: ['state', 'estado', 'uf'],
-      postal_code: ['postal_code', 'cep', 'zip', 'zip code']
+      postal_code: ['postal_code', 'cep', 'zip', 'zip code'],
+      rg: ['rg', 'identity', 'identidade'],
+      birth_date: ['birth_date', 'birthdate', 'data_nascimento', 'nascimento'],
+      nationality: ['nationality', 'nacionalidade'],
+      gender: ['gender', 'sexo', 'genero'],
+      mobile_phone: ['mobile_phone', 'celular', 'mobile'],
+      other_phone: ['other_phone', 'outro_telefone', 'telefone2'],
+      license_number: ['license_number', 'cnh', 'drivers_license', 'carteira_motorista'],
+      license_category: ['license_category', 'categoria_cnh', 'cnh_categoria'],
+      license_expiry: ['license_expiry', 'cnh_validade', 'license_expiration'],
+      registration_type: ['registration_type', 'tipo_registro', 'tipo_cadastro']
     }
 
     const findColumnName = (field: string): string | undefined => {
@@ -69,27 +80,15 @@ serve(async (req) => {
     const BATCH_SIZE = 5
     const BATCH_DELAY = 300
 
-    const cpfColumn = findColumnName('cpf')
-    const nameColumn = findColumnName('full_name')
-    const emailColumn = findColumnName('email')
-    const phoneColumn = findColumnName('phone')
-    const addressColumn = findColumnName('address')
-    const cityColumn = findColumnName('city')
-    const stateColumn = findColumnName('state')
-    const postalCodeColumn = findColumnName('postal_code')
+    // Find column names for all fields
+    const columnMappings = Object.keys(fieldMappings).reduce((acc, field) => {
+      acc[field] = findColumnName(field)
+      return acc
+    }, {} as Record<string, string | undefined>)
 
-    console.log('Found columns:', {
-      cpfColumn,
-      nameColumn,
-      emailColumn,
-      phoneColumn,
-      addressColumn,
-      cityColumn,
-      stateColumn,
-      postalCodeColumn
-    })
+    console.log('Found column mappings:', columnMappings)
 
-    // First, get all customers with active rentals from fleet_vehicles
+    // Get active rentals
     const { data: activeRentals } = await supabase
       .from('fleet_vehicles')
       .select('customer_id, customers!inner(cpf)')
@@ -101,26 +100,47 @@ serve(async (req) => {
 
     console.log('Active rental CPFs:', activeRentalCpfs)
 
+    const formatDate = (dateStr: string) => {
+      if (!dateStr) return null
+      try {
+        const date = new Date(dateStr)
+        return date.toISOString().split('T')[0]
+      } catch (error) {
+        return null
+      }
+    }
+
     for (let i = 0; i < rows.length; i += BATCH_SIZE) {
       const batch = rows.slice(i, Math.min(i + BATCH_SIZE, rows.length))
         .map((row: any) => {
           try {
-            const cpf = String(row[cpfColumn || 'cpf'] || '').replace(/[^\d]/g, '')
+            const cpf = String(row[columnMappings.cpf || 'cpf'] || '').replace(/[^\d]/g, '')
             if (!cpf) {
               throw new Error('CPF is required')
             }
 
             const cleanPhone = (phone: string) => phone?.replace(/[^\d]/g, '') || ''
 
+            // Create a comprehensive customer object with all possible fields
             return {
-              full_name: row[nameColumn || 'full_name'] || row[nameColumn || 'name'] || '',
-              email: row[emailColumn || 'email'] || `${cpf}@placeholder.com`,
+              full_name: row[columnMappings.full_name || 'full_name'] || '',
+              email: row[columnMappings.email || 'email'] || `${cpf}@placeholder.com`,
               cpf,
-              phone: cleanPhone(row[phoneColumn || 'phone']),
-              address: row[addressColumn || 'address'] || null,
-              city: row[cityColumn || 'city'] || null,
-              state: row[stateColumn || 'state'] || null,
-              postal_code: row[postalCodeColumn || 'postal_code'] || null,
+              phone: cleanPhone(row[columnMappings.phone || 'phone']),
+              address: row[columnMappings.address || 'address'] || null,
+              city: row[columnMappings.city || 'city'] || null,
+              state: row[columnMappings.state || 'state'] || null,
+              postal_code: row[columnMappings.postal_code || 'postal_code'] || null,
+              rg: row[columnMappings.rg || 'rg'] || null,
+              birth_date: formatDate(row[columnMappings.birth_date || 'birth_date']) || null,
+              nationality: row[columnMappings.nationality || 'nationality'] || null,
+              gender: row[columnMappings.gender || 'gender'] || null,
+              mobile_phone: cleanPhone(row[columnMappings.mobile_phone || 'mobile_phone']),
+              other_phone: cleanPhone(row[columnMappings.other_phone || 'other_phone']),
+              license_number: row[columnMappings.license_number || 'license_number'] || null,
+              license_category: row[columnMappings.license_category || 'license_category'] || null,
+              license_expiry: formatDate(row[columnMappings.license_expiry || 'license_expiry']) || null,
+              registration_type: row[columnMappings.registration_type || 'registration_type'] || 'regular',
               status: activeRentalCpfs.has(cpf) ? 'active_rental' : 'active'
             }
           } catch (error) {
