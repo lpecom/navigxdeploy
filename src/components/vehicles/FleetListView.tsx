@@ -9,6 +9,8 @@ import { FleetLoadingState } from "./fleet/FleetLoadingState";
 import { FleetErrorState } from "./fleet/FleetErrorState";
 import { FleetEmptyState } from "./fleet/FleetEmptyState";
 import { FleetVehicleProfileDialog } from "./fleet/FleetVehicleProfileDialog";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 import type { FleetVehicle, VehicleStatus } from "@/types/vehicles";
 
 export const FleetListView = () => {
@@ -18,6 +20,7 @@ export const FleetListView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<VehicleStatus | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const { data: allVehicles, refetch, isLoading, error } = useQuery({
     queryKey: ['fleet-vehicles-list'],
@@ -46,6 +49,33 @@ export const FleetListView = () => {
       return (data || []).filter(vehicle => vehicle && vehicle.plate) as FleetVehicle[];
     },
   });
+
+  const handleSync = async () => {
+    setIsSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-fleet-data');
+      
+      if (error) throw error;
+
+      toast({
+        title: "Sincronização concluída",
+        description: `${data.processed} veículos processados.${
+          data.errors?.length ? ` ${data.errors.length} erros encontrados.` : ''
+        }`,
+      });
+
+      refetch();
+    } catch (error) {
+      console.error("Error syncing fleet:", error);
+      toast({
+        title: "Erro",
+        description: "Falha ao sincronizar dados da frota. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const filteredVehicles = allVehicles?.filter(vehicle => {
     const matchesSearch = !searchTerm || 
@@ -114,11 +144,22 @@ export const FleetListView = () => {
 
   return (
     <div className="space-y-6">
-      <FleetMetrics 
-        vehicles={allVehicles || []} 
-        onFilterChange={handleFilterChange}
-        activeFilter={statusFilter}
-      />
+      <div className="flex items-center justify-between">
+        <FleetMetrics 
+          vehicles={allVehicles || []} 
+          onFilterChange={handleFilterChange}
+          activeFilter={statusFilter}
+        />
+        <Button
+          onClick={handleSync}
+          disabled={isSyncing}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+          {isSyncing ? 'Sincronizando...' : 'Sincronizar Frota'}
+        </Button>
+      </div>
       
       <FleetHeader
         searchTerm={searchTerm}
