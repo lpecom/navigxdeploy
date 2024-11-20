@@ -35,21 +35,21 @@ export const CustomerFilters = ({
     { 
       label: 'Com Aluguel Ativo', 
       value: 'active_rental', 
-      count: counts.activeRental, 
+      count: counts.activeRental || 0, 
       color: 'bg-blue-100 text-blue-800',
       description: 'Clientes com veículos alugados atualmente'
     },
     { 
       label: 'Recentes', 
       value: 'active', 
-      count: counts.active, 
+      count: counts.active || 0, 
       color: 'bg-green-100 text-green-800',
       description: 'Clientes ativos nos últimos 90 dias'
     },
     { 
       label: 'Inativos', 
       value: 'inactive', 
-      count: counts.inactive, 
+      count: counts.inactive || 0, 
       color: 'bg-gray-100 text-gray-800',
       description: 'Sem atividade nos últimos 90 dias'
     },
@@ -63,8 +63,6 @@ export const CustomerFilters = ({
   ];
 
   const handleFilterChange = (value: string) => {
-    // If the value is already selected, clear the filter
-    // Otherwise, set it as the only selected filter
     onStatusFilterChange(statusFilter.includes(value) ? [] : [value]);
   };
 
@@ -87,7 +85,7 @@ export const CustomerFilters = ({
               Status
               {statusFilter.length > 0 && (
                 <Badge variant="secondary" className="ml-1">
-                  1
+                  {statusFilter.length}
                 </Badge>
               )}
             </Button>
@@ -116,7 +114,6 @@ export const CustomerFilters = ({
         </DropdownMenu>
       </div>
 
-      {/* Status Summary */}
       <div className="flex gap-4 flex-wrap">
         {statusOptions.map((option) => (
           <button

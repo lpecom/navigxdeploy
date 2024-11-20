@@ -73,7 +73,7 @@ export const useCustomers = (searchTerm: string, statusFilter: string[]) => {
     return matchesSearch && matchesStatus;
   });
 
-  // Calculate counts based on actual rental data
+  // Calculate counts based on all customers (not filtered)
   const counts = {
     activeRental: customers?.filter(c => c.status === 'active_rental').length || 0,
     active: customers?.filter(c => c.status === 'active').length || 0,
