@@ -1,0 +1,20 @@
+export const fieldMappings: { [key: string]: string[] } = {
+  cpf: ['cpf', 'cpf/passport', 'document', 'documento', 'cpf/passaporte'],
+  full_name: ['full_name', 'name', 'nome', 'full name', 'nome completo'],
+  email: ['email', 'e-mail', 'correio'],
+  phone: ['phone', 'telefone', 'celular', 'mobile'],
+  address: ['address', 'endereco', 'endereço'],
+  city: ['city', 'cidade'],
+  state: ['state', 'estado', 'uf'],
+  postal_code: ['postal_code', 'cep', 'zip', 'zip code'],
+  rg: ['rg', 'identity', 'identidade'],
+  birth_date: ['birth_date', 'birthdate', 'data_nascimento', 'nascimento'],
+  nationality: ['nationality', 'nacionalidade'],
+  gender: ['gender', 'sexo', 'genero'],
+  mobile_phone: ['mobile_phone', 'celular', 'mobile'],
+  other_phone: ['other_phone', 'outro_telefone', 'telefone2'],
+  license_number: ['license_number', 'cnh', 'drivers_license', 'carteira_motorista'],
+  license_category: ['license_category', 'categoria_cnh', 'cnh_categoria'],
+  license_expiry: ['license_expiry', 'cnh_validade', 'license_expiration'],
+  registration_type: ['registration_type', 'tipo_registro', 'tipo_cadastro']
+};
