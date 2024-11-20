@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Car } from "lucide-react";
 import { getBrandLogo } from "@/utils/brandLogos";
@@ -15,6 +15,7 @@ interface VehicleCardProps {
 
 export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
   const brandLogoUrl = getBrandLogo(car.name);
+  const brandName = car.name.split(' ')[0];
 
   const { data: fleetStats } = useQuery({
     queryKey: ['fleet-stats', car.id],
@@ -29,13 +30,18 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
         return null;
       }
 
-      const statuses = vehicles?.map(v => v.status?.toLowerCase() || '');
+      const statuses = vehicles?.map(v => v.status) || [];
       
       return {
-        rented: statuses.filter(s => s.includes('alugado') || s.includes('locado')).length || 0,
-        available: statuses.filter(s => s.includes('disponivel') || s.includes('disponível')).length || 0,
-        forSale: statuses.filter(s => s.includes('venda')).length || 0,
-        total: vehicles?.length || 0
+        rented: statuses.filter(s => s === 'rented').length,
+        available: statuses.filter(s => s === 'available').length,
+        forSale: statuses.filter(s => s === 'for_sale').length,
+        maintenance: statuses.filter(s => s === 'maintenance').length,
+        bodyShop: statuses.filter(s => s === 'body_shop').length,
+        deactivated: statuses.filter(s => s === 'deactivated').length,
+        management: statuses.filter(s => s === 'management').length,
+        accident: statuses.filter(s => s === 'accident').length,
+        total: statuses.length
       };
     }
   });
@@ -52,15 +58,15 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
             {brandLogoUrl ? (
               <img 
                 src={brandLogoUrl} 
-                alt={`${car.name} brand`}
+                alt={`${brandName} brand`}
                 className="w-8 h-8 object-contain"
               />
             ) : (
               <Car className="w-8 h-8 text-muted-foreground" />
             )}
             <div>
-              <p className="text-sm text-muted-foreground font-medium">Marca</p>
-              <h3 className="font-semibold text-lg">{car.name.split(' ')[0]}</h3>
+              <p className="text-sm text-muted-foreground font-medium">{brandName}</p>
+              <h3 className="font-semibold text-lg">{car.name.split(' ').slice(1).join(' ')}</h3>
             </div>
           </div>
         </CardHeader>
@@ -83,18 +89,54 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
 
             {fleetStats && fleetStats.total > 0 && (
               <div className="space-y-2 pt-2 border-t text-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Alugados</span>
-                  <span className="font-medium text-orange-600">{fleetStats.rented}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Disponíveis</span>
-                  <span className="font-medium text-green-600">{fleetStats.available}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">À Venda</span>
-                  <span className="font-medium text-blue-600">{fleetStats.forSale}</span>
-                </div>
+                {fleetStats.available > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Disponíveis</span>
+                    <span className="font-medium text-green-600">{fleetStats.available}</span>
+                  </div>
+                )}
+                {fleetStats.rented > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Alugados</span>
+                    <span className="font-medium text-orange-600">{fleetStats.rented}</span>
+                  </div>
+                )}
+                {fleetStats.maintenance > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Em Manutenção</span>
+                    <span className="font-medium text-yellow-600">{fleetStats.maintenance}</span>
+                  </div>
+                )}
+                {fleetStats.bodyShop > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Funilaria</span>
+                    <span className="font-medium text-purple-600">{fleetStats.bodyShop}</span>
+                  </div>
+                )}
+                {fleetStats.accident > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Acidente</span>
+                    <span className="font-medium text-red-600">{fleetStats.accident}</span>
+                  </div>
+                )}
+                {fleetStats.deactivated > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Desativados</span>
+                    <span className="font-medium text-gray-600">{fleetStats.deactivated}</span>
+                  </div>
+                )}
+                {fleetStats.management > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Diretoria</span>
+                    <span className="font-medium text-blue-600">{fleetStats.management}</span>
+                  </div>
+                )}
+                {fleetStats.forSale > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">À Venda</span>
+                    <span className="font-medium text-blue-600">{fleetStats.forSale}</span>
+                  </div>
+                )}
               </div>
             )}
 
