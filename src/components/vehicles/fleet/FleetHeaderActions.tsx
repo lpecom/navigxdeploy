@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Download, Upload } from "lucide-react";
-import { useState } from "react";
 
 interface FleetHeaderActionsProps {
   onSync: () => Promise<void>;
@@ -33,7 +32,7 @@ export const FleetHeaderActions = ({
         className="flex items-center gap-2"
       >
         <Upload className={`w-4 h-4 ${isUploading ? 'animate-spin' : ''}`} />
-        {isUploading ? 'Importando...' : 'Importar CSV'}
+        {isUploading ? 'Importando...' : 'Importar dados do template'}
       </Button>
       <Button
         onClick={onExport}
@@ -41,7 +40,7 @@ export const FleetHeaderActions = ({
         className="flex items-center gap-2"
       >
         <Download className="w-4 h-4" />
-        Exportar CSV
+        Exportar dados em template
       </Button>
       <Button
         onClick={onSync}
