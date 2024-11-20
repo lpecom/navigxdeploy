@@ -1,6 +1,8 @@
 import { useSession } from '@supabase/auth-helpers-react';
 import StatsPanel from "@/components/dashboard/StatsPanel";
 import RentalsList from "@/components/dashboard/RentalsList";
+import OrdersWidget from "@/components/dashboard/OrdersWidget";
+import ScheduleWidget from "@/components/dashboard/ScheduleWidget";
 
 const Dashboard = () => {
   const session = useSession();
@@ -18,6 +20,12 @@ const Dashboard = () => {
 
       <div className="grid gap-8">
         <StatsPanel />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <OrdersWidget />
+          <ScheduleWidget />
+        </div>
+        
         <RentalsList />
       </div>
     </div>
