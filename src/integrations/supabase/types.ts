@@ -290,6 +290,13 @@ export type Database = {
           birth_date: string | null
           city: string | null
           commercial_address: Json | null
+          commercial_city: string | null
+          commercial_complement: string | null
+          commercial_neighborhood: string | null
+          commercial_number: string | null
+          commercial_phone: string | null
+          commercial_postal_code: string | null
+          commercial_state: string | null
           contract_count: number | null
           correspondence_address: string | null
           cpf: string
@@ -300,10 +307,144 @@ export type Database = {
           gender: string | null
           id: string
           last_rental_date: string | null
+          license_category: string | null
+          license_expiry: string | null
+          license_number: string | null
+          license_record: string | null
           mobile_phone: string | null
           nationality: string | null
           other_phone: string | null
           phone: string
+          postal_code: string | null
+          registration_code: string | null
+          registration_date: string | null
+          registration_type: string | null
+          rental_days_count: number | null
+          residential_address: Json | null
+          residential_complement: string | null
+          residential_neighborhood: string | null
+          residential_number: string | null
+          residential_phone: string | null
+          rg: string | null
+          state: string | null
+          status: string | null
+          total_rentals: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          birth_date?: string | null
+          city?: string | null
+          commercial_address?: Json | null
+          commercial_city?: string | null
+          commercial_complement?: string | null
+          commercial_neighborhood?: string | null
+          commercial_number?: string | null
+          commercial_phone?: string | null
+          commercial_postal_code?: string | null
+          commercial_state?: string | null
+          contract_count?: number | null
+          correspondence_address?: string | null
+          cpf: string
+          created_at?: string | null
+          drivers_license?: Json | null
+          email: string
+          full_name: string
+          gender?: string | null
+          id?: string
+          last_rental_date?: string | null
+          license_category?: string | null
+          license_expiry?: string | null
+          license_number?: string | null
+          license_record?: string | null
+          mobile_phone?: string | null
+          nationality?: string | null
+          other_phone?: string | null
+          phone: string
+          postal_code?: string | null
+          registration_code?: string | null
+          registration_date?: string | null
+          registration_type?: string | null
+          rental_days_count?: number | null
+          residential_address?: Json | null
+          residential_complement?: string | null
+          residential_neighborhood?: string | null
+          residential_number?: string | null
+          residential_phone?: string | null
+          rg?: string | null
+          state?: string | null
+          status?: string | null
+          total_rentals?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          birth_date?: string | null
+          city?: string | null
+          commercial_address?: Json | null
+          commercial_city?: string | null
+          commercial_complement?: string | null
+          commercial_neighborhood?: string | null
+          commercial_number?: string | null
+          commercial_phone?: string | null
+          commercial_postal_code?: string | null
+          commercial_state?: string | null
+          contract_count?: number | null
+          correspondence_address?: string | null
+          cpf?: string
+          created_at?: string | null
+          drivers_license?: Json | null
+          email?: string
+          full_name?: string
+          gender?: string | null
+          id?: string
+          last_rental_date?: string | null
+          license_category?: string | null
+          license_expiry?: string | null
+          license_number?: string | null
+          license_record?: string | null
+          mobile_phone?: string | null
+          nationality?: string | null
+          other_phone?: string | null
+          phone?: string
+          postal_code?: string | null
+          registration_code?: string | null
+          registration_date?: string | null
+          registration_type?: string | null
+          rental_days_count?: number | null
+          residential_address?: Json | null
+          residential_complement?: string | null
+          residential_neighborhood?: string | null
+          residential_number?: string | null
+          residential_phone?: string | null
+          rg?: string | null
+          state?: string | null
+          status?: string | null
+          total_rentals?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      customers_backup: {
+        Row: {
+          address: string | null
+          birth_date: string | null
+          city: string | null
+          commercial_address: Json | null
+          contract_count: number | null
+          correspondence_address: string | null
+          cpf: string | null
+          created_at: string | null
+          drivers_license: Json | null
+          email: string | null
+          full_name: string | null
+          gender: string | null
+          id: string | null
+          last_rental_date: string | null
+          mobile_phone: string | null
+          nationality: string | null
+          other_phone: string | null
+          phone: string | null
           postal_code: string | null
           registration_code: string | null
           registration_date: string | null
@@ -323,18 +464,18 @@ export type Database = {
           commercial_address?: Json | null
           contract_count?: number | null
           correspondence_address?: string | null
-          cpf: string
+          cpf?: string | null
           created_at?: string | null
           drivers_license?: Json | null
-          email: string
-          full_name: string
+          email?: string | null
+          full_name?: string | null
           gender?: string | null
-          id?: string
+          id?: string | null
           last_rental_date?: string | null
           mobile_phone?: string | null
           nationality?: string | null
           other_phone?: string | null
-          phone: string
+          phone?: string | null
           postal_code?: string | null
           registration_code?: string | null
           registration_date?: string | null
@@ -354,18 +495,18 @@ export type Database = {
           commercial_address?: Json | null
           contract_count?: number | null
           correspondence_address?: string | null
-          cpf?: string
+          cpf?: string | null
           created_at?: string | null
           drivers_license?: Json | null
-          email?: string
-          full_name?: string
+          email?: string | null
+          full_name?: string | null
           gender?: string | null
-          id?: string
+          id?: string | null
           last_rental_date?: string | null
           mobile_phone?: string | null
           nationality?: string | null
           other_phone?: string | null
-          phone?: string
+          phone?: string | null
           postal_code?: string | null
           registration_code?: string | null
           registration_date?: string | null
