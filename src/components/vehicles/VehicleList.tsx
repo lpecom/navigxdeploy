@@ -44,7 +44,9 @@ const Vehicles = ({ view }: VehiclesProps) => {
 
           {view === 'fleet' && <FleetImport />}
 
-          <VehicleListContent view={view} vehicles={[]} />
+          {(view === 'models' || view === 'fleet') && (
+            <VehicleListContent view={view} vehicles={[]} />
+          )}
         </div>
       </div>
 
