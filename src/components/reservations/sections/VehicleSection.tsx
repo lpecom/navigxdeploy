@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Car, Wrench } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { StatusLabel } from "@/components/vehicles/fleet/status/StatusLabel";
+import type { VehicleStatus } from "@/types/vehicles";
 
 interface VehicleSectionProps {
   vehicle: {
@@ -11,6 +13,7 @@ interface VehicleSectionProps {
     mileage: number;
     lastService: string;
     nextServiceDue: string;
+    status: VehicleStatus;
   };
   onServiceRequest: () => void;
 }
@@ -30,6 +33,9 @@ export const VehicleSection = ({ vehicle, onServiceRequest }: VehicleSectionProp
             <div>
               <p className="text-sm font-medium">{vehicle.model}</p>
               <p className="text-sm text-muted-foreground">Placa: {vehicle.plate}</p>
+              <div className="mt-2">
+                <StatusLabel status={vehicle.status} />
+              </div>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
