@@ -42,7 +42,7 @@ export const getStatusInfo = (status: string | null) => {
     };
   }
 
-  if (statusLower.includes('funilaria')) {
+  if (statusLower.includes('funilaria') || statusLower === 'body_shop') {
     return {
       variant: 'warning' as const,
       icon: Car,
@@ -51,7 +51,7 @@ export const getStatusInfo = (status: string | null) => {
     };
   }
 
-  if (statusLower.includes('desativado')) {
+  if (statusLower.includes('desativado') || statusLower === 'deactivated') {
     return {
       variant: 'destructive' as const,
       icon: XOctagon,
@@ -60,7 +60,7 @@ export const getStatusInfo = (status: string | null) => {
     };
   }
 
-  if (statusLower.includes('diretoria')) {
+  if (statusLower.includes('diretoria') || statusLower === 'management') {
     return {
       variant: 'default' as const,
       icon: Shield,
