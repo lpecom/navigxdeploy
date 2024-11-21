@@ -13,7 +13,7 @@ interface AccessoryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   accessory: Accessory | null;
-  onSuccess: () => void;
+  onSuccess: (quantity?: number) => void;
 }
 
 export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: AccessoryDialogProps) => {
@@ -76,8 +76,8 @@ export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: Ac
         description: `Opcional ${accessory ? 'atualizado' : 'adicionado'} com sucesso.`,
       });
       
-      // Call onSuccess with quantity before closing the dialog
-      onSuccess();
+      // Call onSuccess with quantity
+      onSuccess(quantity);
       onOpenChange(false);
     } catch (error) {
       console.error('Error saving accessory:', error);
