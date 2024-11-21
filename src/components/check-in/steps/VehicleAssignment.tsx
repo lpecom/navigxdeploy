@@ -18,7 +18,6 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
   const [isAssigning, setIsAssigning] = useState(false);
 
-  // Fetch the checkout session with selected car details
   const { data: session } = useQuery({
     queryKey: ['checkout-session', sessionId],
     queryFn: async () => {
@@ -48,7 +47,6 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
     },
   });
 
-  // Fetch available vehicles based on the car group
   const { data: availableVehicles } = useQuery<FleetVehicleWithRelations[]>({
     queryKey: ['available-vehicles', session?.selected_car?.group_id],
     enabled: !!session?.selected_car?.group_id,
@@ -58,7 +56,9 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
         .select(`
           *,
           car_model:car_models(
-            *,
+            id,
+            name,
+            image_url,
             car_group:car_groups(*)
           )
         `)
@@ -66,7 +66,7 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
         .eq('car_model.car_group.id', session?.selected_car?.group_id);
       
       if (error) throw error;
-      return data;
+      return data as FleetVehicleWithRelations[];
     },
   });
 

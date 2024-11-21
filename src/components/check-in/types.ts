@@ -61,8 +61,11 @@ export interface CarGroup {
 export interface FleetVehicleWithRelations {
   id: string;
   car_model_id: string | null;
-  car_model?: CarModel & {
-    car_group?: CarGroup;
+  car_model?: {
+    id: string;
+    name: string;
+    image_url: string | null;
+    car_group: CarGroup;
   };
   year: string;
   current_km: number;
