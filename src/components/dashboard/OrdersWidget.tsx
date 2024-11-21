@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { DashboardCheckoutSession, SelectedCarData } from "@/types/dashboard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
 
 const OrdersWidget = () => {
   const { data: orders, isLoading, error } = useQuery({
@@ -31,42 +32,40 @@ const OrdersWidget = () => {
 
   if (error) {
     return (
-      <Alert variant="destructive">
+      <Alert variant="destructive" className="mt-2">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Failed to load orders. Please try again later.
-        </AlertDescription>
+        <AlertDescription>Failed to load orders. Please try again later.</AlertDescription>
       </Alert>
     );
   }
 
   return (
-    <Card className="border-0 shadow-none">
-      <CardHeader className="flex flex-row items-center justify-between pb-2 px-0">
+    <Card className="border-0 shadow-none overflow-hidden">
+      <CardHeader className="flex flex-row items-center justify-between pb-6 space-y-0 px-6">
         <div className="flex items-center gap-2">
-          <h3 className="text-lg font-semibold">Orders</h3>
-          <Badge variant="secondary" className="rounded-full">
+          <h3 className="text-lg font-semibold tracking-tight">Recent Orders</h3>
+          <Badge variant="secondary" className="rounded-full px-2.5">
             {isLoading ? '...' : orders?.length || 0}
           </Badge>
         </div>
         <Button 
           variant="ghost" 
-          className="text-sm text-muted-foreground hover:text-primary"
-          aria-label="View all orders"
+          size="sm"
+          className="text-sm text-muted-foreground hover:text-primary transition-colors"
         >
-          See all <ChevronRight className="w-4 h-4 ml-1" />
+          View all <ChevronRight className="w-4 h-4 ml-1" />
         </Button>
       </CardHeader>
-      <CardContent className="px-0">
+      <CardContent className="px-6">
         <div className="space-y-1">
           {isLoading ? (
             <div className="animate-pulse space-y-3">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="flex items-center gap-4 p-3 rounded-lg bg-gray-50">
+                <div key={i} className="flex items-center gap-4 p-4 rounded-lg bg-gray-50/50">
                   <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-1/4 animate-pulse" />
-                    <div className="h-3 bg-gray-200 rounded w-1/3 animate-pulse" />
+                    <div className="h-4 bg-gray-200 rounded w-1/4" />
+                    <div className="h-3 bg-gray-200 rounded w-1/3" />
                   </div>
                 </div>
               ))}
@@ -79,30 +78,35 @@ const OrdersWidget = () => {
                 return (
                   <div
                     key={order.id}
-                    className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors animate-fade-up"
+                    className="group flex items-center gap-4 p-4 -mx-2 rounded-lg hover:bg-gray-50/80 transition-all duration-200"
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">#{order.reservation_number}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-medium text-gray-900">#{order.reservation_number}</span>
                           <span className="text-sm text-muted-foreground">·</span>
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-sm text-muted-foreground truncate">
                             {selectedCar?.name || 'Vehicle not selected'}
                           </span>
                         </div>
                         <Badge 
                           variant={order.status === 'pending' ? 'secondary' : 'default'}
-                          className="font-medium"
+                          className={cn(
+                            "font-medium transition-colors",
+                            order.status === 'pending' ? 'bg-gray-100 text-gray-900' : '',
+                            order.status === 'active' ? 'bg-green-100 text-green-900' : '',
+                            order.status === 'cancelled' ? 'bg-red-100 text-red-900' : ''
+                          )}
                         >
                           {order.status}
                         </Badge>
                       </div>
-                      <div className="flex items-center gap-4 mt-2">
+                      <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <span>{order.driver?.full_name}</span>
+                          <span className="truncate">{order.driver?.full_name}</span>
                         </div>
                         {order.driver?.phone && (
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground group-hover:text-gray-900 transition-colors">
                             <Phone className="w-3 h-3" />
                             <span>{order.driver.phone}</span>
                           </div>
@@ -112,6 +116,16 @@ const OrdersWidget = () => {
                   </div>
                 );
               })}
+              
+              {(!orders || orders.length === 0) && (
+                <div className="py-12 text-center">
+                  <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                    <AlertCircle className="w-6 h-6 text-gray-400" />
+                  </div>
+                  <p className="text-gray-500 font-medium">No orders found</p>
+                  <p className="text-sm text-muted-foreground mt-1">New orders will appear here</p>
+                </div>
+              )}
             </div>
           )}
         </div>
