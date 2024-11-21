@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Car, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
-import type { CheckInReservation, SelectedCar } from "../types";
+import type { CheckInReservation, SelectedCar, FleetVehicleWithRelations } from "../types";
 
 interface VehicleAssignmentProps {
   sessionId: string;
@@ -49,7 +49,7 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
   });
 
   // Fetch available vehicles based on the car group
-  const { data: availableVehicles } = useQuery({
+  const { data: availableVehicles } = useQuery<FleetVehicleWithRelations[]>({
     queryKey: ['available-vehicles', session?.selected_car?.group_id],
     enabled: !!session?.selected_car?.group_id,
     queryFn: async () => {
