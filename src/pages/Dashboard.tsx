@@ -11,35 +11,27 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-8 animate-fade-up p-1">
+    <div className="space-y-8 animate-fade-up">
       <div className="relative">
-        <div className="max-w-2xl">
-          <h1 className="text-display-sm font-display mb-2 text-gradient">Dashboard</h1>
-          <p className="text-muted-foreground text-lg">
-            Welcome back! Here's an overview of your business.
-          </p>
-        </div>
+        <h1 className="text-display-sm font-display mb-2">Dashboard</h1>
+        <p className="text-muted-foreground text-lg max-w-2xl">
+          Welcome back! Here's an overview of your business.
+        </p>
       </div>
 
       <StatsPanel />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 transition-all duration-300 ease-in-out">
-        <div className="group relative p-1.5 transition-all duration-300">
-          {/* Gradient blur effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary-50/50 to-secondary-50/50 rounded-2xl opacity-0 group-hover:opacity-50 blur-xl transition-all duration-500" />
-          
-          {/* Card container with hover effect */}
-          <div className="relative bg-white rounded-xl shadow-sm ring-1 ring-gray-100/50 hover:ring-primary/10 transition-all duration-300">
+        <div className="relative p-1">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-xl opacity-50 blur-xl" />
+          <div className="relative bg-white rounded-lg shadow-sm">
             <OrdersWidget />
           </div>
         </div>
         
-        <div className="group relative p-1.5 transition-all duration-300">
-          {/* Gradient blur effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-secondary-50/50 to-primary-50/50 rounded-2xl opacity-0 group-hover:opacity-50 blur-xl transition-all duration-500" />
-          
-          {/* Card container with hover effect */}
-          <div className="relative bg-white rounded-xl shadow-sm ring-1 ring-gray-100/50 hover:ring-primary/10 transition-all duration-300">
+        <div className="relative p-1">
+          <div className="absolute inset-0 bg-gradient-to-r from-secondary-50 to-primary-50 rounded-xl opacity-50 blur-xl" />
+          <div className="relative bg-white rounded-lg shadow-sm">
             <ScheduleWidget />
           </div>
         </div>
