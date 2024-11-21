@@ -5,12 +5,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Camera, Image, CheckCircle, FileText, Printer } from "lucide-react";
+import { Camera, Image, CheckCircle, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { PhotoCategory, CheckInReservation, PhotosState } from "./types";
+import { CustomerReview } from "./steps/CustomerReview";
+import { OrderReview } from "./steps/OrderReview";
+import { VehicleAssignment } from "./steps/VehicleAssignment";
 import { PhotosTab } from "./tabs/PhotosTab";
 import { ReviewTab } from "./tabs/ReviewTab";
 import { ContractTab } from "./tabs/ContractTab";
+import type { PhotoCategory, CheckInReservation, PhotosState } from "./types";
 
 const PHOTO_CATEGORIES: PhotoCategory[] = [
   { id: 'front', label: 'Frente' },
@@ -25,6 +28,7 @@ const PHOTO_CATEGORIES: PhotoCategory[] = [
 const CheckInProcess = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [step, setStep] = useState(1);
   const [activeTab, setActiveTab] = useState('photos');
   const [photos, setPhotos] = useState<PhotosState>({});
   
@@ -80,6 +84,74 @@ const CheckInProcess = () => {
     }
   };
 
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <CustomerReview
+            driverId={reservation.driver.id}
+            onNext={() => setStep(2)}
+          />
+        );
+      case 2:
+        return (
+          <OrderReview
+            sessionId={reservation.id}
+            onNext={() => setStep(3)}
+          />
+        );
+      case 3:
+        return (
+          <VehicleAssignment
+            sessionId={reservation.id}
+            onComplete={() => setStep(4)}
+          />
+        );
+      case 4:
+        return (
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="photos" className="flex items-center gap-2">
+                <Camera className="w-4 h-4" />
+                Fotos
+              </TabsTrigger>
+              <TabsTrigger value="review" className="flex items-center gap-2">
+                <Image className="w-4 h-4" />
+                Revisão
+              </TabsTrigger>
+              <TabsTrigger value="contract" className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Contrato
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="photos">
+              <PhotosTab 
+                categories={PHOTO_CATEGORIES}
+                photos={photos}
+                onPhotoCapture={handlePhotoCapture}
+                supabaseStorageUrl={supabase.storage.from('check-in-photos').getPublicUrl('').data.publicUrl}
+              />
+            </TabsContent>
+
+            <TabsContent value="review">
+              <ReviewTab 
+                categories={PHOTO_CATEGORIES}
+                photos={photos}
+                supabaseStorageUrl={supabase.storage.from('check-in-photos').getPublicUrl('').data.publicUrl}
+              />
+            </TabsContent>
+
+            <TabsContent value="contract">
+              <ContractTab />
+            </TabsContent>
+          </Tabs>
+        );
+      default:
+        return null;
+    }
+  };
+
   if (isLoading || !reservation) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -106,56 +178,22 @@ const CheckInProcess = () => {
         </div>
       </Card>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="photos" className="flex items-center gap-2">
-            <Camera className="w-4 h-4" />
-            Fotos
-          </TabsTrigger>
-          <TabsTrigger value="review" className="flex items-center gap-2">
-            <Image className="w-4 h-4" />
-            Revisão
-          </TabsTrigger>
-          <TabsTrigger value="contract" className="flex items-center gap-2">
-            <FileText className="w-4 h-4" />
-            Contrato
-          </TabsTrigger>
-        </TabsList>
+      {renderStep()}
 
-        <TabsContent value="photos">
-          <PhotosTab 
-            categories={PHOTO_CATEGORIES}
-            photos={photos}
-            onPhotoCapture={handlePhotoCapture}
-            supabaseStorageUrl={supabase.storage.from('check-in-photos').getPublicUrl('').data.publicUrl}
-          />
-        </TabsContent>
-
-        <TabsContent value="review">
-          <ReviewTab 
-            categories={PHOTO_CATEGORIES}
-            photos={photos}
-            supabaseStorageUrl={supabase.storage.from('check-in-photos').getPublicUrl('').data.publicUrl}
-          />
-        </TabsContent>
-
-        <TabsContent value="contract">
-          <ContractTab />
-        </TabsContent>
-      </Tabs>
-
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t">
-        <Button 
-          className="w-full"
-          onClick={() => {
-            toast.success('Check-in concluído com sucesso');
-            navigate('/admin/check-in');
-          }}
-        >
-          <CheckCircle className="w-4 h-4 mr-2" />
-          Concluir Check-in
-        </Button>
-      </div>
+      {step === 4 && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t">
+          <Button 
+            className="w-full"
+            onClick={() => {
+              toast.success('Check-in concluído com sucesso');
+              navigate('/admin/check-in');
+            }}
+          >
+            <CheckCircle className="w-4 h-4 mr-2" />
+            Concluir Check-in
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

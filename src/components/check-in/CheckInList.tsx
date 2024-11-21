@@ -1,16 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
-import { Car, Camera, Clock } from "lucide-react";
-import { CheckoutSession } from "./types";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Clock, User, Car } from "lucide-react";
+import { motion } from "framer-motion";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 const CheckInList = () => {
   const navigate = useNavigate();
   
-  const { data: reservations, isLoading } = useQuery({
-    queryKey: ['check-in-reservations'],
+  const { data: sessions, isLoading } = useQuery({
+    queryKey: ['check-in-sessions'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('checkout_sessions')
@@ -22,58 +25,93 @@ const CheckInList = () => {
         .order('pickup_date', { ascending: true });
       
       if (error) throw error;
-      return (data || []) as unknown as CheckoutSession[];
+      return data;
     },
   });
 
+  const handleStartCheckIn = (id: string) => {
+    navigate(`/admin/check-in/${id}`);
+  };
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-32 bg-gray-100 rounded-lg animate-pulse" />
+        ))}
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto py-6 space-y-6">
       <h1 className="text-2xl font-bold">Check-in de Veículos</h1>
       
       <div className="grid gap-4">
-        {reservations?.map((reservation) => (
-          <Card key={reservation.id} className="p-4">
-            <div className="flex items-start justify-between">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Car className="w-5 h-5 text-primary" />
-                  <h3 className="font-medium">{reservation.selected_car?.name || 'Veículo não especificado'}</h3>
+        {sessions?.map((session) => (
+          <motion.div
+            key={session.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <h3 className="text-lg font-semibold">
+                      {session.driver?.full_name}
+                    </h3>
+                    <Badge variant="outline">
+                      #{session.reservation_number}
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      <span>
+                        {format(new Date(session.pickup_date), "dd 'de' MMMM", {
+                          locale: ptBR,
+                        })}
+                      </span>
+                    </div>
+                    
+                    {session.pickup_time && (
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        <span>{session.pickup_time}</span>
+                      </div>
+                    )}
+                    
+                    <div className="flex items-center gap-2">
+                      <Car className="w-4 h-4" />
+                      <span>{session.selected_car.name}</span>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {reservation.driver?.full_name || 'Motorista não especificado'}
-                </p>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  <span>
-                    {reservation.pickup_date ? new Date(reservation.pickup_date).toLocaleDateString('pt-BR') : 'Data não especificada'} às{' '}
-                    {reservation.pickup_time || 'Horário não especificado'}
-                  </span>
-                </div>
+                
+                <Button 
+                  onClick={() => handleStartCheckIn(session.id)}
+                  className="ml-4"
+                >
+                  Iniciar Check-in
+                </Button>
               </div>
-              
-              <Button
-                onClick={() => navigate(`/admin/check-in/${reservation.id}`)}
-                className="flex items-center gap-2"
-              >
-                <Camera className="w-4 h-4" />
-                Iniciar Check-in
-              </Button>
-            </div>
-          </Card>
+            </Card>
+          </motion.div>
         ))}
-        
-        {(!reservations || reservations.length === 0) && (
-          <div className="text-center py-8 text-muted-foreground">
-            Nenhuma reserva pendente de check-in.
-          </div>
+
+        {sessions?.length === 0 && (
+          <Card className="p-12 text-center">
+            <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Nenhum check-in pendente
+            </h3>
+            <p className="text-gray-500">
+              Não há reservas aprovadas aguardando check-in no momento.
+            </p>
+          </Card>
         )}
       </div>
     </div>
