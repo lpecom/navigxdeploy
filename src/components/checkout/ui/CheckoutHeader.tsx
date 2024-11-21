@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export const CheckoutHeader = () => {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+    <header className="fixed top-8 sm:top-10 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-14 sm:h-16">
           <Link to="/" className="flex items-center">
