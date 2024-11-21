@@ -967,6 +967,85 @@ export type Database = {
           },
         ]
       }
+      orders: {
+        Row: {
+          additional_services: Json | null
+          created_at: string
+          customer_id: string | null
+          driver_id: string | null
+          id: string
+          insurance_details: Json | null
+          notes: string | null
+          order_number: number
+          payment_method: string | null
+          payment_status: string
+          pickup_date: string | null
+          return_date: string | null
+          status: string
+          total_amount: number
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          additional_services?: Json | null
+          created_at?: string
+          customer_id?: string | null
+          driver_id?: string | null
+          id?: string
+          insurance_details?: Json | null
+          notes?: string | null
+          order_number?: number
+          payment_method?: string | null
+          payment_status?: string
+          pickup_date?: string | null
+          return_date?: string | null
+          status?: string
+          total_amount: number
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          additional_services?: Json | null
+          created_at?: string
+          customer_id?: string | null
+          driver_id?: string | null
+          id?: string
+          insurance_details?: Json | null
+          notes?: string | null
+          order_number?: number
+          payment_method?: string | null
+          payment_status?: string
+          pickup_date?: string | null
+          return_date?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "driver_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_methods: {
         Row: {
           card_brand: string

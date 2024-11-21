@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { motion } from "framer-motion";
 import Vehicles from "@/pages/Vehicles";
 import VehicleDetails from "@/pages/VehicleDetails";
 import Offers from "@/pages/Offers";
@@ -74,7 +75,12 @@ const AdminRoutes = () => {
       <Sidebar />
       <div className="lg:pl-64">
         <Header />
-        <main className="p-8">
+        <motion.main 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="p-8"
+        >
           <div className="max-w-7xl mx-auto">
             <Routes>
               <Route index element={<Dashboard />} />
@@ -109,7 +115,7 @@ const AdminRoutes = () => {
               <Route path="*" element={<Navigate to="/admin" replace />} />
             </Routes>
           </div>
-        </main>
+        </motion.main>
       </div>
     </div>
   );
