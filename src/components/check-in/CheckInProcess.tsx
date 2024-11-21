@@ -44,18 +44,15 @@ const CheckInProcess = () => {
 
   const handlePhotoCapture = async (category: string) => {
     try {
-      // Create a file input element
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
       input.capture = 'environment';
       
-      // Handle file selection
       input.onchange = async (e) => {
         const file = (e.target as HTMLInputElement).files?.[0];
         if (!file) return;
 
-        // Upload to Supabase Storage
         const fileExt = file.name.split('.').pop();
         const filePath = `${id}/${category}/${Date.now()}.${fileExt}`;
         
@@ -65,7 +62,6 @@ const CheckInProcess = () => {
 
         if (uploadError) throw uploadError;
 
-        // Update state with new photo
         setPhotos(prev => ({
           ...prev,
           [category]: [...(prev[category] || []), data.path],
@@ -79,11 +75,6 @@ const CheckInProcess = () => {
       console.error('Error capturing photo:', error);
       toast.error('Erro ao capturar foto');
     }
-  };
-
-  const handleGenerateReport = async () => {
-    // Implementation for generating report
-    toast.success('Relatório gerado com sucesso');
   };
 
   if (isLoading || !reservation) {
@@ -128,76 +119,25 @@ const CheckInProcess = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="photos" className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            {PHOTO_CATEGORIES.map((category) => (
-              <Card key={category.id} className="p-4">
-                <div className="space-y-4">
-                  <h3 className="font-medium">{category.label}</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {photos[category.id]?.map((photo, index) => (
-                      <img
-                        key={index}
-                        src={`${supabase.storage.from('check-in-photos').getPublicUrl(photo).data.publicUrl}`}
-                        alt={`${category.label} ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg"
-                      />
-                    ))}
-                  </div>
-                  <Button
-                    onClick={() => handlePhotoCapture(category.id)}
-                    className="w-full"
-                    variant="outline"
-                  >
-                    <Camera className="w-4 h-4 mr-2" />
-                    Capturar Foto
-                  </Button>
-                </div>
-              </Card>
-            ))}
-          </div>
+        <TabsContent value="photos">
+          <PhotosTab 
+            categories={PHOTO_CATEGORIES}
+            photos={photos}
+            onPhotoCapture={handlePhotoCapture}
+            supabaseStorageUrl={supabase.storage.from('check-in-photos').getPublicUrl('').data.publicUrl}
+          />
         </TabsContent>
 
-        <TabsContent value="review" className="space-y-4">
-          <div className="grid gap-4">
-            {PHOTO_CATEGORIES.map((category) => (
-              <Card key={category.id} className="p-4">
-                <h3 className="font-medium mb-2">{category.label}</h3>
-                <div className="grid grid-cols-3 gap-2">
-                  {photos[category.id]?.map((photo, index) => (
-                    <img
-                      key={index}
-                      src={`${supabase.storage.from('check-in-photos').getPublicUrl(photo).data.publicUrl}`}
-                      alt={`${category.label} ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg"
-                    />
-                  ))}
-                </div>
-              </Card>
-            ))}
-          </div>
+        <TabsContent value="review">
+          <ReviewTab 
+            categories={PHOTO_CATEGORIES}
+            photos={photos}
+            supabaseStorageUrl={supabase.storage.from('check-in-photos').getPublicUrl('').data.publicUrl}
+          />
         </TabsContent>
 
-        <TabsContent value="contract" className="space-y-4">
-          <Card className="p-4">
-            <div className="space-y-4">
-              <h3 className="font-medium">Documentação</h3>
-              <div className="space-y-4">
-                <Button
-                  onClick={handleGenerateReport}
-                  className="w-full"
-                  variant="outline"
-                >
-                  <FileText className="w-4 h-4 mr-2" />
-                  Gerar Relatório
-                </Button>
-                <Button className="w-full" variant="outline">
-                  <Printer className="w-4 h-4 mr-2" />
-                  Imprimir Contrato
-                </Button>
-              </div>
-            </div>
-          </Card>
+        <TabsContent value="contract">
+          <ContractTab />
         </TabsContent>
       </Tabs>
 
@@ -205,7 +145,6 @@ const CheckInProcess = () => {
         <Button 
           className="w-full"
           onClick={() => {
-            // Implementation for completing check-in
             toast.success('Check-in concluído com sucesso');
             navigate('/admin/check-in');
           }}

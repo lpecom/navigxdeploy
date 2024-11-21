@@ -255,8 +255,87 @@ export type Database = {
         }
         Relationships: []
       }
+      check_in_changes: {
+        Row: {
+          change_type: string
+          checkout_session_id: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          new_value: Json | null
+          previous_value: Json | null
+        }
+        Insert: {
+          change_type: string
+          checkout_session_id: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          new_value?: Json | null
+          previous_value?: Json | null
+        }
+        Update: {
+          change_type?: string
+          checkout_session_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          new_value?: Json | null
+          previous_value?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "check_in_changes_checkout_session_id_fkey"
+            columns: ["checkout_session_id"]
+            isOneToOne: false
+            referencedRelation: "checkout_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      check_in_documents: {
+        Row: {
+          checkout_session_id: string
+          created_at: string | null
+          created_by: string | null
+          document_type: string
+          file_url: string
+          id: string
+        }
+        Insert: {
+          checkout_session_id: string
+          created_at?: string | null
+          created_by?: string | null
+          document_type: string
+          file_url: string
+          id?: string
+        }
+        Update: {
+          checkout_session_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          document_type?: string
+          file_url?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "check_in_documents_checkout_session_id_fkey"
+            columns: ["checkout_session_id"]
+            isOneToOne: false
+            referencedRelation: "checkout_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       checkout_sessions: {
         Row: {
+          assigned_vehicle_id: string | null
+          check_in_completed_at: string | null
+          check_in_completed_by: string | null
+          check_in_notes: string | null
+          check_in_photos: Json | null
+          check_in_status: string | null
           created_at: string
           driver_id: string | null
           id: string
@@ -270,6 +349,12 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          assigned_vehicle_id?: string | null
+          check_in_completed_at?: string | null
+          check_in_completed_by?: string | null
+          check_in_notes?: string | null
+          check_in_photos?: Json | null
+          check_in_status?: string | null
           created_at?: string
           driver_id?: string | null
           id?: string
@@ -283,6 +368,12 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          assigned_vehicle_id?: string | null
+          check_in_completed_at?: string | null
+          check_in_completed_by?: string | null
+          check_in_notes?: string | null
+          check_in_photos?: Json | null
+          check_in_status?: string | null
           created_at?: string
           driver_id?: string | null
           id?: string
@@ -296,6 +387,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "checkout_sessions_assigned_vehicle_id_fkey"
+            columns: ["assigned_vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_vehicles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "checkout_sessions_driver_id_fkey"
             columns: ["driver_id"]
