@@ -8,6 +8,8 @@ import { SuccessSection } from "./SuccessSection"
 import { SupportCard } from "./SupportCard"
 import { createCheckoutSession } from "../CheckoutSessionHandler"
 import { supabase } from "@/integrations/supabase/client"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft } from "lucide-react"
 
 interface CheckoutContentProps {
   step: number
@@ -106,6 +108,15 @@ export const CheckoutContent = ({
     })
   }
 
+  const handleBack = () => {
+    if (step > 1) {
+      setStep(step - 1)
+    } else {
+      // If we're at step 1, we go back to the plans page
+      window.location.href = '/plans'
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -113,6 +124,17 @@ export const CheckoutContent = ({
       transition={{ duration: 0.5 }}
       className="space-y-8"
     >
+      {step < 4 && (
+        <Button
+          variant="ghost"
+          onClick={handleBack}
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-4"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Voltar
+        </Button>
+      )}
+
       <CheckoutProgress currentStep={step} />
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
