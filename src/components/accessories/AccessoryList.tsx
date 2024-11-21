@@ -19,6 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Avatar } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import type { Accessory } from "@/pages/Accessories";
 import { useToast } from "@/components/ui/use-toast";
@@ -28,6 +29,18 @@ interface AccessoryListProps {
   onEdit: (accessory: Accessory) => void;
   onRefetch: () => void;
 }
+
+// Default Unsplash images for optionals
+const defaultThumbnails = [
+  "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
+  "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+  "https://images.unsplash.com/photo-1518770660439-4636190af475",
+  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+  "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07",
+  "https://images.unsplash.com/photo-1433086966358-54859d0ed716",
+  "https://images.unsplash.com/photo-1472396961693-142e6e269027",
+  "https://images.unsplash.com/photo-1496307653780-42ee777d4833",
+];
 
 export const AccessoryList = ({ accessories, onEdit, onRefetch }: AccessoryListProps) => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -67,6 +80,7 @@ export const AccessoryList = ({ accessories, onEdit, onRefetch }: AccessoryListP
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-[50px]">Imagem</TableHead>
             <TableHead>Nome</TableHead>
             <TableHead>Descrição</TableHead>
             <TableHead>Preço</TableHead>
@@ -77,6 +91,13 @@ export const AccessoryList = ({ accessories, onEdit, onRefetch }: AccessoryListP
         <TableBody>
           {accessories.map((accessory) => (
             <TableRow key={accessory.id}>
+              <TableCell>
+                <Avatar 
+                  className="h-10 w-10 rounded-md"
+                  src={accessory.thumbnail_url || defaultThumbnails[Math.floor(Math.random() * defaultThumbnails.length)]} 
+                  alt={accessory.name}
+                />
+              </TableCell>
               <TableCell>{accessory.name}</TableCell>
               <TableCell>{accessory.description}</TableCell>
               <TableCell>R$ {accessory.price.toFixed(2)}</TableCell>

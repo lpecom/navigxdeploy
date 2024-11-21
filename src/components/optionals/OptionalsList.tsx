@@ -5,6 +5,7 @@ import { Plus, Minus } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Avatar } from "@/components/ui/avatar";
 
 interface Optional {
   id: string;
@@ -12,7 +13,19 @@ interface Optional {
   description: string;
   price: number;
   price_period: string;
+  thumbnail_url: string | null;
 }
+
+const defaultThumbnails = [
+  "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
+  "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+  "https://images.unsplash.com/photo-1518770660439-4636190af475",
+  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+  "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07",
+  "https://images.unsplash.com/photo-1433086966358-54859d0ed716",
+  "https://images.unsplash.com/photo-1472396961693-142e6e269027",
+  "https://images.unsplash.com/photo-1496307653780-42ee777d4833",
+];
 
 export const OptionalsList = () => {
   const { state, dispatch } = useCart();
@@ -84,9 +97,15 @@ export const OptionalsList = () => {
     <div className="space-y-6">
       {optionals.map((optional) => {
         const currentQuantity = state.items.find(item => item.id === optional.id)?.quantity || 0;
+        const thumbnailUrl = optional.thumbnail_url || defaultThumbnails[Math.floor(Math.random() * defaultThumbnails.length)];
 
         return (
-          <div key={optional.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition-colors">
+          <div key={optional.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-slate-50 transition-colors">
+            <Avatar 
+              className="h-16 w-16 rounded-md"
+              src={thumbnailUrl}
+              alt={optional.name}
+            />
             <div className="flex-1">
               <h3 className="font-medium">{optional.name}</h3>
               <p className="text-sm text-gray-600">{optional.description}</p>
