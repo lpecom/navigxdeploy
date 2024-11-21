@@ -32,7 +32,8 @@ const Home = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("car_models")
-        .select("*");
+        .select("*")
+        .not("image_url", "is", null);
       
       if (error) throw error;
       return data as CarModel[];
@@ -47,6 +48,33 @@ const Home = () => {
     <div className="min-h-screen bg-white">
       <Navigation />
       <Hero />
+      
+      {categories?.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              {categories.map((category) => {
+                const categoryModels = getCarsByCategory(category.id);
+                if (!categoryModels.length) return null;
+                
+                return (
+                  <CarCategoryCard
+                    key={category.id}
+                    category={category}
+                    cars={categoryModels}
+                  />
+                );
+              })}
+            </motion.div>
+          </div>
+        </section>
+      )}
+      
       <HowItWorks />
       <WhyChooseUs />
       <CarModelsShowcase />
