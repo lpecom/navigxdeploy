@@ -21,3 +21,15 @@ export interface CheckInReservation {
 export interface PhotosState {
   [key: string]: string[];
 }
+
+export interface CheckoutSession {
+  id: string;
+  reservation_number: number;
+  selected_car: SelectedCar;
+  driver: {
+    full_name: string;
+  };
+  pickup_date: string;
+  pickup_time: string;
+  status: string;
+}
