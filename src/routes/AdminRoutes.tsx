@@ -25,18 +25,39 @@ const AdminRoutes = () => {
           <div className="mx-auto max-w-7xl">
             <Routes>
               <Route index element={<Dashboard />} />
-              <Route path="vehicles" element={<Vehicles view="fleet" />} />
+              
+              {/* Vehicle Routes */}
+              <Route path="vehicles/overview" element={<Vehicles view="overview" />} />
+              <Route path="vehicles/categories" element={<Vehicles view="categories" />} />
+              <Route path="vehicles/models" element={<Vehicles view="models" />} />
+              <Route path="vehicles/fleet" element={<Vehicles view="fleet" />} />
+              <Route path="vehicles/maintenance" element={<Vehicles view="maintenance" />} />
               <Route path="vehicles/:id" element={<VehicleDetails />} />
+              
+              {/* Customer Routes */}
               <Route path="customers" element={<Customers />} />
               <Route path="customers/:id" element={<CustomerDetails />} />
-              <Route path="reservations" element={<Reservations filter="all" />} />
-              <Route path="offers" element={<Offers />} />
+              
+              {/* Reservation Routes */}
+              <Route path="reservations/pending" element={<Reservations filter="pending" />} />
+              <Route path="reservations/pickup" element={<Reservations filter="pickup" />} />
+              <Route path="check-in" element={<Reservations filter="checkin" />} />
+              
+              {/* Tariff Routes */}
               <Route path="accessories" element={<Accessories />} />
-              <Route path="optionals" element={<Optionals />} />
+              <Route path="plans" element={<Optionals />} />
+              <Route path="fares" element={<Optionals />} />
+              
+              {/* Analytics Routes */}
               <Route path="analytics" element={<Analytics />} />
-              <Route path="performance" element={<Performance />} />
               <Route path="reports" element={<Reports />} />
+              <Route path="performance" element={<Performance />} />
+              
+              {/* Marketing Routes */}
+              <Route path="offers" element={<Offers />} />
               <Route path="automations" element={<Automations />} />
+              
+              {/* Catch all redirect */}
               <Route path="*" element={<Navigate to="/admin" replace />} />
             </Routes>
           </div>
