@@ -1,5 +1,7 @@
 import { Navigation } from "@/components/website/Navigation";
 import { Hero } from "@/components/website/Hero";
+import { HowItWorks } from "@/components/website/HowItWorks";
+import { WhyChooseUs } from "@/components/website/WhyChooseUs";
 import { Features } from "@/components/website/Features";
 import { Testimonials } from "@/components/website/Testimonials";
 import { Footer } from "@/components/website/Footer";
@@ -42,9 +44,11 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#111] to-gray-900">
+    <div className="min-h-screen bg-white">
       <Navigation />
       <Hero />
+      <HowItWorks />
+      <WhyChooseUs />
       <CarModelsShowcase />
       <Features />
       <Testimonials />
