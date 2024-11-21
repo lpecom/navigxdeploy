@@ -24,69 +24,38 @@ import {
 } from "lucide-react";
 
 export type MenuItem = {
-  to?: string;
-  icon: any;
-  label: string;
-  subItems?: MenuItem[];
+  title: string;
+  href: string;
+  icon?: React.ComponentType<{ className?: string }>;
 };
 
 export const adminMenuItems: MenuItem[] = [
-  { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/admin/customers", icon: Users, label: "Clientes" },
-  {
-    icon: Calendar,
-    label: "Reservas",
-    subItems: [
-      { to: "/admin/reservations/pending", icon: Clock, label: "Pendentes" },
-      { to: "/admin/reservations/pickup", icon: CalendarCheck, label: "Retirada" },
-      { to: "/admin/check-in", icon: CalendarClock, label: "Check-in" },
-    ]
-  },
-  {
-    icon: Car,
-    label: "Frota",
-    subItems: [
-      { to: "/admin/vehicles/overview", label: "Visão Geral", icon: Grid },
-      { to: "/admin/vehicles/categories", label: "Categorias", icon: Tag },
-      { to: "/admin/vehicles/models", label: "Modelos", icon: CarFront },
-      { to: "/admin/vehicles/fleet", label: "Veículos", icon: Car },
-      { to: "/admin/vehicles/maintenance", label: "Manutenção", icon: Wrench },
-    ]
-  },
-  {
-    icon: DollarSign,
-    label: "Tarifas",
-    subItems: [
-      { to: "/admin/accessories", icon: Package, label: "Opcionais" },
-      { to: "/admin/plans", icon: Tag, label: "Planos" },
-      { to: "/admin/fares", icon: DollarSign, label: "Condições" },
-    ]
-  },
-  {
-    icon: BarChart2,
-    label: "Análises",
-    subItems: [
-      { to: "/admin/analytics", icon: LineChart, label: "Visão Geral" },
-      { to: "/admin/reports", icon: BarChart, label: "Relatórios" },
-      { to: "/admin/performance", icon: PieChart, label: "Performance" },
-    ]
-  },
-  {
-    icon: Tag,
-    label: "Marketing",
-    subItems: [
-      { to: "/admin/offers", icon: Megaphone, label: "Ofertas" },
-      { to: "/admin/automations", icon: Settings, label: "Automações" },
-    ]
-  },
-  { to: "/admin/website-settings", icon: Globe, label: "Website" },
-  { to: "/admin/changelog", icon: History, label: "Changelog" },
+  { title: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { title: "Clientes", href: "/admin/customers", icon: Users },
+  { title: "Reservas Pendentes", href: "/admin/reservations/pending", icon: Clock },
+  { title: "Retirada", href: "/admin/reservations/pickup", icon: CalendarCheck },
+  { title: "Check-in", href: "/admin/check-in", icon: CalendarClock },
+  { title: "Visão Geral", href: "/admin/vehicles/overview", icon: Grid },
+  { title: "Categorias", href: "/admin/vehicles/categories", icon: Tag },
+  { title: "Modelos", href: "/admin/vehicles/models", icon: CarFront },
+  { title: "Veículos", href: "/admin/vehicles/fleet", icon: Car },
+  { title: "Manutenção", href: "/admin/vehicles/maintenance", icon: Wrench },
+  { title: "Opcionais", href: "/admin/accessories", icon: Package },
+  { title: "Planos", href: "/admin/plans", icon: Tag },
+  { title: "Condições", href: "/admin/fares", icon: DollarSign },
+  { title: "Análises", href: "/admin/analytics", icon: LineChart },
+  { title: "Relatórios", href: "/admin/reports", icon: BarChart },
+  { title: "Performance", href: "/admin/performance", icon: PieChart },
+  { title: "Ofertas", href: "/admin/offers", icon: Megaphone },
+  { title: "Automações", href: "/admin/automations", icon: Settings },
+  { title: "Website", href: "/admin/website-settings", icon: Globe },
+  { title: "Changelog", href: "/admin/changelog", icon: History },
 ];
 
 export const driverMenuItems: MenuItem[] = [
-  { to: "/driver", icon: LayoutDashboard, label: "Visão Geral" },
-  { to: "/driver/vehicle", icon: Car, label: "Meu Veículo" },
-  { to: "/driver/reservations", icon: Calendar, label: "Minhas Reservas" },
-  { to: "/driver/financial", icon: FileText, label: "Financeiro" },
-  { to: "/driver/promotions", icon: Tag, label: "Promoções" },
+  { title: "Visão Geral", href: "/driver", icon: LayoutDashboard },
+  { title: "Meu Veículo", href: "/driver/vehicle", icon: Car },
+  { title: "Minhas Reservas", href: "/driver/reservations", icon: Calendar },
+  { title: "Financeiro", href: "/driver/financial", icon: FileText },
+  { title: "Promoções", href: "/driver/promotions", icon: Tag },
 ];

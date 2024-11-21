@@ -6,7 +6,6 @@ interface MenuItem {
   title: string;
   href: string;
   icon?: React.ComponentType<{ className?: string }>;
-  items?: MenuItem[];
 }
 
 interface SidebarMenuProps {
