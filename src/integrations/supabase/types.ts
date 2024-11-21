@@ -112,42 +112,60 @@ export type Database = {
           brand_logo_url: string | null
           category_id: string | null
           created_at: string | null
+          daily_price: number | null
           description: string | null
           engine_size: string | null
+          features: Json | null
           id: string
           image_url: string | null
+          luggage: number | null
           name: string
           optionals: Json | null
+          passengers: number | null
+          total_price: number | null
           transmission: string | null
           updated_at: string | null
+          vehicle_type: string | null
           year: string | null
         }
         Insert: {
           brand_logo_url?: string | null
           category_id?: string | null
           created_at?: string | null
+          daily_price?: number | null
           description?: string | null
           engine_size?: string | null
+          features?: Json | null
           id?: string
           image_url?: string | null
+          luggage?: number | null
           name: string
           optionals?: Json | null
+          passengers?: number | null
+          total_price?: number | null
           transmission?: string | null
           updated_at?: string | null
+          vehicle_type?: string | null
           year?: string | null
         }
         Update: {
           brand_logo_url?: string | null
           category_id?: string | null
           created_at?: string | null
+          daily_price?: number | null
           description?: string | null
           engine_size?: string | null
+          features?: Json | null
           id?: string
           image_url?: string | null
+          luggage?: number | null
           name?: string
           optionals?: Json | null
+          passengers?: number | null
+          total_price?: number | null
           transmission?: string | null
           updated_at?: string | null
+          vehicle_type?: string | null
           year?: string | null
         }
         Relationships: [
