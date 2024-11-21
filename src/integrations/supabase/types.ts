@@ -1454,6 +1454,7 @@ export type Database = {
       }
     }
     Enums: {
+      check_in_status: "pending" | "in_progress" | "completed" | "cancelled"
       vehicle_status:
         | "available"
         | "rented"
