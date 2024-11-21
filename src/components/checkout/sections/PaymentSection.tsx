@@ -9,6 +9,8 @@ import { motion } from "framer-motion"
 import { useCart } from "@/contexts/CartContext"
 import { Separator } from "@/components/ui/separator"
 import { CheckCircle, Package } from "lucide-react"
+import { OptionalsList } from "@/components/optionals/OptionalsList"
+import { OrderSummary } from "@/components/optionals/OrderSummary"
 
 interface PaymentSectionProps {
   onPaymentSuccess: (id: string) => void
@@ -44,6 +46,30 @@ export const PaymentSection = ({
     )
   }
 
+  // Show optionals selection before proceeding to payment
+  if (!selectedMethod && paymentType === 'online') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="space-y-6"
+      >
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-6">Adicione opcionais ao seu plano</h2>
+          <OptionalsList />
+        </Card>
+        <OrderSummary />
+        <Card className="p-6">
+          <PaymentMethodSelector
+            selectedMethod={selectedMethod}
+            onMethodChange={setSelectedMethod}
+          />
+        </Card>
+      </motion.div>
+    )
+  }
+
   if (paymentType === 'store') {
     return (
       <motion.div
@@ -52,6 +78,11 @@ export const PaymentSection = ({
         transition={{ duration: 0.5 }}
         className="space-y-6"
       >
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-6">Adicione opcionais ao seu plano</h2>
+          <OptionalsList />
+        </Card>
+        <OrderSummary />
         <Card className="p-6 text-center space-y-4">
           <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
             <CheckCircle className="w-6 h-6 text-green-600" />
@@ -100,14 +131,6 @@ export const PaymentSection = ({
           </div>
         </Card>
       )}
-
-      <Card className="p-4 sm:p-6">
-        <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Método de Pagamento</h2>
-        <PaymentMethodSelector
-          selectedMethod={selectedMethod}
-          onMethodChange={setSelectedMethod}
-        />
-      </Card>
 
       <Card className="p-4 sm:p-6">
         {selectedMethod === "credit" && (
