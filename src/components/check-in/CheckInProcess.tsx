@@ -8,6 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Camera, Image, CheckCircle, FileText, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { PhotoCategory, CheckInReservation, PhotosState } from "./types";
+import { PhotosTab } from "./tabs/PhotosTab";
+import { ReviewTab } from "./tabs/ReviewTab";
+import { ContractTab } from "./tabs/ContractTab";
 
 const PHOTO_CATEGORIES: PhotoCategory[] = [
   { id: 'front', label: 'Frente' },
