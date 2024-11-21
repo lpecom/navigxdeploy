@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -53,21 +54,22 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
     },
   });
 
-  const { data: availableVehicles } = useQuery({
+  const { data: availableVehicles, isLoading } = useQuery({
     queryKey: ['available-vehicles', session?.selected_car?.category],
     enabled: !!session?.selected_car?.category,
     queryFn: async () => {
       // First get the category ID for the selected category name
-      const { data: categoryData, error: categoryError } = await supabase
+      const { data: categories, error: categoryError } = await supabase
         .from('categories')
         .select('id')
-        .eq('name', session.selected_car.category)
-        .single();
+        .eq('name', session.selected_car.category);
       
       if (categoryError) throw categoryError;
       
-      if (!categoryData?.id) {
-        throw new Error('Category not found');
+      // Handle case where category is not found
+      if (!categories?.length) {
+        toast.error(`Category "${session.selected_car.category}" not found`);
+        return [];
       }
 
       // Then query vehicles with the correct category ID
@@ -78,7 +80,7 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
           car_model:car_models(*)
         `)
         .eq('status', 'available')
-        .eq('car_model.category_id', categoryData.id);
+        .eq('car_model.category_id', categories[0].id);
       
       if (error) throw error;
       return data;
