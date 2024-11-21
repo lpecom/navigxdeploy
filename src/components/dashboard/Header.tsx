@@ -41,7 +41,7 @@ const Header = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search vehicles, customers and orders..."
+              placeholder="Buscar veículos, clientes e pedidos..."
               className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-gray-50/80 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-primary text-gray-900 placeholder:text-gray-500 transition-all duration-200"
             />
           </div>
@@ -50,7 +50,7 @@ const Header = () => {
         <div className="flex items-center gap-6">
           <Link to="/login">
             <Button variant="outline" className="font-medium">
-              Driver Portal
+              Portal do Motorista
             </Button>
           </Link>
 
@@ -71,19 +71,19 @@ const Header = () => {
                 </div>
                 <div className="text-left">
                   <p className="text-sm font-medium text-gray-900">John Doe</p>
-                  <p className="text-xs text-gray-500">Administrator</p>
+                  <p className="text-xs text-gray-500">Administrador</p>
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
+                  <span>Configurações</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Logout</span>
+                  <span>Sair</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

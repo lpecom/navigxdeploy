@@ -24,20 +24,10 @@ export const CarSlider = ({ cars = [], category }: CarSliderProps) => {
     );
   };
 
-  // Fallback image for when no cars are available
-  const fallbackImage = "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80";
-
   if (!cars?.length) {
     return (
-      <div className="relative h-48 md:h-64 overflow-hidden rounded-lg">
-        <img
-          src={fallbackImage}
-          alt="Luxury Car"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-          <p className="text-white font-medium">Coming Soon</p>
-        </div>
+      <div className="relative h-48 md:h-64 overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
+        <p className="text-gray-500">No cars available</p>
       </div>
     );
   }
@@ -58,11 +48,17 @@ export const CarSlider = ({ cars = [], category }: CarSliderProps) => {
               )}
               style={{ left: `${index * 100}%` }}
             >
-              <img
-                src={car.image_url || fallbackImage}
-                alt={car.name}
-                className="object-cover w-full h-full"
-              />
+              {car.image_url ? (
+                <img
+                  src={car.image_url}
+                  alt={car.name}
+                  className="object-contain w-full h-full"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  Sem imagem
+                </div>
+              )}
               <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/50 text-white">
                 <p className="text-sm font-medium">
                   {car.name} {car.year}

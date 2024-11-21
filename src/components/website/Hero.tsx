@@ -4,16 +4,9 @@ import { ArrowRight } from "lucide-react";
 
 export const Hero = () => {
   return (
-    <div className="relative min-h-screen flex items-center pt-16 md:pt-20 overflow-hidden">
-      {/* Background Image with Overlay */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="https://images.unsplash.com/photo-1503376780353-7e6692767b70"
-          alt="Luxury Car"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
-      </div>
+    <div className="relative min-h-screen flex items-center pt-16 md:pt-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+      {/* Subtle Pattern Background */}
+      <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.02]" />
       
       <div className="relative z-10 container mx-auto px-4 py-12 md:py-24">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -24,16 +17,16 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-center lg:text-left"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white font-medium text-sm mb-6 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/5 text-primary-600 font-medium text-sm mb-6">
               <span>BLACK FRIDAY NAVIG 2024</span>
             </div>
             
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-semibold text-white mb-6 leading-[1.1] tracking-tight">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-semibold text-gray-900 mb-6 leading-[1.1] tracking-tight">
               Aluguel de carros com{" "}
-              <span className="text-primary-400">R$1.200 de desconto!</span>
+              <span className="text-primary-600">R$1.200 de desconto!</span>
             </h1>
             
-            <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
               Black Friday Navig: estoque limitado por um valor imperdível! 
               Aproveite as melhores ofertas do ano.
             </p>
@@ -50,13 +43,13 @@ export const Hero = () => {
               <Button 
                 size="lg"
                 variant="outline"
-                className="border-white/20 text-white hover:bg-white/10 px-8 py-6 text-lg rounded-full backdrop-blur-sm"
+                className="border-gray-200 text-gray-700 hover:bg-gray-50 px-8 py-6 text-lg rounded-full"
               >
                 Saiba mais
               </Button>
             </div>
 
-            <p className="text-gray-400 text-sm mt-6">
+            <p className="text-gray-500 text-sm mt-6">
               *Desconto válido apenas nos planos Navig Próprio e Navig Anual.
             </p>
           </motion.div>
@@ -66,7 +59,7 @@ export const Hero = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="relative hidden lg:block"
+            className="relative"
           >
             <img
               src="https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80"

@@ -1,80 +1,66 @@
 import { motion } from "framer-motion";
-import { Search, Calendar, Car } from "lucide-react";
+import { MapPin, Calendar, Car } from "lucide-react";
 
 const steps = [
   {
-    icon: Search,
-    title: "Escolha seu carro",
-    description: "Explore nossa frota premium e encontre o carro perfeito para você."
+    icon: MapPin,
+    title: "Choose location",
+    description: "Choose your location and find your best car."
   },
   {
     icon: Calendar,
-    title: "Selecione as datas",
-    description: "Escolha as datas de retirada e devolução que melhor se adequam a você."
+    title: "Pick-up date",
+    description: "Select your pick up date and time to book your car."
   },
   {
     icon: Car,
-    title: "Reserve agora",
-    description: "Confirme sua reserva e aproveite a experiência de dirigir um carro premium."
+    title: "Book your car",
+    description: "Book your car and we will deliver it directly to you."
   }
 ];
 
 export const HowItWorks = () => {
   return (
-    <section className="py-24 bg-white relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.02]" />
-      
+    <section className="py-24 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-3xl md:text-4xl font-display font-semibold text-gray-900 mb-4"
-          >
-            Como funciona
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-lg text-gray-600 max-w-2xl mx-auto"
-          >
-            Alugar um carro premium nunca foi tão fácil. Siga estes três passos simples.
-          </motion.p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-sm font-medium text-primary-600 mb-3 uppercase tracking-wider">
+            HOW IT WORKS
+          </h2>
+          <h3 className="text-4xl font-display font-semibold text-gray-900">
+            Rent with following 3 working steps
+          </h3>
+        </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8 relative">
           {/* Connecting Lines */}
-          <div className="hidden md:block absolute top-1/2 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-primary-500/20 to-primary-500/20 transform -translate-y-1/2" />
+          <div className="hidden md:block absolute top-1/4 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-primary-100 via-primary-500 to-primary-100" />
 
           {steps.map((step, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.2 }}
+              viewport={{ once: true }}
               className="relative"
             >
-              <div className="bg-white rounded-2xl p-8 text-center relative z-10 shadow-lg shadow-gray-100/50 border border-gray-100">
-                <div className="w-16 h-16 bg-primary-50 rounded-xl flex items-center justify-center mx-auto mb-6">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-20 h-20 bg-primary-50 rounded-2xl flex items-center justify-center mb-6 relative">
                   <step.icon className="w-8 h-8 text-primary-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                <h4 className="text-xl font-semibold text-gray-900 mb-3">
                   {step.title}
-                </h3>
-                <p className="text-gray-600">
+                </h4>
+                <p className="text-gray-600 leading-relaxed">
                   {step.description}
                 </p>
-              </div>
-              
-              {/* Step Number */}
-              <div className="absolute -top-4 -right-4 w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                {index + 1}
               </div>
             </motion.div>
           ))}

@@ -10,8 +10,6 @@ interface CarModelCardProps {
   index: number;
 }
 
-const fallbackImage = "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80";
-
 export const CarModelCard = ({ model, index }: CarModelCardProps) => {
   return (
     <motion.div
@@ -21,11 +19,17 @@ export const CarModelCard = ({ model, index }: CarModelCardProps) => {
     >
       <Card className="overflow-hidden group">
         <div className="relative aspect-[16/9] overflow-hidden">
-          <img
-            src={model.image_url || fallbackImage}
-            alt={model.name}
-            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
-          />
+          {model.image_url ? (
+            <img
+              src={model.image_url}
+              alt={model.name}
+              className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+              <span className="text-gray-400">No image available</span>
+            </div>
+          )}
           {model.vehicle_type && (
             <Badge 
               variant="secondary" 
