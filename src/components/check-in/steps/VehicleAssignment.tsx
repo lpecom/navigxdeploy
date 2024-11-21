@@ -32,10 +32,24 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
       
       if (error) throw error;
       
+      const selectedCar = data.selected_car as Record<string, any>;
+      const optionals = Array.isArray(data.selected_optionals) 
+        ? data.selected_optionals.map(opt => ({
+            name: (opt as Record<string, any>).name || '',
+            price: Number((opt as Record<string, any>).price) || 0
+          }))
+        : [];
+
       return {
         ...data,
-        selected_car: data.selected_car as SelectedCar,
-        selected_optionals: (data.selected_optionals as Optional[]) || []
+        selected_car: {
+          name: selectedCar.name || '',
+          category: selectedCar.category || '',
+          group_id: selectedCar.group_id,
+          price: selectedCar.price,
+          period: selectedCar.period
+        } as SelectedCar,
+        selected_optionals: optionals
       } as CheckInReservation;
     },
   });
@@ -163,4 +177,3 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
     </div>
   );
 };
-

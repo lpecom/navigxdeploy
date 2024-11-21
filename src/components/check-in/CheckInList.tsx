@@ -28,11 +28,27 @@ const CheckInList = () => {
       if (error) throw error;
       
       // Transform the data to match our type
-      return (data || []).map(session => ({
-        ...session,
-        selected_car: session.selected_car as SelectedCar,
-        selected_optionals: (session.selected_optionals as Optional[]) || []
-      })) as CheckoutSession[];
+      return (data || []).map(session => {
+        const selectedCar = session.selected_car as Record<string, any>;
+        const optionals = Array.isArray(session.selected_optionals) 
+          ? session.selected_optionals.map(opt => ({
+              name: (opt as Record<string, any>).name || '',
+              price: Number((opt as Record<string, any>).price) || 0
+            }))
+          : [];
+
+        return {
+          ...session,
+          selected_car: {
+            name: selectedCar.name || '',
+            category: selectedCar.category || '',
+            group_id: selectedCar.group_id,
+            price: selectedCar.price,
+            period: selectedCar.period
+          } as SelectedCar,
+          selected_optionals: optionals
+        } as CheckoutSession;
+      });
     },
   });
 
