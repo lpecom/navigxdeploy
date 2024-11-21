@@ -5,8 +5,6 @@ import ReservationsList from "@/components/reservations/ReservationsList"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { type ReservationFilter } from "@/types/reservation"
 import { motion } from "framer-motion"
-import Sidebar from "@/components/dashboard/Sidebar"
-import Header from "@/components/dashboard/Header"
 
 interface ReservationsProps {
   filter: ReservationFilter
@@ -78,20 +76,14 @@ const Reservations = ({ filter }: ReservationsProps) => {
   )
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1">
-        <Header />
-        <motion.main 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="p-6 lg:p-8"
-        >
-          {content}
-        </motion.main>
-      </div>
-    </div>
+    <motion.main 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="p-6 lg:p-8"
+    >
+      {content}
+    </motion.main>
   )
 }
 
