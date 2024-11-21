@@ -18,6 +18,7 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
   const [isAssigning, setIsAssigning] = useState(false);
 
+  // Fetch the checkout session with selected car details
   const { data: session } = useQuery({
     queryKey: ['checkout-session', sessionId],
     queryFn: async () => {
@@ -47,7 +48,8 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
     },
   });
 
-  const { data: availableVehicles, isLoading } = useQuery({
+  // Fetch available vehicles based on the car group
+  const { data: availableVehicles } = useQuery({
     queryKey: ['available-vehicles', session?.selected_car?.group_id],
     enabled: !!session?.selected_car?.group_id,
     queryFn: async () => {
@@ -55,10 +57,13 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
         .from('fleet_vehicles')
         .select(`
           *,
-          car_model:car_models(*)
+          car_model:car_models(
+            *,
+            car_group:car_groups(*)
+          )
         `)
         .eq('status', 'available')
-        .eq('car_model.car_group_id', session?.selected_car?.group_id);
+        .eq('car_model.car_group.id', session?.selected_car?.group_id);
       
       if (error) throw error;
       return data;
@@ -140,6 +145,9 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
                     </h3>
                     <p className="text-sm text-muted-foreground">
                       Placa: {vehicle.plate}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Grupo: {vehicle.car_model?.car_group?.name}
                     </p>
                   </div>
 
