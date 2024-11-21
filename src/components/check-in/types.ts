@@ -1,3 +1,5 @@
+import { Json } from "@/integrations/supabase/types";
+
 export interface PhotoCategory {
   id: string;
   label: string;
@@ -6,13 +8,16 @@ export interface PhotoCategory {
 export interface SelectedCar {
   name: string;
   category: string;
-  [key: string]: any;
+  group_id?: string;
+  price?: number;
+  period?: string;
 }
 
 export interface CheckInReservation {
   id: string;
   selected_car: SelectedCar;
   driver: {
+    id: string;
     full_name: string;
     [key: string]: any;
   };
@@ -28,6 +33,7 @@ export interface CheckoutSession {
   reservation_number: number;
   selected_car: SelectedCar;
   driver: {
+    id: string;
     full_name: string;
   };
   pickup_date: string;

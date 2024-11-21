@@ -29,13 +29,23 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('checkout_sessions')
-        .select('*')
+        .select(`
+          *,
+          driver:driver_details(*)
+        `)
         .eq('id', sessionId)
         .single();
       
       if (error) throw error;
-      setSelectedGroup(data.selected_car.category);
-      return data as CheckInReservation;
+      
+      const transformedData = {
+        ...data,
+        selected_car: data.selected_car as SelectedCar,
+        selected_optionals: data.selected_optionals || []
+      } as CheckInReservation;
+      
+      setSelectedGroup(transformedData.selected_car.category);
+      return transformedData;
     },
   });
 

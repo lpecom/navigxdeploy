@@ -23,12 +23,20 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
     queryFn: async () => {
       const { data, error } = await supabase
         .from('checkout_sessions')
-        .select('*')
+        .select(`
+          *,
+          driver:driver_details(*)
+        `)
         .eq('id', sessionId)
         .single();
       
       if (error) throw error;
-      return data as CheckInReservation;
+      
+      return {
+        ...data,
+        selected_car: data.selected_car as SelectedCar,
+        selected_optionals: data.selected_optionals || []
+      } as CheckInReservation;
     },
   });
 

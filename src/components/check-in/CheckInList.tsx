@@ -26,7 +26,13 @@ const CheckInList = () => {
         .order('pickup_date', { ascending: true });
       
       if (error) throw error;
-      return data as CheckoutSession[];
+      
+      // Transform the data to match our type
+      return (data || []).map(session => ({
+        ...session,
+        selected_car: session.selected_car as SelectedCar,
+        selected_optionals: session.selected_optionals || []
+      })) as CheckoutSession[];
     },
   });
 
