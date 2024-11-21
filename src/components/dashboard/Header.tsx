@@ -34,56 +34,58 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 w-full bg-white border-b border-gray-200 h-16 z-40">
-      <div className="h-full px-6 flex items-center justify-between max-w-[1600px] mx-auto">
-        <div className="flex items-center gap-8">
-          <div className="relative w-96">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+    <header className="fixed top-0 right-0 left-0 lg:left-64 h-14 bg-white border-b border-gray-200 z-40">
+      <div className="h-full px-4 flex items-center justify-between max-w-[1600px] mx-auto">
+        <div className="flex items-center gap-8 flex-1">
+          <div className="relative max-w-md w-full">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
-              placeholder="Buscar veículos, clientes e pedidos..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-gray-50/80 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-primary text-gray-900 placeholder:text-gray-500 transition-all duration-200"
+              placeholder="Search..."
+              className="w-full pl-9 pr-4 py-2 text-sm rounded-lg bg-gray-50/80 border-0 ring-1 ring-gray-200 focus:ring-2 focus:ring-primary text-gray-900 placeholder:text-gray-500 transition-all duration-200"
             />
           </div>
         </div>
         
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2">
           <Link to="/login">
-            <Button variant="outline" className="font-medium">
-              Portal do Motorista
+            <Button variant="outline" size="sm" className="hidden sm:flex">
+              Driver Portal
             </Button>
           </Link>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5 text-gray-500" />
+              <Bell className="h-4 w-4 text-gray-500" />
               <span className="absolute top-1 right-1.5 h-2 w-2 bg-red-500 rounded-full" />
             </Button>
 
             <Button variant="ghost" size="icon">
-              <Settings className="h-5 w-5 text-gray-500" />
+              <Settings className="h-4 w-4 text-gray-500" />
             </Button>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-3 hover:bg-gray-50 p-1.5 rounded-lg transition-colors">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                  <span className="text-primary font-medium">JD</span>
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-medium text-gray-900">John Doe</p>
-                  <p className="text-xs text-gray-500">Administrador</p>
-                </div>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="flex items-center gap-2 ml-2">
+                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                    <span className="text-primary text-sm font-medium">JD</span>
+                  </div>
+                  <div className="hidden sm:block text-left">
+                    <p className="text-sm font-medium text-gray-700">John Doe</p>
+                    <p className="text-xs text-gray-500">Admin</p>
+                  </div>
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Settings className="mr-2 h-4 w-4" />
-                  <span>Configurações</span>
+                  <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sair</span>
+                  <span>Sign out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

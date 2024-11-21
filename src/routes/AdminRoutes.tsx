@@ -71,7 +71,7 @@ const AdminRoutes = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50/50">
       <Sidebar />
       <div className="lg:pl-64">
         <Header />
@@ -79,9 +79,9 @@ const AdminRoutes = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="p-4 mt-16"
+          className="mt-14"
         >
-          <div className="max-w-7xl mx-auto">
+          <div className="px-4 py-4 max-w-7xl mx-auto">
             <Routes>
               <Route index element={<Dashboard />} />
               <Route path="vehicles">
