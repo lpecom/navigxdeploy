@@ -80,7 +80,7 @@ const Reservations = ({ filter }: ReservationsProps) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="p-6 lg:p-8"
+      className="h-full"
     >
       {content}
     </motion.main>
