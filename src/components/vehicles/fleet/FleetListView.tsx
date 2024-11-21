@@ -21,6 +21,7 @@ export const FleetListView = () => {
   const [statusFilter, setStatusFilter] = useState<VehicleStatus | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const { data: allVehicles, refetch, isLoading, error } = useQuery({
     queryKey: ['fleet-vehicles-list'],
@@ -80,6 +81,77 @@ export const FleetListView = () => {
       });
     } finally {
       setIsSyncing(false);
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const { data, error } = await supabase.rpc('export_fleet_data');
+      if (error) throw error;
+
+      // Convert data to CSV format
+      const csvContent = "data:text/csv;charset=utf-8," + 
+        Object.keys(data[0]).join(",") + "\n" +
+        data.map(row => Object.values(row).join(",")).join("\n");
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "fleet_data.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({
+        title: "Exportação concluída",
+        description: "Os dados da frota foram exportados com sucesso.",
+      });
+    } catch (error) {
+      console.error("Error exporting fleet data:", error);
+      toast({
+        title: "Erro",
+        description: "Falha ao exportar dados da frota. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const { data, error } = await supabase.functions.invoke('process-fleet-csv', {
+        body: formData,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Importação concluída",
+        description: `${data.processed} veículos processados.${
+          data.errors?.length ? ` ${data.errors.length} erros encontrados.` : ''
+        }`,
+      });
+
+      refetch();
+    } catch (error) {
+      console.error("Error uploading fleet data:", error);
+      toast({
+        title: "Erro",
+        description: "Falha ao importar dados da frota. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+      // Reset the file input
+      if (event.target) {
+        event.target.value = '';
+      }
     }
   };
 
@@ -153,7 +225,10 @@ export const FleetListView = () => {
         />
         <FleetHeaderActions
           onSync={handleSync}
+          onExport={handleExport}
+          onFileUpload={handleFileUpload}
           isSyncing={isSyncing}
+          isUploading={isUploading}
         />
       </div>
       
