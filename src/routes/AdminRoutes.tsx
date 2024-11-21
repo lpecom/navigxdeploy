@@ -25,11 +25,11 @@ const AdminRoutes = () => {
           <div className="mx-auto max-w-7xl">
             <Routes>
               <Route index element={<Dashboard />} />
-              <Route path="vehicles" element={<Vehicles />} />
+              <Route path="vehicles" element={<Vehicles view="fleet" />} />
               <Route path="vehicles/:id" element={<VehicleDetails />} />
               <Route path="customers" element={<Customers />} />
               <Route path="customers/:id" element={<CustomerDetails />} />
-              <Route path="reservations" element={<Reservations />} />
+              <Route path="reservations" element={<Reservations filter="all" />} />
               <Route path="offers" element={<Offers />} />
               <Route path="accessories" element={<Accessories />} />
               <Route path="optionals" element={<Optionals />} />
