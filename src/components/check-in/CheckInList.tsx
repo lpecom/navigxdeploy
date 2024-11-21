@@ -8,7 +8,7 @@ import { Calendar, Clock, User, Car } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import type { CheckoutSession } from "./types";
+import type { CheckoutSession, SelectedCar, Optional } from "./types";
 
 const CheckInList = () => {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const CheckInList = () => {
       return (data || []).map(session => ({
         ...session,
         selected_car: session.selected_car as SelectedCar,
-        selected_optionals: session.selected_optionals || []
+        selected_optionals: (session.selected_optionals as Optional[]) || []
       })) as CheckoutSession[];
     },
   });

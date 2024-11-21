@@ -28,6 +28,11 @@ export interface PhotosState {
   [key: string]: string[];
 }
 
+export interface Optional {
+  name: string;
+  price: number;
+}
+
 export interface CheckoutSession {
   id: string;
   reservation_number: number;
@@ -39,8 +44,5 @@ export interface CheckoutSession {
   pickup_date: string;
   pickup_time: string;
   status: string;
-  selected_optionals: Array<{
-    name: string;
-    price: number;
-  }>;
+  selected_optionals: Optional[];
 }

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Car, CreditCard, Package } from "lucide-react";
-import type { CheckInReservation } from "../types";
+import type { CheckInReservation, SelectedCar, Optional } from "../types";
 
 interface OrderReviewProps {
   sessionId: string;
@@ -41,7 +41,7 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
       const transformedData = {
         ...data,
         selected_car: data.selected_car as SelectedCar,
-        selected_optionals: data.selected_optionals || []
+        selected_optionals: (data.selected_optionals as Optional[]) || []
       } as CheckInReservation;
       
       setSelectedGroup(transformedData.selected_car.category);
@@ -141,7 +141,7 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
           <CardContent>
             {session.selected_optionals?.length > 0 ? (
               <div className="space-y-4">
-                {session.selected_optionals.map((optional: any, index: number) => (
+                {session.selected_optionals.map((optional: Optional, index: number) => (
                   <div key={index} className="flex justify-between items-center">
                     <span>{optional.name}</span>
                     <Badge variant="secondary">
