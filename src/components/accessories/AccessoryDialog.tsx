@@ -24,7 +24,8 @@ export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: Ac
     description: accessory?.description || '',
     price: accessory?.price || 0,
     price_period: accessory?.price_period || 'per_rental',
-    created_at: accessory?.created_at || new Date().toISOString()
+    created_at: accessory?.created_at || new Date().toISOString(),
+    thumbnail_url: accessory?.thumbnail_url || null
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,7 +40,8 @@ export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: Ac
             name: formData.name,
             description: formData.description,
             price: formData.price,
-            price_period: formData.price_period
+            price_period: formData.price_period,
+            thumbnail_url: formData.thumbnail_url
           })
           .eq('id', accessory.id);
 
@@ -51,7 +53,8 @@ export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: Ac
             name: formData.name,
             description: formData.description,
             price: formData.price,
-            price_period: formData.price_period
+            price_period: formData.price_period,
+            thumbnail_url: formData.thumbnail_url
           });
 
         if (error) throw error;
