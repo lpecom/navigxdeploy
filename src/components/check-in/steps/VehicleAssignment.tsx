@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Car, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import type { CheckInReservation } from "../types";
 
 interface VehicleAssignmentProps {
   sessionId: string;
@@ -27,7 +28,7 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
         .single();
       
       if (error) throw error;
-      return data;
+      return data as CheckInReservation;
     },
   });
 

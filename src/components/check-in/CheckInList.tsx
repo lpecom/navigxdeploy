@@ -8,6 +8,7 @@ import { Calendar, Clock, User, Car } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import type { CheckoutSession } from "./types";
 
 const CheckInList = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const CheckInList = () => {
         .order('pickup_date', { ascending: true });
       
       if (error) throw error;
-      return data;
+      return data as CheckoutSession[];
     },
   });
 

@@ -5,6 +5,7 @@ export interface PhotoCategory {
 
 export interface SelectedCar {
   name: string;
+  category: string;
   [key: string]: any;
 }
 
@@ -32,4 +33,8 @@ export interface CheckoutSession {
   pickup_date: string;
   pickup_time: string;
   status: string;
+  selected_optionals: Array<{
+    name: string;
+    price: number;
+  }>;
 }

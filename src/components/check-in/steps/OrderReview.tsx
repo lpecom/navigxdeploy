@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Car, CreditCard, Package } from "lucide-react";
+import type { CheckInReservation } from "../types";
 
 interface OrderReviewProps {
   sessionId: string;
@@ -34,7 +35,7 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
       
       if (error) throw error;
       setSelectedGroup(data.selected_car.category);
-      return data;
+      return data as CheckInReservation;
     },
   });
 
@@ -55,7 +56,6 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
   const handleGroupChange = async (newGroup: string) => {
     try {
       setIsChanging(true);
-      // Here we would calculate price differences and update the session
       const { error } = await supabase
         .from('checkout_sessions')
         .update({
