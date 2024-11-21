@@ -6,7 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// Helper function to map status values
 const mapVehicleStatus = (status: string): string => {
   const statusMap: Record<string, string> = {
     'disponível': 'available',
@@ -43,10 +42,13 @@ serve(async (req) => {
   try {
     console.log('Starting fleet data sync')
     
-    // Fetch fleet data from the URL
-    const response = await fetch('https://brown-georgeanne-53.tiiny.site/')
+    // Update the URL to use HTTPS and remove the trailing colon
+    const fleetDataUrl = 'https://brown-georgeanne-53.tiiny.site'
+    console.log('Fetching data from:', fleetDataUrl)
+    
+    const response = await fetch(fleetDataUrl)
     if (!response.ok) {
-      throw new Error(`Failed to fetch fleet data: ${response.statusText}`)
+      throw new Error(`Failed to fetch fleet data: ${response.status} ${response.statusText}`)
     }
 
     const fleetData = await response.text()
@@ -130,11 +132,12 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message
+        error: error.message,
+        details: error.stack
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400
+        status: 500
       }
     )
   }
