@@ -59,7 +59,7 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
             id,
             name,
             image_url,
-            car_group:car_groups(
+            car_group:car_groups!inner(
               id,
               name,
               description,
@@ -71,10 +71,11 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
           )
         `)
         .eq('status', 'available')
-        .eq('car_model.car_group.id', session?.selected_car?.group_id);
+        .eq('car_model.car_group.id', session?.selected_car?.group_id)
+        .returns<FleetVehicleWithRelations[]>();
       
       if (error) throw error;
-      return data as FleetVehicleWithRelations[];
+      return data;
     },
   });
 
