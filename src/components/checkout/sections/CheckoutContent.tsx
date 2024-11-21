@@ -112,7 +112,6 @@ export const CheckoutContent = ({
     if (step > 1) {
       setStep(step - 1)
     } else {
-      // If we're at step 1, we go back to the plans page
       window.location.href = '/plans'
     }
   }

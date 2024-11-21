@@ -34,6 +34,7 @@ export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: Ac
 
     try {
       if (accessory) {
+        // Update existing accessory
         const { error } = await supabase
           .from('accessories')
           .update({
@@ -47,6 +48,7 @@ export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: Ac
 
         if (error) throw error;
       } else {
+        // Create new accessory
         const { error } = await supabase
           .from('accessories')
           .insert({
@@ -64,6 +66,8 @@ export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: Ac
         title: "Sucesso",
         description: `Opcional ${accessory ? 'atualizado' : 'criado'} com sucesso.`,
       });
+      
+      // Call onSuccess before closing the dialog
       onSuccess();
       onOpenChange(false);
     } catch (error) {
