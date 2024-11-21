@@ -4,23 +4,23 @@ import { DollarSign, Users, Truck, HeadphonesIcon } from "lucide-react";
 const features = [
   {
     icon: DollarSign,
-    title: "Best price guaranteed",
-    description: "Find a lower price? We'll refund you 100% of the difference."
+    title: "Melhor preço garantido",
+    description: "Encontrou preço menor? Devolvemos 100% da diferença."
   },
   {
     icon: Users,
-    title: "Experience driver",
-    description: "Don't have a driver? Don't worry, we have many experienced drivers for you."
+    title: "Motorista experiente",
+    description: "Não tem motorista? Não se preocupe, temos vários motoristas experientes para você."
   },
   {
     icon: Truck,
-    title: "24-hour car delivery",
-    description: "Book your car anytime and we will deliver it directly to you."
+    title: "Entrega 24 horas",
+    description: "Reserve seu carro a qualquer momento e entregaremos diretamente para você."
   },
   {
     icon: HeadphonesIcon,
-    title: "24/7 technical support",
-    description: "Have a question? Contact our rental support anytime when you have a problem."
+    title: "Suporte 24/7",
+    description: "Tem alguma dúvida? Entre em contato com nosso suporte a qualquer momento."
   }
 ];
 
@@ -35,10 +35,10 @@ export const WhyChooseUs = () => {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="relative"
+            className="relative order-2 lg:order-1"
           >
             <img
-              src="https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80"
+              src="https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&q=80"
               alt="Luxury Car"
               className="w-full h-auto rounded-2xl shadow-xl"
             />
@@ -48,7 +48,7 @@ export const WhyChooseUs = () => {
           </motion.div>
 
           {/* Content */}
-          <div className="space-y-12">
+          <div className="space-y-12 order-1 lg:order-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -57,10 +57,10 @@ export const WhyChooseUs = () => {
               className="space-y-4"
             >
               <h2 className="text-sm font-medium text-primary-600 uppercase tracking-wider">
-                WHY CHOOSE US
+                POR QUE NOS ESCOLHER
               </h2>
               <h3 className="text-4xl font-display font-semibold text-gray-900 leading-tight">
-                We offer the best experience with our rental deals
+                Oferecemos a melhor experiência com nossos planos de aluguel
               </h3>
             </motion.div>
 
