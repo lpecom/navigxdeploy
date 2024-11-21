@@ -79,7 +79,7 @@ const AdminRoutes = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="p-6 lg:p-8 mt-16"
+          className="p-4 mt-16"
         >
           <div className="max-w-7xl mx-auto">
             <Routes>
