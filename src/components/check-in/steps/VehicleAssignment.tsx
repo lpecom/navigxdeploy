@@ -55,24 +55,9 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
   });
 
   const { data: availableVehicles, isLoading } = useQuery({
-    queryKey: ['available-vehicles', session?.selected_car?.category],
-    enabled: !!session?.selected_car?.category,
+    queryKey: ['available-vehicles', session?.selected_car?.group_id],
+    enabled: !!session?.selected_car?.group_id,
     queryFn: async () => {
-      // First get the category ID for the selected category name
-      const { data: categories, error: categoryError } = await supabase
-        .from('categories')
-        .select('id')
-        .eq('name', session.selected_car.category);
-      
-      if (categoryError) throw categoryError;
-      
-      // Handle case where category is not found
-      if (!categories?.length) {
-        toast.error(`Category "${session.selected_car.category}" not found`);
-        return [];
-      }
-
-      // Then query vehicles with the correct category ID
       const { data, error } = await supabase
         .from('fleet_vehicles')
         .select(`
@@ -80,7 +65,7 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
           car_model:car_models(*)
         `)
         .eq('status', 'available')
-        .eq('car_model.category_id', categories[0].id);
+        .eq('car_model.car_group_id', session?.selected_car?.group_id);
       
       if (error) throw error;
       return data;
