@@ -59,7 +59,15 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
             id,
             name,
             image_url,
-            car_group:car_groups(*)
+            car_group:car_groups(
+              id,
+              name,
+              description,
+              display_order,
+              is_active,
+              created_at,
+              updated_at
+            )
           )
         `)
         .eq('status', 'available')

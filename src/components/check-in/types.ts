@@ -65,7 +65,15 @@ export interface FleetVehicleWithRelations {
     id: string;
     name: string;
     image_url: string | null;
-    car_group: CarGroup;
+    car_group: {
+      id: string;
+      name: string;
+      description: string | null;
+      display_order: number | null;
+      is_active: boolean | null;
+      created_at: string | null;
+      updated_at: string | null;
+    };
   };
   year: string;
   current_km: number;
