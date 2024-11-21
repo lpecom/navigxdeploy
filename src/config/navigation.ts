@@ -25,29 +25,60 @@ import {
 
 export type MenuItem = {
   title: string;
-  href: string;
+  href?: string;
   icon?: React.ComponentType<{ className?: string }>;
+  items?: MenuItem[];
 };
 
 export const adminMenuItems: MenuItem[] = [
   { title: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { title: "Clientes", href: "/admin/customers", icon: Users },
-  { title: "Reservas Pendentes", href: "/admin/reservations/pending", icon: Clock },
-  { title: "Retirada", href: "/admin/reservations/pickup", icon: CalendarCheck },
-  { title: "Check-in", href: "/admin/check-in", icon: CalendarClock },
-  { title: "Visão Geral", href: "/admin/vehicles/overview", icon: Grid },
-  { title: "Categorias", href: "/admin/vehicles/categories", icon: Tag },
-  { title: "Modelos", href: "/admin/vehicles/models", icon: CarFront },
-  { title: "Veículos", href: "/admin/vehicles/fleet", icon: Car },
-  { title: "Manutenção", href: "/admin/vehicles/maintenance", icon: Wrench },
-  { title: "Opcionais", href: "/admin/accessories", icon: Package },
-  { title: "Planos", href: "/admin/plans", icon: Tag },
-  { title: "Condições", href: "/admin/fares", icon: DollarSign },
-  { title: "Análises", href: "/admin/analytics", icon: LineChart },
-  { title: "Relatórios", href: "/admin/reports", icon: BarChart },
-  { title: "Performance", href: "/admin/performance", icon: PieChart },
-  { title: "Ofertas", href: "/admin/offers", icon: Megaphone },
-  { title: "Automações", href: "/admin/automations", icon: Settings },
+  {
+    title: "Reservas",
+    icon: Calendar,
+    items: [
+      { title: "Pendentes", href: "/admin/reservations/pending", icon: Clock },
+      { title: "Retirada", href: "/admin/reservations/pickup", icon: CalendarCheck },
+      { title: "Check-in", href: "/admin/check-in", icon: CalendarClock },
+    ]
+  },
+  {
+    title: "Frota",
+    icon: Car,
+    items: [
+      { title: "Visão Geral", href: "/admin/vehicles/overview", icon: Grid },
+      { title: "Categorias", href: "/admin/vehicles/categories", icon: Tag },
+      { title: "Modelos", href: "/admin/vehicles/models", icon: CarFront },
+      { title: "Veículos", href: "/admin/vehicles/fleet", icon: Car },
+      { title: "Manutenção", href: "/admin/vehicles/maintenance", icon: Wrench },
+    ]
+  },
+  {
+    title: "Tarifas",
+    icon: DollarSign,
+    items: [
+      { title: "Opcionais", href: "/admin/accessories", icon: Package },
+      { title: "Planos", href: "/admin/plans", icon: Tag },
+      { title: "Condições", href: "/admin/fares", icon: DollarSign },
+    ]
+  },
+  {
+    title: "Análises",
+    icon: BarChart2,
+    items: [
+      { title: "Visão Geral", href: "/admin/analytics", icon: LineChart },
+      { title: "Relatórios", href: "/admin/reports", icon: BarChart },
+      { title: "Performance", href: "/admin/performance", icon: PieChart },
+    ]
+  },
+  {
+    title: "Marketing",
+    icon: Tag,
+    items: [
+      { title: "Ofertas", href: "/admin/offers", icon: Megaphone },
+      { title: "Automações", href: "/admin/automations", icon: Settings },
+    ]
+  },
   { title: "Website", href: "/admin/website-settings", icon: Globe },
   { title: "Changelog", href: "/admin/changelog", icon: History },
 ];
