@@ -6,6 +6,7 @@ import VehicleList from "@/components/vehicles/VehicleList";
 import { FleetImport } from "@/components/vehicles/FleetImport";
 import { useState } from "react";
 import { EditVehicleDialog } from "@/components/vehicles/EditVehicleDialog";
+import { motion } from "framer-motion";
 
 interface VehiclesProps {
   view: 'overview' | 'categories' | 'models' | 'fleet' | 'maintenance';
@@ -19,7 +20,12 @@ const Vehicles = ({ view }: VehiclesProps) => {
       <Sidebar />
       <div className="flex-1">
         <Header />
-        <main className="p-6 lg:p-8">
+        <motion.main 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="p-6 lg:p-8"
+        >
           <div className="max-w-[1600px] mx-auto space-y-6">
             <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
               <div>
@@ -45,7 +51,7 @@ const Vehicles = ({ view }: VehiclesProps) => {
 
             <VehicleList view={view} />
           </div>
-        </main>
+        </motion.main>
       </div>
 
       <EditVehicleDialog

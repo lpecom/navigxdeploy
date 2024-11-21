@@ -25,11 +25,11 @@ export const FleetTable = ({
   onViewDocs 
 }: FleetTableProps) => {
   return (
-    <Card className="border-0">
+    <Card className="border rounded-lg overflow-hidden">
       <div className="rounded-md">
         <Table>
-          <TableHeader className="bg-gray-50">
-            <TableRow className="hover:bg-gray-50 border-0">
+          <TableHeader className="bg-gray-50/50">
+            <TableRow className="hover:bg-gray-50/50 border-0">
               <TableHead className="w-[300px] font-medium">Vehicle / ID</TableHead>
               <TableHead className="w-[120px] font-medium">Status</TableHead>
               <TableHead className="font-medium">VIN & License plate</TableHead>

@@ -10,6 +10,7 @@ import { FleetErrorState } from "./FleetErrorState";
 import { FleetEmptyState } from "./FleetEmptyState";
 import { FleetVehicleProfileDialog } from "./FleetVehicleProfileDialog";
 import { FleetHeaderActions } from "./FleetHeaderActions";
+import { motion } from "framer-motion";
 import type { FleetVehicle, VehicleStatus } from "@/types/vehicles";
 
 export const FleetListView = () => {
@@ -20,7 +21,6 @@ export const FleetListView = () => {
   const [statusFilter, setStatusFilter] = useState<VehicleStatus | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
 
   const { data: allVehicles, refetch, isLoading, error } = useQuery({
     queryKey: ['fleet-vehicles-list'],
@@ -45,16 +45,23 @@ export const FleetListView = () => {
         `);
       
       if (error) throw error;
-      
       return (data || []).filter(vehicle => vehicle && vehicle.plate) as FleetVehicle[];
     },
+  });
+
+  const filteredVehicles = allVehicles?.filter(vehicle => {
+    const matchesSearch = !searchTerm || 
+      vehicle.plate?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehicle.car_model?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus = !statusFilter || vehicle.status === statusFilter;
+    return matchesSearch && matchesStatus;
   });
 
   const handleSync = async () => {
     setIsSyncing(true);
     try {
       const { data, error } = await supabase.functions.invoke('sync-fleet-data');
-      
       if (error) throw error;
 
       toast({
@@ -63,7 +70,6 @@ export const FleetListView = () => {
           data.errors?.length ? ` ${data.errors.length} erros encontrados.` : ''
         }`,
       });
-
       refetch();
     } catch (error) {
       console.error("Error syncing fleet:", error);
@@ -76,103 +82,6 @@ export const FleetListView = () => {
       setIsSyncing(false);
     }
   };
-
-  const handleExport = async () => {
-    try {
-      const { data, error } = await supabase.rpc('export_fleet_data');
-      if (error) throw error;
-
-      // Convert data to CSV
-      const headers = Object.keys(data[0]).join(',');
-      const rows = data.map(row => Object.values(row).join(','));
-      const csv = [headers, ...rows].join('\n');
-
-      // Create and download file
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `fleet-export-${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-
-      toast({
-        title: "Exportação concluída",
-        description: "Os dados da frota foram exportados com sucesso.",
-      });
-    } catch (error) {
-      console.error("Error exporting fleet:", error);
-      toast({
-        title: "Erro",
-        description: "Falha ao exportar dados da frota. Tente novamente.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (!file.name.endsWith('.csv')) {
-      toast({
-        title: "Erro",
-        description: "Por favor, selecione um arquivo CSV",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsUploading(true);
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const { data, error } = await supabase.functions.invoke(
-        'process-fleet-csv',
-        {
-          body: formData,
-          headers: {
-            'Accept': 'application/json',
-          },
-        }
-      );
-
-      if (error) throw error;
-
-      toast({
-        title: "Sucesso!",
-        description: `${data.processed} veículos atualizados com sucesso.${
-          data.errors?.length ? ` ${data.errors.length} erros encontrados.` : ''
-        }`,
-      });
-
-      refetch();
-    } catch (error: any) {
-      console.error("Error importing fleet:", error);
-      toast({
-        title: "Erro",
-        description: error.message || "Falha ao importar dados da frota. Tente novamente.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUploading(false);
-      event.target.value = '';
-    }
-  };
-
-  const filteredVehicles = allVehicles?.filter(vehicle => {
-    const matchesSearch = !searchTerm || 
-      vehicle.plate?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.car_model?.name?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus = !statusFilter || vehicle.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
 
   const handleEdit = (vehicle: FleetVehicle) => {
     setEditingId(vehicle.id);
@@ -230,7 +139,12 @@ export const FleetListView = () => {
   if (error) return <FleetErrorState error={error as Error} />;
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-6"
+    >
       <div className="flex items-center justify-between">
         <FleetMetrics 
           vehicles={allVehicles || []} 
@@ -239,10 +153,7 @@ export const FleetListView = () => {
         />
         <FleetHeaderActions
           onSync={handleSync}
-          onExport={handleExport}
-          onFileUpload={handleFileUpload}
           isSyncing={isSyncing}
-          isUploading={isUploading}
         />
       </div>
       
@@ -273,6 +184,6 @@ export const FleetListView = () => {
         open={!!selectedVehicleId}
         onOpenChange={(open) => !open && setSelectedVehicleId(null)}
       />
-    </div>
+    </motion.div>
   );
 };
