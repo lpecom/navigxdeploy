@@ -14,6 +14,8 @@ import Reports from "@/pages/Reports";
 import Automations from "@/pages/Automations";
 import Header from "@/components/dashboard/Header";
 import Sidebar from "@/components/dashboard/Sidebar";
+import CheckInList from "@/components/check-in/CheckInList";
+import CheckInProcess from "@/components/check-in/CheckInProcess";
 
 const AdminRoutes = () => {
   return (
@@ -49,7 +51,12 @@ const AdminRoutes = () => {
                 <Route path="pending" element={<Reservations filter="pending" />} />
                 <Route path="pickup" element={<Reservations filter="pickup" />} />
               </Route>
-              <Route path="check-in" element={<Reservations filter="checkin" />} />
+
+              {/* Check-in Routes */}
+              <Route path="check-in">
+                <Route index element={<CheckInList />} />
+                <Route path=":id" element={<CheckInProcess />} />
+              </Route>
               
               {/* Tariff Routes */}
               <Route path="accessories" element={<Accessories />} />
