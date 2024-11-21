@@ -3,7 +3,7 @@ export type PaymentStatus = 'paid' | 'pending';
 export type ReservationStatus = 'pending' | 'approved' | 'rejected';
 export type CarCategory = 'SUV' | 'Luxury' | 'Economy' | 'Sports';
 export type LeadSource = 'facebook' | 'whatsapp' | 'form';
-export type ReservationFilter = 'pending' | 'pickup';
+export type ReservationFilter = 'pending' | 'pickup' | 'checkin';
 export type PickupFilter = 'today' | 'this-week' | 'next-week';
 
 export interface Optional {

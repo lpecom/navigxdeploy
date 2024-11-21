@@ -27,20 +27,28 @@ const AdminRoutes = () => {
               <Route index element={<Dashboard />} />
               
               {/* Vehicle Routes */}
-              <Route path="vehicles/overview" element={<Vehicles view="overview" />} />
-              <Route path="vehicles/categories" element={<Vehicles view="categories" />} />
-              <Route path="vehicles/models" element={<Vehicles view="models" />} />
-              <Route path="vehicles/fleet" element={<Vehicles view="fleet" />} />
-              <Route path="vehicles/maintenance" element={<Vehicles view="maintenance" />} />
-              <Route path="vehicles/:id" element={<VehicleDetails />} />
+              <Route path="vehicles">
+                <Route index element={<Navigate to="fleet" replace />} />
+                <Route path="overview" element={<Vehicles view="overview" />} />
+                <Route path="categories" element={<Vehicles view="categories" />} />
+                <Route path="models" element={<Vehicles view="models" />} />
+                <Route path="fleet" element={<Vehicles view="fleet" />} />
+                <Route path="maintenance" element={<Vehicles view="maintenance" />} />
+                <Route path=":id" element={<VehicleDetails />} />
+              </Route>
               
               {/* Customer Routes */}
-              <Route path="customers" element={<Customers />} />
-              <Route path="customers/:id" element={<CustomerDetails />} />
+              <Route path="customers">
+                <Route index element={<Customers />} />
+                <Route path=":id" element={<CustomerDetails />} />
+              </Route>
               
               {/* Reservation Routes */}
-              <Route path="reservations/pending" element={<Reservations filter="pending" />} />
-              <Route path="reservations/pickup" element={<Reservations filter="pickup" />} />
+              <Route path="reservations">
+                <Route index element={<Navigate to="pending" replace />} />
+                <Route path="pending" element={<Reservations filter="pending" />} />
+                <Route path="pickup" element={<Reservations filter="pickup" />} />
+              </Route>
               <Route path="check-in" element={<Reservations filter="checkin" />} />
               
               {/* Tariff Routes */}
