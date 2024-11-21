@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Car, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
-import type { CheckInReservation, SelectedCar, Optional } from "../types";
+import type { CheckInReservation, SelectedCar } from "../types";
 
 interface VehicleAssignmentProps {
   sessionId: string;
@@ -33,12 +33,6 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
       if (error) throw error;
       
       const selectedCar = data.selected_car as Record<string, any>;
-      const optionals = Array.isArray(data.selected_optionals) 
-        ? data.selected_optionals.map(opt => ({
-            name: (opt as Record<string, any>).name || '',
-            price: Number((opt as Record<string, any>).price) || 0
-          }))
-        : [];
 
       return {
         ...data,
@@ -48,8 +42,7 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
           group_id: selectedCar.group_id,
           price: selectedCar.price,
           period: selectedCar.period
-        } as SelectedCar,
-        selected_optionals: optionals
+        } as SelectedCar
       } as CheckInReservation;
     },
   });
@@ -112,7 +105,7 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
       <h2 className="text-2xl font-bold">Atribuição de Veículo</h2>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {availableVehicles.map((vehicle) => (
+        {availableVehicles?.map((vehicle) => (
           <motion.div
             key={vehicle.id}
             initial={{ opacity: 0, y: 20 }}
