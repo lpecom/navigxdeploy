@@ -14,6 +14,12 @@ export interface CarModel {
   category?: {
     name: string;
   };
+  vehicle_type?: string | null;
+  passengers?: number | null;
+  luggage?: number | null;
+  daily_price?: number | null;
+  total_price?: number | null;
+  features?: any[] | null;
 }
 
 export interface CarModelResponse extends CarModel {
