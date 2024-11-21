@@ -4,6 +4,7 @@ import { PaymentMethodSelector } from "../PaymentMethodSelector"
 import { CreditCardForm } from "../payment-methods/CreditCardForm"
 import { PixPayment } from "../payment-methods/PixPayment"
 import { BoletoPayment } from "../payment-methods/BoletoPayment"
+import { PaymentTypeSelector } from "../PaymentTypeSelector"
 import { motion } from "framer-motion"
 import { useCart } from "@/contexts/CartContext"
 import { Separator } from "@/components/ui/separator"
@@ -20,10 +21,49 @@ export const PaymentSection = ({
   amount,
   driverId,
 }: PaymentSectionProps) => {
-  const [selectedMethod, setSelectedMethod] = useState("credit")
+  const [selectedMethod, setSelectedMethod] = useState("")
+  const [paymentType, setPaymentType] = useState<'online' | 'store' | null>(null)
+  const [finalAmount, setFinalAmount] = useState(amount)
   const { state: cartState } = useCart()
   
   const optionalItems = cartState.items.filter(item => item.type === 'optional')
+
+  const handlePaymentTypeSelect = (type: 'online' | 'store', amount: number) => {
+    setPaymentType(type)
+    setFinalAmount(amount)
+  }
+
+  if (!paymentType) {
+    return (
+      <Card className="p-4 sm:p-6">
+        <PaymentTypeSelector 
+          amount={amount}
+          onSelect={handlePaymentTypeSelect}
+        />
+      </Card>
+    )
+  }
+
+  if (paymentType === 'store') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="space-y-6"
+      >
+        <Card className="p-6 text-center space-y-4">
+          <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+            <CheckCircle className="w-6 h-6 text-green-600" />
+          </div>
+          <h2 className="text-xl font-semibold">Reserva Confirmada!</h2>
+          <p className="text-muted-foreground">
+            Sua reserva foi confirmada com sucesso. O pagamento de R$ {finalAmount.toFixed(2)} será realizado na loja no momento da retirada do veículo.
+          </p>
+        </Card>
+      </motion.div>
+    )
+  }
 
   return (
     <motion.div
@@ -72,21 +112,21 @@ export const PaymentSection = ({
       <Card className="p-4 sm:p-6">
         {selectedMethod === "credit" && (
           <CreditCardForm
-            amount={amount}
+            amount={finalAmount}
             driverId={driverId}
             onSuccess={onPaymentSuccess}
           />
         )}
         {selectedMethod === "pix" && (
           <PixPayment
-            amount={amount}
+            amount={finalAmount}
             driverId={driverId}
             onSuccess={onPaymentSuccess}
           />
         )}
         {selectedMethod === "boleto" && (
           <BoletoPayment
-            amount={amount}
+            amount={finalAmount}
             driverId={driverId}
             onSuccess={onPaymentSuccess}
           />
