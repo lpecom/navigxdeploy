@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import type { Accessory } from "@/pages/Accessories";
 import { useToast } from "@/components/ui/use-toast";
+import { Plus, Minus } from "lucide-react";
 
 interface AccessoryDialogProps {
   open: boolean;
@@ -18,6 +19,7 @@ interface AccessoryDialogProps {
 export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: AccessoryDialogProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const [quantity, setQuantity] = useState(1);
   const [formData, setFormData] = useState<Accessory>({
     id: accessory?.id || '',
     name: accessory?.name || '',
@@ -27,6 +29,13 @@ export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: Ac
     created_at: accessory?.created_at || new Date().toISOString(),
     thumbnail_url: accessory?.thumbnail_url || null
   });
+
+  const handleQuantityChange = (delta: number) => {
+    const newQuantity = quantity + delta;
+    if (newQuantity >= 1) {
+      setQuantity(newQuantity);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,10 +73,10 @@ export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: Ac
 
       toast({
         title: "Sucesso",
-        description: `Opcional ${accessory ? 'atualizado' : 'criado'} com sucesso.`,
+        description: `Opcional ${accessory ? 'atualizado' : 'adicionado'} com sucesso.`,
       });
       
-      // Call onSuccess before closing the dialog
+      // Call onSuccess with quantity before closing the dialog
       onSuccess();
       onOpenChange(false);
     } catch (error) {
@@ -137,6 +146,32 @@ export const AccessoryDialog = ({ open, onOpenChange, accessory, onSuccess }: Ac
               </SelectContent>
             </Select>
           </div>
+
+          {!accessory && (
+            <div className="space-y-2">
+              <label>Quantidade</label>
+              <div className="flex items-center gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleQuantityChange(-1)}
+                  disabled={quantity <= 1}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="text-lg font-medium">{quantity}</span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleQuantityChange(1)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
 
           <div className="flex justify-end gap-2">
             <Button
