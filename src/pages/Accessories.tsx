@@ -15,6 +15,7 @@ export interface Accessory {
   price: number;
   price_period: string;
   created_at: string;
+  thumbnail_url: string | null;
 }
 
 const Accessories = () => {

@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import type { Accessory } from "@/pages/Accessories";
 import { useToast } from "@/components/ui/use-toast";
@@ -92,11 +92,13 @@ export const AccessoryList = ({ accessories, onEdit, onRefetch }: AccessoryListP
           {accessories.map((accessory) => (
             <TableRow key={accessory.id}>
               <TableCell>
-                <Avatar 
-                  className="h-10 w-10 rounded-md"
-                  src={accessory.thumbnail_url || defaultThumbnails[Math.floor(Math.random() * defaultThumbnails.length)]} 
-                  alt={accessory.name}
-                />
+                <Avatar className="h-10 w-10 rounded-md">
+                  <AvatarImage 
+                    src={accessory.thumbnail_url || defaultThumbnails[Math.floor(Math.random() * defaultThumbnails.length)]} 
+                    alt={accessory.name}
+                  />
+                  <AvatarFallback>{accessory.name[0]}</AvatarFallback>
+                </Avatar>
               </TableCell>
               <TableCell>{accessory.name}</TableCell>
               <TableCell>{accessory.description}</TableCell>

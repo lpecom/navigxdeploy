@@ -5,7 +5,7 @@ import { Plus, Minus } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface Optional {
   id: string;
@@ -101,11 +101,13 @@ export const OptionalsList = () => {
 
         return (
           <div key={optional.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-slate-50 transition-colors">
-            <Avatar 
-              className="h-16 w-16 rounded-md"
-              src={thumbnailUrl}
-              alt={optional.name}
-            />
+            <Avatar className="h-16 w-16 rounded-md">
+              <AvatarImage 
+                src={thumbnailUrl}
+                alt={optional.name}
+              />
+              <AvatarFallback>{optional.name[0]}</AvatarFallback>
+            </Avatar>
             <div className="flex-1">
               <h3 className="font-medium">{optional.name}</h3>
               <p className="text-sm text-gray-600">{optional.description}</p>
