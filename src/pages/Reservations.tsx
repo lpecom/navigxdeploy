@@ -5,6 +5,8 @@ import ReservationsList from "@/components/reservations/ReservationsList"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { type ReservationFilter } from "@/types/reservation"
 import { motion } from "framer-motion"
+import Sidebar from "@/components/dashboard/Sidebar"
+import Header from "@/components/dashboard/Header"
 
 interface ReservationsProps {
   filter: ReservationFilter
@@ -42,51 +44,54 @@ const Reservations = ({ filter }: ReservationsProps) => {
     )
   }
 
-  if (filter === 'pending') {
-    return (
-      <motion.main 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className="flex-1 p-6 bg-gray-50"
-      >
-        <div className="max-w-7xl mx-auto space-y-6">
+  const content = (
+    <div className="max-w-[1600px] mx-auto space-y-6">
+      {filter === 'pending' ? (
+        <>
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">Reservas Pendentes</h1>
           </div>
           <ReservationsList filter="pending" />
-        </div>
-      </motion.main>
-    )
-  }
+        </>
+      ) : (
+        <>
+          <h1 className="text-2xl font-bold">Retiradas</h1>
+          <Tabs defaultValue="today" className="w-full">
+            <TabsList className="bg-white shadow-sm">
+              <TabsTrigger value="today">Hoje</TabsTrigger>
+              <TabsTrigger value="this-week">Esta Semana</TabsTrigger>
+              <TabsTrigger value="next-week">Próxima Semana</TabsTrigger>
+            </TabsList>
+            <TabsContent value="today" className="mt-6">
+              <ReservationsList filter="today" />
+            </TabsContent>
+            <TabsContent value="this-week" className="mt-6">
+              <ReservationsList filter="this-week" />
+            </TabsContent>
+            <TabsContent value="next-week" className="mt-6">
+              <ReservationsList filter="next-week" />
+            </TabsContent>
+          </Tabs>
+        </>
+      )}
+    </div>
+  )
 
   return (
-    <motion.main 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="flex-1 p-6 bg-gray-50"
-    >
-      <div className="max-w-7xl mx-auto space-y-6">
-        <h1 className="text-2xl font-bold">Retiradas</h1>
-        <Tabs defaultValue="today" className="w-full">
-          <TabsList className="bg-white shadow-sm">
-            <TabsTrigger value="today">Hoje</TabsTrigger>
-            <TabsTrigger value="this-week">Esta Semana</TabsTrigger>
-            <TabsTrigger value="next-week">Próxima Semana</TabsTrigger>
-          </TabsList>
-          <TabsContent value="today" className="mt-6">
-            <ReservationsList filter="today" />
-          </TabsContent>
-          <TabsContent value="this-week" className="mt-6">
-            <ReservationsList filter="this-week" />
-          </TabsContent>
-          <TabsContent value="next-week" className="mt-6">
-            <ReservationsList filter="next-week" />
-          </TabsContent>
-        </Tabs>
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
+      <div className="flex-1">
+        <Header />
+        <motion.main 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="p-6 lg:p-8"
+        >
+          {content}
+        </motion.main>
       </div>
-    </motion.main>
+    </div>
   )
 }
 
