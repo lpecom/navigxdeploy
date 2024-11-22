@@ -19,7 +19,7 @@ export interface CarModel {
   luggage?: number | null;
   daily_price?: number | null;
   total_price?: number | null;
-  features?: any[] | null;
+  features?: Record<string, any>[] | null;
 }
 
 export interface CarModelResponse extends CarModel {

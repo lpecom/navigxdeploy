@@ -13,6 +13,7 @@ import { ChevronLeft } from "lucide-react"
 import { CarSlider } from "@/components/home/CarSlider"
 import { PlanDetails } from "./PlanDetails"
 import { useQuery } from "@tanstack/react-query"
+import type { CarModel } from "@/types/vehicles"
 
 interface CheckoutContentProps {
   step: number
@@ -120,7 +121,13 @@ export const CheckoutContent = ({
         .eq('category_id', cartState?.items?.[0]?.category_id)
       
       if (error) throw error;
-      return data;
+      
+      // Convert the JSON fields to the correct type
+      return (data || []).map(model => ({
+        ...model,
+        optionals: model.optionals as Record<string, any> | null,
+        features: model.features as Record<string, any>[] | null
+      })) as CarModel[];
     },
     enabled: !!cartState?.items?.[0]?.category_id
   });
