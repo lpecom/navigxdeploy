@@ -6,23 +6,19 @@ import { PickupScheduler } from "./PickupScheduler"
 import { PaymentSection } from "./PaymentSection"
 import { SuccessSection } from "./SuccessSection"
 import { SupportCard } from "./SupportCard"
-import { createCheckoutSession } from "../CheckoutSessionHandler"
-import { supabase } from "@/integrations/supabase/client"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft } from "lucide-react"
-import { CarSlider } from "@/components/home/CarSlider"
-import { PlanDetails } from "./PlanDetails"
-import { useQuery } from "@tanstack/react-query"
-import type { CarModel } from "@/types/vehicles"
+import { PlanSelectionStep } from "./steps/PlanSelectionStep"
+import { InsuranceAndOptionalsStep } from "./steps/InsuranceAndOptionalsStep"
 
 interface CheckoutContentProps {
-  step: number
-  customerId: string | null
-  cartState: any
-  dispatch: any
-  toast: any
-  setStep: (step: number) => void
-  setCustomerId: (id: string | null) => void
+  step: number;
+  customerId: string | null;
+  cartState: any;
+  dispatch: any;
+  toast: any;
+  setStep: (step: number) => void;
+  setCustomerId: (id: string | null) => void;
 }
 
 export const CheckoutContent = ({
@@ -36,27 +32,8 @@ export const CheckoutContent = ({
 }: CheckoutContentProps) => {
   const handleCustomerSubmit = async (customerData: any) => {
     try {
-      if (cartState.items.length === 0) {
-        toast({
-          title: "Carrinho vazio",
-          description: "Adicione itens ao carrinho antes de prosseguir.",
-          variant: "destructive",
-        })
-        return
-      }
-
-      const session = await createCheckoutSession({
-        driverId: customerData.id,
-        cartItems: cartState.items,
-        totalAmount: cartState.total,
-        onSuccess: (sessionId) => {
-          dispatch({ type: 'SET_CHECKOUT_SESSION', payload: sessionId })
-        }
-      })
-
       setCustomerId(customerData.id)
-      setStep(2)
-      
+      setStep(4) // Move to date/time selection
       toast({
         title: "Dados salvos com sucesso!",
         description: "Seus dados foram salvos. Vamos agendar sua retirada.",
@@ -65,7 +42,7 @@ export const CheckoutContent = ({
       console.error('Error saving customer details:', error)
       toast({
         title: "Erro ao salvar dados",
-        description: "Ocorreu um erro ao salvar seus dados. Por favor, tente novamente.",
+        description: error.message || "Ocorreu um erro ao salvar seus dados.",
         variant: "destructive",
       })
     }
@@ -73,78 +50,27 @@ export const CheckoutContent = ({
 
   const handleScheduleSubmit = async (scheduleData: any) => {
     try {
-      if (!cartState.checkoutSessionId) {
-        throw new Error('No checkout session found')
-      }
-
-      const { error } = await supabase
-        .from('checkout_sessions')
-        .update({
-          pickup_date: scheduleData.date,
-          pickup_time: scheduleData.time,
-          status: 'pending_approval'
-        })
-        .eq('id', cartState.checkoutSessionId)
-
-      if (error) throw error
-
-      setStep(3)
-      
+      setStep(5)
       toast({
         title: "Agendamento confirmado!",
         description: "Seu horário foi agendado com sucesso.",
       })
     } catch (error: any) {
-      console.error('Error saving schedule:', error)
       toast({
         title: "Erro ao agendar",
-        description: "Ocorreu um erro ao agendar seu horário. Por favor, tente novamente.",
+        description: "Ocorreu um erro ao agendar seu horário.",
         variant: "destructive",
       })
     }
   }
 
   const handlePaymentSuccess = () => {
-    setStep(4)
+    setStep(6)
     toast({
       title: "Pagamento confirmado!",
       description: "Seu pagamento foi processado com sucesso.",
     })
   }
-
-  const { data: carModels } = useQuery({
-    queryKey: ['car-models'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('car_models')
-        .select('*')
-        .eq('category_id', cartState?.items?.[0]?.category_id)
-      
-      if (error) throw error;
-      
-      // Convert the JSON fields to the correct type
-      return (data || []).map(model => ({
-        ...model,
-        optionals: model.optionals as Record<string, any> | null,
-        features: model.features as Record<string, any>[] | null
-      })) as CarModel[];
-    },
-    enabled: !!cartState?.items?.[0]?.category_id
-  });
-
-  const selectedPlan = cartState.items.find((item: any) => item.type === 'car_group');
-  const planDetails = selectedPlan ? {
-    type: selectedPlan.period,
-    name: selectedPlan.name,
-    features: [
-      'Seguro completo incluso',
-      'Manutenção preventiva',
-      'Assistência 24h',
-      'Documentação e IPVA'
-    ],
-    price: selectedPlan.unitPrice,
-    period: 'mês'
-  } : null;
 
   return (
     <motion.div
@@ -153,10 +79,10 @@ export const CheckoutContent = ({
       transition={{ duration: 0.5 }}
       className="space-y-8"
     >
-      {step === 1 && (
+      {step > 1 && (
         <Button
           variant="ghost"
-          onClick={() => window.location.href = '/plans'}
+          onClick={() => setStep(step - 1)}
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-4"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -168,25 +94,23 @@ export const CheckoutContent = ({
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         <div className="lg:col-span-2 space-y-6">
-          {carModels && carModels.length > 0 && (
-            <div className="rounded-lg overflow-hidden bg-white p-4">
-              <CarSlider cars={carModels} category={selectedPlan?.category || ''} />
-            </div>
-          )}
-
-          {planDetails && step === 1 && (
-            <PlanDetails plan={planDetails} />
-          )}
-          
           {step === 1 && (
-            <CustomerForm onSubmit={handleCustomerSubmit} />
+            <PlanSelectionStep onNext={() => setStep(2)} />
           )}
           
           {step === 2 && (
+            <InsuranceAndOptionalsStep onNext={() => setStep(3)} />
+          )}
+          
+          {step === 3 && (
+            <CustomerForm onSubmit={handleCustomerSubmit} />
+          )}
+          
+          {step === 4 && (
             <PickupScheduler onSubmit={handleScheduleSubmit} />
           )}
           
-          {step === 3 && customerId && (
+          {step === 5 && customerId && (
             <PaymentSection
               amount={cartState.total}
               driverId={customerId}
@@ -194,16 +118,16 @@ export const CheckoutContent = ({
             />
           )}
           
-          {step === 4 && (
+          {step === 6 && (
             <SuccessSection />
           )}
         </div>
 
         <div className="space-y-6">
           <EnhancedSummary />
-          {step < 4 && <SupportCard />}
+          {step < 6 && <SupportCard />}
         </div>
       </div>
     </motion.div>
-  );
-};
+  )
+}
