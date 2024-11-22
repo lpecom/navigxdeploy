@@ -15,20 +15,33 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
   const selectedPlan = cartState.items.find((item: any) => item.type === 'car_group')
 
   const { data: carModels } = useQuery({
-    queryKey: ['car-models', selectedPlan?.category],
+    queryKey: ['car-models', selectedPlan?.id],
     queryFn: async () => {
-      if (!selectedPlan?.category) return null;
+      if (!selectedPlan?.id) return null;
       
+      // First get the category_id from car_groups
+      const { data: carGroup, error: carGroupError } = await supabase
+        .from('car_groups')
+        .select('id')
+        .eq('name', selectedPlan.category)
+        .single();
+      
+      if (carGroupError) {
+        console.error('Error fetching car group:', carGroupError);
+        return null;
+      }
+
+      // Then use that ID to fetch the models
       const { data, error } = await supabase
         .from('car_models')
         .select('*')
-        .eq('category_id', selectedPlan.category)
+        .eq('category_id', carGroup.id);
       
-      if (error) throw error
-      return data as CarModel[]
+      if (error) throw error;
+      return data as CarModel[];
     },
-    enabled: !!selectedPlan?.category
-  })
+    enabled: !!selectedPlan?.id
+  });
 
   const planDetails = selectedPlan ? {
     type: selectedPlan.period,
@@ -41,7 +54,7 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
     ],
     price: selectedPlan.unitPrice,
     period: 'mês'
-  } : null
+  } : null;
 
   return (
     <div className="space-y-6">
@@ -52,5 +65,5 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
       )}
       {planDetails && <PlanDetails plan={planDetails} />}
     </div>
-  )
-}
+  );
+};
