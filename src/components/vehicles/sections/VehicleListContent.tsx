@@ -5,9 +5,10 @@ import type { CarModel, FleetVehicle } from "@/types/vehicles";
 interface VehicleListContentProps {
   view: 'models' | 'fleet';
   vehicles: (CarModel | FleetVehicle)[];
+  onEdit?: (vehicle: CarModel) => void;
 }
 
-export const VehicleListContent = ({ view, vehicles }: VehicleListContentProps) => {
+export const VehicleListContent = ({ view, vehicles, onEdit }: VehicleListContentProps) => {
   if (!vehicles || vehicles.length === 0) {
     return (
       <div className="col-span-full text-center py-12">
@@ -25,6 +26,7 @@ export const VehicleListContent = ({ view, vehicles }: VehicleListContentProps) 
           <VehicleCard 
             key={vehicle.id} 
             car={vehicle as CarModel}
+            onEdit={onEdit}
           />
         ) : (
           <FleetVehicleCard 

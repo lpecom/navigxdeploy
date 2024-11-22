@@ -77,7 +77,7 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setIsEditing(true)}
+            onClick={() => onEdit ? onEdit(car) : setIsEditing(true)}
           >
             <Pencil className="h-4 w-4" />
           </Button>
