@@ -13,6 +13,27 @@ export const CheckoutPage = () => {
   const { toast } = useToast();
   const { cartState } = useCheckoutState();
 
+  const handleInsuranceSelect = useCallback(async (insuranceId: string) => {
+    try {
+      if (!cartState.checkoutSessionId) return;
+
+      const { error } = await supabase
+        .from('checkout_sessions')
+        .update({ insurance_option_id: insuranceId })
+        .eq('id', cartState.checkoutSessionId);
+
+      if (error) throw error;
+      setStep(2);
+    } catch (error) {
+      console.error('Error selecting insurance:', error);
+      toast({
+        title: "Erro ao selecionar seguro",
+        description: "Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    }
+  }, [cartState.checkoutSessionId, toast]);
+
   const handleScheduleSubmit = useCallback(async (scheduleData: any) => {
     try {
       if (!cartState.checkoutSessionId) return;
@@ -66,6 +87,35 @@ export const CheckoutPage = () => {
     navigate('/driver/dashboard');
   }, [navigate, toast]);
 
+  const handleKYCSubmit = useCallback(async (data: any) => {
+    try {
+      if (!cartState.checkoutSessionId) return;
+
+      const { error } = await supabase
+        .from('driver_details')
+        .update({
+          full_name: data.full_name,
+          birth_date: data.birth_date,
+          cpf: data.cpf,
+          phone: data.phone,
+          email: data.email,
+          license_number: data.license_number,
+          license_expiry: data.license_expiry
+        })
+        .eq('id', cartState.driver_id);
+
+      if (error) throw error;
+      setStep(5);
+    } catch (error) {
+      console.error('Error saving KYC data:', error);
+      toast({
+        title: "Erro ao salvar dados",
+        description: "Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    }
+  }, [cartState.checkoutSessionId, cartState.driver_id, toast]);
+
   if (!cartState || (cartState.items.length === 0 && !cartState.checkoutSessionId)) {
     return (
       <CheckoutLayout>
@@ -80,9 +130,11 @@ export const CheckoutPage = () => {
         <CheckoutSteps
           step={step}
           checkoutSessionId={cartState.checkoutSessionId}
+          onInsuranceSelect={handleInsuranceSelect}
           onScheduleSubmit={handleScheduleSubmit}
           onPaymentLocationSelect={handlePaymentLocationSelect}
           onPaymentSuccess={handlePaymentSuccess}
+          onKYCSubmit={handleKYCSubmit}
         />
       </div>
     </CheckoutLayout>
