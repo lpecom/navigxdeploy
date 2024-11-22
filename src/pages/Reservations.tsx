@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { type ReservationFilter } from "@/types/reservation"
 import { motion } from "framer-motion"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card } from "@/components/ui/card"
 
 interface ReservationsProps {
   filter: ReservationFilter
@@ -50,31 +51,32 @@ const Reservations = ({ filter }: ReservationsProps) => {
     <div className="max-w-[1600px] mx-auto space-y-6">
       {filter === 'pending' ? (
         <>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-8">
             <div className="space-y-1">
-              <h1 className="text-2xl font-bold">Aprovações</h1>
-              <div className="w-[180px]">
-                <Select 
-                  value={statusFilter} 
-                  onValueChange={(value) => setStatusFilter(value as StatusFilter)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Filtrar por status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending_approval">Pendentes</SelectItem>
-                    <SelectItem value="approved">Aprovados</SelectItem>
-                    <SelectItem value="rejected">Rejeitados</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <h1 className="text-3xl font-bold">Aprovações</h1>
+              <p className="text-gray-500">Gerencie e analise as solicitações de reserva</p>
             </div>
+            <Card className="w-[200px]">
+              <Select 
+                value={statusFilter} 
+                onValueChange={(value) => setStatusFilter(value as StatusFilter)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Filtrar por status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending_approval">Pendentes</SelectItem>
+                  <SelectItem value="approved">Aprovados</SelectItem>
+                  <SelectItem value="rejected">Rejeitados</SelectItem>
+                </SelectContent>
+              </Select>
+            </Card>
           </div>
           <ReservationsList filter="pending" status={statusFilter} />
         </>
       ) : (
         <>
-          <h1 className="text-2xl font-bold">Retiradas</h1>
+          <h1 className="text-2xl font-bold mb-6">Retiradas</h1>
           <Tabs defaultValue="today" className="w-full">
             <TabsList className="bg-white shadow-sm">
               <TabsTrigger value="today">Hoje</TabsTrigger>
@@ -101,7 +103,7 @@ const Reservations = ({ filter }: ReservationsProps) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="h-full"
+      className="p-8 bg-gray-50 min-h-screen"
     >
       {content}
     </motion.main>
