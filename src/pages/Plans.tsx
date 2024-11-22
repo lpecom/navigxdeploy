@@ -5,6 +5,9 @@ import { Navigation } from "@/components/website/Navigation";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Category {
   id: string;
@@ -13,11 +16,36 @@ interface Category {
   badge_text: string | null;
 }
 
+interface Plan {
+  id: string;
+  name: string;
+  type: 'flex' | 'monthly' | 'black';
+  base_price: number;
+  features: string[];
+  bullet_points: { km: string; price: string; }[];
+  highlight: boolean;
+  display_order: number;
+}
+
 const Plans = () => {
   const navigate = useNavigate();
   const { dispatch } = useCart();
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  
+  const { data: plans, isLoading } = useQuery({
+    queryKey: ['plans'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('plans')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order');
+      
+      if (error) throw error;
+      return data as Plan[];
+    }
+  });
   
   useEffect(() => {
     const categoryData = sessionStorage.getItem('selectedCategory');
@@ -33,7 +61,7 @@ const Plans = () => {
     }
   }, [navigate]);
 
-  const handlePlanSelect = (planType: 'flex' | 'monthly' | 'black') => {
+  const handlePlanSelect = (plan: Plan) => {
     if (!selectedCategory) {
       toast({
         title: "Erro",
@@ -43,15 +71,6 @@ const Plans = () => {
       navigate('/');
       return;
     }
-
-    // Get base prices for each plan type
-    const basePrices = {
-      flex: 529,
-      monthly: 729,
-      black: 1299
-    };
-
-    const basePrice = basePrices[planType];
     
     // Clear cart before adding new item
     dispatch({ type: 'CLEAR_CART' });
@@ -59,25 +78,42 @@ const Plans = () => {
     dispatch({
       type: 'ADD_ITEM',
       payload: {
-        id: `${selectedCategory.id}-${planType}`,
+        id: `${selectedCategory.id}-${plan.type}`,
         type: 'car_group',
         quantity: 1,
-        unitPrice: basePrice,
-        totalPrice: basePrice,
-        name: `${selectedCategory.name} - Plano ${planType}`,
+        unitPrice: plan.base_price,
+        totalPrice: plan.base_price,
+        name: `${selectedCategory.name} - ${plan.name}`,
         category: selectedCategory.name,
-        period: planType
+        period: plan.type
       }
     });
 
     // Store selected plan in session storage
-    sessionStorage.setItem('selectedPlan', planType);
+    sessionStorage.setItem('selectedPlan', plan.type);
     
-    // Navigate to checkout instead of optionals
     navigate('/checkout');
   };
 
   if (!selectedCategory) return null;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen">
+        <Navigation />
+        <div className="pt-20 sm:pt-28 pb-8 sm:pb-16">
+          <div className="container mx-auto px-4">
+            <Skeleton className="h-12 w-3/4 mx-auto mb-8" />
+            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-[600px] w-full" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -93,23 +129,20 @@ const Plans = () => {
             Escolha seu plano para {selectedCategory.name}
           </h1>
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
-            <PlanCard
-              type="flex"
-              price="529,00"
-              onSelect={() => handlePlanSelect('flex')}
-            />
-            <div className="transform hover:scale-105 transition-transform duration-300">
-              <PlanCard
-                type="black"
-                price="1299,00"
-                onSelect={() => handlePlanSelect('black')}
-              />
-            </div>
-            <PlanCard
-              type="monthly"
-              price="729,00"
-              onSelect={() => handlePlanSelect('monthly')}
-            />
+            {plans?.sort((a, b) => a.display_order - b.display_order).map((plan) => (
+              <div 
+                key={plan.id} 
+                className={plan.highlight ? "transform hover:scale-105 transition-transform duration-300" : ""}
+              >
+                <PlanCard
+                  type={plan.type}
+                  price={plan.base_price.toFixed(2)}
+                  features={plan.features}
+                  kmRanges={plan.bullet_points}
+                  onSelect={() => handlePlanSelect(plan)}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </motion.div>

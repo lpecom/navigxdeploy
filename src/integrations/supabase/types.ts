@@ -1315,9 +1315,14 @@ export type Database = {
       plans: {
         Row: {
           base_price: number
+          bullet_points: Json | null
+          conditions: Json | null
           created_at: string | null
           description: string | null
+          display_order: number | null
           extra_km_price: number | null
+          features: Json | null
+          highlight: boolean | null
           id: string
           included_km: number
           is_active: boolean | null
@@ -1328,9 +1333,14 @@ export type Database = {
         }
         Insert: {
           base_price: number
+          bullet_points?: Json | null
+          conditions?: Json | null
           created_at?: string | null
           description?: string | null
+          display_order?: number | null
           extra_km_price?: number | null
+          features?: Json | null
+          highlight?: boolean | null
           id?: string
           included_km: number
           is_active?: boolean | null
@@ -1341,9 +1351,14 @@ export type Database = {
         }
         Update: {
           base_price?: number
+          bullet_points?: Json | null
+          conditions?: Json | null
           created_at?: string | null
           description?: string | null
+          display_order?: number | null
           extra_km_price?: number | null
+          features?: Json | null
+          highlight?: boolean | null
           id?: string
           included_km?: number
           is_active?: boolean | null

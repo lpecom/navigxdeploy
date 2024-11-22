@@ -5,6 +5,8 @@ import { Check } from "lucide-react";
 interface PlanCardProps {
   type: 'flex' | 'monthly' | 'black';
   price: string;
+  features: string[];
+  kmRanges: { km: string; price: string; }[];
   onSelect: () => void;
 }
 
@@ -14,46 +16,7 @@ const planNames = {
   black: 'Black'
 };
 
-const planFeatures = {
-  flex: [
-    'Comece no aluguel com flexibilidade de devolução',
-    'Sem multa por cancelamento com aviso prévio de 30 dias',
-    'Facilidade no financiamento no momento da compra Navig Anual'
-  ],
-  monthly: [
-    'Comece no aluguel e tenha a opção de comprar o veículo ao final do contrato',
-    'Valor de compra 20% abaixo do mercado e definido desde a contratação',
-    'Facilidade no financiamento no momento da compra Navig Anual'
-  ],
-  black: [
-    'Acesso exclusivo aos veículos premium da frota',
-    'Serviço de concierge 24/7',
-    'Seguro premium com cobertura total incluído'
-  ]
-};
-
-const planKmRanges = {
-  flex: [
-    { km: '200 KM', price: '529,00' },
-    { km: '400 KM', price: '574,00' },
-    { km: '1250 KM', price: '704,00' },
-    { km: '1500 KM', price: '777,00' }
-  ],
-  monthly: [
-    { km: '200 KM', price: '729,00' },
-    { km: '400 KM', price: '774,00' },
-    { km: '1250 KM', price: '904,00' },
-    { km: '1500 KM', price: '977,00' }
-  ],
-  black: [
-    { km: '500 KM', price: '1299,00' },
-    { km: '1000 KM', price: '1499,00' },
-    { km: '2000 KM', price: '1799,00' },
-    { km: 'Ilimitado', price: '2299,00' }
-  ]
-};
-
-export const PlanCard = ({ type, price, onSelect }: PlanCardProps) => {
+export const PlanCard = ({ type, price, features, kmRanges, onSelect }: PlanCardProps) => {
   return (
     <Card className={`w-full max-w-md mx-auto ${type === 'black' ? 'bg-gray-900 text-white' : ''}`}>
       <CardHeader>
@@ -78,7 +41,7 @@ export const PlanCard = ({ type, price, onSelect }: PlanCardProps) => {
         </div>
 
         <div className="space-y-4">
-          {planFeatures[type].map((feature, index) => (
+          {features.map((feature, index) => (
             <div key={index} className="flex gap-2">
               <Check className={`w-5 h-5 ${type === 'black' ? 'text-green-400' : 'text-green-500'} flex-shrink-0`} />
               <p className="text-sm">{feature}</p>
@@ -89,8 +52,7 @@ export const PlanCard = ({ type, price, onSelect }: PlanCardProps) => {
         <div className="space-y-4">
           <p className="font-semibold">Pague apenas pelos KMs rodados!</p>
           <div className="space-y-2">
-            {planKmRanges[type].map((range, index) => (
-              
+            {kmRanges.map((range, index) => (
               <div key={index} className="flex justify-between text-sm">
                 <span>Rodando até {range.km}</span>
                 <span>R$ {range.price}</span>
@@ -104,7 +66,7 @@ export const PlanCard = ({ type, price, onSelect }: PlanCardProps) => {
           className={`w-full ${
             type === 'black' 
               ? 'bg-white text-gray-900 hover:bg-gray-100' 
-              : 'bg-navig hover:bg-navig/90'
+              : 'bg-primary hover:bg-primary/90'
           }`}
         >
           Selecionar plano
