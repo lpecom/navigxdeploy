@@ -21,7 +21,15 @@ export const createCheckoutSession = async ({
   onSuccess,
 }: CheckoutSessionHandlerProps) => {
   try {
+    if (!driverId || !cartItems.length || totalAmount <= 0) {
+      throw new Error("Invalid checkout data");
+    }
+
     const selectedGroup = cartItems.find(item => item.type === 'car_group');
+    if (!selectedGroup) {
+      throw new Error("No car group selected");
+    }
+
     const selectedOptionals = cartItems.filter(item => item.type === 'optional');
     const selectedInsurance = cartItems.find(item => item.type === 'insurance');
 
@@ -30,14 +38,18 @@ export const createCheckoutSession = async ({
       .from('checkout_sessions')
       .insert({
         driver_id: driverId,
-        selected_car: selectedGroup ? {
+        selected_car: {
           group_id: getValidUUID(selectedGroup.id),
           name: selectedGroup.name,
           category: selectedGroup.category,
           price: selectedGroup.unitPrice,
           period: selectedGroup.period
-        } : {},
-        selected_optionals: [],
+        },
+        selected_optionals: selectedOptionals.map(opt => ({
+          id: getValidUUID(opt.id),
+          name: opt.name,
+          totalPrice: opt.totalPrice
+        })),
         total_amount: totalAmount,
         status: 'pending',
         created_at: new Date().toISOString(),
@@ -47,55 +59,38 @@ export const createCheckoutSession = async ({
       .single();
 
     if (sessionError) throw sessionError;
+    if (!session) throw new Error("Failed to create checkout session");
 
-    if (session) {
-      // Then update with insurance if selected
-      if (selectedInsurance) {
-        const { error: insuranceError } = await supabase
-          .from('checkout_sessions')
-          .update({ 
-            insurance_option_id: getValidUUID(selectedInsurance.id)
-          })
-          .eq('id', session.id);
+    // Then update with insurance if selected
+    if (selectedInsurance) {
+      const { error: insuranceError } = await supabase
+        .from('checkout_sessions')
+        .update({ 
+          insurance_option_id: getValidUUID(selectedInsurance.id)
+        })
+        .eq('id', session.id);
 
-        if (insuranceError) throw insuranceError;
-      }
-
-      // Then add optionals if any
-      if (selectedOptionals.length > 0) {
-        const { error: optionalsError } = await supabase
-          .from('checkout_sessions')
-          .update({ 
-            selected_optionals: selectedOptionals.map(opt => ({
-              id: getValidUUID(opt.id),
-              name: opt.name,
-              totalPrice: opt.totalPrice
-            }))
-          })
-          .eq('id', session.id);
-
-        if (optionalsError) throw optionalsError;
-      }
-
-      // Finally insert cart items
-      const cartItemsData = cartItems.map(item => ({
-        checkout_session_id: session.id,
-        item_type: item.type,
-        item_id: getValidUUID(item.id),
-        quantity: item.quantity || 1,
-        unit_price: item.unitPrice,
-        total_price: item.totalPrice
-      }));
-
-      const { error: cartError } = await supabase
-        .from('cart_items')
-        .insert(cartItemsData);
-
-      if (cartError) throw cartError;
-
-      onSuccess(session.id);
-      return session;
+      if (insuranceError) throw insuranceError;
     }
+
+    // Finally insert cart items
+    const cartItemsData = cartItems.map(item => ({
+      checkout_session_id: session.id,
+      item_type: item.type,
+      item_id: getValidUUID(item.id),
+      quantity: item.quantity || 1,
+      unit_price: item.unitPrice,
+      total_price: item.totalPrice
+    }));
+
+    const { error: cartError } = await supabase
+      .from('cart_items')
+      .insert(cartItemsData);
+
+    if (cartError) throw cartError;
+
+    onSuccess(session.id);
+    return session;
   } catch (error) {
     console.error('Error creating checkout session:', error);
     throw error;

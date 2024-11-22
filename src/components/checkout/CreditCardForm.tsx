@@ -44,6 +44,15 @@ export const CreditCardForm = ({ amount, driverId, onSuccess }: CreditCardFormPr
   })
 
   const onSubmit = async (values: z.infer<typeof creditCardSchema>) => {
+    if (!driverId) {
+      toast({
+        title: "Erro no pagamento",
+        description: "ID do motorista não encontrado. Por favor, faça login novamente.",
+        variant: "destructive",
+      })
+      return
+    }
+
     setIsSubmitting(true)
     try {
       const payload = {
@@ -66,6 +75,7 @@ export const CreditCardForm = ({ amount, driverId, onSuccess }: CreditCardFormPr
       })
 
       if (error) throw error
+      if (!data?.transaction_id) throw new Error("No transaction ID returned")
 
       toast({
         title: "Pagamento processado com sucesso!",
@@ -77,7 +87,7 @@ export const CreditCardForm = ({ amount, driverId, onSuccess }: CreditCardFormPr
       console.error('Payment error:', error)
       toast({
         title: "Erro no pagamento",
-        description: "Ocorreu um erro ao processar seu pagamento. Por favor, tente novamente.",
+        description: error.message || "Ocorreu um erro ao processar seu pagamento. Por favor, tente novamente.",
         variant: "destructive",
       })
     } finally {
