@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Calendar, Clock, User, Car, ArrowRightToLine, Package } from "lucide-react";
+import { ChevronDown, ChevronUp, Calendar, Clock, MapPin, User, Car, DollarSign, Package, ArrowRightToLine } from "lucide-react";
 import { ReservationExpandedContent } from "./ReservationExpandedContent";
 import { StatusBadges } from "./StatusBadges";
 import { format } from "date-fns";
@@ -21,13 +21,10 @@ const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: Reserva
   const navigate = useNavigate();
   const pickupDate = new Date(reservation.pickupDate);
   const formattedDate = format(pickupDate, "dd 'de' MMMM", { locale: ptBR });
-  const creationDate = format(new Date(reservation.createdAt), "dd/MM/yyyy HH:mm");
 
   const handleCheckIn = () => {
     navigate(`/admin/check-in/${reservation.id}`);
   };
-
-  const showCheckInButton = reservation.status === 'approved';
 
   return (
     <Card className="bg-white shadow-sm hover:shadow-md transition-all duration-200">
@@ -42,10 +39,7 @@ const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: Reserva
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold">{reservation.customerName}</h3>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Clock className="w-4 h-4" />
-                    <span>Criado em: {creationDate}</span>
-                  </div>
+                  <p className="text-sm text-gray-500">#{reservation.reservationNumber}</p>
                 </div>
               </div>
               
@@ -112,16 +106,14 @@ const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: Reserva
 
           {!isExpanded && (
             <div className="flex justify-between items-center pt-4 border-t">
-              {showCheckInButton && (
-                <Button 
-                  onClick={handleCheckIn}
-                  className="flex items-center gap-2"
-                  variant="default"
-                >
-                  <ArrowRightToLine className="w-4 h-4" />
-                  Iniciar Check-in
-                </Button>
-              )}
+              <Button 
+                onClick={handleCheckIn}
+                className="flex items-center gap-2"
+                variant="default"
+              >
+                <ArrowRightToLine className="w-4 h-4" />
+                Iniciar Check-in
+              </Button>
 
               <ReservationActions 
                 reservation={reservation}

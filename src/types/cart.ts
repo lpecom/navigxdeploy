@@ -1,24 +1,16 @@
-export type CartItemType = 'car_group' | 'optional' | 'insurance';
-
 export interface CartItem {
   id: string;
-  type: CartItemType;
+  type: 'car_group' | 'optional';
+  name: string;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
-  name: string;
   category?: string;
   period?: string;
 }
 
 export interface CartState {
   items: CartItem[];
+  total: number;
   checkoutSessionId?: string;
 }
-
-export type CartAction =
-  | { type: 'ADD_ITEM'; payload: CartItem }
-  | { type: 'REMOVE_ITEM'; payload: string }
-  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
-  | { type: 'SET_CHECKOUT_SESSION'; payload: string }
-  | { type: 'CLEAR_CART' };

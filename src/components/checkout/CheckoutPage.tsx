@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckoutLayout } from "./ui/CheckoutLayout";
 import { EmptyCartMessage } from "./ui/EmptyCartMessage";
@@ -13,10 +13,27 @@ export const CheckoutPage = () => {
   const { toast } = useToast();
   const { cartState } = useCheckoutState();
 
-  const handleScheduleSubmit = useCallback(async (scheduleData: any) => {
+  const handleInsuranceSelect = async (insuranceId: string) => {
     try {
-      if (!cartState.checkoutSessionId) return;
+      const { error } = await supabase
+        .from('checkout_sessions')
+        .update({ insurance_option_id: insuranceId })
+        .eq('id', cartState.checkoutSessionId);
 
+      if (error) throw error;
+      setStep(2);
+    } catch (error) {
+      console.error('Error selecting insurance:', error);
+      toast({
+        title: "Erro ao selecionar seguro",
+        description: "Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleScheduleSubmit = async (scheduleData: any) => {
+    try {
       const { error } = await supabase
         .from('checkout_sessions')
         .update({
@@ -35,19 +52,17 @@ export const CheckoutPage = () => {
         variant: "destructive",
       });
     }
-  }, [cartState.checkoutSessionId, toast]);
+  };
 
-  const handlePaymentLocationSelect = useCallback(async (location: 'online' | 'store') => {
+  const handlePaymentLocationSelect = async (location: 'online' | 'store') => {
     try {
-      if (!cartState.checkoutSessionId) return;
-
       const { error } = await supabase
         .from('checkout_sessions')
         .update({ payment_location: location })
         .eq('id', cartState.checkoutSessionId);
 
       if (error) throw error;
-      setStep(4);
+      setStep(5);
     } catch (error) {
       console.error('Error selecting payment location:', error);
       toast({
@@ -56,17 +71,25 @@ export const CheckoutPage = () => {
         variant: "destructive",
       });
     }
-  }, [cartState.checkoutSessionId, toast]);
+  };
 
-  const handlePaymentSuccess = useCallback((paymentId: string) => {
+  const handlePaymentSuccess = (paymentId: string) => {
     toast({
       title: "Pagamento confirmado!",
       description: "Sua reserva foi confirmada com sucesso.",
     });
     navigate('/driver/dashboard');
-  }, [navigate, toast]);
+  };
 
-  if (!cartState || (cartState.items.length === 0 && !cartState.checkoutSessionId)) {
+  const handleKYCSubmit = (data: any) => {
+    toast({
+      title: "Cadastro realizado!",
+      description: "Sua reserva foi confirmada. Você receberá um email para definir sua senha.",
+    });
+    navigate('/driver/dashboard');
+  };
+
+  if (cartState.items.length === 0 && !cartState.checkoutSessionId) {
     return (
       <CheckoutLayout>
         <EmptyCartMessage />
@@ -80,9 +103,11 @@ export const CheckoutPage = () => {
         <CheckoutSteps
           step={step}
           checkoutSessionId={cartState.checkoutSessionId}
+          onInsuranceSelect={handleInsuranceSelect}
           onScheduleSubmit={handleScheduleSubmit}
           onPaymentLocationSelect={handlePaymentLocationSelect}
           onPaymentSuccess={handlePaymentSuccess}
+          onKYCSubmit={handleKYCSubmit}
         />
       </div>
     </CheckoutLayout>

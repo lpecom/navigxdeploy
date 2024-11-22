@@ -79,8 +79,7 @@ export const PlansPage = () => {
     });
 
     sessionStorage.setItem('selectedPlan', plan.type);
-    // Navigate to insurance selection instead of checkout
-    navigate('/insurance');
+    navigate('/checkout');
   };
 
   if (!selectedCategory) return null;

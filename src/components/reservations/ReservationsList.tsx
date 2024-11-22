@@ -2,10 +2,9 @@ import { useState, useCallback, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import type { Reservation, PickupFilter } from "@/types/reservation"
 import { ReservationCard } from "./ReservationCard"
-import { TimeSlotHeader } from "./sections/TimeSlotHeader"
 import { supabase } from "@/integrations/supabase/client"
-import { startOfWeek, endOfWeek, addWeeks, format } from "date-fns"
-import { Car } from "lucide-react"
+import { startOfWeek, endOfWeek, addWeeks, format, isEqual, parseISO } from "date-fns"
+import { Car, Clock } from "lucide-react"
 
 interface ReservationsListProps {
   filter: "pending" | PickupFilter
@@ -42,7 +41,7 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
             postal_code
           )
         `)
-        .order('created_at', { ascending: false }) // Changed to sort by creation date, newest first
+        .order('pickup_time', { ascending: true })
 
       if (filter === 'pending') {
         query = query.eq('status', status)
@@ -106,12 +105,6 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
   const sortedReservations = useMemo(() => {
     if (!reservations) return []
     return [...reservations].sort((a, b) => {
-      // Sort by creation date first (newest first)
-      const dateA = new Date(a.createdAt).getTime()
-      const dateB = new Date(b.createdAt).getTime()
-      if (dateA !== dateB) return dateB - dateA
-      
-      // If same creation date, sort by pickup time
       if (!a.pickupTime || !b.pickupTime) return 0
       return a.pickupTime.localeCompare(b.pickupTime)
     })
@@ -159,11 +152,11 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
           
           return (
             <div key={timeSlot} className="space-y-4">
-              <TimeSlotHeader 
-                timeSlot={timeSlot} 
-                reservations={slotReservations}
-                filter={filter}
-              />
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <Clock className="w-4 h-4" />
+                <span>{timeSlot || 'Horário não definido'}</span>
+                <span className="text-gray-400">({slotReservations.length} retiradas)</span>
+              </div>
               <div className="grid gap-4">
                 {slotReservations.map((reservation) => (
                   <ReservationCard
@@ -179,7 +172,7 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
         })}
       </div>
     )
-  }, [sortedReservations, isLoading, error, expandedCards, toggleCard, filter])
+  }, [sortedReservations, isLoading, error, expandedCards, toggleCard])
 
   return (
     <div className="max-w-3xl mx-auto">

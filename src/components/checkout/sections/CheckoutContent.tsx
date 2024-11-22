@@ -1,27 +1,28 @@
-import { motion } from "framer-motion";
-import { CheckoutProgress } from "./CheckoutProgress";
-import { EnhancedSummary } from "./EnhancedSummary";
-import { CustomerForm } from "./CustomerForm";
-import { PickupScheduler } from "./PickupScheduler";
-import { PaymentSection } from "./PaymentSection";
-import { SuccessSection } from "./SuccessSection";
-import { SupportCard } from "./SupportCard";
-import { createCheckoutSession } from "../CheckoutSessionHandler";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
-import { CarDisplay } from "./CarDisplay";
-import { PlanDisplaySection } from "./PlanDisplaySection";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import { useCallback } from "react";
+import { motion } from "framer-motion"
+import { CheckoutProgress } from "./CheckoutProgress"
+import { EnhancedSummary } from "./EnhancedSummary"
+import { CustomerForm } from "./CustomerForm"
+import { PickupScheduler } from "./PickupScheduler"
+import { PaymentSection } from "./PaymentSection"
+import { SuccessSection } from "./SuccessSection"
+import { SupportCard } from "./SupportCard"
+import { createCheckoutSession } from "../CheckoutSessionHandler"
+import { supabase } from "@/integrations/supabase/client"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft } from "lucide-react"
+import { CarSlider } from "@/components/home/CarSlider"
+import { PlanDetails } from "./PlanDetails"
+import { useQuery } from "@tanstack/react-query"
+import type { CarModel } from "@/types/vehicles"
 
 interface CheckoutContentProps {
-  step: number;
-  customerId: string | null;
-  cartState: any;
-  dispatch: any;
-  setStep: (step: number) => void;
-  setCustomerId: (id: string | null) => void;
+  step: number
+  customerId: string | null
+  cartState: any
+  dispatch: any
+  toast: any
+  setStep: (step: number) => void
+  setCustomerId: (id: string | null) => void
 }
 
 export const CheckoutContent = ({
@@ -29,20 +30,19 @@ export const CheckoutContent = ({
   customerId,
   cartState,
   dispatch,
+  toast,
   setStep,
   setCustomerId
 }: CheckoutContentProps) => {
-  const { toast } = useToast();
-
-  const handleCustomerSubmit = useCallback(async (customerData: any) => {
+  const handleCustomerSubmit = async (customerData: any) => {
     try {
-      if (!cartState?.items?.length) {
+      if (cartState.items.length === 0) {
         toast({
           title: "Carrinho vazio",
           description: "Adicione itens ao carrinho antes de prosseguir.",
           variant: "destructive",
-        });
-        return;
+        })
+        return
       }
 
       const session = await createCheckoutSession({
@@ -50,31 +50,31 @@ export const CheckoutContent = ({
         cartItems: cartState.items,
         totalAmount: cartState.total,
         onSuccess: (sessionId) => {
-          dispatch({ type: 'SET_CHECKOUT_SESSION', payload: sessionId });
+          dispatch({ type: 'SET_CHECKOUT_SESSION', payload: sessionId })
         }
-      });
+      })
 
-      setCustomerId(customerData.id);
-      setStep(2);
+      setCustomerId(customerData.id)
+      setStep(2)
       
       toast({
         title: "Dados salvos com sucesso!",
         description: "Seus dados foram salvos. Vamos agendar sua retirada.",
-      });
+      })
     } catch (error: any) {
-      console.error('Error saving customer details:', error);
+      console.error('Error saving customer details:', error)
       toast({
         title: "Erro ao salvar dados",
         description: "Ocorreu um erro ao salvar seus dados. Por favor, tente novamente.",
         variant: "destructive",
-      });
+      })
     }
-  }, [cartState, dispatch, setCustomerId, setStep, toast]);
+  }
 
-  const handleScheduleSubmit = useCallback(async (scheduleData: any) => {
+  const handleScheduleSubmit = async (scheduleData: any) => {
     try {
-      if (!cartState?.checkoutSessionId) {
-        throw new Error('No checkout session found');
+      if (!cartState.checkoutSessionId) {
+        throw new Error('No checkout session found')
       }
 
       const { error } = await supabase
@@ -84,27 +84,55 @@ export const CheckoutContent = ({
           pickup_time: scheduleData.time,
           status: 'pending_approval'
         })
-        .eq('id', cartState.checkoutSessionId);
+        .eq('id', cartState.checkoutSessionId)
 
-      if (error) throw error;
+      if (error) throw error
 
-      setStep(3);
+      setStep(3)
       
       toast({
         title: "Agendamento confirmado!",
         description: "Seu horário foi agendado com sucesso.",
-      });
+      })
     } catch (error: any) {
-      console.error('Error saving schedule:', error);
+      console.error('Error saving schedule:', error)
       toast({
         title: "Erro ao agendar",
         description: "Ocorreu um erro ao agendar seu horário. Por favor, tente novamente.",
         variant: "destructive",
-      });
+      })
     }
-  }, [cartState?.checkoutSessionId, setStep, toast]);
+  }
 
-  const selectedPlan = cartState?.items?.find((item: any) => item.type === 'car_group');
+  const handlePaymentSuccess = () => {
+    setStep(4)
+    toast({
+      title: "Pagamento confirmado!",
+      description: "Seu pagamento foi processado com sucesso.",
+    })
+  }
+
+  const { data: carModels } = useQuery({
+    queryKey: ['car-models'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('car_models')
+        .select('*')
+        .eq('category_id', cartState?.items?.[0]?.category_id)
+      
+      if (error) throw error;
+      
+      // Convert the JSON fields to the correct type
+      return (data || []).map(model => ({
+        ...model,
+        optionals: model.optionals as Record<string, any> | null,
+        features: model.features as Record<string, any>[] | null
+      })) as CarModel[];
+    },
+    enabled: !!cartState?.items?.[0]?.category_id
+  });
+
+  const selectedPlan = cartState.items.find((item: any) => item.type === 'car_group');
   const planDetails = selectedPlan ? {
     type: selectedPlan.period,
     name: selectedPlan.name,
@@ -140,10 +168,14 @@ export const CheckoutContent = ({
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <CarDisplay categoryId={selectedPlan?.category_id} />
-          
-          {step === 1 && planDetails && (
-            <PlanDisplaySection selectedPlan={planDetails} />
+          {carModels && carModels.length > 0 && (
+            <div className="rounded-lg overflow-hidden bg-white p-4">
+              <CarSlider cars={carModels} category={selectedPlan?.category || ''} />
+            </div>
+          )}
+
+          {planDetails && step === 1 && (
+            <PlanDetails plan={planDetails} />
           )}
           
           {step === 1 && (
@@ -156,9 +188,9 @@ export const CheckoutContent = ({
           
           {step === 3 && customerId && (
             <PaymentSection
-              amount={cartState?.total || 0}
+              amount={cartState.total}
               driverId={customerId}
-              onPaymentSuccess={() => setStep(4)}
+              onPaymentSuccess={handlePaymentSuccess}
             />
           )}
           
