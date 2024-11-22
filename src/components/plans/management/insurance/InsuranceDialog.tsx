@@ -28,8 +28,8 @@ import * as z from "zod";
 const insuranceSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
-  coverage_details: z.record(z.boolean()).default({}),
   price: z.number().min(0, "Price must be greater than zero"),
+  coverage_details: z.record(z.boolean()).default({}),
   is_active: z.boolean().default(true),
 });
 
@@ -47,8 +47,8 @@ export const InsuranceDialog = ({ insurance, open, onOpenChange }: InsuranceDial
     defaultValues: {
       name: "",
       description: "",
-      coverage_details: {},
       price: 0,
+      coverage_details: {},
       is_active: true,
     },
   });
@@ -58,8 +58,8 @@ export const InsuranceDialog = ({ insurance, open, onOpenChange }: InsuranceDial
       form.reset({
         name: insurance.name,
         description: insurance.description || "",
-        coverage_details: insurance.coverage_details,
         price: insurance.price,
+        coverage_details: insurance.coverage_details,
         is_active: insurance.is_active,
       });
     }

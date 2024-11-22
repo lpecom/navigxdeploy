@@ -28,11 +28,11 @@ export const InsuranceTable = ({ insuranceOptions, onEdit }: InsuranceTableProps
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Nome</TableHead>
-          <TableHead>Descrição</TableHead>
-          <TableHead>Preço</TableHead>
+          <TableHead>Name</TableHead>
+          <TableHead>Description</TableHead>
+          <TableHead>Price</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead>Ações</TableHead>
+          <TableHead>Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -43,19 +43,17 @@ export const InsuranceTable = ({ insuranceOptions, onEdit }: InsuranceTableProps
             <TableCell>{formatCurrency(insurance.price)}</TableCell>
             <TableCell>
               <Badge variant={insurance.is_active ? "default" : "secondary"}>
-                {insurance.is_active ? "Ativo" : "Inativo"}
+                {insurance.is_active ? "Active" : "Inactive"}
               </Badge>
             </TableCell>
             <TableCell>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onEdit(insurance)}
-                >
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onEdit(insurance)}
+              >
+                <Edit2 className="h-4 w-4" />
+              </Button>
             </TableCell>
           </TableRow>
         ))}
