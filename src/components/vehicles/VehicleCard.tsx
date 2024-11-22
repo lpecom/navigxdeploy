@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Car } from "lucide-react";
+import { Car, Pencil } from "lucide-react";
 import { getBrandLogo, getBrandFromModel } from "@/utils/brandLogos";
 import type { CarModel } from "@/types/vehicles";
 import { motion } from "framer-motion";
@@ -8,13 +8,16 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { VehicleImage } from "./card/VehicleImage";
 import { VehicleStats } from "./card/VehicleStats";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { ModelEditDialog } from "./card/ModelEditDialog";
 
 interface VehicleCardProps {
   car: CarModel;
-  onEdit: (car: CarModel) => void;
 }
 
-export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
+export const VehicleCard = ({ car }: VehicleCardProps) => {
+  const [isEditing, setIsEditing] = useState(false);
   const brandLogoUrl = getBrandLogo(car.name);
   const brandName = getBrandFromModel(car.name);
 
@@ -70,9 +73,16 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
               <h3 className="font-semibold text-lg">{car.name}</h3>
             </div>
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsEditing(true)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
         </CardHeader>
         <CardContent className="space-y-4">
-          <VehicleImage car={car} onEdit={onEdit} />
+          <VehicleImage car={car} />
           
           {fleetStats && fleetStats.total > 0 && (
             <VehicleStats stats={fleetStats} />
@@ -85,6 +95,12 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
           )}
         </CardContent>
       </Card>
+
+      <ModelEditDialog
+        model={car}
+        open={isEditing}
+        onOpenChange={setIsEditing}
+      />
     </motion.div>
   );
 };
