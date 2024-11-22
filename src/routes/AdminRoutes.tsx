@@ -12,6 +12,7 @@ import Analytics from "@/pages/Analytics";
 import Performance from "@/pages/Performance";
 import Reports from "@/pages/Reports";
 import Automations from "@/pages/Automations";
+import PlanManagement from "@/pages/PlanManagement";
 import Header from "@/components/dashboard/Header";
 import Sidebar from "@/components/dashboard/Sidebar";
 import CheckInList from "@/components/check-in/CheckInList";

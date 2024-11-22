@@ -33,13 +33,13 @@ import type { Plan } from "@/types/plans";
 import * as z from "zod";
 
 const planSchema = z.object({
-  name: z.string().min(1, "Nome é obrigatório"),
+  name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   type: z.enum(["flex", "monthly", "black"]),
   period: z.enum(["week", "month"]),
-  base_price: z.number().min(0, "Preço deve ser maior que zero"),
-  included_km: z.number().min(0, "KM incluídos deve ser maior que zero"),
-  extra_km_price: z.number().min(0, "Preço por KM extra deve ser maior que zero").optional(),
+  base_price: z.number().min(0, "Price must be greater than zero"),
+  included_km: z.number().min(0, "Included KM must be greater than zero"),
+  extra_km_price: z.number().min(0, "Extra KM price must be greater than zero").optional(),
   is_active: z.boolean().default(true),
 });
 
@@ -99,8 +99,8 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["plans"] });
       toast({
-        title: "Sucesso",
-        description: `Plano ${plan ? "atualizado" : "criado"} com sucesso`,
+        title: "Success",
+        description: `Plan ${plan ? "updated" : "created"} successfully`,
       });
       onOpenChange(false);
       form.reset();
@@ -116,7 +116,7 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {plan ? "Editar Plano" : "Novo Plano"}
+            {plan ? "Edit Plan" : "New Plan"}
           </DialogTitle>
         </DialogHeader>
 
@@ -127,7 +127,7 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -141,7 +141,7 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Descrição</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea {...field} />
                   </FormControl>
@@ -156,19 +156,19 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tipo</FormLabel>
+                    <FormLabel>Type</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione o tipo" />
+                          <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="flex">Flex</SelectItem>
-                        <SelectItem value="monthly">Mensal</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
                         <SelectItem value="black">Black</SelectItem>
                       </SelectContent>
                     </Select>
@@ -182,19 +182,19 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
                 name="period"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Período</FormLabel>
+                    <FormLabel>Period</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione o período" />
+                          <SelectValue placeholder="Select period" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="week">Semanal</SelectItem>
-                        <SelectItem value="month">Mensal</SelectItem>
+                        <SelectItem value="week">Weekly</SelectItem>
+                        <SelectItem value="month">Monthly</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -209,7 +209,7 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
                 name="base_price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Preço Base</FormLabel>
+                    <FormLabel>Base Price</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -227,7 +227,7 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
                 name="included_km"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>KM Incluídos</FormLabel>
+                    <FormLabel>Included KM</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -246,7 +246,7 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
               name="extra_km_price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Preço por KM Extra</FormLabel>
+                  <FormLabel>Extra KM Price</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -265,7 +265,7 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
               render={({ field }) => (
                 <FormItem className="flex items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
-                    <FormLabel className="text-base">Ativo</FormLabel>
+                    <FormLabel className="text-base">Active</FormLabel>
                   </div>
                   <FormControl>
                     <Switch
@@ -278,7 +278,7 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
             />
 
             <Button type="submit" className="w-full">
-              {plan ? "Atualizar" : "Criar"} Plano
+              {plan ? "Update" : "Create"} Plan
             </Button>
           </form>
         </Form>

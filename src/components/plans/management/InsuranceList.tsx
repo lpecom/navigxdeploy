@@ -3,30 +3,29 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { PlanTable } from "./PlanTable";
-import { PlanDialog } from "./PlanDialog";
-import type { Plan } from "@/types/plans";
+import { InsuranceTable } from "./insurance/InsuranceTable";
+import { InsuranceDialog } from "./insurance/InsuranceDialog";
+import type { InsuranceOption } from "@/types/plans";
 
-export const PlanList = () => {
-  const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
+export const InsuranceList = () => {
+  const [editingInsurance, setEditingInsurance] = useState<InsuranceOption | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { data: plans, isLoading } = useQuery({
-    queryKey: ["plans"],
+  const { data: insuranceOptions, isLoading } = useQuery({
+    queryKey: ["insurance-options"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("plans")
+        .from("insurance_options")
         .select("*")
-        .order("type", { ascending: true })
-        .order("included_km", { ascending: true });
+        .order("name", { ascending: true });
       
       if (error) throw error;
-      return data as Plan[];
+      return data as InsuranceOption[];
     },
   });
 
   if (isLoading) {
-    return <div>Loading plans...</div>;
+    return <div>Loading insurance options...</div>;
   }
 
   return (
@@ -34,24 +33,24 @@ export const PlanList = () => {
       <div className="flex justify-end">
         <Button onClick={() => setIsDialogOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
-          New Plan
+          Add Insurance Option
         </Button>
       </div>
 
-      <PlanTable
-        plans={plans || []}
-        onEdit={(plan) => {
-          setEditingPlan(plan);
+      <InsuranceTable
+        insuranceOptions={insuranceOptions || []}
+        onEdit={(insurance) => {
+          setEditingInsurance(insurance);
           setIsDialogOpen(true);
         }}
       />
 
-      <PlanDialog
-        plan={editingPlan}
+      <InsuranceDialog
+        insurance={editingInsurance}
         open={isDialogOpen}
         onOpenChange={(open) => {
           setIsDialogOpen(open);
-          if (!open) setEditingPlan(null);
+          if (!open) setEditingInsurance(null);
         }}
       />
     </div>
