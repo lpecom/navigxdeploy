@@ -61,7 +61,7 @@ const AdminRoutes = () => {
               
               {/* Tariff Routes */}
               <Route path="accessories" element={<Accessories />} />
-              <Route path="plans" element={<Optionals />} />
+              <Route path="plans" element={<PlanManagement />} />
               <Route path="fares" element={<Optionals />} />
               
               {/* Analytics Routes */}
