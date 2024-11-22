@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card"
 import { useCart } from "@/contexts/CartContext"
 
 export const CheckoutSummary = () => {
-  const { state } = useCart()
+  const { state, total } = useCart()
 
   return (
     <Card className="p-6">
@@ -17,7 +17,7 @@ export const CheckoutSummary = () => {
         <div className="border-t pt-4 mt-4">
           <div className="flex justify-between font-semibold">
             <span>Total</span>
-            <span>R$ {state.total.toFixed(2)}</span>
+            <span>R$ {total.toFixed(2)}</span>
           </div>
         </div>
       </div>

@@ -86,7 +86,7 @@ const demoCarModels: CarModel[] = [
 
 const Optionals = () => {
   const navigate = useNavigate();
-  const { state: cartState } = useCart();
+  const { state: cartState, total } = useCart();
   const { toast } = useToast();
   const [selectedCar, setSelectedCar] = useState<SelectedCar | null>(null);
 
@@ -115,7 +115,7 @@ const Optionals = () => {
       return;
     }
 
-    if (cartState.items.length > 0 && cartState.total > 0) {
+    if (cartState.items.length > 0 && total > 0) {
       navigate('/checkout');
     } else {
       toast({

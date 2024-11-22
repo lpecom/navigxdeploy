@@ -6,7 +6,7 @@ import { motion } from "framer-motion"
 import { Calendar, Car, Package2 } from "lucide-react"
 
 export const EnhancedSummary = () => {
-  const { state } = useCart()
+  const { state, total } = useCart()
 
   const carGroupItem = state.items.find(item => item.type === 'car_group')
   const optionalItems = state.items.filter(item => item.type === 'optional')
@@ -16,16 +16,16 @@ export const EnhancedSummary = () => {
     queryFn: async () => {
       if (!carGroupItem?.id) return null
       
-      // Get the full UUID before any suffix
       const baseId = carGroupItem.id.includes('-') ? 
-        carGroupItem.id.substring(0, 36) : // UUIDs are 36 characters long
+        carGroupItem.id.substring(0, 36) : 
+        
         carGroupItem.id
       
       const { data, error } = await supabase
         .from('car_groups')
         .select('*, vehicles(*)')
         .eq('id', baseId)
-        .maybeSingle() // Use maybeSingle() instead of single() to handle no results gracefully
+        .maybeSingle()
       
       if (error) {
         console.error('Error fetching car group:', error)
@@ -89,11 +89,11 @@ export const EnhancedSummary = () => {
         <div className="border-t pt-4">
           <div className="flex justify-between items-center mb-2">
             <span className="text-gray-600">Subtotal</span>
-            <span>R$ {state.total.toFixed(2)}</span>
+            <span>R$ {total.toFixed(2)}</span>
           </div>
           <div className="flex justify-between items-center font-semibold text-lg">
             <span>Total</span>
-            <span className="text-primary">R$ {state.total.toFixed(2)}</span>
+            <span className="text-primary">R$ {total.toFixed(2)}</span>
           </div>
           <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
             <Calendar className="w-3 h-3" />

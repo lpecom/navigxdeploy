@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 
 export const OrderSummary = () => {
-  const { state } = useCart()
+  const { state, total } = useCart()
 
   const { data: accessories } = useQuery({
     queryKey: ['accessories'],
@@ -45,7 +45,7 @@ export const OrderSummary = () => {
         <div className="pt-2">
           <div className="flex justify-between items-center font-semibold">
             <span>Total</span>
-            <span className="text-xl">R$ {state.total.toFixed(2)}</span>
+            <span className="text-xl">R$ {total.toFixed(2)}</span>
           </div>
           <p className="text-xs text-gray-500 mt-2">
             Todos os impostos inclusos

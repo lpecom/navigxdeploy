@@ -10,7 +10,7 @@ export const useCheckoutState = () => {
   const [step, setStep] = useState(1)
   const [customerId, setCustomerId] = useState<string | null>(null)
   const { toast } = useToast()
-  const { state: cartState, dispatch } = useCart()
+  const { state: cartState, dispatch, total } = useCart()
   const session = useSession()
   const navigate = useNavigate()
 
@@ -36,7 +36,7 @@ export const useCheckoutState = () => {
               await createCheckoutSession({
                 driverId: driverDetails.id,
                 cartItems: cartState.items,
-                totalAmount: cartState.total,
+                totalAmount: total,
                 onSuccess: (sessionId) => {
                   dispatch({ type: 'SET_CHECKOUT_SESSION', payload: sessionId })
                 }
@@ -51,7 +51,7 @@ export const useCheckoutState = () => {
     }
 
     checkSession()
-  }, [session, cartState.items, cartState.total, cartState.checkoutSessionId, dispatch])
+  }, [session, cartState.items, total, cartState.checkoutSessionId, dispatch])
 
   // Prevent empty cart access
   useEffect(() => {
