@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useCart } from "@/contexts/CartContext"
 import { useToast } from "@/components/ui/use-toast"
 import { supabase } from "@/integrations/supabase/client"
@@ -14,44 +14,44 @@ export const useCheckoutState = () => {
   const session = useSession()
   const navigate = useNavigate()
 
-  // Check for existing session and driver details
-  useEffect(() => {
-    const checkSession = async () => {
-      if (session?.user) {
-        const { data: driverDetails, error } = await supabase
-          .from('driver_details')
-          .select('*')
-          .eq('auth_user_id', session.user.id)
-          .single()
+  // Memoize the checkSession function to prevent infinite re-renders
+  const checkSession = useCallback(async () => {
+    if (session?.user) {
+      const { data: driverDetails, error } = await supabase
+        .from('driver_details')
+        .select('*')
+        .eq('auth_user_id', session.user.id)
+        .single()
 
-        if (error) {
-          console.error('Error fetching driver details:', error)
-          return
-        }
+      if (error) {
+        console.error('Error fetching driver details:', error)
+        return
+      }
 
-        if (driverDetails) {
-          setCustomerId(driverDetails.id)
-          if (cartState.items.length > 0 && !cartState.checkoutSessionId) {
-            try {
-              await createCheckoutSession({
-                driverId: driverDetails.id,
-                cartItems: cartState.items,
-                totalAmount: total,
-                onSuccess: (sessionId) => {
-                  dispatch({ type: 'SET_CHECKOUT_SESSION', payload: sessionId })
-                }
-              })
-            } catch (error) {
-              console.error('Error creating checkout session:', error)
-            }
+      if (driverDetails) {
+        setCustomerId(driverDetails.id)
+        if (cartState.items.length > 0 && !cartState.checkoutSessionId) {
+          try {
+            await createCheckoutSession({
+              driverId: driverDetails.id,
+              cartItems: cartState.items,
+              totalAmount: total,
+              onSuccess: (sessionId) => {
+                dispatch({ type: 'SET_CHECKOUT_SESSION', payload: sessionId })
+              }
+            })
+          } catch (error) {
+            console.error('Error creating checkout session:', error)
           }
-          setStep(2)
         }
+        setStep(2)
       }
     }
-
-    checkSession()
   }, [session, cartState.items, total, cartState.checkoutSessionId, dispatch])
+
+  useEffect(() => {
+    checkSession()
+  }, [checkSession])
 
   // Prevent empty cart access
   useEffect(() => {

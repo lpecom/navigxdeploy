@@ -54,25 +54,31 @@ export const createCheckoutSession = async ({
 
     if (sessionError) throw sessionError;
 
-    // Then insert cart items
+    // Then insert cart items with proper validation
     if (session) {
       const cartItemsData = cartItems.map(item => ({
         checkout_session_id: session.id,
         item_type: item.type,
         item_id: getValidUUID(item.id),
-        quantity: item.quantity,
+        quantity: item.quantity || 1,
         unit_price: item.unitPrice,
         total_price: item.totalPrice
       }));
 
-      const { error: cartError } = await supabase
-        .from('cart_items')
-        .insert(cartItemsData);
+      // Validate item types before insertion
+      const validItemTypes = ['car_group', 'optional', 'insurance'];
+      const validatedCartItems = cartItemsData.filter(item => 
+        validItemTypes.includes(item.item_type)
+      );
 
-      if (cartError) throw cartError;
-    }
+      if (validatedCartItems.length > 0) {
+        const { error: cartError } = await supabase
+          .from('cart_items')
+          .insert(validatedCartItems);
 
-    if (session) {
+        if (cartError) throw cartError;
+      }
+
       onSuccess(session.id);
       return session;
     }
