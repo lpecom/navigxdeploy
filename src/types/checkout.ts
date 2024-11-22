@@ -9,15 +9,32 @@ export interface JsonCartItem {
   totalPrice: number;
 }
 
+export interface SelectedCar {
+  name: string;
+  category: string;
+  price: number;
+  period: string;
+  group_id?: string;
+}
+
+export interface Optional {
+  id: string;
+  name: string;
+  totalPrice: number;
+}
+
 export interface CheckoutSession {
   id?: string;
   driver_id: string;
-  selected_car: Json;  // Changed back to Json type for Supabase compatibility
-  selected_optionals: Json;  // Changed back to Json type for Supabase compatibility
+  selected_car: SelectedCar;
+  selected_optionals: Optional[];
   total_amount: number;
   status?: string;
   created_at?: string;
   updated_at?: string;
+  pickup_date?: string;
+  pickup_time?: string;
+  reservation_number?: number;
 }
 
 export interface CheckoutFormData {

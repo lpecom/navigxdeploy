@@ -5,10 +5,24 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Package } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import type { CheckoutSession } from "@/types/checkout";
 
 interface OrderSummaryProps {
   checkoutSessionId: string;
   onContinue?: () => void;
+}
+
+interface SelectedCar {
+  name: string;
+  category: string;
+  price: number;
+  period: string;
+}
+
+interface Optional {
+  id: string;
+  name: string;
+  totalPrice: number;
 }
 
 export const OrderSummary = ({ checkoutSessionId, onContinue }: OrderSummaryProps) => {
@@ -31,7 +45,22 @@ export const OrderSummary = ({ checkoutSessionId, onContinue }: OrderSummaryProp
         });
         throw error;
       }
-      return data;
+
+      // Type assertion for selected_car and selected_optionals
+      const selectedCar = data.selected_car as unknown as SelectedCar;
+      const selectedOptionals = Array.isArray(data.selected_optionals) 
+        ? data.selected_optionals.map((opt: any) => ({
+            id: opt.id || '',
+            name: opt.name || '',
+            totalPrice: Number(opt.totalPrice) || 0
+          }))
+        : [];
+
+      return {
+        ...data,
+        selected_car: selectedCar,
+        selected_optionals: selectedOptionals
+      } as CheckoutSession & { selected_car: SelectedCar, selected_optionals: Optional[] };
     },
     enabled: !!checkoutSessionId,
   });
@@ -63,7 +92,7 @@ export const OrderSummary = ({ checkoutSessionId, onContinue }: OrderSummaryProp
           <div>
             <h3 className="font-medium mb-2">Opcionais</h3>
             <div className="space-y-2">
-              {session.selected_optionals.map((optional: any) => (
+              {session.selected_optionals.map((optional: Optional) => (
                 <div key={optional.id} className="flex items-center justify-between bg-muted/50 p-3 rounded-lg">
                   <div className="flex items-center gap-2">
                     <Package className="w-4 h-4 text-primary" />
