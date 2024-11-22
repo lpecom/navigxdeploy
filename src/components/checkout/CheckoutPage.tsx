@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckoutLayout } from "./ui/CheckoutLayout";
 import { EmptyCartMessage } from "./ui/EmptyCartMessage";
@@ -13,8 +13,10 @@ export const CheckoutPage = () => {
   const { toast } = useToast();
   const { cartState } = useCheckoutState();
 
-  const handleInsuranceSelect = async (insuranceId: string) => {
+  const handleInsuranceSelect = useCallback(async (insuranceId: string) => {
     try {
+      if (!cartState.checkoutSessionId) return;
+
       const { error } = await supabase
         .from('checkout_sessions')
         .update({ insurance_option_id: insuranceId })
@@ -30,10 +32,12 @@ export const CheckoutPage = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [cartState.checkoutSessionId, toast]);
 
-  const handleScheduleSubmit = async (scheduleData: any) => {
+  const handleScheduleSubmit = useCallback(async (scheduleData: any) => {
     try {
+      if (!cartState.checkoutSessionId) return;
+
       const { error } = await supabase
         .from('checkout_sessions')
         .update({
@@ -52,10 +56,12 @@ export const CheckoutPage = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [cartState.checkoutSessionId, toast]);
 
-  const handlePaymentLocationSelect = async (location: 'online' | 'store') => {
+  const handlePaymentLocationSelect = useCallback(async (location: 'online' | 'store') => {
     try {
+      if (!cartState.checkoutSessionId) return;
+
       const { error } = await supabase
         .from('checkout_sessions')
         .update({ payment_location: location })
@@ -71,23 +77,23 @@ export const CheckoutPage = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [cartState.checkoutSessionId, toast]);
 
-  const handlePaymentSuccess = (paymentId: string) => {
+  const handlePaymentSuccess = useCallback((paymentId: string) => {
     toast({
       title: "Pagamento confirmado!",
       description: "Sua reserva foi confirmada com sucesso.",
     });
     navigate('/driver/dashboard');
-  };
+  }, [navigate, toast]);
 
-  const handleKYCSubmit = (data: any) => {
+  const handleKYCSubmit = useCallback((data: any) => {
     toast({
       title: "Cadastro realizado!",
       description: "Sua reserva foi confirmada. Você receberá um email para definir sua senha.",
     });
     navigate('/driver/dashboard');
-  };
+  }, [navigate, toast]);
 
   if (!cartState || (cartState.items.length === 0 && !cartState.checkoutSessionId)) {
     return (

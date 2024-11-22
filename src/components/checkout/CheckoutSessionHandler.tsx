@@ -26,52 +26,56 @@ export const createCheckoutSession = async ({
     const selectedOptionals = cartItems.filter(item => item.type === 'optional');
     const selectedInsurance = cartItems.find(item => item.type === 'insurance');
 
-    const sessionData = {
-      driver_id: driverId,
-      selected_car: selectedGroup ? {
-        group_id: getValidUUID(selectedGroup.id),
-        name: selectedGroup.name,
-        category: selectedGroup.category,
-        price: selectedGroup.unitPrice,
-        period: selectedGroup.period
-      } as Json : {} as Json,
-      selected_optionals: selectedOptionals.map(opt => ({
-        id: getValidUUID(opt.id),
-        name: opt.name,
-        totalPrice: opt.totalPrice
-      })) as unknown as Json,
-      total_amount: totalAmount,
-      status: 'pending',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      insurance_option_id: selectedInsurance ? getValidUUID(selectedInsurance.id) : null
-    };
-
+    // First create the checkout session
     const { data: session, error: sessionError } = await supabase
       .from('checkout_sessions')
-      .insert(sessionData)
+      .insert({
+        driver_id: driverId,
+        selected_car: selectedGroup ? {
+          group_id: getValidUUID(selectedGroup.id),
+          name: selectedGroup.name,
+          category: selectedGroup.category,
+          price: selectedGroup.unitPrice,
+          period: selectedGroup.period
+        } : {},
+        selected_optionals: selectedOptionals.map(opt => ({
+          id: getValidUUID(opt.id),
+          name: opt.name,
+          totalPrice: opt.totalPrice
+        })),
+        total_amount: totalAmount,
+        status: 'pending',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        insurance_option_id: selectedInsurance ? getValidUUID(selectedInsurance.id) : null
+      })
       .select()
       .single();
 
     if (sessionError) throw sessionError;
 
-    const cartItemsData = cartItems.map(item => ({
-      checkout_session_id: session.id,
-      item_type: item.type,
-      item_id: getValidUUID(item.id),
-      quantity: item.quantity,
-      unit_price: item.unitPrice,
-      total_price: item.totalPrice
-    }));
+    // Then insert cart items
+    if (session) {
+      const cartItemsData = cartItems.map(item => ({
+        checkout_session_id: session.id,
+        item_type: item.type,
+        item_id: getValidUUID(item.id),
+        quantity: item.quantity,
+        unit_price: item.unitPrice,
+        total_price: item.totalPrice
+      }));
 
-    const { error: cartError } = await supabase
-      .from('cart_items')
-      .insert(cartItemsData);
+      const { error: cartError } = await supabase
+        .from('cart_items')
+        .insert(cartItemsData);
 
-    if (cartError) throw cartError;
+      if (cartError) throw cartError;
+    }
 
-    onSuccess(session.id);
-    return session;
+    if (session) {
+      onSuccess(session.id);
+      return session;
+    }
   } catch (error) {
     console.error('Error creating checkout session:', error);
     throw error;
