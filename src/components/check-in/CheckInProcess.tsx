@@ -47,10 +47,18 @@ const CheckInProcess = () => {
       if (error) throw error;
       if (!data) throw new Error('Reservation not found');
       
+      const selectedCar = data.selected_car as Record<string, any>;
+      
       // Convert the data to match our expected type
       const formattedData: CheckInReservation = {
         ...data,
-        selected_car: data.selected_car as Json,
+        selected_car: {
+          name: selectedCar.name || '',
+          category: selectedCar.category || '',
+          group_id: selectedCar.group_id,
+          price: selectedCar.price,
+          period: selectedCar.period
+        },
         driver: data.driver || { id: '', full_name: '' }
       };
       
