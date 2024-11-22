@@ -94,7 +94,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           display_order?: number | null
-          id?: string
+          id: string
           is_active?: boolean | null
           name: string
           updated_at?: string | null
@@ -139,7 +139,7 @@ export type Database = {
           description?: string | null
           engine_size?: string | null
           features?: Json | null
-          id?: string
+          id: string
           image_url?: string | null
           luggage?: number | null
           name: string
@@ -240,7 +240,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           display_order?: number | null
-          id?: string
+          id: string
           is_active?: boolean | null
           name: string
         }
@@ -308,7 +308,7 @@ export type Database = {
           created_by?: string | null
           document_type: string
           file_url: string
-          id?: string
+          id: string
         }
         Update: {
           checkout_session_id?: string
@@ -355,17 +355,17 @@ export type Database = {
           check_in_notes?: string | null
           check_in_photos?: Json | null
           check_in_status?: string | null
-          created_at?: string
+          created_at: string
           driver_id?: string | null
           id?: string
           pickup_date?: string | null
           pickup_time?: string | null
-          reservation_number?: number
+          reservation_number: number
           selected_car: Json
           selected_optionals: Json
           status?: string
           total_amount: number
-          updated_at?: string
+          updated_at: string
         }
         Update: {
           assigned_vehicle_id?: string | null
@@ -470,7 +470,7 @@ export type Database = {
           email: string
           full_name: string
           gender?: string | null
-          id?: string
+          id: string
           last_rental_date?: string | null
           license_category?: string | null
           license_expiry?: string | null
@@ -664,11 +664,11 @@ export type Database = {
           birth_date: string
           city?: string | null
           cpf: string
-          created_at?: string
+          created_at: string
           crm_status?: string | null
           email: string
           full_name: string
-          id?: string
+          id: string
           license_expiry: string
           license_number: string
           phone: string
@@ -678,17 +678,17 @@ export type Database = {
         Update: {
           address?: string | null
           auth_user_id?: string | null
-          birth_date?: string
+          birth_date: string
           city?: string | null
           cpf?: string
           created_at?: string
           crm_status?: string | null
           email?: string
           full_name?: string
-          id?: string
-          license_expiry?: string
-          license_number?: string
-          phone?: string
+          id: string
+          license_expiry: string
+          license_number: string
+          phone: string
           postal_code?: string | null
           state?: string | null
         }
@@ -794,7 +794,7 @@ export type Database = {
           next_revision_date?: string
           plate?: string
           renavam_number?: string | null
-          state?: string | null
+          state?: string
           status?: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at?: string | null
           year?: string
@@ -932,26 +932,26 @@ export type Database = {
         }
         Insert: {
           cost?: number | null
-          created_at?: string
+          created_at: string
           description: string
           driver_id: string
-          id?: string
+          id: string
           service_date: string
           service_type: string
           status?: string
-          updated_at?: string
+          updated_at: string
           vehicle_id?: string | null
         }
         Update: {
           cost?: number | null
-          created_at?: string
-          description?: string
-          driver_id?: string
-          id?: string
-          service_date?: string
-          service_type?: string
+          created_at: string
+          description: string
+          driver_id: string
+          id: string
+          service_date: string
+          service_type: string
           status?: string
-          updated_at?: string
+          updated_at: string
           vehicle_id?: string | null
         }
         Relationships: [
@@ -1034,7 +1034,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           display_order?: number | null
-          id?: string
+          id: string
           is_active?: boolean | null
           name: string
           price: number
@@ -1050,7 +1050,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           display_order?: number | null
-          id?: string
+          id: string
           is_active?: boolean | null
           name?: string
           price?: number
@@ -1213,7 +1213,7 @@ export type Database = {
           id?: string
           installments?: number | null
           payment_type: string
-          status?: string
+          status: string
           updated_at?: string
         }
         Update: {
@@ -1342,7 +1342,7 @@ export type Database = {
           engine_size: string
           features?: string[]
           fuel_type: string
-          id?: string
+          id: string
           image_url: string
           name: string
           passengers: number
@@ -1385,8 +1385,8 @@ export type Database = {
           balance?: number
           created_at?: string
           driver_id: string
-          id?: string
-          updated_at?: string
+          id: string
+          updated_at: string
         }
         Update: {
           balance?: number
@@ -1426,35 +1426,66 @@ export type Database = {
         }
         Relationships: []
       }
-    }
+      plans: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          type: 'flex' | 'monthly' | 'black';
+          period: 'week' | 'month';
+          base_price: number;
+          included_km: number;
+          extra_km_price: number | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['plans']['Row'], 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Database['public']['Tables']['plans']['Insert']>;
+      };
+      insurance_options: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          coverage_details: Record<string, boolean>;
+          price: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['insurance_options']['Row'], 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Database['public']['Tables']['insurance_options']['Insert']>;
+      };
+    };
     Views: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Functions: {
       export_fleet_data: {
-        Args: Record<PropertyKey, never>
+        Args: Record<PropertyKey, never>;
         Returns: {
-          id: string
-          car_model_name: string
-          year: string
-          current_km: number
-          last_revision_date: string
-          next_revision_date: string
-          plate: string
-          is_available: boolean
-          color: string
-          state: string
-          chassis_number: string
-          renavam_number: string
-          status: Database["public"]["Enums"]["vehicle_status"]
-          contract_number: string
-          customer_name: string
-          branch: string
-        }[]
-      }
-    }
+          id: string;
+          car_model_name: string;
+          year: string;
+          current_km: number;
+          last_revision_date: string;
+          next_revision_date: string;
+          plate: string;
+          is_available: boolean;
+          color: string;
+          state: string;
+          chassis_number: string;
+          renavam_number: string;
+          status: Database["public"]["Enums"]["vehicle_status"];
+          contract_number: string;
+          customer_name: string;
+          branch: string;
+        }[];
+      };
+    };
     Enums: {
-      check_in_status: "pending" | "in_progress" | "completed" | "cancelled"
+      check_in_status: "pending" | "in_progress" | "completed" | "cancelled";
       vehicle_status:
         | "available"
         | "rented"
@@ -1467,15 +1498,15 @@ export type Database = {
         | "mechanic"
         | "other_maintenance"
         | "for_sale"
-        | "preparing"
-    }
+        | "preparing";
+    };
     CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-}
+      [_ in never]: never;
+    };
+  };
+};
 
-type PublicSchema = Database[Extract<keyof Database, "public">]
+type PublicSchema = Database[Extract<keyof Database, "public">];
 
 export type Tables<
   PublicTableNameOrOptions extends
@@ -1488,7 +1519,7 @@ export type Tables<
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
+      Row: infer R;
     }
     ? R
     : never
@@ -1496,11 +1527,11 @@ export type Tables<
         PublicSchema["Views"])
     ? (PublicSchema["Tables"] &
         PublicSchema["Views"])[PublicTableNameOrOptions] extends {
-        Row: infer R
+        Row: infer R;
       }
       ? R
       : never
-    : never
+    : never;
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
@@ -1511,17 +1542,17 @@ export type TablesInsert<
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
+      Insert: infer I;
     }
     ? I
     : never
   : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
     ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-        Insert: infer I
+        Insert: infer I;
       }
       ? I
       : never
-    : never
+    : never;
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
@@ -1532,17 +1563,17 @@ export type TablesUpdate<
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
+      Update: infer U;
     }
     ? U
     : never
   : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
     ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-        Update: infer U
+        Update: infer U;
       }
       ? U
       : never
-    : never
+    : never;
 
 export type Enums<
   PublicEnumNameOrOptions extends
@@ -1555,14 +1586,14 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
-    : never
+    : never;
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof PublicSchema["CompositeTypes"]
     | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof Database;
   }
     ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
@@ -1570,4 +1601,4 @@ export type CompositeTypes<
   ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+    : never;
