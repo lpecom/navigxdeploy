@@ -6,9 +6,12 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   httpClient: Stripe.createFetchHttpClient(),
 })
 
+// This is needed for webhook verification
+const cryptoProvider = Stripe.createSubtleCryptoProvider()
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
 }
 
 serve(async (req) => {
@@ -17,14 +20,76 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders })
   }
 
+  const url = new URL(req.url)
+
   try {
+    // Handle webhooks on /webhook path
+    if (url.pathname === '/webhook') {
+      const signature = req.headers.get('stripe-signature')
+      
+      if (!signature) {
+        throw new Error('No Stripe signature found')
+      }
+
+      const body = await req.text()
+      
+      let event
+      try {
+        event = await stripe.webhooks.constructEventAsync(
+          body,
+          signature,
+          Deno.env.get('STRIPE_WEBHOOK_SIGNING_SECRET') || '',
+          undefined,
+          cryptoProvider
+        )
+      } catch (err) {
+        console.error('Webhook signature verification failed:', err)
+        return new Response(JSON.stringify({ error: 'Invalid signature' }), { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+      }
+
+      console.log('Webhook event received:', event.type)
+
+      // Handle specific webhook events
+      switch (event.type) {
+        case 'payment_intent.succeeded':
+          const paymentIntent = event.data.object
+          console.log('Payment succeeded:', paymentIntent.id)
+          
+          // Update payment status in database
+          const { error: dbError } = await supabase
+            .from('stripe_payment_intents')
+            .update({ status: 'succeeded' })
+            .eq('payment_intent_id', paymentIntent.id)
+
+          if (dbError) {
+            console.error('Database update failed:', dbError)
+          }
+          break
+
+        case 'payment_intent.payment_failed':
+          const failedPayment = event.data.object
+          console.log('Payment failed:', failedPayment.id)
+          break
+
+        // Add more webhook event handlers as needed
+      }
+
+      return new Response(JSON.stringify({ received: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+
+    // Handle regular payment creation requests
     const { action, payload } = await req.json()
     console.log('Received request:', { action, payload })
 
     if (action === 'create_payment_intent') {
       const { amount, driver_id, metadata } = payload
 
-      // Create payment intent
+      // Create payment intent in test mode
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount * 100), // Convert to cents
         currency: 'brl',
