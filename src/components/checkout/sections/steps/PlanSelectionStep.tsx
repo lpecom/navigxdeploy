@@ -15,17 +15,19 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
   const selectedPlan = cartState.items.find((item: any) => item.type === 'car_group')
 
   const { data: carModels } = useQuery({
-    queryKey: ['car-models', selectedPlan?.category_id],
+    queryKey: ['car-models', selectedPlan?.category],
     queryFn: async () => {
+      if (!selectedPlan?.category) return null;
+      
       const { data, error } = await supabase
         .from('car_models')
         .select('*')
-        .eq('category_id', cartState?.items?.[0]?.category_id)
+        .eq('category_id', selectedPlan.category)
       
       if (error) throw error
       return data as CarModel[]
     },
-    enabled: !!cartState?.items?.[0]?.category_id
+    enabled: !!selectedPlan?.category
   })
 
   const planDetails = selectedPlan ? {

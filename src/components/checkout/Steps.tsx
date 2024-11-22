@@ -1,4 +1,5 @@
 import { User, Calendar, CreditCard, ShieldCheck, CheckCircle } from "lucide-react"
+import { motion } from "framer-motion"
 
 export const checkoutSteps = [
   { number: 1, title: "Escolher Plano", icon: Calendar },
