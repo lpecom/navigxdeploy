@@ -33,6 +33,8 @@ const insuranceSchema = z.object({
   is_active: z.boolean().default(true),
 });
 
+type InsuranceFormData = z.infer<typeof insuranceSchema>;
+
 interface InsuranceDialogProps {
   insurance: InsuranceOptions | null;
   open: boolean;
@@ -42,7 +44,7 @@ interface InsuranceDialogProps {
 export const InsuranceDialog = ({ insurance, open, onOpenChange }: InsuranceDialogProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const form = useForm<z.infer<typeof insuranceSchema>>({
+  const form = useForm<InsuranceFormData>({
     resolver: zodResolver(insuranceSchema),
     defaultValues: {
       name: "",
@@ -66,7 +68,7 @@ export const InsuranceDialog = ({ insurance, open, onOpenChange }: InsuranceDial
   }, [insurance, form]);
 
   const mutation = useMutation({
-    mutationFn: async (values: z.infer<typeof insuranceSchema>) => {
+    mutationFn: async (values: InsuranceFormData) => {
       if (insurance) {
         const { error } = await supabase
           .from("insurance_options")
@@ -91,7 +93,7 @@ export const InsuranceDialog = ({ insurance, open, onOpenChange }: InsuranceDial
     },
   });
 
-  const onSubmit = (values: z.infer<typeof insuranceSchema>) => {
+  const onSubmit = (values: InsuranceFormData) => {
     mutation.mutate(values);
   };
 
