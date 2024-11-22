@@ -1,5 +1,4 @@
 import { Json } from "@/integrations/supabase/types";
-import type { CarModel } from "@/types/vehicles";
 
 export interface PhotoCategory {
   id: string;
@@ -16,7 +15,7 @@ export interface SelectedCar {
 
 export interface CheckInReservation {
   id: string;
-  selected_car: SelectedCar;
+  selected_car: Json;
   driver: {
     id: string;
     full_name: string;
