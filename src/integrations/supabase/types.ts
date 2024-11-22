@@ -1279,6 +1279,48 @@ export type Database = {
           },
         ]
       }
+      plans: {
+        Row: {
+          base_price: number
+          created_at: string | null
+          description: string | null
+          extra_km_price: number | null
+          id: string
+          included_km: number
+          is_active: boolean | null
+          name: string
+          period: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          base_price: number
+          created_at?: string | null
+          description?: string | null
+          extra_km_price?: number | null
+          id?: string
+          included_km: number
+          is_active?: boolean | null
+          name: string
+          period: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          base_price?: number
+          created_at?: string | null
+          description?: string | null
+          extra_km_price?: number | null
+          id?: string
+          included_km?: number
+          is_active?: boolean | null
+          name?: string
+          period?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       support_tickets: {
         Row: {
           category: string

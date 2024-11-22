@@ -77,3 +77,5 @@ export interface Database {
     };
   };
 }
+
+export type { Plans, InsuranceOptions };
