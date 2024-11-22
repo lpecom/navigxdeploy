@@ -72,10 +72,18 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       };
     }
 
+    case 'SET_DRIVER_ID': {
+      return {
+        ...state,
+        driver_id: action.payload
+      };
+    }
+
     case 'CLEAR_CART':
       return {
         items: [],
-        checkoutSessionId: undefined
+        checkoutSessionId: undefined,
+        driver_id: undefined
       };
 
     default:
@@ -86,7 +94,8 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(cartReducer, {
     items: [],
-    checkoutSessionId: undefined
+    checkoutSessionId: undefined,
+    driver_id: undefined
   });
 
   const total = calculateTotal(state.items);

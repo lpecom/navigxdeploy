@@ -89,7 +89,14 @@ export const CheckoutPage = () => {
 
   const handleKYCSubmit = useCallback(async (data: any) => {
     try {
-      if (!cartState.checkoutSessionId) return;
+      if (!cartState.checkoutSessionId || !cartState.driver_id) {
+        toast({
+          title: "Erro ao salvar dados",
+          description: "Informações do motorista não encontradas.",
+          variant: "destructive",
+        });
+        return;
+      }
 
       const { error } = await supabase
         .from('driver_details')

@@ -14,6 +14,7 @@ export interface CartItem {
 export interface CartState {
   items: CartItem[];
   checkoutSessionId?: string;
+  driver_id?: string;
 }
 
 export type CartAction =
@@ -21,4 +22,5 @@ export type CartAction =
   | { type: 'REMOVE_ITEM'; payload: string }
   | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
   | { type: 'SET_CHECKOUT_SESSION'; payload: string }
+  | { type: 'SET_DRIVER_ID'; payload: string }
   | { type: 'CLEAR_CART' };
