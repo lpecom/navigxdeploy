@@ -8,9 +8,10 @@ import { Car } from "lucide-react"
 
 interface ReservationsListProps {
   filter: "pending" | PickupFilter
+  status?: 'pending_approval' | 'approved' | 'rejected'
 }
 
-const ReservationsList = ({ filter }: ReservationsListProps) => {
+const ReservationsList = ({ filter, status = 'pending_approval' }: ReservationsListProps) => {
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({})
 
   const toggleCard = useCallback((id: string) => {
@@ -21,7 +22,7 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
   }, [])
 
   const { data: reservations, isLoading, error } = useQuery({
-    queryKey: ['reservations', filter],
+    queryKey: ['reservations', filter, status],
     queryFn: async () => {
       let query = supabase
         .from('checkout_sessions')
@@ -42,7 +43,7 @@ const ReservationsList = ({ filter }: ReservationsListProps) => {
         .order('reservation_number', { ascending: false })
 
       if (filter === 'pending') {
-        query = query.eq('status', 'pending_approval')
+        query = query.eq('status', status)
       } else {
         query = query.eq('status', 'approved')
 

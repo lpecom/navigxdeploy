@@ -37,7 +37,7 @@ export const adminMenuItems: MenuItem[] = [
     title: "Reservas",
     icon: Calendar,
     items: [
-      { title: "Pendentes", href: "/admin/reservations/pending", icon: Clock },
+      { title: "Aprovações", href: "/admin/reservations/pending", icon: Clock },
       { title: "Retirada", href: "/admin/reservations/pickup", icon: CalendarCheck },
       { title: "Check-in", href: "/admin/check-in", icon: CalendarClock },
     ]

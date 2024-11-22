@@ -5,14 +5,18 @@ import ReservationsList from "@/components/reservations/ReservationsList"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { type ReservationFilter } from "@/types/reservation"
 import { motion } from "framer-motion"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface ReservationsProps {
   filter: ReservationFilter
 }
 
+type StatusFilter = 'pending_approval' | 'approved' | 'rejected';
+
 const Reservations = ({ filter }: ReservationsProps) => {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(true)
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('pending_approval')
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -47,9 +51,26 @@ const Reservations = ({ filter }: ReservationsProps) => {
       {filter === 'pending' ? (
         <>
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Reservas Pendentes</h1>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold">Aprovações</h1>
+              <div className="w-[180px]">
+                <Select 
+                  value={statusFilter} 
+                  onValueChange={(value) => setStatusFilter(value as StatusFilter)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filtrar por status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending_approval">Pendentes</SelectItem>
+                    <SelectItem value="approved">Aprovados</SelectItem>
+                    <SelectItem value="rejected">Rejeitados</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
-          <ReservationsList filter="pending" />
+          <ReservationsList filter="pending" status={statusFilter} />
         </>
       ) : (
         <>
