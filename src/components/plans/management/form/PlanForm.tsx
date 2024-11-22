@@ -46,20 +46,32 @@ export const PlanForm = ({ plan, onSubmit }: PlanFormProps) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="space-y-6"
         >
-          <BasicInfoFields form={form} />
-          <PlanTypeFields form={form} />
-          <PricingFields form={form} />
-          <FeaturesField form={form} />
-          <KmRangesField form={form} />
-          <DisplayOrderField form={form} />
-          <HighlightField form={form} />
-          <StatusField form={form} />
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-6">
+              <BasicInfoFields form={form} />
+              <PlanTypeFields form={form} />
+              <PricingFields form={form} />
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <DisplayOrderField form={form} />
+                </div>
+                <div className="flex-1">
+                  <HighlightField form={form} />
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-6">
+              <FeaturesField form={form} />
+              <KmRangesField form={form} />
+              <StatusField form={form} />
+            </div>
+          </div>
 
           <Button 
             type="submit" 
-            className="w-full h-12 text-lg font-medium"
+            className="w-full mt-6 h-12 text-lg font-medium"
           >
             <Save className="w-5 h-5 mr-2" />
             {plan ? "Update" : "Create"} Plan

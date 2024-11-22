@@ -63,7 +63,7 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-5xl">
         <DialogHeader>
           <DialogTitle>
             {plan ? "Edit Plan" : "New Plan"}
