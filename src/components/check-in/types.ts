@@ -9,6 +9,7 @@ export interface PhotoCategory {
 export interface SelectedCar {
   name: string;
   category: string;
+  plan_type?: string;
   group_id?: string;
   price?: number;
   period?: string;
