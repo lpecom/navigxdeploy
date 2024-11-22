@@ -47,15 +47,16 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
           }))
         : [];
 
+      // Set initial values from the session data
       setSelectedGroup(selectedCar.category || '');
-      setSelectedPlan(selectedCar.plan_type || 'flex');
+      setSelectedPlan(selectedCar.plan_type || '');
 
       return {
         ...data,
         selected_car: {
           name: selectedCar.name || '',
           category: selectedCar.category || '',
-          plan_type: selectedCar.plan_type || 'flex',
+          plan_type: selectedCar.plan_type || '',
           group_id: selectedCar.group_id,
           price: selectedCar.price,
           period: selectedCar.period
@@ -65,11 +66,11 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
     },
   });
 
-  const { data: groups } = useQuery({
-    queryKey: ['car-groups'],
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('car_groups')
+        .from('categories')
         .select('*')
         .eq('is_active', true)
         .order('display_order');
@@ -154,7 +155,7 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Car className="w-5 h-5" />
-              Grupo do Veículo
+              Categoria do Veículo
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -164,12 +165,12 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
               disabled={isChanging}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione o grupo" />
+                <SelectValue placeholder="Selecione a categoria" />
               </SelectTrigger>
               <SelectContent>
-                {groups?.map((group) => (
-                  <SelectItem key={group.id} value={group.name}>
-                    {group.name}
+                {categories?.map((category) => (
+                  <SelectItem key={category.id} value={category.name}>
+                    {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>
