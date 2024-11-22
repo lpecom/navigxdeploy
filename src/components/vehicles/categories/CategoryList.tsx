@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import { CategoryCard } from "./ui/CategoryCard";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CategoryForm } from "./CategoryForm";
+import { CategoryModelsDialog } from "./CategoryModelsDialog";
 import type { Category } from "@/types/offers";
 
 export const CategoryList = () => {
@@ -20,10 +21,7 @@ export const CategoryList = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("categories")
-        .select(`
-          *,
-          car_models:car_models(count)
-        `)
+        .select("*, car_models(count)")
         .order("display_order");
       
       if (error) throw error;
@@ -84,9 +82,9 @@ export const CategoryList = () => {
             Nova Categoria
           </Button>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-[300px] rounded-lg bg-muted animate-pulse" />
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-[200px] rounded-lg bg-muted animate-pulse" />
           ))}
         </div>
       </div>
@@ -103,7 +101,7 @@ export const CategoryList = () => {
         </Button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
         {categories?.map((category) => (
           <CategoryCard
             key={category.id}
@@ -112,7 +110,7 @@ export const CategoryList = () => {
             onEdit={setEditingCategory}
             onDelete={(category) => {
               if (window.confirm("Tem certeza que deseja excluir esta categoria?")) {
-                deleteMutation.mutate(category.id);
+                deleteMutation.mutate(category);
               }
             }}
           />
@@ -130,22 +128,10 @@ export const CategoryList = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog
-        open={!!editingCategory}
-        onOpenChange={() => setEditingCategory(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Editar Categoria</DialogTitle>
-          </DialogHeader>
-          {editingCategory && (
-            <CategoryForm
-              category={editingCategory}
-              onSuccess={() => setEditingCategory(null)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <CategoryModelsDialog
+        category={editingCategory}
+        onClose={() => setEditingCategory(null)}
+      />
     </div>
   );
 };
