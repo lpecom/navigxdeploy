@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Car, CheckCircle } from "lucide-react";
+import { Car, CheckCircle, ArrowUpCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { GroupUpgradeDialog } from "../dialogs/GroupUpgradeDialog";
 import type { CheckInReservation, SelectedCar, FleetVehicleWithRelations } from "../types";
 
 interface VehicleAssignmentProps {
@@ -17,6 +18,7 @@ interface VehicleAssignmentProps {
 export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentProps) => {
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
   const [isAssigning, setIsAssigning] = useState(false);
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
 
   const { data: session } = useQuery({
     queryKey: ['checkout-session', sessionId],
@@ -47,7 +49,7 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
     },
   });
 
-  const { data: availableVehicles } = useQuery<FleetVehicleWithRelations[]>({
+  const { data: availableVehicles } = useQuery({
     queryKey: ['available-vehicles', session?.selected_car?.group_id],
     enabled: !!session?.selected_car?.group_id,
     queryFn: async () => {
@@ -73,6 +75,23 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
         .eq('status', 'available')
         .eq('car_model.car_group.id', session?.selected_car?.group_id)
         .returns<FleetVehicleWithRelations[]>();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: availableGroups } = useQuery({
+    queryKey: ['car-groups'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('car_groups')
+        .select(`
+          *,
+          group_fares(*)
+        `)
+        .eq('is_active', true)
+        .order('display_order');
       
       if (error) throw error;
       return data;
@@ -114,9 +133,45 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
 
   if (!session || !availableVehicles) return null;
 
+  const currentGroup = availableGroups?.find(
+    group => group.id === session.selected_car.group_id
+  );
+
+  const currentPlan = currentGroup?.group_fares?.find(
+    fare => fare.plan_type === session.selected_car.period
+  );
+
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Atribuição de Veículo</h2>
+      <Card className="bg-muted/50">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span>Grupo Atual: {currentGroup?.name || 'Não definido'}</span>
+              <Badge variant="outline">{session.selected_car.period}</Badge>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowUpgradeDialog(true)}
+              className="flex items-center gap-2"
+            >
+              <ArrowUpCircle className="w-4 h-4" />
+              Upgrade Disponível
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-sm text-muted-foreground">
+            <p>Plano: {currentPlan?.plan_type || 'Não definido'}</p>
+            <p>Preço Base: R$ {currentPlan?.base_price || 0}</p>
+            <p>KM Incluídos: {currentPlan?.km_included || 0} km</p>
+            <p>Preço por KM extra: R$ {currentPlan?.extra_km_price || 0}</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <h2 className="text-2xl font-bold">Veículos Disponíveis</h2>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {availableVehicles?.map((vehicle) => (
@@ -184,6 +239,14 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
           {isAssigning ? "Atribuindo..." : "Concluir Check-in"}
         </Button>
       </div>
+
+      <GroupUpgradeDialog 
+        open={showUpgradeDialog}
+        onOpenChange={setShowUpgradeDialog}
+        currentGroup={currentGroup}
+        availableGroups={availableGroups || []}
+        sessionId={sessionId}
+      />
     </div>
   );
 };
