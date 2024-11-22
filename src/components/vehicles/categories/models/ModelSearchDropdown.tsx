@@ -47,6 +47,7 @@ export const ModelSearchDropdown = ({ categoryId, onSelect }: ModelSearchDropdow
     enabled: Boolean(categoryId),
   });
 
+  // Ensure we always have an array to work with
   const models = availableModels || [];
 
   return (
