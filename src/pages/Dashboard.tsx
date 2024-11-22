@@ -2,21 +2,45 @@ import { useSession } from '@supabase/auth-helpers-react';
 import StatsPanel from "@/components/dashboard/StatsPanel";
 import OrdersWidget from "@/components/dashboard/OrdersWidget";
 import ScheduleWidget from "@/components/dashboard/ScheduleWidget";
+import Lottie from "lottie-react";
+import analyticsAnimation from "@/assets/animations/analytics.json";
+import loadingAnimation from "@/assets/animations/loading.json";
 
 const Dashboard = () => {
   const session = useSession();
 
   if (!session) {
-    return null;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-32 h-32">
+          <Lottie 
+            animationData={loadingAnimation} 
+            loop={true}
+            className="w-full h-full"
+          />
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-8 animate-fade-up">
       <div className="relative">
-        <h1 className="text-display-sm font-display mb-2">Dashboard</h1>
-        <p className="text-muted-foreground text-lg max-w-2xl">
-          Welcome back! Here's an overview of your business.
-        </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-display-sm font-display mb-2">Dashboard</h1>
+            <p className="text-muted-foreground text-lg max-w-2xl">
+              Welcome back! Here's an overview of your business.
+            </p>
+          </div>
+          <div className="w-32 h-32 opacity-75">
+            <Lottie 
+              animationData={analyticsAnimation} 
+              loop={true}
+              className="w-full h-full"
+            />
+          </div>
+        </div>
       </div>
 
       <StatsPanel />
