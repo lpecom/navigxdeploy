@@ -2,9 +2,10 @@ import { useState, useCallback, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import type { Reservation, PickupFilter } from "@/types/reservation"
 import { ReservationCard } from "./ReservationCard"
+import { TimeSlotHeader } from "./sections/TimeSlotHeader"
 import { supabase } from "@/integrations/supabase/client"
-import { startOfWeek, endOfWeek, addWeeks, format, parseISO } from "date-fns"
-import { Car, Clock, Calendar } from "lucide-react"
+import { startOfWeek, endOfWeek, addWeeks, format } from "date-fns"
+import { Car } from "lucide-react"
 
 interface ReservationsListProps {
   filter: "pending" | PickupFilter
@@ -158,25 +159,11 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
           
           return (
             <div key={timeSlot} className="space-y-4">
-              {filter === 'pending' ? (
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    <span>Agendado para: {format(parseISO(slotReservations[0].pickupDate), 'dd/MM/yyyy')}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    <span>{timeSlot || 'Horário não definido'}</span>
-                  </div>
-                  <span className="text-gray-400">({slotReservations.length} retiradas)</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Clock className="w-4 h-4" />
-                  <span>{timeSlot || 'Horário não definido'}</span>
-                  <span className="text-gray-400">({slotReservations.length} retiradas)</span>
-                </div>
-              )}
+              <TimeSlotHeader 
+                timeSlot={timeSlot} 
+                reservations={slotReservations}
+                filter={filter}
+              />
               <div className="grid gap-4">
                 {slotReservations.map((reservation) => (
                   <ReservationCard
