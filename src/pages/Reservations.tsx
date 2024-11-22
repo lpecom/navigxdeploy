@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card"
 import { Calendar } from "@/components/ui/calendar"
 import { addDays, format, startOfToday } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { CalendarDays, Clock, CheckCircle2, AlertTriangle } from "lucide-react"
 
 interface ReservationsProps {
   filter: ReservationFilter
@@ -45,22 +46,26 @@ const Reservations = ({ filter }: ReservationsProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     )
   }
 
   const content = (
-    <div className="max-w-[1600px] mx-auto space-y-6">
+    <div className="max-w-[1600px] mx-auto space-y-8">
       {filter === 'pending' ? (
         <>
-          <div className="flex items-center justify-between mb-8">
-            <div className="space-y-1">
-              <h1 className="text-3xl font-bold">Aprovações</h1>
-              <p className="text-gray-500">Gerencie e analise as solicitações de reserva</p>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                Aprovações
+              </h1>
+              <p className="text-muted-foreground">
+                Gerencie e analise as solicitações de reserva
+              </p>
             </div>
-            <Card className="w-[200px]">
+            <Card className="w-full md:w-[200px] shadow-sm">
               <Select 
                 value={statusFilter} 
                 onValueChange={(value) => setStatusFilter(value as StatusFilter)}
@@ -80,10 +85,22 @@ const Reservations = ({ filter }: ReservationsProps) => {
         </>
       ) : (
         <>
-          <h1 className="text-2xl font-bold mb-6">Retiradas</h1>
+          <div className="space-y-4">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Retiradas
+            </h1>
+            <p className="text-muted-foreground">
+              Acompanhe e gerencie as retiradas de veículos
+            </p>
+          </div>
+          
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-4 space-y-6">
-              <Card className="p-4">
+              <Card className="p-6 shadow-sm backdrop-blur-xl bg-white/50 dark:bg-gray-800/50">
+                <div className="flex items-center gap-2 mb-4 text-primary">
+                  <CalendarDays className="w-5 h-5" />
+                  <h3 className="font-semibold">Calendário</h3>
+                </div>
                 <Calendar
                   mode="single"
                   selected={selectedDate}
@@ -93,41 +110,71 @@ const Reservations = ({ filter }: ReservationsProps) => {
                   className="rounded-md"
                 />
               </Card>
-              <Card className="p-4">
-                <h3 className="font-semibold mb-3">Resumo do Dia</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Total de Retiradas:</span>
+              
+              <Card className="p-6 shadow-sm backdrop-blur-xl bg-white/50 dark:bg-gray-800/50">
+                <div className="flex items-center gap-2 mb-4 text-primary">
+                  <Clock className="w-5 h-5" />
+                  <h3 className="font-semibold">Resumo do Dia</h3>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-white/50 dark:bg-gray-700/50 rounded-lg">
+                    <span className="text-sm">Total de Retiradas</span>
                     <span className="font-medium">12</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Pendentes:</span>
+                  <div className="flex justify-between items-center p-3 bg-amber-50/50 dark:bg-amber-900/20 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-600" />
+                      <span className="text-sm">Pendentes</span>
+                    </div>
                     <span className="font-medium text-amber-600">3</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Concluídas:</span>
+                  <div className="flex justify-between items-center p-3 bg-green-50/50 dark:bg-green-900/20 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-600" />
+                      <span className="text-sm">Concluídas</span>
+                    </div>
                     <span className="font-medium text-green-600">9</span>
                   </div>
                 </div>
               </Card>
             </div>
+            
             <div className="lg:col-span-8">
-              <Tabs defaultValue="today" className="w-full">
-                <TabsList className="bg-white shadow-sm">
-                  <TabsTrigger value="today">Hoje</TabsTrigger>
-                  <TabsTrigger value="this-week">Esta Semana</TabsTrigger>
-                  <TabsTrigger value="next-week">Próxima Semana</TabsTrigger>
-                </TabsList>
-                <TabsContent value="today" className="mt-6">
-                  <ReservationsList filter="today" selectedDate={selectedDate} />
-                </TabsContent>
-                <TabsContent value="this-week" className="mt-6">
-                  <ReservationsList filter="this-week" selectedDate={selectedDate} />
-                </TabsContent>
-                <TabsContent value="next-week" className="mt-6">
-                  <ReservationsList filter="next-week" selectedDate={selectedDate} />
-                </TabsContent>
-              </Tabs>
+              <Card className="shadow-sm backdrop-blur-xl bg-white/50 dark:bg-gray-800/50">
+                <Tabs defaultValue="today" className="w-full">
+                  <TabsList className="w-full justify-start border-b rounded-none p-0 h-auto">
+                    <TabsTrigger 
+                      value="today" 
+                      className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+                    >
+                      Hoje
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="this-week"
+                      className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+                    >
+                      Esta Semana
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="next-week"
+                      className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary"
+                    >
+                      Próxima Semana
+                    </TabsTrigger>
+                  </TabsList>
+                  <div className="p-6">
+                    <TabsContent value="today" className="m-0">
+                      <ReservationsList filter="today" selectedDate={selectedDate} />
+                    </TabsContent>
+                    <TabsContent value="this-week" className="m-0">
+                      <ReservationsList filter="this-week" selectedDate={selectedDate} />
+                    </TabsContent>
+                    <TabsContent value="next-week" className="m-0">
+                      <ReservationsList filter="next-week" selectedDate={selectedDate} />
+                    </TabsContent>
+                  </div>
+                </Tabs>
+              </Card>
             </div>
           </div>
         </>
@@ -140,7 +187,7 @@ const Reservations = ({ filter }: ReservationsProps) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="p-8 bg-gray-50 min-h-screen"
+      className="p-8 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen"
     >
       {content}
     </motion.main>
