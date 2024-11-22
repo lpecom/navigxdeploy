@@ -10,6 +10,21 @@ interface OrderSummaryProps {
   onContinue?: () => void;
 }
 
+interface CheckoutSession {
+  selected_car: {
+    name: string;
+    category: string;
+    price: number;
+    period: string;
+  };
+  selected_optionals: Array<{
+    id: string;
+    name: string;
+    totalPrice: number;
+  }>;
+  total_amount: number;
+}
+
 export const OrderSummary = ({ checkoutSessionId, onContinue }: OrderSummaryProps) => {
   const { data: session } = useQuery({
     queryKey: ['checkout-session', checkoutSessionId],
@@ -21,7 +36,7 @@ export const OrderSummary = ({ checkoutSessionId, onContinue }: OrderSummaryProp
         .single();
       
       if (error) throw error;
-      return data;
+      return data as CheckoutSession;
     },
   });
 
@@ -52,7 +67,7 @@ export const OrderSummary = ({ checkoutSessionId, onContinue }: OrderSummaryProp
           <div>
             <h3 className="font-medium mb-2">Opcionais</h3>
             <div className="space-y-2">
-              {session.selected_optionals.map((optional: any) => (
+              {session.selected_optionals.map((optional) => (
                 <div key={optional.id} className="flex items-center justify-between bg-muted/50 p-3 rounded-lg">
                   <div className="flex items-center gap-2">
                     <Package className="w-4 h-4 text-primary" />

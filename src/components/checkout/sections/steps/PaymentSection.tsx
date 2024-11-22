@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { StripePaymentForm } from "../../payment-methods/StripePaymentForm";
-import { useToast } from "@/components/ui/use-toast";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
@@ -14,7 +13,6 @@ interface PaymentSectionProps {
 }
 
 export const PaymentSection = ({ checkoutSessionId, onSuccess }: PaymentSectionProps) => {
-  const { toast } = useToast();
   const { data: session } = useQuery({
     queryKey: ['checkout-session', checkoutSessionId],
     queryFn: async () => {

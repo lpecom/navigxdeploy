@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { InsuranceSelection } from "./steps/InsuranceSelection";
 import { PickupScheduler } from "./steps/PickupScheduler";
 import { OrderSummary } from "./steps/OrderSummary";
@@ -8,7 +10,7 @@ import { KYCForm } from "./steps/KYCForm";
 
 interface CheckoutStepsProps {
   step: number;
-  checkoutSessionId: string | undefined;
+  checkoutSessionId: string;
   onInsuranceSelect: (insuranceId: string) => void;
   onScheduleSubmit: (data: any) => void;
   onPaymentLocationSelect: (location: 'online' | 'store') => void;
@@ -25,6 +27,20 @@ export const CheckoutSteps = ({
   onPaymentSuccess,
   onKYCSubmit
 }: CheckoutStepsProps) => {
+  const { data: session } = useQuery({
+    queryKey: ['checkout-session', checkoutSessionId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('checkout_sessions')
+        .select('*')
+        .eq('id', checkoutSessionId)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   if (!checkoutSessionId) return null;
 
   return (
