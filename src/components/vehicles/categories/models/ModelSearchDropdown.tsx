@@ -42,12 +42,13 @@ export const ModelSearchDropdown = ({ categoryId, onSelect }: ModelSearchDropdow
 
       const { data, error } = await query;
       if (error) throw error;
-      return (data || []) as CarModel[];
+      return data as CarModel[];
     },
     enabled: Boolean(categoryId),
+    initialData: [], // Provide initial empty array
   });
 
-  // Ensure we always have an array to work with
+  // Ensure we always have a valid array to work with
   const models = availableModels || [];
 
   return (
