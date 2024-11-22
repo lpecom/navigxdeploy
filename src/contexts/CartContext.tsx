@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useReducer, ReactNode } from 'react';
 import { CartItem, CartState, CartAction } from '@/types/cart';
 
 const CartContext = createContext<{
