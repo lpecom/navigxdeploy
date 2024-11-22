@@ -16,9 +16,10 @@ import { useQueryClient } from "@tanstack/react-query";
 interface ReservationActionsProps {
   reservation: Reservation;
   currentStatus: 'pending_approval' | 'approved' | 'rejected';
+  hideCheckIn?: boolean;
 }
 
-export const ReservationActions = ({ reservation, currentStatus }: ReservationActionsProps) => {
+export const ReservationActions = ({ reservation, currentStatus, hideCheckIn = false }: ReservationActionsProps) => {
   const { toast } = useToast();
   const [showDetails, setShowDetails] = useState(false);
   const [isLoading, setIsLoading] = useState<string | null>(null);
@@ -70,7 +71,7 @@ export const ReservationActions = ({ reservation, currentStatus }: ReservationAc
 
   return (
     <>
-      <div className="flex gap-2 mt-4">
+      <div className="flex gap-2">
         {currentStatus === 'pending_approval' && (
           <>
             <Button 

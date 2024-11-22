@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Calendar, Clock, MapPin, User, Car, DollarSign, Package } from "lucide-react";
+import { ChevronDown, ChevronUp, Calendar, Clock, MapPin, User, Car, DollarSign, Package, ArrowRightToLine } from "lucide-react";
 import { ReservationExpandedContent } from "./ReservationExpandedContent";
 import { StatusBadges } from "./StatusBadges";
 import { format } from "date-fns";
@@ -9,6 +9,7 @@ import { ptBR } from "date-fns/locale";
 import type { Reservation } from "@/types/reservation";
 import { ReservationActions } from "./ReservationActions";
 import { memo } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface ReservationCardProps {
   reservation: Reservation;
@@ -17,8 +18,13 @@ interface ReservationCardProps {
 }
 
 const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: ReservationCardProps) => {
+  const navigate = useNavigate();
   const pickupDate = new Date(reservation.pickupDate);
   const formattedDate = format(pickupDate, "dd 'de' MMMM", { locale: ptBR });
+
+  const handleCheckIn = () => {
+    navigate(`/admin/check-in/${reservation.id}`);
+  };
 
   return (
     <Card className="bg-white shadow-sm hover:shadow-md transition-all duration-200">
@@ -99,10 +105,20 @@ const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: Reserva
           )}
 
           {!isExpanded && (
-            <div className="flex justify-end pt-4 border-t">
+            <div className="flex justify-between items-center pt-4 border-t">
+              <Button 
+                onClick={handleCheckIn}
+                className="flex items-center gap-2"
+                variant="default"
+              >
+                <ArrowRightToLine className="w-4 h-4" />
+                Iniciar Check-in
+              </Button>
+
               <ReservationActions 
                 reservation={reservation}
                 currentStatus={reservation.status}
+                hideCheckIn={true}
               />
             </div>
           )}
