@@ -27,6 +27,8 @@ const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: Reserva
     navigate(`/admin/check-in/${reservation.id}`);
   };
 
+  const showCheckInButton = reservation.status === 'approved';
+
   return (
     <Card className="bg-white shadow-sm hover:shadow-md transition-all duration-200">
       <CardContent className="p-6">
@@ -110,14 +112,16 @@ const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: Reserva
 
           {!isExpanded && (
             <div className="flex justify-between items-center pt-4 border-t">
-              <Button 
-                onClick={handleCheckIn}
-                className="flex items-center gap-2"
-                variant="default"
-              >
-                <ArrowRightToLine className="w-4 h-4" />
-                Iniciar Check-in
-              </Button>
+              {showCheckInButton && (
+                <Button 
+                  onClick={handleCheckIn}
+                  className="flex items-center gap-2"
+                  variant="default"
+                >
+                  <ArrowRightToLine className="w-4 h-4" />
+                  Iniciar Check-in
+                </Button>
+              )}
 
               <ReservationActions 
                 reservation={reservation}
