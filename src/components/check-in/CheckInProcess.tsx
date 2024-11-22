@@ -86,10 +86,22 @@ const CheckInProcess = () => {
 
         if (uploadError) throw uploadError;
 
-        setPhotos(prev => ({
-          ...prev,
-          [category]: [...(prev[category] || []), data.path],
-        }));
+        // Update the photos state
+        const newPhotos = {
+          ...photos,
+          [category]: [...(photos[category] || []), data.path],
+        };
+        setPhotos(newPhotos);
+
+        // Update the checkout session with the new photos
+        const { error: updateError } = await supabase
+          .from('checkout_sessions')
+          .update({
+            check_in_photos: newPhotos
+          })
+          .eq('id', id);
+
+        if (updateError) throw updateError;
 
         toast.success('Foto adicionada com sucesso');
       };
