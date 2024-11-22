@@ -72,13 +72,25 @@ export const InsuranceDialog = ({ insurance, open, onOpenChange }: InsuranceDial
       if (insurance) {
         const { error } = await supabase
           .from("insurance_options")
-          .update(values)
+          .update({
+            name: values.name,
+            description: values.description,
+            price: values.price,
+            coverage_details: values.coverage_details,
+            is_active: values.is_active,
+          })
           .eq("id", insurance.id);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from("insurance_options")
-          .insert([values]);
+          .insert([{
+            name: values.name,
+            description: values.description,
+            price: values.price,
+            coverage_details: values.coverage_details,
+            is_active: values.is_active,
+          }]);
         if (error) throw error;
       }
     },
