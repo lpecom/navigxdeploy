@@ -7,10 +7,11 @@ import { OrderSummary } from "./steps/OrderSummary";
 import { PaymentLocationSelection } from "./steps/PaymentLocationSelection";
 import { PaymentSection } from "./steps/PaymentSection";
 import { KYCForm } from "./steps/KYCForm";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CheckoutStepsProps {
   step: number;
-  checkoutSessionId: string;
+  checkoutSessionId?: string;
   onInsuranceSelect: (insuranceId: string) => void;
   onScheduleSubmit: (data: any) => void;
   onPaymentLocationSelect: (location: 'online' | 'store') => void;
@@ -27,9 +28,13 @@ export const CheckoutSteps = ({
   onPaymentSuccess,
   onKYCSubmit
 }: CheckoutStepsProps) => {
-  const { data: session } = useQuery({
+  const { toast } = useToast();
+
+  const { data: session, error } = useQuery({
     queryKey: ['checkout-session', checkoutSessionId],
     queryFn: async () => {
+      if (!checkoutSessionId) return null;
+      
       const { data, error } = await supabase
         .from('checkout_sessions')
         .select('*')
@@ -39,9 +44,26 @@ export const CheckoutSteps = ({
       if (error) throw error;
       return data;
     },
+    enabled: !!checkoutSessionId,
   });
 
-  if (!checkoutSessionId) return null;
+  if (error) {
+    toast({
+      title: "Erro ao carregar sessão",
+      description: "Não foi possível carregar os dados da sua sessão. Por favor, tente novamente.",
+      variant: "destructive",
+    });
+    return null;
+  }
+
+  if (!checkoutSessionId) {
+    toast({
+      title: "Sessão inválida",
+      description: "Por favor, inicie uma nova sessão de checkout.",
+      variant: "destructive",
+    });
+    return null;
+  }
 
   return (
     <>
@@ -85,13 +107,13 @@ export const CheckoutSteps = ({
         </motion.div>
       )}
 
-      {step === 5 && (
+      {step === 5 && session && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          {session?.payment_location === 'online' ? (
+          {session.payment_location === 'online' ? (
             <PaymentSection
               checkoutSessionId={checkoutSessionId}
               onSuccess={onPaymentSuccess}

@@ -4,29 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Package } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface OrderSummaryProps {
   checkoutSessionId: string;
   onContinue?: () => void;
 }
 
-interface CheckoutSession {
-  selected_car: {
-    name: string;
-    category: string;
-    price: number;
-    period: string;
-  };
-  selected_optionals: Array<{
-    id: string;
-    name: string;
-    totalPrice: number;
-  }>;
-  total_amount: number;
-}
-
 export const OrderSummary = ({ checkoutSessionId, onContinue }: OrderSummaryProps) => {
-  const { data: session } = useQuery({
+  const { toast } = useToast();
+  
+  const { data: session, error } = useQuery({
     queryKey: ['checkout-session', checkoutSessionId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -35,9 +23,17 @@ export const OrderSummary = ({ checkoutSessionId, onContinue }: OrderSummaryProp
         .eq('id', checkoutSessionId)
         .single();
       
-      if (error) throw error;
-      return data as CheckoutSession;
+      if (error) {
+        toast({
+          title: "Erro ao carregar dados",
+          description: "Não foi possível carregar os detalhes do pedido.",
+          variant: "destructive",
+        });
+        throw error;
+      }
+      return data;
     },
+    enabled: !!checkoutSessionId,
   });
 
   if (!session) return null;
@@ -67,7 +63,7 @@ export const OrderSummary = ({ checkoutSessionId, onContinue }: OrderSummaryProp
           <div>
             <h3 className="font-medium mb-2">Opcionais</h3>
             <div className="space-y-2">
-              {session.selected_optionals.map((optional) => (
+              {session.selected_optionals.map((optional: any) => (
                 <div key={optional.id} className="flex items-center justify-between bg-muted/50 p-3 rounded-lg">
                   <div className="flex items-center gap-2">
                     <Package className="w-4 h-4 text-primary" />
