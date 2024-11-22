@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Calendar, Clock, MapPin, User, Car, DollarSign, Package, ArrowRightToLine } from "lucide-react";
+import { ChevronDown, ChevronUp, Calendar, Clock, User, Car, ArrowRightToLine } from "lucide-react";
 import { ReservationExpandedContent } from "./ReservationExpandedContent";
 import { StatusBadges } from "./StatusBadges";
 import { format } from "date-fns";
@@ -21,6 +21,7 @@ const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: Reserva
   const navigate = useNavigate();
   const pickupDate = new Date(reservation.pickupDate);
   const formattedDate = format(pickupDate, "dd 'de' MMMM", { locale: ptBR });
+  const creationDate = format(new Date(reservation.createdAt), "dd/MM/yyyy HH:mm");
 
   const handleCheckIn = () => {
     navigate(`/admin/check-in/${reservation.id}`);
@@ -39,7 +40,10 @@ const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: Reserva
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold">{reservation.customerName}</h3>
-                  <p className="text-sm text-gray-500">#{reservation.reservationNumber}</p>
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Clock className="w-4 h-4" />
+                    <span>Criado em: {creationDate}</span>
+                  </div>
                 </div>
               </div>
               
