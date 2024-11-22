@@ -26,7 +26,7 @@ export const ModelSearchDropdown = ({ categoryId, onSelect }: ModelSearchDropdow
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  const { data: availableModels = [] } = useQuery({
+  const { data: availableModels, isLoading } = useQuery({
     queryKey: ["available-models", search],
     queryFn: async () => {
       if (!categoryId) return [];
@@ -42,10 +42,12 @@ export const ModelSearchDropdown = ({ categoryId, onSelect }: ModelSearchDropdow
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as CarModel[];
+      return (data || []) as CarModel[];
     },
     enabled: Boolean(categoryId),
   });
+
+  const models = availableModels || [];
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -62,9 +64,11 @@ export const ModelSearchDropdown = ({ categoryId, onSelect }: ModelSearchDropdow
             value={search}
             onValueChange={setSearch}
           />
-          <CommandEmpty>Nenhum modelo encontrado.</CommandEmpty>
+          <CommandEmpty>
+            {isLoading ? "Carregando..." : "Nenhum modelo encontrado."}
+          </CommandEmpty>
           <CommandGroup className="max-h-[300px] overflow-auto">
-            {availableModels.map((model) => (
+            {models.map((model) => (
               <CommandItem
                 key={model.id}
                 value={model.name}
