@@ -11,7 +11,7 @@ import { VehicleAssignment } from "./steps/VehicleAssignment";
 import { LoadingState } from "./components/LoadingState";
 import { ReservationHeader } from "./components/ReservationHeader";
 import { CheckInTabs } from "./components/CheckInTabs";
-import type { PhotoCategory, CheckInReservation, PhotosState } from "./types";
+import type { PhotoCategory, CheckInReservation, PhotosState, SelectedCar } from "./types";
 
 const PHOTO_CATEGORIES: PhotoCategory[] = [
   { id: 'front', label: 'Frente' },
@@ -46,8 +46,26 @@ const CheckInProcess = () => {
       
       if (error) throw error;
       if (!data) throw new Error('Reservation not found');
+
+      // Transform the data to match CheckInReservation type
+      const selectedCar = data.selected_car as any;
+      const transformedData: CheckInReservation = {
+        ...data,
+        selected_car: {
+          name: selectedCar.name || '',
+          category: selectedCar.category || '',
+          group_id: selectedCar.group_id,
+          price: selectedCar.price,
+          period: selectedCar.period
+        } as SelectedCar,
+        driver: {
+          id: data.driver?.id || '',
+          full_name: data.driver?.full_name || '',
+          ...data.driver
+        }
+      };
       
-      return data as CheckInReservation;
+      return transformedData;
     },
   });
 

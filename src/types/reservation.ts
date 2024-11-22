@@ -1,6 +1,6 @@
 export type CustomerStatus = 'new' | 'returning' | 'blocked';
 export type PaymentStatus = 'paid' | 'pending';
-export type ReservationStatus = 'pending' | 'approved' | 'rejected';
+export type ReservationStatus = 'pending_approval' | 'approved' | 'rejected';
 export type CarCategory = 'SUV' | 'Luxury' | 'Economy' | 'Sports';
 export type LeadSource = 'facebook' | 'whatsapp' | 'form';
 export type ReservationFilter = 'pending' | 'pickup' | 'checkin';
