@@ -60,7 +60,13 @@ const DriverLogin = () => {
 
       const { error: updateError } = await supabase
         .from('driver_details')
-        .update({ auth_user_id: authData.user.id })
+        .update({
+          auth_user_id: authData.user.id,
+          birth_date: new Date().toISOString(),
+          license_number: 'PENDING',
+          license_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
+          phone: 'PENDING'
+        })
         .eq('id', driverData.id)
         .is('auth_user_id', null);
 
