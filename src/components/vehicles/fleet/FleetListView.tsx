@@ -3,13 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { FleetTable } from "./FleetTable";
-import { FleetMetrics } from "./FleetMetrics";
 import { FleetHeader } from "./FleetHeader";
 import { FleetLoadingState } from "./FleetLoadingState";
 import { FleetErrorState } from "./FleetErrorState";
 import { FleetEmptyState } from "./FleetEmptyState";
 import { FleetVehicleProfileDialog } from "./FleetVehicleProfileDialog";
-import { FleetHeaderActions } from "./FleetHeaderActions";
+import { FleetActions } from "./actions/FleetActions";
 import { motion } from "framer-motion";
 import type { FleetVehicle, VehicleStatus } from "@/types/vehicles";
 
@@ -20,7 +19,6 @@ export const FleetListView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<VehicleStatus | null>(null);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
-  const [isSyncing, setIsSyncing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   const { data: allVehicles, refetch, isLoading, error } = useQuery({
@@ -59,37 +57,11 @@ export const FleetListView = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const handleSync = async () => {
-    setIsSyncing(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('sync-fleet-data');
-      if (error) throw error;
-
-      toast({
-        title: "Sincronização concluída",
-        description: `${data.processed} veículos processados.${
-          data.errors?.length ? ` ${data.errors.length} erros encontrados.` : ''
-        }`,
-      });
-      refetch();
-    } catch (error) {
-      console.error("Error syncing fleet:", error);
-      toast({
-        title: "Erro",
-        description: "Falha ao sincronizar dados da frota. Tente novamente.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
   const handleExport = async () => {
     try {
       const { data, error } = await supabase.rpc('export_fleet_data');
       if (error) throw error;
 
-      // Convert data to CSV format
       const csvContent = "data:text/csv;charset=utf-8," + 
         Object.keys(data[0]).join(",") + "\n" +
         data.map(row => Object.values(row).join(",")).join("\n");
@@ -148,7 +120,6 @@ export const FleetListView = () => {
       });
     } finally {
       setIsUploading(false);
-      // Reset the file input
       if (event.target) {
         event.target.value = '';
       }
@@ -217,17 +188,10 @@ export const FleetListView = () => {
       transition={{ duration: 0.3 }}
       className="space-y-6"
     >
-      <div className="flex items-center justify-between">
-        <FleetMetrics 
-          vehicles={allVehicles || []} 
-          onFilterChange={handleFilterChange}
-          activeFilter={statusFilter}
-        />
-        <FleetHeaderActions
-          onSync={handleSync}
+      <div className="flex items-center justify-end">
+        <FleetActions
           onExport={handleExport}
           onFileUpload={handleFileUpload}
-          isSyncing={isSyncing}
           isUploading={isUploading}
         />
       </div>
