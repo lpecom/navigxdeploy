@@ -26,10 +26,9 @@ export const ModelSearchDropdown = ({ categoryId, onSelect }: ModelSearchDropdow
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  const { data: availableModels } = useQuery({
+  const { data: availableModels = [] } = useQuery({
     queryKey: ["available-models", search],
     queryFn: async () => {
-      // Only fetch if we have a valid categoryId
       if (!categoryId) return [];
 
       const query = supabase
@@ -45,7 +44,7 @@ export const ModelSearchDropdown = ({ categoryId, onSelect }: ModelSearchDropdow
       if (error) throw error;
       return data as CarModel[];
     },
-    enabled: Boolean(categoryId), // Only run query if categoryId exists
+    enabled: Boolean(categoryId),
   });
 
   return (
@@ -65,7 +64,7 @@ export const ModelSearchDropdown = ({ categoryId, onSelect }: ModelSearchDropdow
           />
           <CommandEmpty>Nenhum modelo encontrado.</CommandEmpty>
           <CommandGroup className="max-h-[300px] overflow-auto">
-            {availableModels?.map((model) => (
+            {availableModels.map((model) => (
               <CommandItem
                 key={model.id}
                 value={model.name}
