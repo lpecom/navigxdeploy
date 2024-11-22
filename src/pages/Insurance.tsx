@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Shield, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/components/ui/use-toast";
+import type { InsuranceOptions } from "@/types/database";
 
 const InsurancePage = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const InsurancePage = () => {
         .eq('is_active', true);
       
       if (error) throw error;
-      return data;
+      return data as InsuranceOptions[];
     },
   });
 
@@ -34,12 +35,12 @@ const InsurancePage = () => {
     }
   }, [cartState.items, navigate]);
 
-  const handleInsuranceSelect = (insurance: any) => {
+  const handleInsuranceSelect = (insurance: InsuranceOptions) => {
     dispatch({
       type: 'ADD_ITEM',
       payload: {
         id: insurance.id,
-        type: 'insurance',
+        type: 'insurance' as const,
         quantity: 1,
         unitPrice: insurance.price,
         totalPrice: insurance.price,
