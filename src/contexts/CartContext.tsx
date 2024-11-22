@@ -1,9 +1,10 @@
-import { createContext, useContext, useReducer, ReactNode } from 'react';
+import { createContext, useContext, useReducer, ReactNode, useCallback } from 'react';
 import { CartItem, CartState, CartAction } from '@/types/cart';
 
 const CartContext = createContext<{
   state: CartState;
   dispatch: React.Dispatch<CartAction>;
+  total: number;
 } | null>(null);
 
 const calculateTotal = (items: CartItem[]): number => {
@@ -83,8 +84,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     checkoutSessionId: undefined
   });
 
+  const total = calculateTotal(state.items);
+
   return (
-    <CartContext.Provider value={{ state, dispatch }}>
+    <CartContext.Provider value={{ state, dispatch, total }}>
       {children}
     </CartContext.Provider>
   );
@@ -95,8 +98,5 @@ export const useCart = () => {
   if (!context) {
     throw new Error('useCart must be used within a CartProvider');
   }
-  return {
-    ...context,
-    total: calculateTotal(context.state.items)
-  };
+  return context;
 };

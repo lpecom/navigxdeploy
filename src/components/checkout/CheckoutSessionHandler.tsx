@@ -24,6 +24,7 @@ export const createCheckoutSession = async ({
   try {
     const selectedGroup = cartItems.find(item => item.type === 'car_group');
     const selectedOptionals = cartItems.filter(item => item.type === 'optional');
+    const selectedInsurance = cartItems.find(item => item.type === 'insurance');
 
     const sessionData = {
       driver_id: driverId,
@@ -41,7 +42,8 @@ export const createCheckoutSession = async ({
       total_amount: totalAmount,
       status: 'pending',
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      insurance_option_id: selectedInsurance ? getValidUUID(selectedInsurance.id) : null
     };
 
     const { data: session, error: sessionError } = await supabase
