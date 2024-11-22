@@ -3,27 +3,27 @@ import { Camera, Image, FileText } from "lucide-react";
 import { PhotosTab } from "../tabs/PhotosTab";
 import { ReviewTab } from "../tabs/ReviewTab";
 import { ContractTab } from "../tabs/ContractTab";
-import type { PhotoCategory, PhotosState } from "../types";
+import type { PhotoCategories, PhotosState, CheckInReservation } from "../types";
 
 interface CheckInTabsProps {
-  activeTab: string;
-  setActiveTab: (value: string) => void;
-  categories: PhotoCategory[];
+  reservation: CheckInReservation;
   photos: PhotosState;
-  onPhotoCapture: (category: string) => void;
-  supabaseStorageUrl: string;
+  onPhotoCapture: (file: File, category: PhotoCategories) => Promise<void>;
 }
 
+const PHOTO_CATEGORIES = [
+  { id: "exterior" as const, label: "Exterior" },
+  { id: "interior" as const, label: "Interior" },
+  { id: "documents" as const, label: "Documentos" },
+];
+
 export const CheckInTabs = ({
-  activeTab,
-  setActiveTab,
-  categories,
+  reservation,
   photos,
   onPhotoCapture,
-  supabaseStorageUrl,
 }: CheckInTabsProps) => {
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+    <Tabs defaultValue="photos" className="space-y-4">
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="photos" className="flex items-center gap-2">
           <Camera className="w-4 h-4" />
@@ -41,18 +41,16 @@ export const CheckInTabs = ({
 
       <TabsContent value="photos">
         <PhotosTab 
-          categories={categories}
+          categories={PHOTO_CATEGORIES}
           photos={photos}
           onPhotoCapture={onPhotoCapture}
-          supabaseStorageUrl={supabaseStorageUrl}
         />
       </TabsContent>
 
       <TabsContent value="review">
         <ReviewTab 
-          categories={categories}
+          categories={PHOTO_CATEGORIES}
           photos={photos}
-          supabaseStorageUrl={supabaseStorageUrl}
         />
       </TabsContent>
 

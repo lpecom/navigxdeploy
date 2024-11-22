@@ -5,15 +5,15 @@ import { useToast } from "@/components/ui/use-toast";
 import { CheckInTabs } from "./components/CheckInTabs";
 import { ReservationHeader } from "./components/ReservationHeader";
 import { LoadingState } from "./components/LoadingState";
-import type { CheckInReservation, PhotoCategories } from "./types";
+import type { CheckInReservation, PhotoCategories, PhotosState } from "./types";
 
 interface CheckInProcessProps {
   id: string;
 }
 
-export const CheckInProcess = ({ id }: CheckInProcessProps) => {
+const CheckInProcess = ({ id }: CheckInProcessProps) => {
   const { toast } = useToast();
-  const [photos, setPhotos] = useState<Record<PhotoCategories, string[]>>({
+  const [photos, setPhotos] = useState<PhotosState>({
     exterior: [],
     interior: [],
     documents: [],
@@ -36,7 +36,26 @@ export const CheckInProcess = ({ id }: CheckInProcessProps) => {
         .single();
 
       if (error) throw error;
-      return data as CheckInReservation;
+
+      // Transform the data to match our type
+      const transformedData: CheckInReservation = {
+        ...data,
+        selected_car: data.selected_car as CheckInReservation["selected_car"],
+        selected_optionals: Array.isArray(data.selected_optionals) 
+          ? data.selected_optionals.map((opt: any) => ({
+              name: opt.name || "",
+              price: Number(opt.price) || 0,
+            }))
+          : [],
+        check_in_photos: data.check_in_photos as PhotosState || {
+          exterior: [],
+          interior: [],
+          documents: [],
+        },
+        driver: data.driver || { full_name: "", email: null, phone: null },
+      };
+
+      return transformedData;
     },
   });
 
@@ -55,14 +74,12 @@ export const CheckInProcess = ({ id }: CheckInProcessProps) => {
 
       if (uploadError) throw uploadError;
 
-      // Update the photos state
       const newPhotos = {
         ...photos,
         [category]: [...(photos[category] || []), data.path],
       };
       setPhotos(newPhotos);
 
-      // Update the checkout session with the new photos
       const { error: updateError } = await supabase
         .from("checkout_sessions")
         .update({
@@ -101,3 +118,5 @@ export const CheckInProcess = ({ id }: CheckInProcessProps) => {
     </div>
   );
 };
+
+export default CheckInProcess;

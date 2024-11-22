@@ -2,16 +2,27 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Camera } from "lucide-react";
 import { motion } from "framer-motion";
-import type { PhotoCategory, PhotosState } from "../types";
+import type { PhotoCategories, PhotosState } from "../types";
+
+interface PhotoCategory {
+  id: PhotoCategories;
+  label: string;
+}
 
 interface PhotosTabProps {
   categories: PhotoCategory[];
   photos: PhotosState;
-  onPhotoCapture: (category: string) => void;
-  supabaseStorageUrl: string;
+  onPhotoCapture: (file: File, category: PhotoCategories) => Promise<void>;
 }
 
-export const PhotosTab = ({ categories, photos, onPhotoCapture, supabaseStorageUrl }: PhotosTabProps) => {
+export const PhotosTab = ({ categories, photos, onPhotoCapture }: PhotosTabProps) => {
+  const handleFileSelect = async (category: PhotoCategories, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      await onPhotoCapture(file, category);
+    }
+  };
+
   return (
     <div className="grid grid-cols-2 gap-4">
       {categories.map((category) => (
@@ -28,7 +39,7 @@ export const PhotosTab = ({ categories, photos, onPhotoCapture, supabaseStorageU
                 {photos[category.id]?.map((photo, index) => (
                   <motion.img
                     key={index}
-                    src={`${supabaseStorageUrl}${photo}`}
+                    src={photo}
                     alt={`${category.label} ${index + 1}`}
                     className="w-full h-24 object-cover rounded-lg"
                     initial={{ opacity: 0, scale: 0.9 }}
@@ -37,14 +48,21 @@ export const PhotosTab = ({ categories, photos, onPhotoCapture, supabaseStorageU
                   />
                 ))}
               </div>
-              <Button
-                onClick={() => onPhotoCapture(category.id)}
-                className="w-full group hover:bg-primary/90 transition-colors"
-                variant="outline"
-              >
-                <Camera className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
-                Capturar Foto
-              </Button>
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileSelect(category.id, e)}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <Button
+                  className="w-full group hover:bg-primary/90 transition-colors"
+                  variant="outline"
+                >
+                  <Camera className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                  Capturar Foto
+                </Button>
+              </div>
             </div>
           </Card>
         </motion.div>
