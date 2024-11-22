@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { ChevronLeft } from "lucide-react"
 import { CarDisplay } from "./CarDisplay"
 import { PlanDisplaySection } from "./PlanDisplaySection"
+import { supabase } from "@/integrations/supabase/client"
 
 interface CheckoutContentProps {
   step: number
