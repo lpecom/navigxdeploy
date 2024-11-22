@@ -32,6 +32,11 @@ export interface CheckInReservation {
   check_in_completed_at?: string;
   check_in_completed_by?: string;
   assigned_vehicle_id?: string;
+  check_in_damages?: Json;
+  check_in_fuel_level?: number;
+  check_in_initial_km?: number;
+  check_in_contract_signed?: boolean;
+  check_in_documents_verified?: boolean;
   [key: string]: any;
 }
 
@@ -70,4 +75,12 @@ export interface FleetVehicleWithRelations extends FleetVehicle {
       updated_at?: string;
     };
   };
+}
+
+export interface InspectionItem {
+  id: string;
+  name: string;
+  category: string;
+  display_order: number;
+  is_active: boolean;
 }

@@ -328,11 +328,43 @@ export type Database = {
           },
         ]
       }
+      check_in_inspection_items: {
+        Row: {
+          category: string
+          created_at: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+        }
+        Relationships: []
+      }
       checkout_sessions: {
         Row: {
           assigned_vehicle_id: string | null
           check_in_completed_at: string | null
           check_in_completed_by: string | null
+          check_in_contract_signed: boolean | null
+          check_in_damages: Json | null
+          check_in_documents_verified: boolean | null
+          check_in_fuel_level: number | null
+          check_in_initial_km: number | null
           check_in_notes: string | null
           check_in_photos: Json | null
           check_in_status: string | null
@@ -352,6 +384,11 @@ export type Database = {
           assigned_vehicle_id?: string | null
           check_in_completed_at?: string | null
           check_in_completed_by?: string | null
+          check_in_contract_signed?: boolean | null
+          check_in_damages?: Json | null
+          check_in_documents_verified?: boolean | null
+          check_in_fuel_level?: number | null
+          check_in_initial_km?: number | null
           check_in_notes?: string | null
           check_in_photos?: Json | null
           check_in_status?: string | null
@@ -371,6 +408,11 @@ export type Database = {
           assigned_vehicle_id?: string | null
           check_in_completed_at?: string | null
           check_in_completed_by?: string | null
+          check_in_contract_signed?: boolean | null
+          check_in_damages?: Json | null
+          check_in_documents_verified?: boolean | null
+          check_in_fuel_level?: number | null
+          check_in_initial_km?: number | null
           check_in_notes?: string | null
           check_in_photos?: Json | null
           check_in_status?: string | null
