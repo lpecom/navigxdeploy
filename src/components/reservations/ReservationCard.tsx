@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Calendar, Clock, User, Car, ArrowRightToLine } from "lucide-react";
+import { ChevronDown, ChevronUp, Calendar, Clock, User, Car, ArrowRightToLine, Package } from "lucide-react";
 import { ReservationExpandedContent } from "./ReservationExpandedContent";
 import { StatusBadges } from "./StatusBadges";
 import { format } from "date-fns";
