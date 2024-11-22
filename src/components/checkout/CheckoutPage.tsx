@@ -13,27 +13,6 @@ export const CheckoutPage = () => {
   const { toast } = useToast();
   const { cartState } = useCheckoutState();
 
-  const handleInsuranceSelect = useCallback(async (insuranceId: string) => {
-    try {
-      if (!cartState.checkoutSessionId) return;
-
-      const { error } = await supabase
-        .from('checkout_sessions')
-        .update({ insurance_option_id: insuranceId })
-        .eq('id', cartState.checkoutSessionId);
-
-      if (error) throw error;
-      setStep(2);
-    } catch (error) {
-      console.error('Error selecting insurance:', error);
-      toast({
-        title: "Erro ao selecionar seguro",
-        description: "Por favor, tente novamente.",
-        variant: "destructive",
-      });
-    }
-  }, [cartState.checkoutSessionId, toast]);
-
   const handleScheduleSubmit = useCallback(async (scheduleData: any) => {
     try {
       if (!cartState.checkoutSessionId) return;
@@ -68,7 +47,7 @@ export const CheckoutPage = () => {
         .eq('id', cartState.checkoutSessionId);
 
       if (error) throw error;
-      setStep(5);
+      setStep(4);
     } catch (error) {
       console.error('Error selecting payment location:', error);
       toast({
@@ -87,14 +66,6 @@ export const CheckoutPage = () => {
     navigate('/driver/dashboard');
   }, [navigate, toast]);
 
-  const handleKYCSubmit = useCallback((data: any) => {
-    toast({
-      title: "Cadastro realizado!",
-      description: "Sua reserva foi confirmada. Você receberá um email para definir sua senha.",
-    });
-    navigate('/driver/dashboard');
-  }, [navigate, toast]);
-
   if (!cartState || (cartState.items.length === 0 && !cartState.checkoutSessionId)) {
     return (
       <CheckoutLayout>
@@ -109,11 +80,9 @@ export const CheckoutPage = () => {
         <CheckoutSteps
           step={step}
           checkoutSessionId={cartState.checkoutSessionId}
-          onInsuranceSelect={handleInsuranceSelect}
           onScheduleSubmit={handleScheduleSubmit}
           onPaymentLocationSelect={handlePaymentLocationSelect}
           onPaymentSuccess={handlePaymentSuccess}
-          onKYCSubmit={handleKYCSubmit}
         />
       </div>
     </CheckoutLayout>
