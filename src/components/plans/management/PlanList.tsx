@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { PlanTable } from "./PlanTable";
 import { PlanDialog } from "./PlanDialog";
-import type { Plan } from "@/types/plans";
+import type { Plans } from "@/types/database";
 
 export const PlanList = () => {
-  const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
+  const [editingPlan, setEditingPlan] = useState<Plans | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { data: plans, isLoading } = useQuery({
@@ -21,7 +21,7 @@ export const PlanList = () => {
         .order("included_km", { ascending: true });
       
       if (error) throw error;
-      return data as Plan[];
+      return data as Plans[];
     },
   });
 

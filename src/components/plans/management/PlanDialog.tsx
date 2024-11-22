@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import type { Plan } from "@/types/plans";
+import type { Plans } from "@/types/database";
 import * as z from "zod";
 
 const planSchema = z.object({
@@ -44,7 +44,7 @@ const planSchema = z.object({
 });
 
 interface PlanDialogProps {
-  plan: Plan | null;
+  plan: Plans | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }

@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { InsuranceTable } from "./insurance/InsuranceTable";
 import { InsuranceDialog } from "./insurance/InsuranceDialog";
-import type { InsuranceOption } from "@/types/plans";
+import type { InsuranceOptions } from "@/types/database";
 
 export const InsuranceList = () => {
-  const [editingInsurance, setEditingInsurance] = useState<InsuranceOption | null>(null);
+  const [editingInsurance, setEditingInsurance] = useState<InsuranceOptions | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { data: insuranceOptions, isLoading } = useQuery({
@@ -20,7 +20,7 @@ export const InsuranceList = () => {
         .order("name", { ascending: true });
       
       if (error) throw error;
-      return data as InsuranceOption[];
+      return data as InsuranceOptions[];
     },
   });
 
