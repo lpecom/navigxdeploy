@@ -3,16 +3,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Camera, Image, CheckCircle, FileText } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { CustomerReview } from "./steps/CustomerReview";
 import { OrderReview } from "./steps/OrderReview";
 import { VehicleAssignment } from "./steps/VehicleAssignment";
-import { PhotosTab } from "./tabs/PhotosTab";
-import { ReviewTab } from "./tabs/ReviewTab";
-import { ContractTab } from "./tabs/ContractTab";
+import { LoadingState } from "./components/LoadingState";
+import { ReservationHeader } from "./components/ReservationHeader";
+import { CheckInTabs } from "./components/CheckInTabs";
 import type { PhotoCategory, CheckInReservation, PhotosState } from "./types";
 
 const PHOTO_CATEGORIES: PhotoCategory[] = [
@@ -32,9 +30,11 @@ const CheckInProcess = () => {
   const [activeTab, setActiveTab] = useState('photos');
   const [photos, setPhotos] = useState<PhotosState>({});
   
-  const { data: reservation, isLoading } = useQuery({
+  const { data: reservation, isLoading, error } = useQuery({
     queryKey: ['check-in-reservation', id],
     queryFn: async () => {
+      if (!id) throw new Error('No reservation ID provided');
+
       const { data, error } = await supabase
         .from('checkout_sessions')
         .select(`
@@ -45,7 +45,9 @@ const CheckInProcess = () => {
         .single();
       
       if (error) throw error;
-      return data as unknown as CheckInReservation;
+      if (!data) throw new Error('Reservation not found');
+      
+      return data as CheckInReservation;
     },
   });
 
@@ -84,12 +86,27 @@ const CheckInProcess = () => {
     }
   };
 
+  if (isLoading) {
+    return <LoadingState />;
+  }
+
+  if (error || !reservation) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-500">Erro ao carregar reserva</p>
+        <Button variant="outline" onClick={() => navigate('/admin/check-in')} className="mt-4">
+          Voltar
+        </Button>
+      </div>
+    );
+  }
+
   const renderStep = () => {
     switch (step) {
       case 1:
         return (
           <CustomerReview
-            driverId={reservation.driver.id}
+            driverId={reservation.driver?.id}
             onNext={() => setStep(2)}
           />
         );
@@ -109,56 +126,19 @@ const CheckInProcess = () => {
         );
       case 4:
         return (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="photos" className="flex items-center gap-2">
-                <Camera className="w-4 h-4" />
-                Fotos
-              </TabsTrigger>
-              <TabsTrigger value="review" className="flex items-center gap-2">
-                <Image className="w-4 h-4" />
-                Revisão
-              </TabsTrigger>
-              <TabsTrigger value="contract" className="flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                Contrato
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="photos">
-              <PhotosTab 
-                categories={PHOTO_CATEGORIES}
-                photos={photos}
-                onPhotoCapture={handlePhotoCapture}
-                supabaseStorageUrl={supabase.storage.from('check-in-photos').getPublicUrl('').data.publicUrl}
-              />
-            </TabsContent>
-
-            <TabsContent value="review">
-              <ReviewTab 
-                categories={PHOTO_CATEGORIES}
-                photos={photos}
-                supabaseStorageUrl={supabase.storage.from('check-in-photos').getPublicUrl('').data.publicUrl}
-              />
-            </TabsContent>
-
-            <TabsContent value="contract">
-              <ContractTab />
-            </TabsContent>
-          </Tabs>
+          <CheckInTabs
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            categories={PHOTO_CATEGORIES}
+            photos={photos}
+            onPhotoCapture={handlePhotoCapture}
+            supabaseStorageUrl={supabase.storage.from('check-in-photos').getPublicUrl('').data.publicUrl}
+          />
         );
       default:
         return null;
     }
   };
-
-  if (isLoading || !reservation) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6 pb-20">
@@ -169,14 +149,7 @@ const CheckInProcess = () => {
         </Button>
       </div>
 
-      <Card className="p-4">
-        <div className="space-y-2">
-          <h3 className="font-medium">{reservation.selected_car.name}</h3>
-          <p className="text-sm text-muted-foreground">
-            Cliente: {reservation.driver.full_name}
-          </p>
-        </div>
-      </Card>
+      <ReservationHeader reservation={reservation} />
 
       {renderStep()}
 
