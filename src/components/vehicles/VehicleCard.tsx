@@ -14,9 +14,10 @@ import { ModelEditDialog } from "./card/ModelEditDialog";
 
 interface VehicleCardProps {
   car: CarModel;
+  onEdit?: (car: CarModel) => void;
 }
 
-export const VehicleCard = ({ car }: VehicleCardProps) => {
+export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const brandLogoUrl = getBrandLogo(car.name);
   const brandName = getBrandFromModel(car.name);

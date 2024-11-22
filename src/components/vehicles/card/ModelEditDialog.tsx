@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { ImageUpload } from "../ImageUpload";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { CarModel } from "@/types/vehicles";
 
 interface ModelEditDialogProps {
@@ -30,6 +31,21 @@ export const ModelEditDialog = ({ model, open, onOpenChange }: ModelEditDialogPr
     },
   });
 
+  const { data: fleetVehicles } = useQuery({
+    queryKey: ['fleet-vehicles', model?.id],
+    queryFn: async () => {
+      if (!model?.id) return null;
+      const { data, error } = await supabase
+        .from('fleet_vehicles')
+        .select('*')
+        .eq('car_model_id', model.id);
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!model?.id,
+  });
+
   const updateModelMutation = useMutation({
     mutationFn: async (updates: Partial<CarModel>) => {
       const { error } = await supabase
@@ -51,6 +67,16 @@ export const ModelEditDialog = ({ model, open, onOpenChange }: ModelEditDialogPr
 
   const deleteModelMutation = useMutation({
     mutationFn: async () => {
+      // First check if there are any fleet vehicles using this model
+      const { data: vehicles } = await supabase
+        .from('fleet_vehicles')
+        .select('id')
+        .eq('car_model_id', model?.id);
+
+      if (vehicles && vehicles.length > 0) {
+        throw new Error('Este modelo está sendo usado por veículos da frota e não pode ser excluído.');
+      }
+
       const { error } = await supabase
         .from('car_models')
         .delete()
@@ -65,6 +91,13 @@ export const ModelEditDialog = ({ model, open, onOpenChange }: ModelEditDialogPr
         description: "O modelo foi excluído com sucesso.",
       });
       onOpenChange(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao excluir",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -90,6 +123,15 @@ export const ModelEditDialog = ({ model, open, onOpenChange }: ModelEditDialogPr
         </DialogHeader>
 
         <div className="space-y-6">
+          {fleetVehicles && fleetVehicles.length > 0 && (
+            <Alert>
+              <AlertDescription>
+                Este modelo está sendo usado por {fleetVehicles.length} veículo(s) da frota.
+                Algumas operações podem estar limitadas.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="space-y-2">
             <label className="text-sm font-medium">Imagem do Modelo</label>
             <ImageUpload
@@ -121,6 +163,7 @@ export const ModelEditDialog = ({ model, open, onOpenChange }: ModelEditDialogPr
             variant="destructive"
             className="w-full"
             onClick={handleDelete}
+            disabled={fleetVehicles && fleetVehicles.length > 0}
           >
             Excluir Modelo
           </Button>
