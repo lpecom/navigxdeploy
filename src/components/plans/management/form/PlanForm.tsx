@@ -4,12 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { motion } from "framer-motion";
 import { Save } from "lucide-react";
-import type { Plans } from "@/types/database";
-import { planSchema, type PlanFormValues } from "./PlanFormSchema";
 import { BasicInfoFields } from "./fields/BasicInfoFields";
 import { PlanTypeFields } from "./fields/PlanTypeFields";
 import { PricingFields } from "./fields/PricingFields";
 import { StatusField } from "./fields/StatusField";
+import { FeaturesField } from "./fields/FeaturesField";
+import { KmRangesField } from "./fields/KmRangesField";
+import { DisplayOrderField } from "./fields/DisplayOrderField";
+import { HighlightField } from "./fields/HighlightField";
+import { planSchema, type PlanFormValues } from "./PlanFormSchema";
+import type { Plans } from "@/types/supabase/plans";
 
 interface PlanFormProps {
   plan: Plans | null;
@@ -23,11 +27,15 @@ export const PlanForm = ({ plan, onSubmit }: PlanFormProps) => {
       name: plan?.name ?? "",
       description: plan?.description ?? "",
       type: plan?.type ?? "flex",
-      period: plan?.period ?? "week",
+      period: plan?.period ?? "month",
       base_price: plan?.base_price ?? 0,
       included_km: plan?.included_km ?? 0,
       extra_km_price: plan?.extra_km_price ?? 0,
       is_active: plan?.is_active ?? true,
+      features: plan?.features ?? [],
+      bullet_points: plan?.bullet_points ?? [],
+      highlight: plan?.highlight ?? false,
+      display_order: plan?.display_order ?? 0
     },
   });
 
@@ -43,6 +51,10 @@ export const PlanForm = ({ plan, onSubmit }: PlanFormProps) => {
           <BasicInfoFields form={form} />
           <PlanTypeFields form={form} />
           <PricingFields form={form} />
+          <FeaturesField form={form} />
+          <KmRangesField form={form} />
+          <DisplayOrderField form={form} />
+          <HighlightField form={form} />
           <StatusField form={form} />
 
           <Button 
