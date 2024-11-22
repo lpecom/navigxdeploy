@@ -26,7 +26,6 @@ export const PaymentSection = ({
   const [selectedMethod, setSelectedMethod] = useState("")
   const [paymentType, setPaymentType] = useState<'online' | 'store' | null>(null)
   const [finalAmount, setFinalAmount] = useState(amount)
-  const [showOptionals, setShowOptionals] = useState(false)
   const { state: cartState } = useCart()
   
   const optionalItems = cartState.items.filter(item => item.type === 'optional')
@@ -34,7 +33,6 @@ export const PaymentSection = ({
   const handlePaymentTypeSelect = (type: 'online' | 'store', amount: number) => {
     setPaymentType(type)
     setFinalAmount(amount)
-    setShowOptionals(true)
   }
 
   if (!paymentType) {
@@ -45,33 +43,6 @@ export const PaymentSection = ({
           onSelect={handlePaymentTypeSelect}
         />
       </Card>
-    )
-  }
-
-  // Show optionals selection before proceeding to payment
-  if (showOptionals && !selectedMethod && paymentType === 'online') {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="space-y-6"
-      >
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-6">Adicione opcionais ao seu plano</h2>
-          <OptionalsList />
-        </Card>
-        <OrderSummary />
-        <Card className="p-6">
-          <PaymentMethodSelector
-            selectedMethod={selectedMethod}
-            onMethodChange={(method) => {
-              setSelectedMethod(method)
-              setShowOptionals(false)
-            }}
-          />
-        </Card>
-      </motion.div>
     )
   }
 
@@ -101,6 +72,26 @@ export const PaymentSection = ({
     )
   }
 
+  // For online payment, show payment methods first, then optionals
+  if (!selectedMethod) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="space-y-6"
+      >
+        <Card className="p-6">
+          <PaymentMethodSelector
+            selectedMethod={selectedMethod}
+            onMethodChange={setSelectedMethod}
+          />
+        </Card>
+      </motion.div>
+    )
+  }
+
+  // After payment method is selected, show optionals and payment form
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -108,6 +99,13 @@ export const PaymentSection = ({
       transition={{ duration: 0.5 }}
       className="space-y-4 sm:space-y-6"
     >
+      <Card className="p-6">
+        <h2 className="text-xl font-semibold mb-6">Adicione opcionais ao seu plano</h2>
+        <OptionalsList />
+      </Card>
+
+      <OrderSummary />
+
       {optionalItems.length > 0 && (
         <Card className="p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">

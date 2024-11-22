@@ -109,9 +109,8 @@ export const CheckoutContent = ({
   }
 
   const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1)
-    } else {
+    // Only allow going back if we're in step 1 (to plans) or if we haven't completed the current step
+    if (step === 1) {
       window.location.href = '/plans'
     }
   }
@@ -123,7 +122,7 @@ export const CheckoutContent = ({
       transition={{ duration: 0.5 }}
       className="space-y-8"
     >
-      {step < 4 && (
+      {step === 1 && (
         <Button
           variant="ghost"
           onClick={handleBack}
