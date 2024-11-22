@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Calendar, Clock, MapPin, User, Car, DollarSign } from "lucide-react";
+import { ChevronDown, ChevronUp, Calendar, Clock, MapPin, User, Car, DollarSign, Package } from "lucide-react";
 import { ReservationExpandedContent } from "./ReservationExpandedContent";
 import { StatusBadges } from "./StatusBadges";
 import { format } from "date-fns";
@@ -74,12 +74,29 @@ const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: Reserva
             
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                <DollarSign className="w-4 h-4" />
-                <span>Valor Semanal</span>
+                <Clock className="w-4 h-4" />
+                <span>Horário</span>
               </div>
-              <p className="font-medium">R$ {reservation.weeklyFare.toFixed(2)}</p>
+              <p className="font-medium">{reservation.pickupTime || "Não definido"}</p>
             </div>
           </div>
+
+          {/* Optionals Section */}
+          {reservation.optionals && reservation.optionals.length > 0 && (
+            <div className="pt-4 border-t">
+              <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center gap-2">
+                <Package className="w-4 h-4" />
+                Opcionais Selecionados
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {reservation.optionals.map((optional, index) => (
+                  <Badge key={index} variant="secondary" className="text-xs">
+                    {optional.name}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
 
           {!isExpanded && (
             <div className="flex justify-end pt-4 border-t">

@@ -3,15 +3,16 @@ import { useQuery } from "@tanstack/react-query"
 import type { Reservation, PickupFilter } from "@/types/reservation"
 import { ReservationCard } from "./ReservationCard"
 import { supabase } from "@/integrations/supabase/client"
-import { startOfWeek, endOfWeek, addWeeks, format } from "date-fns"
-import { Car } from "lucide-react"
+import { startOfWeek, endOfWeek, addWeeks, format, isEqual, parseISO } from "date-fns"
+import { Car, Clock } from "lucide-react"
 
 interface ReservationsListProps {
   filter: "pending" | PickupFilter
   status?: 'pending_approval' | 'approved' | 'rejected'
+  selectedDate?: Date
 }
 
-const ReservationsList = ({ filter, status = 'pending_approval' }: ReservationsListProps) => {
+const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }: ReservationsListProps) => {
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({})
 
   const toggleCard = useCallback((id: string) => {
@@ -22,7 +23,7 @@ const ReservationsList = ({ filter, status = 'pending_approval' }: ReservationsL
   }, [])
 
   const { data: reservations, isLoading, error } = useQuery({
-    queryKey: ['reservations', filter, status],
+    queryKey: ['reservations', filter, status, selectedDate?.toISOString()],
     queryFn: async () => {
       let query = supabase
         .from('checkout_sessions')
@@ -40,30 +41,35 @@ const ReservationsList = ({ filter, status = 'pending_approval' }: ReservationsL
             postal_code
           )
         `)
-        .order('reservation_number', { ascending: false })
+        .order('pickup_time', { ascending: true })
 
       if (filter === 'pending') {
         query = query.eq('status', status)
       } else {
         query = query.eq('status', 'approved')
 
-        const now = new Date()
-        const today = format(now, 'yyyy-MM-dd')
+        if (selectedDate) {
+          const dateStr = format(selectedDate, 'yyyy-MM-dd')
+          query = query.eq('pickup_date', dateStr)
+        } else {
+          const now = new Date()
+          const today = format(now, 'yyyy-MM-dd')
 
-        if (filter === 'today') {
-          query = query.eq('pickup_date', today)
-        } else if (filter === 'this-week') {
-          const weekStart = format(startOfWeek(now, { weekStartsOn: 1 }), 'yyyy-MM-dd')
-          const weekEnd = format(endOfWeek(now, { weekStartsOn: 1 }), 'yyyy-MM-dd')
-          query = query
-            .gte('pickup_date', weekStart)
-            .lte('pickup_date', weekEnd)
-        } else if (filter === 'next-week') {
-          const nextWeekStart = format(startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 }), 'yyyy-MM-dd')
-          const nextWeekEnd = format(endOfWeek(addWeeks(now, 1), { weekStartsOn: 1 }), 'yyyy-MM-dd')
-          query = query
-            .gte('pickup_date', nextWeekStart)
-            .lte('pickup_date', nextWeekEnd)
+          if (filter === 'today') {
+            query = query.eq('pickup_date', today)
+          } else if (filter === 'this-week') {
+            const weekStart = format(startOfWeek(now, { weekStartsOn: 1 }), 'yyyy-MM-dd')
+            const weekEnd = format(endOfWeek(now, { weekStartsOn: 1 }), 'yyyy-MM-dd')
+            query = query
+              .gte('pickup_date', weekStart)
+              .lte('pickup_date', weekEnd)
+          } else if (filter === 'next-week') {
+            const nextWeekStart = format(startOfWeek(addWeeks(now, 1), { weekStartsOn: 1 }), 'yyyy-MM-dd')
+            const nextWeekEnd = format(endOfWeek(addWeeks(now, 1), { weekStartsOn: 1 }), 'yyyy-MM-dd')
+            query = query
+              .gte('pickup_date', nextWeekStart)
+              .lte('pickup_date', nextWeekEnd)
+          }
         }
       }
 
@@ -96,6 +102,14 @@ const ReservationsList = ({ filter, status = 'pending_approval' }: ReservationsL
     },
   })
 
+  const sortedReservations = useMemo(() => {
+    if (!reservations) return []
+    return [...reservations].sort((a, b) => {
+      if (!a.pickupTime || !b.pickupTime) return 0
+      return a.pickupTime.localeCompare(b.pickupTime)
+    })
+  }, [reservations])
+
   const renderedReservations = useMemo(() => {
     if (error) {
       console.error('Error fetching reservations:', error)
@@ -118,7 +132,7 @@ const ReservationsList = ({ filter, status = 'pending_approval' }: ReservationsL
       )
     }
 
-    if (!reservations?.length) {
+    if (!sortedReservations?.length) {
       return (
         <div className="text-center py-12">
           <Car className="w-12 h-12 text-gray-300 mx-auto mb-4" />
@@ -129,19 +143,36 @@ const ReservationsList = ({ filter, status = 'pending_approval' }: ReservationsL
       )
     }
 
+    const timeSlots = Array.from(new Set(sortedReservations.map(r => r.pickupTime))).sort()
+
     return (
-      <div className="space-y-4">
-        {reservations.map((reservation) => (
-          <ReservationCard
-            key={reservation.id}
-            reservation={reservation}
-            isExpanded={!!expandedCards[reservation.id]}
-            onToggle={() => toggleCard(reservation.id)}
-          />
-        ))}
+      <div className="space-y-8">
+        {timeSlots.map(timeSlot => {
+          const slotReservations = sortedReservations.filter(r => r.pickupTime === timeSlot)
+          
+          return (
+            <div key={timeSlot} className="space-y-4">
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <Clock className="w-4 h-4" />
+                <span>{timeSlot || 'Horário não definido'}</span>
+                <span className="text-gray-400">({slotReservations.length} retiradas)</span>
+              </div>
+              <div className="grid gap-4">
+                {slotReservations.map((reservation) => (
+                  <ReservationCard
+                    key={reservation.id}
+                    reservation={reservation}
+                    isExpanded={!!expandedCards[reservation.id]}
+                    onToggle={() => toggleCard(reservation.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          )
+        })}
       </div>
     )
-  }, [reservations, isLoading, error, expandedCards, toggleCard])
+  }, [sortedReservations, isLoading, error, expandedCards, toggleCard])
 
   return (
     <div className="max-w-3xl mx-auto">
