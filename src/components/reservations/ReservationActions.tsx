@@ -100,18 +100,19 @@ export const ReservationActions = ({ reservation, currentStatus, hideCheckIn = f
               <X className="w-4 h-4 mr-1" />
               {isLoading === 'reject' ? 'Rejeitando...' : 'Rejeitar'}
             </Button>
-            {!hideCheckIn && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleCheckIn}
-                className="flex-1"
-              >
-                <ArrowRightToLine className="w-4 h-4 mr-1" />
-                Check-in
-              </Button>
-            )}
           </>
+        )}
+
+        {currentStatus === 'approved' && !hideCheckIn && (
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleCheckIn}
+            className="flex-1"
+          >
+            <ArrowRightToLine className="w-4 h-4 mr-1" />
+            Check-in
+          </Button>
         )}
 
         {currentStatus === 'rejected' && (
