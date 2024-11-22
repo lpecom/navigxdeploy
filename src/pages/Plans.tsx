@@ -17,7 +17,7 @@ interface Category {
   badge_text: string | null;
 }
 
-export const Plans = () => {
+export const PlansPage = () => {
   const navigate = useNavigate();
   const { dispatch } = useCart();
   const { toast } = useToast();
@@ -137,4 +137,4 @@ export const Plans = () => {
   );
 };
 
-export default Plans;
+export default PlansPage;

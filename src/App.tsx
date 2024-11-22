@@ -9,7 +9,7 @@ import { CartProvider } from '@/contexts/CartContext';
 import { useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import Home from "./pages/Home";
-import Plans from "./pages/Plans";
+import { PlansPage } from "./pages/Plans";
 import { CheckoutPage } from "./components/checkout/CheckoutPage";
 import DriverDashboard from "./pages/DriverDashboard";
 import AdminRoutes from "./routes/AdminRoutes";
@@ -61,7 +61,7 @@ const App = () => {
                 <Routes>
                   {/* Public Routes */}
                   <Route path="/" element={<Home />} />
-                  <Route path="/plans" element={<Plans />} />
+                  <Route path="/plans" element={<PlansPage />} />
                   <Route path="/checkout" element={<CheckoutPage />} />
                   <Route path="/login" element={<DriverLogin />} />
                   
