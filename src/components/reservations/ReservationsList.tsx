@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query"
 import type { Reservation, PickupFilter } from "@/types/reservation"
 import { ReservationCard } from "./ReservationCard"
 import { supabase } from "@/integrations/supabase/client"
-import { startOfWeek, endOfWeek, addWeeks, format, isEqual, parseISO } from "date-fns"
+import { startOfWeek, endOfWeek, addWeeks, format, parseISO } from "date-fns"
 import { Car, Clock } from "lucide-react"
 
 interface ReservationsListProps {
@@ -41,7 +41,7 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
             postal_code
           )
         `)
-        .order('pickup_time', { ascending: true })
+        .order('created_at', { ascending: false }) // Changed to sort by creation date, newest first
 
       if (filter === 'pending') {
         query = query.eq('status', status)
@@ -105,6 +105,12 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
   const sortedReservations = useMemo(() => {
     if (!reservations) return []
     return [...reservations].sort((a, b) => {
+      // Sort by creation date first (newest first)
+      const dateA = new Date(a.createdAt).getTime()
+      const dateB = new Date(b.createdAt).getTime()
+      if (dateA !== dateB) return dateB - dateA
+      
+      // If same creation date, sort by pickup time
       if (!a.pickupTime || !b.pickupTime) return 0
       return a.pickupTime.localeCompare(b.pickupTime)
     })

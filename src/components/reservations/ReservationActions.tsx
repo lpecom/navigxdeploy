@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Check, X, Eye, RotateCcw } from "lucide-react";
+import { Check, X, Eye, ArrowRightToLine } from "lucide-react";
 import { type Reservation } from "@/types/reservation";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -12,6 +12,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import DetailedReservationView from "./DetailedReservationView";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 interface ReservationActionsProps {
   reservation: Reservation;
@@ -24,6 +25,7 @@ export const ReservationActions = ({ reservation, currentStatus, hideCheckIn = f
   const [showDetails, setShowDetails] = useState(false);
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const handleAction = async (action: 'approve' | 'reject' | 'review' | 'view') => {
     if (action === 'view') {
@@ -69,6 +71,10 @@ export const ReservationActions = ({ reservation, currentStatus, hideCheckIn = f
     }
   };
 
+  const handleCheckIn = () => {
+    navigate(`/admin/check-in/${reservation.id}`);
+  };
+
   return (
     <>
       <div className="flex gap-2">
@@ -94,6 +100,17 @@ export const ReservationActions = ({ reservation, currentStatus, hideCheckIn = f
               <X className="w-4 h-4 mr-1" />
               {isLoading === 'reject' ? 'Rejeitando...' : 'Rejeitar'}
             </Button>
+            {!hideCheckIn && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleCheckIn}
+                className="flex-1"
+              >
+                <ArrowRightToLine className="w-4 h-4 mr-1" />
+                Check-in
+              </Button>
+            )}
           </>
         )}
 
@@ -105,7 +122,7 @@ export const ReservationActions = ({ reservation, currentStatus, hideCheckIn = f
             onClick={() => handleAction('review')}
             disabled={isLoading !== null}
           >
-            <RotateCcw className="w-4 h-4 mr-1" />
+            <Check className="w-4 h-4 mr-1" />
             {isLoading === 'review' ? 'Retornando...' : 'Voltar para revisão'}
           </Button>
         )}
