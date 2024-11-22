@@ -12,6 +12,7 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -23,42 +24,10 @@ serve(async (req) => {
     if (action === 'create_payment_intent') {
       const { amount, driver_id, metadata } = payload
 
-      // Create or retrieve Stripe customer
-      const { data: existingCustomer } = await supabase
-        .from('stripe_customers')
-        .select('stripe_customer_id')
-        .eq('driver_id', driver_id)
-        .single()
-
-      let stripeCustomerId
-      if (existingCustomer) {
-        stripeCustomerId = existingCustomer.stripe_customer_id
-      } else {
-        const { data: driverDetails } = await supabase
-          .from('driver_details')
-          .select('email, full_name')
-          .eq('id', driver_id)
-          .single()
-
-        const customer = await stripe.customers.create({
-          email: driverDetails.email,
-          name: driverDetails.full_name,
-          metadata: { driver_id }
-        })
-
-        await supabase.from('stripe_customers').insert({
-          driver_id,
-          stripe_customer_id: customer.id
-        })
-
-        stripeCustomerId = customer.id
-      }
-
       // Create payment intent
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount * 100), // Convert to cents
         currency: 'brl',
-        customer: stripeCustomerId,
         metadata: {
           driver_id,
           ...metadata
@@ -69,17 +38,23 @@ serve(async (req) => {
       })
 
       // Store payment intent in database
-      await supabase.from('stripe_payment_intents').insert({
-        driver_id,
-        payment_intent_id: paymentIntent.id,
-        amount: Math.round(amount * 100),
-        status: paymentIntent.status
-      })
+      const { error: dbError } = await supabase
+        .from('stripe_payment_intents')
+        .insert({
+          driver_id,
+          payment_intent_id: paymentIntent.id,
+          amount: Math.round(amount * 100),
+          status: paymentIntent.status
+        })
+
+      if (dbError) {
+        console.error('Database error:', dbError)
+        throw new Error('Failed to store payment intent')
+      }
 
       return new Response(
         JSON.stringify({
           clientSecret: paymentIntent.client_secret,
-          customerId: stripeCustomerId
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
