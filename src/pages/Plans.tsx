@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { Plans } from "@/types/supabase/plans";
 
 interface Category {
   id: string;
@@ -16,18 +17,7 @@ interface Category {
   badge_text: string | null;
 }
 
-interface Plan {
-  id: string;
-  name: string;
-  type: 'flex' | 'monthly' | 'black';
-  base_price: number;
-  features: string[];
-  bullet_points: { km: string; price: string; }[];
-  highlight: boolean;
-  display_order: number;
-}
-
-const Plans = () => {
+export const Plans = () => {
   const navigate = useNavigate();
   const { dispatch } = useCart();
   const { toast } = useToast();
@@ -43,7 +33,7 @@ const Plans = () => {
         .order('display_order');
       
       if (error) throw error;
-      return data as Plan[];
+      return data as Plans[];
     }
   });
   
@@ -61,7 +51,7 @@ const Plans = () => {
     }
   }, [navigate]);
 
-  const handlePlanSelect = (plan: Plan) => {
+  const handlePlanSelect = (plan: Plans) => {
     if (!selectedCategory) {
       toast({
         title: "Erro",
@@ -72,7 +62,6 @@ const Plans = () => {
       return;
     }
     
-    // Clear cart before adding new item
     dispatch({ type: 'CLEAR_CART' });
     
     dispatch({
@@ -89,9 +78,7 @@ const Plans = () => {
       }
     });
 
-    // Store selected plan in session storage
     sessionStorage.setItem('selectedPlan', plan.type);
-    
     navigate('/checkout');
   };
 

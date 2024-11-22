@@ -9,13 +9,13 @@ export const planSchema = z.object({
   included_km: z.number().min(0, "Included KM must be greater than zero"),
   extra_km_price: z.number().min(0, "Extra KM price must be greater than zero").optional(),
   is_active: z.boolean().default(true),
-  features: z.array(z.string()),
+  features: z.array(z.string()).default([]),
   bullet_points: z.array(z.object({
     km: z.string(),
     price: z.string()
-  })),
+  })).default([]),
   highlight: z.boolean().default(false),
-  display_order: z.number().min(0)
+  display_order: z.number().min(0).default(0)
 });
 
 export type PlanFormValues = z.infer<typeof planSchema>;

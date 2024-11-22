@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { Plans } from "@/types/database";
+import type { Plans } from "@/types/supabase/plans";
 import { PlanForm } from "./form/PlanForm";
 import type { PlanFormValues } from "./form/PlanFormSchema";
 
@@ -32,6 +32,10 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
         included_km: values.included_km,
         extra_km_price: values.extra_km_price,
         is_active: values.is_active,
+        features: values.features,
+        bullet_points: values.bullet_points,
+        highlight: values.highlight,
+        display_order: values.display_order
       };
 
       if (plan) {

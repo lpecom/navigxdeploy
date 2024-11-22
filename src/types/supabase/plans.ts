@@ -12,6 +12,11 @@ export interface Plans {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  features: string[];
+  bullet_points: { km: string; price: string; }[];
+  highlight: boolean;
+  display_order: number;
+  conditions?: Json | null;
 }
 
 export interface InsuranceOptions {
