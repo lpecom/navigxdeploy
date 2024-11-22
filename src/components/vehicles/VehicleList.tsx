@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { VehicleListHeader } from "./sections/VehicleListHeader";
 import { VehicleListContent } from "./sections/VehicleListContent";
 import { supabase } from "@/integrations/supabase/client";
-import type { CarModel } from "@/types/vehicles";
+import type { CarModel, FleetVehicle } from "@/types/vehicles";
 
 interface VehicleListProps {
   view: 'overview' | 'categories' | 'models' | 'fleet' | 'maintenance';
