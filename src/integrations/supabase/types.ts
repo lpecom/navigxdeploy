@@ -270,7 +270,7 @@ export type Database = {
           checkout_session_id: string
           created_at?: string | null
           created_by?: string | null
-          id?: string
+          id: string
           new_value?: Json | null
           previous_value?: Json | null
         }
@@ -308,7 +308,7 @@ export type Database = {
           created_by?: string | null
           document_type: string
           file_url: string
-          id?: string
+          id: string
         }
         Update: {
           checkout_session_id?: string
@@ -355,7 +355,7 @@ export type Database = {
           check_in_notes?: string | null
           check_in_photos?: Json | null
           check_in_status?: string | null
-          created_at?: string
+          created_at: string
           driver_id?: string | null
           id?: string
           pickup_date?: string | null
@@ -678,7 +678,7 @@ export type Database = {
         Update: {
           address?: string | null
           auth_user_id?: string | null
-          birth_date?: string
+          birth_date: string
           city?: string | null
           cpf?: string
           created_at?: string
@@ -686,9 +686,9 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
-          license_expiry?: string
-          license_number?: string
-          phone?: string
+          license_expiry: string
+          license_number: string
+          phone: string
           postal_code?: string | null
           state?: string | null
         }
@@ -774,9 +774,9 @@ export type Database = {
           next_revision_date: string
           plate: string
           renavam_number?: string | null
-          state?: string | null
+          state?: string
           status?: Database["public"]["Enums"]["vehicle_status"] | null
-          updated_at?: string | null
+          updated_at?: string
           year: string
         }
         Update: {
@@ -794,7 +794,7 @@ export type Database = {
           next_revision_date?: string
           plate?: string
           renavam_number?: string | null
-          state?: string | null
+          state?: string
           status?: Database["public"]["Enums"]["vehicle_status"] | null
           updated_at?: string | null
           year?: string
@@ -1213,7 +1213,7 @@ export type Database = {
           id?: string
           installments?: number | null
           payment_type: string
-          status?: string
+          status: string
           updated_at?: string
         }
         Update: {
@@ -1342,7 +1342,7 @@ export type Database = {
           engine_size: string
           features?: string[]
           fuel_type: string
-          id?: string
+          id: string
           image_url: string
           name: string
           passengers: number
@@ -1386,7 +1386,7 @@ export type Database = {
           created_at?: string
           driver_id: string
           id?: string
-          updated_at?: string
+          updated_at: string
         }
         Update: {
           balance?: number
@@ -1426,6 +1426,79 @@ export type Database = {
         }
         Relationships: []
       }
+      plans: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          type: 'flex' | 'monthly' | 'black';
+          period: 'week' | 'month';
+          base_price: number;
+          included_km: number;
+          extra_km_price: number | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          description?: string | null;
+          type: 'flex' | 'monthly' | 'black';
+          period: 'week' | 'month';
+          base_price: number;
+          included_km: number;
+          extra_km_price?: number | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          description?: string | null;
+          type?: 'flex' | 'monthly' | 'black';
+          period?: 'week' | 'month';
+          base_price?: number;
+          included_km?: number;
+          extra_km_price?: number | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      insurance_options: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          coverage_details: Record<string, boolean>;
+          price: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          description?: string | null;
+          coverage_details?: Record<string, boolean>;
+          price: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          description?: string | null;
+          coverage_details?: Record<string, boolean>;
+          price?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     }
     Views: {
       [_ in never]: never
@@ -1484,7 +1557,7 @@ export type Tables<
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -1538,10 +1611,10 @@ export type TablesUpdate<
     : never
   : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
     ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
+      Update: infer U
+    }
+    ? U
+    : never
     : never
 
 export type Enums<

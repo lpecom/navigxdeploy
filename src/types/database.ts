@@ -2,6 +2,7 @@ import { Database as DatabaseGenerated } from "@/integrations/supabase/types";
 
 // Extract specific table types
 export type Tables = DatabaseGenerated["public"]["Tables"];
+
 export type Plans = {
   id: string;
   name: string;
@@ -15,6 +16,7 @@ export type Plans = {
   created_at: string;
   updated_at: string;
 };
+
 export type InsuranceOptions = {
   id: string;
   name: string;
