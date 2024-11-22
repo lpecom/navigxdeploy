@@ -1,5 +1,6 @@
 import { Json } from "@/integrations/supabase/types";
 import { Plans, InsuranceOptions } from './supabase/plans';
+import { Wallet } from './supabase/wallet';
 
 export interface Database {
   public: {
@@ -22,18 +23,14 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['plans']['Insert']>;
       };
       insurance_options: {
-        Row: {
-          id: string;
-          name: string;
-          description: string | null;
-          coverage_details: Record<string, boolean>;
-          price: number;
-          is_active: boolean;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Omit<Database['public']['Tables']['insurance_options']['Row'], 'id' | 'created_at' | 'updated_at'>;
-        Update: Partial<Database['public']['Tables']['insurance_options']['Insert']>;
+        Row: InsuranceOptions;
+        Insert: Omit<InsuranceOptions, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<InsuranceOptions, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      wallet: {
+        Row: Wallet;
+        Insert: Omit<Wallet, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<Wallet, 'id' | 'created_at' | 'updated_at'>>;
       };
     };
     Enums: {
@@ -78,4 +75,4 @@ export interface Database {
   };
 }
 
-export type { Plans, InsuranceOptions };
+export type { Plans, InsuranceOptions, Wallet };
