@@ -48,18 +48,18 @@ export const CategoryList = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async (categoryId: string) => {
       const { error: modelsError } = await supabase
         .from("car_models")
         .update({ category_id: null })
-        .eq("category_id", id);
+        .eq("category_id", categoryId);
       
       if (modelsError) throw modelsError;
 
       const { error } = await supabase
         .from("categories")
         .delete()
-        .eq("id", id);
+        .eq("id", categoryId);
       
       if (error) throw error;
     },
@@ -110,7 +110,7 @@ export const CategoryList = () => {
             onEdit={setEditingCategory}
             onDelete={(category) => {
               if (window.confirm("Tem certeza que deseja excluir esta categoria?")) {
-                deleteMutation.mutate(category);
+                deleteMutation.mutate(category.id);
               }
             }}
           />

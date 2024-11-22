@@ -12,7 +12,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Category, CarModel } from "@/types/offers";
+import type { Category } from "@/types/offers";
+import type { CarModel } from "@/types/vehicles";
 
 interface CategoryModelsDialogProps {
   category: Category | null;
@@ -33,7 +34,7 @@ export const CategoryModelsDialog = ({ category, onClose }: CategoryModelsDialog
         .eq("category_id", category.id);
       
       if (error) throw error;
-      return data;
+      return data as CarModel[];
     },
     enabled: !!category?.id,
   });
@@ -47,7 +48,7 @@ export const CategoryModelsDialog = ({ category, onClose }: CategoryModelsDialog
         .is("category_id", null);
       
       if (error) throw error;
-      return data;
+      return data as CarModel[];
     },
     enabled: !!category?.id,
   });
