@@ -10,6 +10,9 @@ import { createCheckoutSession } from "../CheckoutSessionHandler"
 import { supabase } from "@/integrations/supabase/client"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft } from "lucide-react"
+import { CarSlider } from "@/components/home/CarSlider"
+import { PlanDetails } from "./PlanDetails"
+import { useQuery } from "@tanstack/react-query"
 
 interface CheckoutContentProps {
   step: number
@@ -108,12 +111,33 @@ export const CheckoutContent = ({
     })
   }
 
-  const handleBack = () => {
-    // Only allow going back if we're in step 1 (to plans) or if we haven't completed the current step
-    if (step === 1) {
-      window.location.href = '/plans'
-    }
-  }
+  const { data: carModels } = useQuery({
+    queryKey: ['car-models'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('car_models')
+        .select('*')
+        .eq('category_id', cartState?.items?.[0]?.category_id)
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!cartState?.items?.[0]?.category_id
+  });
+
+  const selectedPlan = cartState.items.find((item: any) => item.type === 'car_group');
+  const planDetails = selectedPlan ? {
+    type: selectedPlan.period,
+    name: selectedPlan.name,
+    features: [
+      'Seguro completo incluso',
+      'Manutenção preventiva',
+      'Assistência 24h',
+      'Documentação e IPVA'
+    ],
+    price: selectedPlan.unitPrice,
+    period: 'mês'
+  } : null;
 
   return (
     <motion.div
@@ -125,7 +149,7 @@ export const CheckoutContent = ({
       {step === 1 && (
         <Button
           variant="ghost"
-          onClick={handleBack}
+          onClick={() => window.location.href = '/plans'}
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-4"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -137,6 +161,16 @@ export const CheckoutContent = ({
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         <div className="lg:col-span-2 space-y-6">
+          {carModels && carModels.length > 0 && (
+            <div className="rounded-lg overflow-hidden bg-white p-4">
+              <CarSlider cars={carModels} category={selectedPlan?.category || ''} />
+            </div>
+          )}
+
+          {planDetails && step === 1 && (
+            <PlanDetails plan={planDetails} />
+          )}
+          
           {step === 1 && (
             <CustomerForm onSubmit={handleCustomerSubmit} />
           )}
@@ -164,5 +198,5 @@ export const CheckoutContent = ({
         </div>
       </div>
     </motion.div>
-  )
-}
+  );
+};
