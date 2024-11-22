@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import Home from "./pages/Home";
 import { PlansPage } from "./pages/Plans";
+import InsurancePage from "./pages/Insurance";
 import { CheckoutPage } from "./components/checkout/CheckoutPage";
 import DriverDashboard from "./pages/DriverDashboard";
 import AdminRoutes from "./routes/AdminRoutes";
@@ -62,6 +63,7 @@ const App = () => {
                   {/* Public Routes */}
                   <Route path="/" element={<Home />} />
                   <Route path="/plans" element={<PlansPage />} />
+                  <Route path="/insurance" element={<InsurancePage />} />
                   <Route path="/checkout" element={<CheckoutPage />} />
                   <Route path="/login" element={<DriverLogin />} />
                   
