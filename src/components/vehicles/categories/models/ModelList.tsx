@@ -21,6 +21,9 @@ export const ModelList = ({ categoryId, onRemove }: ModelListProps) => {
   const { data: models, isLoading } = useQuery({
     queryKey: ["category-models", categoryId],
     queryFn: async () => {
+      // Only fetch if we have a valid categoryId
+      if (!categoryId) return [];
+      
       const { data, error } = await supabase
         .from("car_models")
         .select("*")
@@ -30,6 +33,7 @@ export const ModelList = ({ categoryId, onRemove }: ModelListProps) => {
       if (error) throw error;
       return data as CarModel[];
     },
+    enabled: Boolean(categoryId), // Only run query if categoryId exists
   });
 
   if (isLoading) {

@@ -22,9 +22,11 @@ export const CategoryModelsDialog = ({ category, onClose }: CategoryModelsDialog
 
   const addModelMutation = useMutation({
     mutationFn: async (modelId: string) => {
+      if (!category?.id) return;
+      
       const { error } = await supabase
         .from("car_models")
-        .update({ category_id: category?.id })
+        .update({ category_id: category.id })
         .eq("id", modelId);
       
       if (error) throw error;

@@ -29,6 +29,9 @@ export const ModelSearchDropdown = ({ categoryId, onSelect }: ModelSearchDropdow
   const { data: availableModels } = useQuery({
     queryKey: ["available-models", search],
     queryFn: async () => {
+      // Only fetch if we have a valid categoryId
+      if (!categoryId) return [];
+
       const query = supabase
         .from("car_models")
         .select("*")
@@ -42,6 +45,7 @@ export const ModelSearchDropdown = ({ categoryId, onSelect }: ModelSearchDropdow
       if (error) throw error;
       return data as CarModel[];
     },
+    enabled: Boolean(categoryId), // Only run query if categoryId exists
   });
 
   return (
