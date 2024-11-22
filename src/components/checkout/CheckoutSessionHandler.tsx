@@ -36,8 +36,9 @@ export const createCheckoutSession = async ({
         period: selectedGroup.period
       } as Json : {} as Json,
       selected_optionals: selectedOptionals.map(opt => ({
-        ...opt,
-        id: getValidUUID(opt.id)
+        id: getValidUUID(opt.id),
+        name: opt.name,
+        totalPrice: opt.totalPrice
       })) as unknown as Json,
       total_amount: totalAmount,
       status: 'pending',
@@ -56,7 +57,7 @@ export const createCheckoutSession = async ({
 
     const cartItemsData = cartItems.map(item => ({
       checkout_session_id: session.id,
-      item_type: item.type === 'car_group' ? 'car' : item.type,
+      item_type: item.type,
       item_id: getValidUUID(item.id),
       quantity: item.quantity,
       unit_price: item.unitPrice,

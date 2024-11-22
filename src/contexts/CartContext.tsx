@@ -14,9 +14,15 @@ const calculateTotal = (items: CartItem[]): number => {
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case 'ADD_ITEM': {
-      const existingItem = state.items.find(item => item.id === action.payload.id);
+      // If it's an insurance item, remove any existing insurance first
+      let updatedItems = state.items;
+      if (action.payload.type === 'insurance') {
+        updatedItems = state.items.filter(item => item.type !== 'insurance');
+      }
+      
+      const existingItem = updatedItems.find(item => item.id === action.payload.id);
       if (existingItem) {
-        const updatedItems = state.items.map(item =>
+        updatedItems = updatedItems.map(item =>
           item.id === action.payload.id
             ? {
                 ...item,
@@ -25,14 +31,13 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
               }
             : item
         );
-        return {
-          ...state,
-          items: updatedItems,
-        };
+      } else {
+        updatedItems = [...updatedItems, action.payload];
       }
+      
       return {
         ...state,
-        items: [...state.items, action.payload],
+        items: updatedItems,
       };
     }
 
