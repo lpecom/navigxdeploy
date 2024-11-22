@@ -5,15 +5,15 @@ import { ArrowUpDown } from "lucide-react";
 
 export const DisplayOrderField = ({ form }: { form: any }) => {
   return (
-    <Card className="p-6">
+    <Card className="p-4">
       <FormField
         control={form.control}
         name="display_order"
         render={({ field }) => (
           <FormItem>
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2">
               <ArrowUpDown className="w-5 h-5 text-primary" />
-              <FormLabel className="text-lg font-semibold">Display Order</FormLabel>
+              <FormLabel className="text-base">Ordem de Exibição</FormLabel>
             </div>
             <FormControl>
               <Input

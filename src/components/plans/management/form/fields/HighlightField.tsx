@@ -5,7 +5,7 @@ import { Star } from "lucide-react";
 
 export const HighlightField = ({ form }: { form: any }) => {
   return (
-    <Card className="p-6">
+    <Card className="p-4">
       <FormField
         control={form.control}
         name="highlight"
@@ -14,10 +14,10 @@ export const HighlightField = ({ form }: { form: any }) => {
             <div className="space-y-0.5">
               <FormLabel className="text-base flex items-center gap-2">
                 <Star className="w-5 h-5 text-primary" />
-                Highlight Plan
+                Destacar Plano
               </FormLabel>
               <p className="text-sm text-muted-foreground">
-                Featured plans will be highlighted in the UI
+                Planos destacados terão maior visibilidade
               </p>
             </div>
             <FormControl>

@@ -54,8 +54,8 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["plans"] });
       toast({
-        title: "Success",
-        description: `Plan ${plan ? "updated" : "created"} successfully`,
+        title: "Sucesso",
+        description: `Plano ${plan ? "atualizado" : "criado"} com sucesso`,
       });
       onOpenChange(false);
     },
@@ -63,10 +63,10 @@ export const PlanDialog = ({ plan, open, onOpenChange }: PlanDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {plan ? "Edit Plan" : "New Plan"}
+            {plan ? "Editar Plano" : "Novo Plano"}
           </DialogTitle>
         </DialogHeader>
 

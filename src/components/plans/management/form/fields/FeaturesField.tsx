@@ -17,10 +17,10 @@ export const FeaturesField = ({ form }: { form: any }) => {
   };
 
   return (
-    <Card className="p-6 space-y-4">
-      <div className="flex items-center gap-2 mb-4">
+    <Card className="p-4 space-y-4">
+      <div className="flex items-center gap-2">
         <ListChecks className="w-5 h-5 text-primary" />
-        <h3 className="text-lg font-semibold">Features</h3>
+        <h3 className="text-lg font-semibold">Recursos</h3>
       </div>
 
       <FormField
@@ -28,7 +28,7 @@ export const FeaturesField = ({ form }: { form: any }) => {
         name="features"
         render={() => (
           <FormItem>
-            <FormLabel>Plan Features</FormLabel>
+            <FormLabel>Recursos do Plano</FormLabel>
             <div className="space-y-2">
               {features.map((feature: string, index: number) => (
                 <div key={index} className="flex gap-2">
@@ -39,7 +39,7 @@ export const FeaturesField = ({ form }: { form: any }) => {
                       newFeatures[index] = e.target.value;
                       form.setValue('features', newFeatures);
                     }}
-                    placeholder={`Feature ${index + 1}`}
+                    placeholder={`Recurso ${index + 1}`}
                   />
                   <Button
                     type="button"
@@ -60,7 +60,7 @@ export const FeaturesField = ({ form }: { form: any }) => {
               className="mt-2"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Add Feature
+              Adicionar Recurso
             </Button>
             <FormMessage />
           </FormItem>

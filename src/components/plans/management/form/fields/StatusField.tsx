@@ -5,7 +5,7 @@ import { Power } from "lucide-react";
 
 export const StatusField = ({ form }: { form: any }) => {
   return (
-    <Card className="p-6">
+    <Card className="p-4">
       <FormField
         control={form.control}
         name="is_active"
@@ -14,10 +14,10 @@ export const StatusField = ({ form }: { form: any }) => {
             <div className="space-y-0.5">
               <FormLabel className="text-base flex items-center gap-2">
                 <Power className="w-5 h-5 text-primary" />
-                Plan Status
+                Status do Plano
               </FormLabel>
               <p className="text-sm text-muted-foreground">
-                Enable or disable this plan
+                Ativar ou desativar este plano
               </p>
             </div>
             <FormControl>

@@ -6,10 +6,10 @@ import { FileText } from "lucide-react";
 
 export const BasicInfoFields = ({ form }: { form: any }) => {
   return (
-    <Card className="p-6 space-y-4">
-      <div className="flex items-center gap-2 mb-4">
+    <Card className="p-4 space-y-4">
+      <div className="flex items-center gap-2">
         <FileText className="w-5 h-5 text-primary" />
-        <h3 className="text-lg font-semibold">Basic Information</h3>
+        <h3 className="text-lg font-semibold">Informações Básicas</h3>
       </div>
 
       <FormField
@@ -17,9 +17,9 @@ export const BasicInfoFields = ({ form }: { form: any }) => {
         name="name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Name</FormLabel>
+            <FormLabel>Nome</FormLabel>
             <FormControl>
-              <Input placeholder="Enter plan name" {...field} />
+              <Input placeholder="Digite o nome do plano" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -31,11 +31,11 @@ export const BasicInfoFields = ({ form }: { form: any }) => {
         name="description"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Description</FormLabel>
+            <FormLabel>Descrição</FormLabel>
             <FormControl>
               <Textarea 
-                placeholder="Enter plan description"
-                className="min-h-[100px] resize-none"
+                placeholder="Digite a descrição do plano"
+                className="min-h-[80px] resize-none"
                 {...field} 
               />
             </FormControl>
