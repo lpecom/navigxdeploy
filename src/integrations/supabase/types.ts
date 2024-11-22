@@ -371,6 +371,8 @@ export type Database = {
           created_at: string
           driver_id: string | null
           id: string
+          insurance_option_id: string | null
+          payment_location: string | null
           pickup_date: string | null
           pickup_time: string | null
           reservation_number: number
@@ -395,6 +397,8 @@ export type Database = {
           created_at?: string
           driver_id?: string | null
           id?: string
+          insurance_option_id?: string | null
+          payment_location?: string | null
           pickup_date?: string | null
           pickup_time?: string | null
           reservation_number?: number
@@ -419,6 +423,8 @@ export type Database = {
           created_at?: string
           driver_id?: string | null
           id?: string
+          insurance_option_id?: string | null
+          payment_location?: string | null
           pickup_date?: string | null
           pickup_time?: string | null
           reservation_number?: number
@@ -441,6 +447,13 @@ export type Database = {
             columns: ["driver_id"]
             isOneToOne: false
             referencedRelation: "driver_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checkout_sessions_insurance_option_id_fkey"
+            columns: ["insurance_option_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_options"
             referencedColumns: ["id"]
           },
         ]

@@ -1,43 +1,41 @@
 import { motion } from "framer-motion";
-import { CustomerForm } from "./CustomerForm";
-import { PickupScheduler } from "./PickupScheduler";
-import { PaymentSection } from "./PaymentSection";
-import { CheckoutAuth } from "./auth/CheckoutAuth";
-import { Card } from "@/components/ui/card";
-import { ShoppingCart } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { InsuranceSelection } from "./steps/InsuranceSelection";
+import { PickupScheduler } from "./steps/PickupScheduler";
+import { OrderSummary } from "./steps/OrderSummary";
+import { PaymentLocationSelection } from "./steps/PaymentLocationSelection";
+import { PaymentSection } from "./steps/PaymentSection";
+import { KYCForm } from "./steps/KYCForm";
 
 interface CheckoutStepsProps {
   step: number;
-  isLoggedIn: boolean;
-  customerId: string | null;
   checkoutSessionId: string | undefined;
-  onLoginSuccess: (userId: string) => void;
-  onCustomerSubmit: (data: any) => void;
+  onInsuranceSelect: (insuranceId: string) => void;
   onScheduleSubmit: (data: any) => void;
+  onPaymentLocationSelect: (location: 'online' | 'store') => void;
   onPaymentSuccess: (paymentId: string) => void;
+  onKYCSubmit: (data: any) => void;
 }
 
 export const CheckoutSteps = ({
   step,
-  isLoggedIn,
-  customerId,
   checkoutSessionId,
-  onLoginSuccess,
-  onCustomerSubmit,
+  onInsuranceSelect,
   onScheduleSubmit,
-  onPaymentSuccess
+  onPaymentLocationSelect,
+  onPaymentSuccess,
+  onKYCSubmit
 }: CheckoutStepsProps) => {
+  if (!checkoutSessionId) return null;
+
   return (
     <>
-      {step === 1 && !isLoggedIn && (
+      {step === 1 && (
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <CheckoutAuth onLoginSuccess={onLoginSuccess} />
-          <CustomerForm onSubmit={onCustomerSubmit} />
+          <InsuranceSelection onSelect={onInsuranceSelect} />
         </motion.div>
       )}
 
@@ -46,18 +44,19 @@ export const CheckoutSteps = ({
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="space-y-6"
         >
           <PickupScheduler onSubmit={onScheduleSubmit} />
         </motion.div>
       )}
 
-      {step === 3 && customerId && checkoutSessionId && (
-        <PaymentSection
-          amount={0}
-          driverId={customerId}
-          onPaymentSuccess={onPaymentSuccess}
-        />
+      {step === 3 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <OrderSummary checkoutSessionId={checkoutSessionId} />
+        </motion.div>
       )}
 
       {step === 4 && (
@@ -66,21 +65,24 @@ export const CheckoutSteps = ({
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <Card className="p-8 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-500 mb-6">
-              <ShoppingCart className="w-8 h-8" />
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Reserva Confirmada!</h2>
-            <p className="text-gray-600 mb-8">
-              Sua reserva foi recebida com sucesso. Em breve nossa equipe entrará em contato para confirmar os detalhes.
-            </p>
-            <Button
-              onClick={() => window.location.href = '/'}
-              className="w-full sm:w-auto"
-            >
-              Voltar para Home
-            </Button>
-          </Card>
+          <PaymentLocationSelection onSelect={onPaymentLocationSelect} />
+        </motion.div>
+      )}
+
+      {step === 5 && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {location === 'online' ? (
+            <PaymentSection
+              checkoutSessionId={checkoutSessionId}
+              onSuccess={onPaymentSuccess}
+            />
+          ) : (
+            <KYCForm onSubmit={onKYCSubmit} />
+          )}
         </motion.div>
       )}
     </>
