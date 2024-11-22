@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { CustomerForm } from "@/components/checkout/sections/CustomerForm";
 import { PlanDetails } from "@/components/checkout/sections/PlanDetails";
 import { OptionalsList } from "@/components/optionals/OptionalsList";
@@ -26,7 +26,7 @@ export const CheckoutPage = () => {
   const { state: cartState, dispatch } = useCart();
   const { toast } = useToast();
 
-  const handleCustomerSubmit = async (data: any) => {
+  const handleCustomerSubmit = useCallback(async (data: any) => {
     try {
       const { data: customer, error } = await supabase
         .from('driver_details')
@@ -51,9 +51,9 @@ export const CheckoutPage = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
 
-  const handleScheduleSubmit = async (scheduleData: any) => {
+  const handleScheduleSubmit = useCallback(async (scheduleData: any) => {
     try {
       if (!cartState.checkoutSessionId) return;
 
@@ -82,7 +82,7 @@ export const CheckoutPage = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [cartState.checkoutSessionId, toast]);
 
   const selectedPlan = cartState?.items?.find(item => item.type === 'car_group');
   const planDetails = selectedPlan ? {
