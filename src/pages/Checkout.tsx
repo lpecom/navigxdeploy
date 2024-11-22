@@ -9,6 +9,8 @@ import { CheckoutLayout } from "@/components/checkout/ui/CheckoutLayout";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { User, Car, Package, Calendar, CheckCircle } from "lucide-react";
 
 const steps = [
   { number: 1, title: "Dados Pessoais", icon: User },
@@ -82,6 +84,20 @@ export const CheckoutPage = () => {
     }
   };
 
+  const selectedPlan = cartState?.items?.find(item => item.type === 'car_group');
+  const planDetails = selectedPlan ? {
+    type: selectedPlan.period || 'mensal',
+    name: selectedPlan.name,
+    features: [
+      'Seguro completo incluso',
+      'Manutenção preventiva',
+      'Assistência 24h',
+      'Documentação e IPVA'
+    ],
+    price: selectedPlan.unitPrice,
+    period: 'mês'
+  } : null;
+
   return (
     <CheckoutLayout>
       <div className="container max-w-4xl mx-auto px-4 py-8">
@@ -92,9 +108,9 @@ export const CheckoutPage = () => {
             <CustomerForm onSubmit={handleCustomerSubmit} />
           )}
 
-          {currentStep === 2 && cartState.items.find(item => item.type === 'car_group') && (
+          {currentStep === 2 && planDetails && (
             <PlanDetails 
-              plan={cartState.items.find(item => item.type === 'car_group')}
+              plan={planDetails}
               onNext={() => setCurrentStep(3)}
             />
           )}
