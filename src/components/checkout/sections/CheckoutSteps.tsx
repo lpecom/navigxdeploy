@@ -1,79 +1,43 @@
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { InsuranceSelection } from "./steps/InsuranceSelection";
-import { PickupScheduler } from "./steps/PickupScheduler";
-import { OrderSummary } from "./steps/OrderSummary";
-import { PaymentLocationSelection } from "./steps/PaymentLocationSelection";
-import { PaymentSection } from "./steps/PaymentSection";
-import { KYCForm } from "./steps/KYCForm";
-import { useToast } from "@/components/ui/use-toast";
+import { CustomerForm } from "./CustomerForm";
+import { PickupScheduler } from "./PickupScheduler";
+import { PaymentSection } from "./PaymentSection";
+import { CheckoutAuth } from "./auth/CheckoutAuth";
+import { Card } from "@/components/ui/card";
+import { ShoppingCart } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface CheckoutStepsProps {
   step: number;
-  checkoutSessionId?: string;
-  onInsuranceSelect: (insuranceId: string) => void;
+  isLoggedIn: boolean;
+  customerId: string | null;
+  checkoutSessionId: string | undefined;
+  onLoginSuccess: (userId: string) => void;
+  onCustomerSubmit: (data: any) => void;
   onScheduleSubmit: (data: any) => void;
-  onPaymentLocationSelect: (location: 'online' | 'store') => void;
   onPaymentSuccess: (paymentId: string) => void;
-  onKYCSubmit: (data: any) => void;
 }
 
 export const CheckoutSteps = ({
   step,
+  isLoggedIn,
+  customerId,
   checkoutSessionId,
-  onInsuranceSelect,
+  onLoginSuccess,
+  onCustomerSubmit,
   onScheduleSubmit,
-  onPaymentLocationSelect,
-  onPaymentSuccess,
-  onKYCSubmit
+  onPaymentSuccess
 }: CheckoutStepsProps) => {
-  const { toast } = useToast();
-
-  const { data: session, error } = useQuery({
-    queryKey: ['checkout-session', checkoutSessionId],
-    queryFn: async () => {
-      if (!checkoutSessionId) return null;
-      
-      const { data, error } = await supabase
-        .from('checkout_sessions')
-        .select('*')
-        .eq('id', checkoutSessionId)
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!checkoutSessionId,
-  });
-
-  if (error) {
-    toast({
-      title: "Erro ao carregar sessão",
-      description: "Não foi possível carregar os dados da sua sessão. Por favor, tente novamente.",
-      variant: "destructive",
-    });
-    return null;
-  }
-
-  if (!checkoutSessionId) {
-    toast({
-      title: "Sessão inválida",
-      description: "Por favor, inicie uma nova sessão de checkout.",
-      variant: "destructive",
-    });
-    return null;
-  }
-
   return (
     <>
-      {step === 1 && (
+      {step === 1 && !isLoggedIn && (
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <InsuranceSelection onSelect={onInsuranceSelect} />
+          <CheckoutAuth onLoginSuccess={onLoginSuccess} />
+          <CustomerForm onSubmit={onCustomerSubmit} />
         </motion.div>
       )}
 
@@ -82,19 +46,18 @@ export const CheckoutSteps = ({
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
+          className="space-y-6"
         >
           <PickupScheduler onSubmit={onScheduleSubmit} />
         </motion.div>
       )}
 
-      {step === 3 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <OrderSummary checkoutSessionId={checkoutSessionId} />
-        </motion.div>
+      {step === 3 && customerId && checkoutSessionId && (
+        <PaymentSection
+          amount={0}
+          driverId={customerId}
+          onPaymentSuccess={onPaymentSuccess}
+        />
       )}
 
       {step === 4 && (
@@ -103,24 +66,21 @@ export const CheckoutSteps = ({
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <PaymentLocationSelection onSelect={onPaymentLocationSelect} />
-        </motion.div>
-      )}
-
-      {step === 5 && session && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          {session.payment_location === 'online' ? (
-            <PaymentSection
-              checkoutSessionId={checkoutSessionId}
-              onSuccess={onPaymentSuccess}
-            />
-          ) : (
-            <KYCForm onSubmit={onKYCSubmit} />
-          )}
+          <Card className="p-8 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-500 mb-6">
+              <ShoppingCart className="w-8 h-8" />
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Reserva Confirmada!</h2>
+            <p className="text-gray-600 mb-8">
+              Sua reserva foi recebida com sucesso. Em breve nossa equipe entrará em contato para confirmar os detalhes.
+            </p>
+            <Button
+              onClick={() => window.location.href = '/'}
+              className="w-full sm:w-auto"
+            >
+              Voltar para Home
+            </Button>
+          </Card>
         </motion.div>
       )}
     </>
