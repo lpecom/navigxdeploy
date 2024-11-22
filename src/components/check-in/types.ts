@@ -1,4 +1,5 @@
 import { Json } from "@/integrations/supabase/types";
+import type { CarModel, FleetVehicle } from "@/types/vehicles";
 
 export interface PhotoCategory {
   id: string;
@@ -55,4 +56,18 @@ export interface CheckoutSession {
   pickup_time: string;
   status: string;
   selected_optionals: Optional[];
+}
+
+export interface FleetVehicleWithRelations extends FleetVehicle {
+  car_model?: CarModel & {
+    car_group?: {
+      id: string;
+      name: string;
+      description?: string;
+      display_order?: number;
+      is_active?: boolean;
+      created_at?: string;
+      updated_at?: string;
+    };
+  };
 }
