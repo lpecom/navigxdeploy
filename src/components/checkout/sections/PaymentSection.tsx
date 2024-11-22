@@ -26,6 +26,7 @@ export const PaymentSection = ({
   const [selectedMethod, setSelectedMethod] = useState("")
   const [paymentType, setPaymentType] = useState<'online' | 'store' | null>(null)
   const [finalAmount, setFinalAmount] = useState(amount)
+  const [showOptionals, setShowOptionals] = useState(false)
   const { state: cartState } = useCart()
   
   const optionalItems = cartState.items.filter(item => item.type === 'optional')
@@ -33,6 +34,7 @@ export const PaymentSection = ({
   const handlePaymentTypeSelect = (type: 'online' | 'store', amount: number) => {
     setPaymentType(type)
     setFinalAmount(amount)
+    setShowOptionals(true)
   }
 
   if (!paymentType) {
@@ -47,7 +49,7 @@ export const PaymentSection = ({
   }
 
   // Show optionals selection before proceeding to payment
-  if (!selectedMethod && paymentType === 'online') {
+  if (showOptionals && !selectedMethod && paymentType === 'online') {
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -63,7 +65,10 @@ export const PaymentSection = ({
         <Card className="p-6">
           <PaymentMethodSelector
             selectedMethod={selectedMethod}
-            onMethodChange={setSelectedMethod}
+            onMethodChange={(method) => {
+              setSelectedMethod(method)
+              setShowOptionals(false)
+            }}
           />
         </Card>
       </motion.div>
