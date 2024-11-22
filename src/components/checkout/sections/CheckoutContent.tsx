@@ -7,13 +7,10 @@ import { PaymentSection } from "./PaymentSection"
 import { SuccessSection } from "./SuccessSection"
 import { SupportCard } from "./SupportCard"
 import { createCheckoutSession } from "../CheckoutSessionHandler"
-import { supabase } from "@/integrations/supabase/client"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft } from "lucide-react"
-import { CarSlider } from "@/components/home/CarSlider"
-import { PlanDetails } from "./PlanDetails"
-import { useQuery } from "@tanstack/react-query"
-import type { CarModel } from "@/types/vehicles"
+import { CarDisplay } from "./CarDisplay"
+import { PlanDisplaySection } from "./PlanDisplaySection"
 
 interface CheckoutContentProps {
   step: number
@@ -104,34 +101,6 @@ export const CheckoutContent = ({
     }
   }
 
-  const handlePaymentSuccess = () => {
-    setStep(4)
-    toast({
-      title: "Pagamento confirmado!",
-      description: "Seu pagamento foi processado com sucesso.",
-    })
-  }
-
-  const { data: carModels } = useQuery({
-    queryKey: ['car-models'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('car_models')
-        .select('*')
-        .eq('category_id', cartState?.items?.[0]?.category_id)
-      
-      if (error) throw error;
-      
-      // Convert the JSON fields to the correct type
-      return (data || []).map(model => ({
-        ...model,
-        optionals: model.optionals as Record<string, any> | null,
-        features: model.features as Record<string, any>[] | null
-      })) as CarModel[];
-    },
-    enabled: !!cartState?.items?.[0]?.category_id
-  });
-
   const selectedPlan = cartState.items.find((item: any) => item.type === 'car_group');
   const planDetails = selectedPlan ? {
     type: selectedPlan.period,
@@ -168,14 +137,10 @@ export const CheckoutContent = ({
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         <div className="lg:col-span-2 space-y-6">
-          {carModels && carModels.length > 0 && (
-            <div className="rounded-lg overflow-hidden bg-white p-4">
-              <CarSlider cars={carModels} category={selectedPlan?.category || ''} />
-            </div>
-          )}
-
-          {planDetails && step === 1 && (
-            <PlanDetails plan={planDetails} />
+          <CarDisplay categoryId={selectedPlan?.category_id} />
+          
+          {step === 1 && (
+            <PlanDisplaySection selectedPlan={planDetails} />
           )}
           
           {step === 1 && (
@@ -190,7 +155,7 @@ export const CheckoutContent = ({
             <PaymentSection
               amount={cartState.total}
               driverId={customerId}
-              onPaymentSuccess={handlePaymentSuccess}
+              onPaymentSuccess={() => setStep(4)}
             />
           )}
           
