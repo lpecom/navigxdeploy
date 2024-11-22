@@ -1,17 +1,14 @@
 import { createContext, useContext, useReducer, ReactNode } from 'react';
-import { CartItem, CartState } from '@/types/cart';
-
-type CartAction =
-  | { type: 'ADD_ITEM'; payload: CartItem }
-  | { type: 'REMOVE_ITEM'; payload: string }
-  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
-  | { type: 'SET_CHECKOUT_SESSION'; payload: string }
-  | { type: 'CLEAR_CART' };
+import { CartItem, CartState, CartAction } from '@/types/cart';
 
 const CartContext = createContext<{
   state: CartState;
   dispatch: React.Dispatch<CartAction>;
 } | null>(null);
+
+const calculateTotal = (items: CartItem[]): number => {
+  return items.reduce((sum, item) => sum + item.totalPrice, 0);
+};
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
@@ -30,13 +27,11 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         return {
           ...state,
           items: updatedItems,
-          total: updatedItems.reduce((sum, item) => sum + item.totalPrice, 0)
         };
       }
       return {
         ...state,
         items: [...state.items, action.payload],
-        total: state.total + action.payload.totalPrice
       };
     }
 
@@ -45,7 +40,6 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       return {
         ...state,
         items: updatedItems,
-        total: updatedItems.reduce((sum, item) => sum + item.totalPrice, 0)
       };
     }
 
@@ -62,7 +56,6 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       return {
         ...state,
         items: updatedItems,
-        total: updatedItems.reduce((sum, item) => sum + item.totalPrice, 0)
       };
     }
 
@@ -76,7 +69,6 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     case 'CLEAR_CART':
       return {
         items: [],
-        total: 0,
         checkoutSessionId: undefined
       };
 
@@ -88,7 +80,6 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(cartReducer, {
     items: [],
-    total: 0,
     checkoutSessionId: undefined
   });
 
@@ -104,5 +95,8 @@ export const useCart = () => {
   if (!context) {
     throw new Error('useCart must be used within a CartProvider');
   }
-  return context;
+  return {
+    ...context,
+    total: calculateTotal(context.state.items)
+  };
 };

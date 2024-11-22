@@ -36,6 +36,12 @@ const InsurancePage = () => {
   }, [cartState.items, navigate]);
 
   const handleInsuranceSelect = (insurance: InsuranceOptions) => {
+    // Remove any existing insurance
+    const existingInsurance = cartState.items.find(item => item.type === 'insurance');
+    if (existingInsurance) {
+      dispatch({ type: 'REMOVE_ITEM', payload: existingInsurance.id });
+    }
+
     dispatch({
       type: 'ADD_ITEM',
       payload: {

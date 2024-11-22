@@ -19,5 +19,6 @@ export interface CartState {
 export type CartAction =
   | { type: 'ADD_ITEM'; payload: CartItem }
   | { type: 'REMOVE_ITEM'; payload: string }
-  | { type: 'CLEAR_CART' }
-  | { type: 'SET_CHECKOUT_SESSION'; payload: string };
+  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
+  | { type: 'SET_CHECKOUT_SESSION'; payload: string }
+  | { type: 'CLEAR_CART' };
