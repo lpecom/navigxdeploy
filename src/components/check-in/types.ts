@@ -1,48 +1,43 @@
-import { Json } from "@/integrations/supabase/types";
+import type { Json } from "@/integrations/supabase/types";
 
-export interface PhotoCategory {
-  id: string;
-  label: string;
-}
-
-export interface SelectedCar {
-  name: string;
-  category: string;
-  group_id?: string;
-  price?: number;
-  period?: string;
-}
+export type PhotoCategories = "exterior" | "interior" | "documents";
 
 export interface CheckInReservation {
   id: string;
-  selected_car: SelectedCar;
-  driver: {
-    id: string;
-    full_name: string;
-    [key: string]: any;
-  };
-  [key: string]: any;
-}
-
-export interface PhotosState {
-  [key: string]: string[];
-}
-
-export interface Optional {
-  name: string;
-  price: number;
-}
-
-export interface CheckoutSession {
-  id: string;
-  reservation_number: number;
-  selected_car: SelectedCar;
-  driver: {
-    id: string;
-    full_name: string;
-  };
+  driver_id: string;
+  selected_car: Json;
+  selected_optionals: Json[];
+  total_amount: number;
+  status: string;
   pickup_date: string;
   pickup_time: string;
+  reservation_number: number;
+  assigned_vehicle_id: string | null;
+  check_in_status: string | null;
+  check_in_notes: string | null;
+  check_in_photos: Record<PhotoCategories, string[]> | null;
+  check_in_completed_at: string | null;
+  check_in_completed_by: string | null;
+  driver: {
+    full_name: string;
+    email: string | null;
+    phone: string | null;
+  };
+}
+
+export interface FleetVehicleWithRelations {
+  id: string;
+  car_model_id: string;
+  year: string;
+  current_km: number;
+  last_revision_date: string;
+  next_revision_date: string;
+  plate: string;
+  is_available: boolean;
   status: string;
-  selected_optionals: Optional[];
+  car_model?: {
+    id: string;
+    name: string;
+    image_url: string | null;
+  };
 }
