@@ -136,8 +136,7 @@ const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: Reserva
       {isExpanded && (
         <ReservationExpandedContent 
           reservation={reservation} 
-          onApprove={handleApprove}
-          onReject={handleReject}
+          currentStatus={reservation.status as 'pending_approval' | 'approved' | 'rejected'}
         />
       )}
     </Card>

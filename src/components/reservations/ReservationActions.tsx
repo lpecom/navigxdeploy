@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Check, X, Eye } from "lucide-react";
+import { Check, X, Eye, RotateCcw } from "lucide-react";
 import { type Reservation } from "@/types/reservation";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -15,15 +15,16 @@ import { useQueryClient } from "@tanstack/react-query";
 
 interface ReservationActionsProps {
   reservation: Reservation;
+  currentStatus: 'pending_approval' | 'approved' | 'rejected';
 }
 
-export const ReservationActions = ({ reservation }: ReservationActionsProps) => {
+export const ReservationActions = ({ reservation, currentStatus }: ReservationActionsProps) => {
   const { toast } = useToast();
   const [showDetails, setShowDetails] = useState(false);
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  const handleAction = async (action: 'approve' | 'reject' | 'view') => {
+  const handleAction = async (action: 'approve' | 'reject' | 'review' | 'view') => {
     if (action === 'view') {
       setShowDetails(true);
       return;
@@ -31,19 +32,29 @@ export const ReservationActions = ({ reservation }: ReservationActionsProps) => 
 
     setIsLoading(action);
     try {
+      const newStatus = action === 'approve' 
+        ? 'approved' 
+        : action === 'reject' 
+          ? 'rejected' 
+          : 'pending_approval';
+
       const { error } = await supabase
         .from('checkout_sessions')
-        .update({ 
-          status: action === 'approve' ? 'approved' : 'rejected' 
-        })
+        .update({ status: newStatus })
         .eq('id', reservation.id);
 
       if (error) throw error;
 
       await queryClient.invalidateQueries({ queryKey: ['reservations'] });
 
+      const actionMessages = {
+        approve: 'Reserva aprovada',
+        reject: 'Reserva rejeitada',
+        review: 'Reserva retornada para revisão'
+      };
+
       toast({
-        title: action === 'approve' ? 'Reserva aprovada' : 'Reserva rejeitada',
+        title: actionMessages[action as keyof typeof actionMessages],
         description: `Ação realizada para ${reservation.customerName}`,
       });
     } catch (error) {
@@ -60,26 +71,44 @@ export const ReservationActions = ({ reservation }: ReservationActionsProps) => 
   return (
     <>
       <div className="flex gap-2 mt-4">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="flex-1 bg-green-50 hover:bg-green-100 text-green-600 disabled:opacity-50"
-          onClick={() => handleAction('approve')}
-          disabled={isLoading !== null}
-        >
-          <Check className="w-4 h-4 mr-1" />
-          {isLoading === 'approve' ? 'Aprovando...' : 'Aprovar'}
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 disabled:opacity-50"
-          onClick={() => handleAction('reject')}
-          disabled={isLoading !== null}
-        >
-          <X className="w-4 h-4 mr-1" />
-          {isLoading === 'reject' ? 'Rejeitando...' : 'Rejeitar'}
-        </Button>
+        {currentStatus === 'pending_approval' && (
+          <>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-1 bg-green-50 hover:bg-green-100 text-green-600 disabled:opacity-50"
+              onClick={() => handleAction('approve')}
+              disabled={isLoading !== null}
+            >
+              <Check className="w-4 h-4 mr-1" />
+              {isLoading === 'approve' ? 'Aprovando...' : 'Aprovar'}
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 disabled:opacity-50"
+              onClick={() => handleAction('reject')}
+              disabled={isLoading !== null}
+            >
+              <X className="w-4 h-4 mr-1" />
+              {isLoading === 'reject' ? 'Rejeitando...' : 'Rejeitar'}
+            </Button>
+          </>
+        )}
+
+        {currentStatus === 'rejected' && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 disabled:opacity-50"
+            onClick={() => handleAction('review')}
+            disabled={isLoading !== null}
+          >
+            <RotateCcw className="w-4 h-4 mr-1" />
+            {isLoading === 'review' ? 'Retornando...' : 'Voltar para revisão'}
+          </Button>
+        )}
+
         <Button 
           variant="outline" 
           size="sm"
