@@ -1,12 +1,12 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Car, Pencil } from "lucide-react";
+import { Car } from "lucide-react";
 import { getBrandLogo, getBrandFromModel } from "@/utils/brandLogos";
 import type { CarModel } from "@/types/vehicles";
+
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 
 interface VehicleCardProps {
   car: CarModel;
@@ -72,23 +72,12 @@ export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
         </CardHeader>
         <CardContent className="space-y-4">
           {car.image_url && (
-            <div className="relative aspect-video w-full overflow-hidden rounded-md group">
+            <div className="relative aspect-video w-full overflow-hidden rounded-md">
               <img
                 src={car.image_url}
                 alt={car.name}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              <Button
-                variant="secondary"
-                size="icon"
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(car);
-                }}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
             </div>
           )}
           

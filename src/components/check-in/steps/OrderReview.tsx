@@ -46,7 +46,7 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
           }))
         : [];
 
-      const transformedData: CheckInReservation = {
+      const transformedData = {
         ...data,
         selected_car: {
           name: selectedCar.name || '',
@@ -54,10 +54,9 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
           group_id: selectedCar.group_id,
           price: selectedCar.price,
           period: selectedCar.period
-        },
-        selected_optionals: optionals,
-        driver: data.driver || { id: '', full_name: '' }
-      };
+        } as SelectedCar,
+        selected_optionals: optionals
+      } as CheckInReservation;
       
       setSelectedGroup(transformedData.selected_car.category);
       return transformedData;

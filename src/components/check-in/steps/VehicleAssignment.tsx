@@ -44,8 +44,7 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
           group_id: selectedCar.group_id,
           price: selectedCar.price,
           period: selectedCar.period
-        } as SelectedCar,
-        driver: data.driver || { id: '', full_name: '' }
+        } as SelectedCar
       } as CheckInReservation;
     },
   });
