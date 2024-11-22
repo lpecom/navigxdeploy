@@ -1,11 +1,11 @@
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { CheckCircle } from "lucide-react";
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { CheckCircle } from "lucide-react"
+import { motion } from "framer-motion"
+import { useNavigate } from "react-router-dom"
 
 export const SuccessSection = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   
   return (
     <motion.div
@@ -22,12 +22,12 @@ export const SuccessSection = () => {
           Sua reserva foi recebida com sucesso. Em breve nossa equipe entrará em contato para confirmar os detalhes.
         </p>
         <Button
-          onClick={() => navigate('/driver/dashboard')}
+          onClick={() => navigate('/')}
           className="w-full sm:w-auto"
         >
-          Ver Minhas Reservas
+          Voltar para Home
         </Button>
       </Card>
     </motion.div>
-  );
-};
+  )
+}

@@ -2,9 +2,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Car, Users, Gauge, Calendar, Check } from "lucide-react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 
-export interface PlanDetailsProps {
+interface PlanDetailsProps {
   plan: {
     type: string;
     name: string;
@@ -12,10 +11,9 @@ export interface PlanDetailsProps {
     price: number;
     period: string;
   };
-  onNext?: () => void;
 }
 
-export const PlanDetails = ({ plan, onNext }: PlanDetailsProps) => {
+export const PlanDetails = ({ plan }: PlanDetailsProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -70,12 +68,6 @@ export const PlanDetails = ({ plan, onNext }: PlanDetailsProps) => {
               </div>
             </div>
           </div>
-
-          {onNext && (
-            <Button onClick={onNext} className="w-full mt-4">
-              Continuar
-            </Button>
-          )}
         </div>
       </Card>
     </motion.div>

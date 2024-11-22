@@ -1,15 +1,15 @@
-import { motion } from "framer-motion";
-import { LucideIcon, CheckCircle } from "lucide-react";
+import { motion } from "framer-motion"
+import { LucideIcon, CheckCircle } from "lucide-react"
 
 interface Step {
-  number: number;
-  title: string;
-  icon: LucideIcon;
+  number: number
+  title: string
+  icon: LucideIcon
 }
 
 interface StepsProps {
-  steps: Step[];
-  currentStep: number;
+  steps: Step[]
+  currentStep: number
 }
 
 export const Steps = ({ steps, currentStep }: StepsProps) => {
@@ -17,9 +17,9 @@ export const Steps = ({ steps, currentStep }: StepsProps) => {
     <div className="w-full max-w-3xl mx-auto">
       <div className="flex justify-between">
         {steps.map((step, index) => {
-          const Icon = step.icon;
-          const isActive = step.number === currentStep;
-          const isCompleted = step.number < currentStep;
+          const Icon = step.icon
+          const isActive = step.number === currentStep
+          const isCompleted = step.number < currentStep
 
           return (
             <div key={step.number} className="flex flex-col items-center relative">
@@ -59,9 +59,9 @@ export const Steps = ({ steps, currentStep }: StepsProps) => {
                 {step.title}
               </span>
             </div>
-          );
+          )
         })}
       </div>
     </div>
-  );
-};
+  )
+}
