@@ -89,7 +89,7 @@ export const CheckoutPage = () => {
     navigate('/driver/dashboard');
   };
 
-  if (cartState.items.length === 0 && !cartState.checkoutSessionId) {
+  if (!cartState || (cartState.items.length === 0 && !cartState.checkoutSessionId)) {
     return (
       <CheckoutLayout>
         <EmptyCartMessage />
