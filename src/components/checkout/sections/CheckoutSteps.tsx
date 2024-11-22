@@ -75,7 +75,7 @@ export const CheckoutSteps = ({
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          {location === 'online' ? (
+          {session?.payment_location === 'online' ? (
             <PaymentSection
               checkoutSessionId={checkoutSessionId}
               onSuccess={onPaymentSuccess}

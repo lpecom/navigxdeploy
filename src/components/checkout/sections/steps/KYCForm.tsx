@@ -17,28 +17,36 @@ const kycSchema = z.object({
   license_expiry: z.string().min(1, "Data de validade da CNH é obrigatória"),
 });
 
+type KYCFormData = z.infer<typeof kycSchema>;
+
 interface KYCFormProps {
-  onSubmit: (data: z.infer<typeof kycSchema>) => void;
+  onSubmit: (data: KYCFormData) => void;
 }
 
 export const KYCForm = ({ onSubmit }: KYCFormProps) => {
   const { toast } = useToast();
-  const form = useForm<z.infer<typeof kycSchema>>({
+  const form = useForm<KYCFormData>({
     resolver: zodResolver(kycSchema),
   });
 
-  const handleSubmit = async (values: z.infer<typeof kycSchema>) => {
+  const handleSubmit = async (values: KYCFormData) => {
     try {
       const { data: auth } = await supabase.auth.signUp({
         email: values.email,
-        password: Math.random().toString(36).slice(-8), // Generate random password
+        password: Math.random().toString(36).slice(-8),
       });
 
       if (auth.user) {
         const { error: profileError } = await supabase
           .from('driver_details')
           .insert({
-            ...values,
+            full_name: values.full_name,
+            birth_date: values.birth_date,
+            cpf: values.cpf,
+            phone: values.phone,
+            email: values.email,
+            license_number: values.license_number,
+            license_expiry: values.license_expiry,
             auth_user_id: auth.user.id,
           });
 
