@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Car, AlertTriangle, CheckCircle, Clock, Wrench, XOctagon, Shield, AlertCircle } from "lucide-react";
+import { Car, CheckCircle, Clock, Wrench, XOctagon, Shield, AlertCircle } from "lucide-react";
 import type { FleetVehicle } from "@/types/vehicles";
 import { cn } from "@/lib/utils";
 
@@ -10,35 +10,10 @@ interface FleetMetricsProps {
 }
 
 export const FleetMetrics = ({ vehicles, onFilterChange, activeFilter }: FleetMetricsProps) => {
-  const totalVehicles = vehicles.length;
-  const availableVehicles = vehicles.filter(v => 
-    v.status?.toLowerCase() === 'available' || 
-    v.status?.toLowerCase() === 'disponível'
-  ).length;
-  const maintenanceVehicles = vehicles.filter(v => 
-    v.status?.toLowerCase() === 'maintenance'
-  ).length;
-  const rentedVehicles = vehicles.filter(v => 
-    v.status?.toLowerCase() === 'rented' || 
-    v.status?.toLowerCase() === 'alugado'
-  ).length;
-  const bodyShopVehicles = vehicles.filter(v => 
-    v.status?.toLowerCase() === 'body_shop'
-  ).length;
-  const deactivatedVehicles = vehicles.filter(v => 
-    v.status?.toLowerCase().includes('desativado')
-  ).length;
-  const managementVehicles = vehicles.filter(v => 
-    v.status?.toLowerCase() === 'management'
-  ).length;
-  const accidentVehicles = vehicles.filter(v => 
-    v.status?.toLowerCase() === 'accident'
-  ).length;
-
   const metrics = [
     {
       title: "Total da Frota",
-      value: totalVehicles,
+      value: vehicles.length,
       icon: Car,
       description: "Veículos cadastrados",
       color: "text-primary",
@@ -47,7 +22,7 @@ export const FleetMetrics = ({ vehicles, onFilterChange, activeFilter }: FleetMe
     },
     {
       title: "Disponíveis",
-      value: availableVehicles,
+      value: vehicles.filter(v => v.status?.toLowerCase() === 'available').length,
       icon: CheckCircle,
       description: "Prontos para uso",
       color: "text-green-600",
@@ -55,17 +30,8 @@ export const FleetMetrics = ({ vehicles, onFilterChange, activeFilter }: FleetMe
       filterValue: "available"
     },
     {
-      title: "Em Manutenção",
-      value: maintenanceVehicles,
-      icon: Wrench,
-      description: "Em serviço",
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-100",
-      filterValue: "maintenance"
-    },
-    {
       title: "Alugados",
-      value: rentedVehicles,
+      value: vehicles.filter(v => v.status?.toLowerCase() === 'rented').length,
       icon: Clock,
       description: "Em uso",
       color: "text-blue-600",
@@ -73,55 +39,28 @@ export const FleetMetrics = ({ vehicles, onFilterChange, activeFilter }: FleetMe
       filterValue: "rented"
     },
     {
-      title: "Funilaria",
-      value: bodyShopVehicles,
-      icon: Car,
-      description: "Em reparo",
-      color: "text-orange-600",
-      bgColor: "bg-orange-100",
-      filterValue: "funilaria"
-    },
-    {
-      title: "Acidentes",
-      value: accidentVehicles,
-      icon: AlertCircle,
-      description: "Reportados",
-      color: "text-red-600",
-      bgColor: "bg-red-100",
-      filterValue: "accident"
-    },
-    {
-      title: "Desativados",
-      value: deactivatedVehicles,
-      icon: XOctagon,
-      description: "Fora de serviço",
-      color: "text-red-600",
-      bgColor: "bg-red-100",
-      filterValue: "desativado"
-    },
-    {
-      title: "Diretoria",
-      value: managementVehicles,
-      icon: Shield,
-      description: "Uso exclusivo",
-      color: "text-purple-600",
-      bgColor: "bg-purple-100",
-      filterValue: "diretoria"
+      title: "Manutenção",
+      value: vehicles.filter(v => v.status?.toLowerCase() === 'maintenance').length,
+      icon: Wrench,
+      description: "Em serviço",
+      color: "text-yellow-600",
+      bgColor: "bg-yellow-100",
+      filterValue: "maintenance"
     }
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-3 md:grid-cols-4">
       {metrics.map((metric) => (
         <Card 
           key={metric.title} 
           className={cn(
-            "hover:border-primary/20 transition-colors cursor-pointer",
-            activeFilter === metric.filterValue && "border-primary bg-muted/50"
+            "transition-all duration-200 hover:shadow-md cursor-pointer border-none bg-gradient-to-br from-white to-gray-50/80",
+            activeFilter === metric.filterValue && "ring-2 ring-primary/20 shadow-lg"
           )}
           onClick={() => onFilterChange(metric.filterValue)}
         >
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 pt-4 px-4">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               {metric.title}
             </CardTitle>
@@ -129,7 +68,7 @@ export const FleetMetrics = ({ vehicles, onFilterChange, activeFilter }: FleetMe
               <metric.icon className={`w-4 h-4 ${metric.color}`} />
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 pb-4">
             <div className="text-2xl font-bold">{metric.value}</div>
             <p className="text-xs text-muted-foreground mt-1">
               {metric.description}
