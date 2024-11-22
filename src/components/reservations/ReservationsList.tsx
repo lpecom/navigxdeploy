@@ -4,7 +4,7 @@ import type { Reservation, PickupFilter } from "@/types/reservation"
 import { ReservationCard } from "./ReservationCard"
 import { supabase } from "@/integrations/supabase/client"
 import { startOfWeek, endOfWeek, addWeeks, format, parseISO } from "date-fns"
-import { Car, Clock } from "lucide-react"
+import { Car, Clock, Calendar } from "lucide-react"
 
 interface ReservationsListProps {
   filter: "pending" | PickupFilter
@@ -158,11 +158,25 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
           
           return (
             <div key={timeSlot} className="space-y-4">
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Clock className="w-4 h-4" />
-                <span>{timeSlot || 'Horário não definido'}</span>
-                <span className="text-gray-400">({slotReservations.length} retiradas)</span>
-              </div>
+              {filter === 'pending' ? (
+                <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    <span>Agendado para: {format(parseISO(slotReservations[0].pickupDate), 'dd/MM/yyyy')}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    <span>{timeSlot || 'Horário não definido'}</span>
+                  </div>
+                  <span className="text-gray-400">({slotReservations.length} retiradas)</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Clock className="w-4 h-4" />
+                  <span>{timeSlot || 'Horário não definido'}</span>
+                  <span className="text-gray-400">({slotReservations.length} retiradas)</span>
+                </div>
+              )}
               <div className="grid gap-4">
                 {slotReservations.map((reservation) => (
                   <ReservationCard
@@ -178,7 +192,7 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
         })}
       </div>
     )
-  }, [sortedReservations, isLoading, error, expandedCards, toggleCard])
+  }, [sortedReservations, isLoading, error, expandedCards, toggleCard, filter])
 
   return (
     <div className="max-w-3xl mx-auto">
