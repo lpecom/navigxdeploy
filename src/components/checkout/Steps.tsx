@@ -1,4 +1,5 @@
 import { User, Calendar, CreditCard, ShieldCheck, CheckCircle, Package } from "lucide-react"
+import { motion } from "framer-motion"
 
 export const checkoutSteps = [
   { number: 1, title: "Seguro e Proteção", icon: ShieldCheck },
