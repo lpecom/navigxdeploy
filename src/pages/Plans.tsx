@@ -63,7 +63,6 @@ export const PlansPage = () => {
     }
     
     dispatch({ type: 'CLEAR_CART' });
-    
     dispatch({
       type: 'ADD_ITEM',
       payload: {
@@ -86,14 +85,14 @@ export const PlansPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
         <Navigation />
         <div className="pt-20 sm:pt-28 pb-8 sm:pb-16">
           <div className="container mx-auto px-4">
-            <Skeleton className="h-12 w-3/4 mx-auto mb-8" />
+            <Skeleton className="h-12 w-3/4 mx-auto mb-8 bg-gray-800" />
             <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
               {[1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-[600px] w-full" />
+                <Skeleton key={i} className="h-[600px] w-full bg-gray-800/50" />
               ))}
             </div>
           </div>
@@ -103,23 +102,33 @@ export const PlansPage = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px] pointer-events-none" />
       <Navigation />
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="pt-20 sm:pt-28 pb-8 sm:pb-16 bg-gradient-to-b from-white to-gray-50"
+        className="relative pt-20 sm:pt-28 pb-8 sm:pb-16"
       >
         <div className="container mx-auto px-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">
-            Escolha seu plano para {selectedCategory.name}
-          </h1>
+          <motion.h1 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="text-3xl sm:text-4xl font-bold text-center mb-6 sm:mb-8 text-white"
+          >
+            Escolha seu plano para{" "}
+            <span className="text-primary-400">{selectedCategory.name}</span>
+          </motion.h1>
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
-            {plans?.sort((a, b) => a.display_order - b.display_order).map((plan) => (
-              <div 
+            {plans?.sort((a, b) => a.display_order - b.display_order).map((plan, index) => (
+              <motion.div 
                 key={plan.id} 
-                className={plan.highlight ? "transform hover:scale-105 transition-transform duration-300" : ""}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 + 0.3, duration: 0.5 }}
+                className={`${plan.highlight ? "transform hover:scale-105 transition-transform duration-300" : ""}`}
               >
                 <PlanCard
                   type={plan.type}
@@ -128,7 +137,7 @@ export const PlansPage = () => {
                   kmRanges={plan.bullet_points}
                   onSelect={() => handlePlanSelect(plan)}
                 />
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
