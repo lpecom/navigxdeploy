@@ -2,9 +2,9 @@ import { User, Calendar, CreditCard, ShieldCheck, CheckCircle } from "lucide-rea
 import { motion } from "framer-motion"
 
 export const checkoutSteps = [
-  { number: 1, title: "Escolher Plano", icon: Calendar },
-  { number: 2, title: "Seguro e Opcionais", icon: ShieldCheck },
-  { number: 3, title: "Seus Dados", icon: User },
+  { number: 1, title: "Seguro e Opcionais", icon: ShieldCheck },
+  { number: 2, title: "Seus Dados", icon: User },
+  { number: 3, title: "Escolher Plano", icon: Calendar },
   { number: 4, title: "Agendamento", icon: Calendar },
   { number: 5, title: "Pagamento", icon: CreditCard },
   { number: 6, title: "Confirmação", icon: CheckCircle }

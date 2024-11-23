@@ -1,14 +1,13 @@
 import { motion } from "framer-motion";
 import { Steps } from "../Steps";
-import { User, Car, Calendar, CreditCard, ShoppingCart } from "lucide-react";
+import { User, Car, Calendar, CreditCard, ShieldCheck } from "lucide-react";
 
 const steps = [
-  { number: 1, title: "Seus Dados", icon: User },
-  { number: 2, title: "Escolha do Plano", icon: Car },
-  { number: 3, title: "Adicionais", icon: Calendar },
+  { number: 1, title: "Proteção", icon: ShieldCheck },
+  { number: 2, title: "Seus Dados", icon: User },
+  { number: 3, title: "Escolha do Plano", icon: Car },
   { number: 4, title: "Agendamento", icon: Calendar },
-  { number: 5, title: "Pagamento", icon: CreditCard },
-  { number: 6, title: "Confirmação", icon: ShoppingCart }
+  { number: 5, title: "Pagamento", icon: CreditCard }
 ];
 
 export const CheckoutProgress = ({ currentStep }: { currentStep: number }) => {

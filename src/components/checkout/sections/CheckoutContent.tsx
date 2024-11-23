@@ -9,7 +9,7 @@ import { SupportCard } from "./SupportCard"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { PlanSelectionStep } from "./steps/PlanSelectionStep"
-import { InsuranceAndOptionalsStep } from "./steps/InsuranceAndOptionalsStep"
+import { InsurancePackageStep } from "./steps/InsurancePackageStep"
 
 interface CheckoutContentProps {
   step: number;
@@ -33,7 +33,7 @@ export const CheckoutContent = ({
   const handleCustomerSubmit = async (customerData: any) => {
     try {
       setCustomerId(customerData.id)
-      setStep(2) // Move to plan selection after customer data
+      setStep(3) // Move to plan selection after customer data
       toast({
         title: "Dados salvos com sucesso!",
         description: "Seus dados foram salvos. Vamos escolher seu plano.",
@@ -72,16 +72,6 @@ export const CheckoutContent = ({
     })
   }
 
-  const handleNextStep = () => {
-    if (step < 6) {
-      setStep(step + 1);
-      toast({
-        title: "Step completed!",
-        description: "Moving to the next step...",
-      });
-    }
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -112,15 +102,24 @@ export const CheckoutContent = ({
             transition={{ duration: 0.3 }}
           >
             {step === 1 && (
-              <CustomerForm onSubmit={handleCustomerSubmit} />
+              <InsurancePackageStep 
+                onSelect={(insuranceId) => {
+                  // Handle insurance selection
+                  setStep(2)
+                  toast({
+                    title: "Proteção selecionada!",
+                    description: "Agora vamos preencher seus dados.",
+                  })
+                }}
+              />
             )}
             
             {step === 2 && (
-              <PlanSelectionStep onNext={() => setStep(3)} />
+              <CustomerForm onSubmit={handleCustomerSubmit} />
             )}
             
             {step === 3 && (
-              <InsuranceAndOptionalsStep onNext={() => setStep(4)} />
+              <PlanSelectionStep onNext={() => setStep(4)} />
             )}
             
             {step === 4 && (
