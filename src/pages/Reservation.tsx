@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import { CategorySelector } from "./reservation/components/CategorySelector";
 import { PlanList } from "./reservation/components/PlanList";
 import { useEffect, useState } from "react";
-import type { Category } from "@/types/offers";
+import { type Category, type Plans } from "@/types/supabase/plans";
 
 export const ReservationPage = () => {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ export const ReservationPage = () => {
         .order('display_order');
       
       if (error) throw error;
-      return data;
+      return data as Category[];
     }
   });
 
@@ -41,11 +41,11 @@ export const ReservationPage = () => {
         .order('display_order');
       
       if (error) throw error;
-      return data;
+      return data as Plans[];
     }
   });
 
-  const handlePlanSelect = (plan: any) => {
+  const handlePlanSelect = (plan: Plans) => {
     if (!selectedCategory) {
       toast({
         title: "Erro",

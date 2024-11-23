@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import type { Category } from "@/types/supabase/plans";
+import { type Category } from "@/types/supabase/plans";
 
 interface CategorySelectorProps {
   categories: Category[] | undefined;

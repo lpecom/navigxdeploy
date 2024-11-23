@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import { CategorySelector } from "./plans/components/CategorySelector";
 import { PlanList } from "./plans/components/PlanList";
 import { useEffect, useState } from "react";
-import type { Category } from "@/types/supabase/plans";
+import { type Category, type Plans } from "@/types/supabase/plans";
 
 export const PlansPage = () => {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ export const PlansPage = () => {
         .order('display_order');
       
       if (error) throw error;
-      return data;
+      return data as Category[];
     }
   });
 
@@ -41,7 +41,7 @@ export const PlansPage = () => {
         .order('display_order');
       
       if (error) throw error;
-      return data;
+      return data as Plans[];
     }
   });
   
@@ -56,7 +56,7 @@ export const PlansPage = () => {
     }
   }, []);
 
-  const handlePlanSelect = (plan: any) => {
+  const handlePlanSelect = (plan: Plans) => {
     if (!selectedCategory) {
       toast({
         title: "Erro",

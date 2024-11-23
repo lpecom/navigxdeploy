@@ -1,5 +1,15 @@
 import { Json } from "@/integrations/supabase/types";
 
+export interface Category {
+  id: string;
+  name: string;
+  description?: string | null;
+  badge_text?: string | null;
+  display_order?: number | null;
+  is_active?: boolean | null;
+  created_at?: string;
+}
+
 export interface Plans {
   id: string;
   name: string;
@@ -17,4 +27,15 @@ export interface Plans {
   highlight: boolean;
   display_order: number;
   conditions?: Json | null;
+}
+
+export interface InsuranceOptions {
+  id: string;
+  name: string;
+  description?: string | null;
+  coverage_details: Record<string, boolean>;
+  price: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
