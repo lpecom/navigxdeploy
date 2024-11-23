@@ -7,7 +7,7 @@ import { PaymentSection } from "./PaymentSection"
 import { SuccessSection } from "./SuccessSection"
 import { SupportCard } from "./SupportCard"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { PlanSelectionStep } from "./steps/PlanSelectionStep"
 import { InsuranceAndOptionalsStep } from "./steps/InsuranceAndOptionalsStep"
 
@@ -72,6 +72,16 @@ export const CheckoutContent = ({
     })
   }
 
+  const handleNextStep = () => {
+    if (step < 6) {
+      setStep(step + 1);
+      toast({
+        title: "Step completed!",
+        description: "Moving to the next step...",
+      });
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -105,7 +115,7 @@ export const CheckoutContent = ({
             <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
             <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/20" />
             
-            <div className="relative p-6 sm:p-8">
+            <div className="relative p-6 sm:p-8 space-y-6">
               {step === 1 && (
                 <CustomerForm onSubmit={handleCustomerSubmit} />
               )}
@@ -132,6 +142,26 @@ export const CheckoutContent = ({
               
               {step === 6 && (
                 <SuccessSection />
+              )}
+
+              {step < 6 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex justify-end mt-8"
+                >
+                  <Button
+                    onClick={handleNextStep}
+                    className="relative overflow-hidden group px-6 py-3 h-14 bg-gradient-to-r from-primary via-primary/80 to-primary hover:opacity-90 transition-all duration-300"
+                  >
+                    <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
+                    <span className="relative flex items-center gap-2 text-base font-medium">
+                      Continuar
+                      <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </Button>
+                </motion.div>
               )}
             </div>
           </motion.div>
