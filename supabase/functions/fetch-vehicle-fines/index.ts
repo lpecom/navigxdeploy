@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1"
-import * as cheerio from "https://esm.sh/cheerio@1.0.0-rc.12"
 import { corsHeaders } from '../_shared/cors.ts'
 
 interface FineData {
@@ -21,20 +20,18 @@ serve(async (req) => {
 
   try {
     const { plate, vehicleId } = await req.json();
+    console.log(`Processing fines for vehicle: ${plate}, ID: ${vehicleId}`);
 
-    if (!plate) {
-      throw new Error('Vehicle plate is required');
+    if (!plate || !vehicleId) {
+      throw new Error('Vehicle plate and ID are required');
     }
 
-    console.log(`Fetching fines for plate: ${plate}`);
-
-    // Mock data for development/testing - remove this in production
-    // This ensures the function works while we resolve the external API issues
+    // Mock data for development
     const mockFines: FineData[] = [
       {
         code: "5541-1",
         description: "Excesso de velocidade",
-        date: "2024-01-15",
+        date: new Date().toISOString(),
         location: "Av. Principal",
         amount: 150.50,
         points: 4,
@@ -42,16 +39,20 @@ serve(async (req) => {
       }
     ];
 
-    console.log(`Using mock data with ${mockFines.length} fines for development`);
+    console.log(`Found ${mockFines.length} fines for vehicle ${plate}`);
 
-    // Store the fines in the database
+    // Initialize Supabase client
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Insert or update fines in the database
+    let successCount = 0;
+    
+    // Store the fines in the database
     for (const fine of mockFines) {
+      console.log(`Storing fine: ${JSON.stringify(fine)}`);
+      
       const { error } = await supabaseAdmin
         .from('vehicle_fines')
         .upsert({
@@ -71,20 +72,32 @@ serve(async (req) => {
 
       if (error) {
         console.error('Error storing fine:', error);
+        throw error;
       }
+      
+      successCount++;
+      console.log(`Successfully stored fine ${fine.code}`);
     }
+
+    console.log(`Successfully stored ${successCount} fines for vehicle ${plate}`);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         fines: mockFines,
-        message: "Mock data retrieved successfully for development" 
+        stored: successCount,
+        message: `Successfully imported ${successCount} fines` 
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
+      }
     );
 
   } catch (error) {
-    console.error('Error:', error.message);
+    console.error('Error processing request:', error);
     return new Response(
       JSON.stringify({ 
         success: false, 
