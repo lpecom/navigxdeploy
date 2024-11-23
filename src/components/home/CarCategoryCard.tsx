@@ -61,6 +61,30 @@ export const CarCategoryCard = ({ category, cars = [] }: CarCategoryCardProps) =
               {category.description}
             </p>
           )}
+
+          {cars.length > 0 && (
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              {cars.slice(0, 3).map((car) => (
+                <div key={car.id} className="relative aspect-video rounded-lg overflow-hidden bg-gray-800/50">
+                  {car.image_url ? (
+                    <img 
+                      src={car.image_url} 
+                      alt={car.name}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-500 text-xs">
+                      No image
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-2">
+                    <p className="text-xs text-white font-medium truncate">{car.name}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           
           <div className="mt-auto flex items-center text-primary-400 group-hover:text-primary-300 transition-colors duration-300">
             <span className="text-sm font-medium tracking-wide uppercase">Ver planos</span>
