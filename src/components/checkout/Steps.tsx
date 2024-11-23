@@ -1,83 +1,53 @@
-import { User, Calendar, CreditCard, ShieldCheck, CheckCircle, Package, FileText } from "lucide-react";
-import { motion } from "framer-motion";
-
 export const checkoutSteps = [
-  { number: 1, title: "Plano", icon: FileText },
-  { number: 2, title: "Seguro e Proteção", icon: ShieldCheck },
-  { number: 3, title: "Opcionais", icon: Package },
-  { number: 4, title: "Seus Dados", icon: User },
-  { number: 5, title: "Agendamento", icon: Calendar },
-  { number: 6, title: "Pagamento", icon: CreditCard },
-  { number: 7, title: "Confirmação", icon: CheckCircle }
+  {
+    id: 1,
+    name: "Categoria",
+    description: "Escolha a categoria do veículo",
+  },
+  {
+    id: 2,
+    name: "Plano",
+    description: "Selecione o plano ideal",
+  },
+  {
+    id: 3,
+    name: "Seguro",
+    description: "Escolha a proteção",
+  },
+  {
+    id: 4,
+    name: "Dados",
+    description: "Preencha seus dados",
+  },
+  {
+    id: 5,
+    name: "Pagamento",
+    description: "Finalize seu pedido",
+  },
 ];
 
-interface StepsProps {
-  currentStep: number;
-  steps: typeof checkoutSteps;
-}
-
-export const Steps = ({ currentStep, steps }: StepsProps) => {
+export const Steps = ({ currentStep, steps }) => {
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="flex justify-between relative">
-        {steps.map((step, index) => {
-          const Icon = step.icon;
-          const isActive = step.number === currentStep;
-          const isCompleted = step.number < currentStep;
-
-          return (
-            <div key={step.number} className="flex flex-col items-center relative z-10">
-              {index > 0 && (
-                <div className="absolute w-full h-1 bg-gray-200 dark:bg-gray-800 top-5 -left-1/2 -z-10">
-                  <motion.div
-                    className={`h-full ${
-                      isCompleted ? "bg-primary" : "bg-transparent"
-                    }`}
-                    initial={{ width: "0%" }}
-                    animate={{ width: isCompleted ? "100%" : "0%" }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </div>
-              )}
-
-              <motion.div
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-200 ${
-                  isActive || isCompleted
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-gray-100 dark:bg-gray-800 text-gray-400"
-                }`}
-                initial={false}
-                animate={{
-                  scale: isActive ? 1.2 : 1,
-                }}
-                transition={{ duration: 0.2 }}
-              >
-                <Icon className="w-5 h-5" />
-              </motion.div>
-
-              <motion.span
-                className={`mt-2 text-sm font-medium ${
-                  isActive ? "text-primary" : "text-gray-500 dark:text-gray-400"
-                }`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-              >
-                {step.title}
-              </motion.span>
-              
-              <motion.span
-                className="text-xs text-gray-400 mt-1"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                {isCompleted ? "Concluído" : isActive ? "Em Andamento" : "Pendente"}
-              </motion.span>
-            </div>
-          );
-        })}
-      </div>
+    <div className="flex space-x-4">
+      {steps.map((step) => (
+        <div key={step.id} className="flex items-center">
+          <div
+            className={`flex-shrink-0 w-8 h-8 rounded-full ${
+              step.id <= currentStep ? "bg-primary" : "bg-gray-400"
+            }`}
+          >
+            {step.id <= currentStep ? (
+              <span className="text-white">{step.id}</span>
+            ) : (
+              <span className="text-gray-200">{step.id}</span>
+            )}
+          </div>
+          <div className="ml-4">
+            <h4 className="text-lg font-medium">{step.name}</h4>
+            <p className="text-sm text-gray-500">{step.description}</p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

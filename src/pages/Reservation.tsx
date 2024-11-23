@@ -8,8 +8,9 @@ import { Steps, checkoutSteps } from "@/components/checkout/Steps";
 import { motion } from "framer-motion";
 import { CategorySelector } from "./reservation/components/CategorySelector";
 import { PlanList } from "./reservation/components/PlanList";
-import { useEffect, useState } from "react";
-import { type Category, type Plans } from "@/types/supabase/plans";
+import { useState } from "react";
+import type { Category } from "@/types/offers";
+import type { Plans } from "@/types/supabase/plans";
 
 export const ReservationPage = () => {
   const navigate = useNavigate();
