@@ -6,6 +6,7 @@ import { Features } from "@/components/website/Features";
 import { Testimonials } from "@/components/website/Testimonials";
 import { Footer } from "@/components/website/Footer";
 import { CarCategoryCard } from "@/components/home/CarCategoryCard";
+import { VehicleShowcase } from "@/components/home/VehicleShowcase";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
@@ -35,7 +36,7 @@ const Home = () => {
       
       if (error) throw error;
       return data as CarModel[];
-    },
+    }
   });
 
   const getCarsByCategory = (categoryId: string) => {
@@ -46,6 +47,7 @@ const Home = () => {
     <div className="min-h-screen bg-white">
       <Navigation />
       <Hero />
+      <VehicleShowcase />
       <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
           <motion.div
