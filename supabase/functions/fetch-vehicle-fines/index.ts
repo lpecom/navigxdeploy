@@ -28,15 +28,21 @@ serve(async (req) => {
 
     console.log(`Fetching fines for plate: ${plate}`);
 
-    // Fetch the webpage
+    // Fetch the webpage with proper headers and timeout
     const response = await fetch(`https://multa.consultaplacas.com.br/consulta/${plate}`, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      }
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+      },
+      signal: AbortSignal.timeout(10000) // 10 second timeout
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch data: ${response.statusText}`);
+      console.error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const html = await response.text();
@@ -54,15 +60,26 @@ serve(async (req) => {
           description: $cols.eq(1).text().trim(),
           date: $cols.eq(2).text().trim(),
           location: $cols.eq(3).text().trim(),
-          amount: parseFloat($cols.eq(4).text().replace('R$', '').trim()) || 0,
+          amount: parseFloat($cols.eq(4).text().replace('R$', '').trim().replace(',', '.')) || 0,
           points: parseInt($cols.eq(5).text().trim()) || 0,
           status: 'pending'
         };
-        fines.push(fine);
+        
+        if (fine.code && fine.description) { // Only add if we have at least these basic fields
+          fines.push(fine);
+        }
       }
     });
 
     console.log(`Found ${fines.length} fines`);
+
+    // If no fines were found but the page loaded, return empty array instead of error
+    if (fines.length === 0) {
+      return new Response(
+        JSON.stringify({ success: true, fines: [] }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Store the fines in the database
     const supabaseAdmin = createClient(
@@ -102,9 +119,13 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error:', error.message);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: `Error processing request: ${error.message}`,
+        details: error.stack
+      }),
       { 
-        status: 400,
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
