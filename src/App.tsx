@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import Home from "./pages/Home";
 import { PlansPage } from "./pages/Plans";
 import { ReservationPage } from "./pages/Reservation";
+import { ReservationPlansPage } from "./pages/reservation/ReservationPlansPage";
 import { CheckoutPage } from "./components/checkout/CheckoutPage";
 import DriverDashboard from "./pages/DriverDashboard";
 import AdminRoutes from "./routes/AdminRoutes";
@@ -61,6 +62,7 @@ const AppContent = () => {
             <Route path="/" element={<Home />} />
             <Route path="/plans" element={<PlansPage />} />
             <Route path="/reservar" element={<ReservationPage />} />
+            <Route path="/reservar/planos" element={<ReservationPlansPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/reservar/checkout" element={<CheckoutPage />} />
             <Route path="/login" element={<DriverLogin />} />
