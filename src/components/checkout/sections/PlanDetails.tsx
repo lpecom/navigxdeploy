@@ -1,7 +1,6 @@
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Car, Users, Gauge, Calendar, Check } from "lucide-react";
 import { motion } from "framer-motion";
+import { Check, Shield, Clock, FileText } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface PlanDetailsProps {
   plan: {
@@ -14,62 +13,54 @@ interface PlanDetailsProps {
 }
 
 export const PlanDetails = ({ plan }: PlanDetailsProps) => {
+  const iconMap = {
+    'Seguro completo incluso': Shield,
+    'Manutenção preventiva': Clock,
+    'Assistência 24h': Clock,
+    'Documentação e IPVA': FileText,
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <Card className="p-6 bg-gradient-to-br from-white to-gray-50">
-        <div className="flex items-center gap-3 mb-6">
-          <Car className="w-6 h-6 text-primary" />
-          <div>
-            <h3 className="text-xl font-semibold">{plan.name}</h3>
-            <Badge variant="secondary" className="mt-1">
-              {plan.type}
-            </Badge>
+    <div className="text-white">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <Badge variant="secondary" className="mb-2 bg-primary/20 text-primary border-0">
+            {plan.type}
+          </Badge>
+          <h2 className="text-2xl font-bold">{plan.name}</h2>
+        </div>
+        <div className="text-right">
+          <div className="text-3xl font-bold text-primary">
+            R$ {plan.price}
+            <span className="text-base font-normal text-gray-400">/{plan.period}</span>
           </div>
         </div>
+      </div>
 
-        <div className="space-y-6">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-primary/5 rounded-lg">
-              <Users className="w-5 h-5 mx-auto mb-2 text-primary" />
-              <span className="text-sm text-gray-600">5 Lugares</span>
-            </div>
-            <div className="text-center p-4 bg-primary/5 rounded-lg">
-              <Gauge className="w-5 h-5 mx-auto mb-2 text-primary" />
-              <span className="text-sm text-gray-600">Automático</span>
-            </div>
-            <div className="text-center p-4 bg-primary/5 rounded-lg">
-              <Calendar className="w-5 h-5 mx-auto mb-2 text-primary" />
-              <span className="text-sm text-gray-600">{plan.period}</span>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="font-medium">Incluso no plano:</h4>
-            {plan.features.map((feature, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-green-500" />
-                <span className="text-sm text-gray-600">{feature}</span>
+      <motion.div 
+        className="grid grid-cols-2 gap-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
+        {plan.features.map((feature, index) => {
+          const Icon = iconMap[feature as keyof typeof iconMap] || Check;
+          return (
+            <motion.div
+              key={index}
+              className="flex items-center gap-3 p-4 bg-white/5 rounded-lg"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+            >
+              <div className="flex-shrink-0">
+                <Icon className="w-5 h-5 text-primary" />
               </div>
-            ))}
-          </div>
-
-          <div className="pt-4 border-t">
-            <div className="flex items-baseline justify-between">
-              <span className="text-sm text-gray-600">Valor do plano</span>
-              <div className="text-right">
-                <span className="text-2xl font-bold text-primary">
-                  R$ {plan.price.toFixed(2)}
-                </span>
-                <span className="text-sm text-gray-600">/{plan.period}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Card>
-    </motion.div>
+              <span className="text-sm">{feature}</span>
+            </motion.div>
+          );
+        })}
+      </motion.div>
+    </div>
   );
 };
