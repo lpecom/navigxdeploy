@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
-import { Sync } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -77,7 +77,7 @@ export const FinesTab = ({ vehicleId, plate }: FinesTabProps) => {
           onClick={handleSync}
           disabled={isSyncing}
         >
-          <Sync className={`w-4 h-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
           {isSyncing ? 'Sincronizando...' : 'Sincronizar Multas'}
         </Button>
       </CardHeader>
