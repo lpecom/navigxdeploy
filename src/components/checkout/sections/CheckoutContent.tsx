@@ -79,22 +79,22 @@ export const CheckoutContent = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="space-y-6"
+      className="space-y-4"
     >
       {step > 1 && (
         <Button
           variant="ghost"
           onClick={() => setStep(step - 1)}
-          className="flex items-center gap-1.5 text-gray-400 hover:text-gray-100 transition-colors -mb-2"
+          className="flex items-center gap-1.5 text-white/60 hover:text-white hover:bg-white/10"
         >
           <ChevronLeft className="w-4 h-4" />
-          Voltar
+          Back
         </Button>
       )}
 
       <CheckoutProgress currentStep={step} />
       
-      <div className={`grid grid-cols-1 ${step === 1 ? '' : 'lg:grid-cols-3'} gap-4 lg:gap-6`}>
+      <div className={`grid gap-4 ${step === 1 ? '' : 'lg:grid-cols-3'}`}>
         <div className={step === 1 ? '' : 'lg:col-span-2'}>
           <motion.div
             key={step}
@@ -108,8 +108,8 @@ export const CheckoutContent = ({
                 onSelect={(insuranceId) => {
                   setStep(2)
                   toast({
-                    title: "Proteção selecionada!",
-                    description: "Agora vamos escolher os opcionais.",
+                    title: "Protection selected!",
+                    description: "Now let's choose your add-ons.",
                   })
                 }}
                 onBack={() => window.history.back()}
@@ -117,15 +117,15 @@ export const CheckoutContent = ({
             )}
 
             {step === 2 && (
-              <Card className="p-5 bg-white border-gray-200/10">
-                <h2 className="text-xl font-semibold mb-4 text-gray-800">Escolha seus opcionais</h2>
+              <Card className="p-6 bg-white/5 backdrop-blur-sm border-white/10">
+                <h2 className="text-xl font-semibold mb-4 text-white">Choose your add-ons</h2>
                 <OptionalsList />
                 <div className="flex justify-end mt-4">
                   <Button 
                     onClick={() => setStep(3)} 
                     className="bg-primary hover:bg-primary/90 text-white gap-1.5"
                   >
-                    Continuar
+                    Continue
                     <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
