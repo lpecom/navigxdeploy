@@ -55,20 +55,6 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
           <h3 className="text-xl font-semibold text-white mb-2">
             {vehicle.name}
           </h3>
-          <div className="flex items-center gap-4 mb-4">
-            <div className="flex items-center gap-2 bg-primary/10 px-3 py-1.5 rounded-full">
-              <Wallet className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-white">
-                {formatCurrency(weeklyPrice)} /semana
-              </span>
-            </div>
-            <div className="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-full">
-              <TrendingUp className="w-4 h-4 text-emerald-500" />
-              <span className="text-sm font-medium text-white">
-                Lucro estimado: {formatCurrency(estimatedProfit.min)} - {formatCurrency(estimatedProfit.max)} /semana
-              </span>
-            </div>
-          </div>
         </div>
 
         <div className="relative aspect-[16/9] overflow-hidden">
@@ -102,6 +88,28 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
             <div className="flex items-center gap-2">
               <DoorOpen className="h-4 w-4" />
               <span>4 portas</span>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-700/50 pt-4 space-y-3">
+            <div className="bg-white/5 rounded-lg p-4">
+              <div className="flex items-center gap-2 text-primary-400 mb-1">
+                <Wallet className="w-4 h-4" />
+                <span className="text-sm font-medium">Valor Semanal</span>
+              </div>
+              <span className="text-2xl font-bold text-white">
+                {formatCurrency(weeklyPrice)}
+              </span>
+            </div>
+
+            <div className="bg-emerald-500/10 rounded-lg p-4">
+              <div className="flex items-center gap-2 text-emerald-400 mb-1">
+                <TrendingUp className="w-4 h-4" />
+                <span className="text-sm font-medium">Lucro Estimado por Semana</span>
+              </div>
+              <div className="text-2xl font-bold text-emerald-400">
+                {formatCurrency(estimatedProfit.min)} - {formatCurrency(estimatedProfit.max)}
+              </div>
             </div>
           </div>
 
@@ -141,11 +149,6 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-2xl font-bold text-white">
-                      {formatCurrency(vehicle.daily_price)} /dia
-                    </span>
-                  </div>
                   <div className="space-x-3">
                     <Button 
                       variant="ghost" 
