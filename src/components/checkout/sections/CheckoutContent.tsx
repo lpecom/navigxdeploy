@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { PlanSelectionStep } from "./steps/PlanSelectionStep"
 import { InsurancePackageStep } from "./steps/InsurancePackageStep"
+import { OptionalsList } from "@/components/optionals/OptionalsList"
+import { Card } from "@/components/ui/card"
 
 interface CheckoutContentProps {
   step: number;
@@ -33,10 +35,10 @@ export const CheckoutContent = ({
   const handleCustomerSubmit = async (customerData: any) => {
     try {
       setCustomerId(customerData.id)
-      setStep(3) // Move to plan selection after customer data
+      setStep(4) // Move to scheduling after customer data
       toast({
         title: "Dados salvos com sucesso!",
-        description: "Seus dados foram salvos. Vamos escolher seu plano.",
+        description: "Seus dados foram salvos. Vamos agendar sua retirada.",
       })
     } catch (error: any) {
       console.error('Error saving customer details:', error)
@@ -104,23 +106,31 @@ export const CheckoutContent = ({
             {step === 1 && (
               <InsurancePackageStep 
                 onSelect={(insuranceId) => {
-                  // Handle insurance selection
                   setStep(2)
                   toast({
                     title: "Proteção selecionada!",
-                    description: "Agora vamos preencher seus dados.",
+                    description: "Agora vamos escolher os opcionais.",
                   })
                 }}
                 onBack={() => window.history.back()}
               />
             )}
-            
+
             {step === 2 && (
-              <CustomerForm onSubmit={handleCustomerSubmit} />
+              <Card className="p-6">
+                <h2 className="text-2xl font-semibold mb-6">Escolha seus opcionais</h2>
+                <OptionalsList />
+                <div className="flex justify-end mt-6">
+                  <Button onClick={() => setStep(3)}>
+                    Continuar
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+              </Card>
             )}
             
             {step === 3 && (
-              <PlanSelectionStep onNext={() => setStep(4)} />
+              <CustomerForm onSubmit={handleCustomerSubmit} />
             )}
             
             {step === 4 && (
