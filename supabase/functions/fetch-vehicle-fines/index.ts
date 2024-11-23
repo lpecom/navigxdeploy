@@ -1,6 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1"
-import { corsHeaders } from '../_shared/cors.ts'
+import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 interface FineData {
   code: string;
@@ -12,10 +17,61 @@ interface FineData {
   status: string;
 }
 
+async function scrapeFines(plate: string): Promise<FineData[]> {
+  try {
+    console.log(`Scraping fines for plate: ${plate}`);
+    
+    const response = await fetch(`https://multa.consultaplacas.com.br/${plate}`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch data: ${response.status}`);
+    }
+
+    const html = await response.text();
+    const parser = new DOMParser();
+    const document = parser.parseFromString(html, "text/html");
+
+    if (!document) {
+      throw new Error("Failed to parse HTML");
+    }
+
+    const fines: FineData[] = [];
+    const fineElements = document.querySelectorAll('.multa-item');
+
+    fineElements.forEach((element) => {
+      try {
+        const fine: FineData = {
+          code: element.querySelector('.codigo')?.textContent?.trim() || '',
+          description: element.querySelector('.descricao')?.textContent?.trim() || '',
+          date: element.querySelector('.data')?.textContent?.trim() || '',
+          location: element.querySelector('.local')?.textContent?.trim() || '',
+          amount: parseFloat(element.querySelector('.valor')?.textContent?.replace('R$', '').trim() || '0'),
+          points: parseInt(element.querySelector('.pontos')?.textContent?.trim() || '0'),
+          status: element.querySelector('.status')?.textContent?.trim().toLowerCase() || 'pending'
+        };
+
+        if (fine.code && fine.description) {
+          fines.push(fine);
+        }
+      } catch (error) {
+        console.error('Error parsing fine element:', error);
+      }
+    });
+
+    return fines;
+  } catch (error) {
+    console.error('Error scraping fines:', error);
+    throw error;
+  }
+}
+
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
@@ -26,32 +82,21 @@ serve(async (req) => {
       throw new Error('Vehicle plate and ID are required');
     }
 
-    // Mock data for development
-    const mockFines: FineData[] = [
-      {
-        code: "5541-1",
-        description: "Excesso de velocidade",
-        date: new Date().toISOString(),
-        location: "Av. Principal",
-        amount: 150.50,
-        points: 4,
-        status: "pending"
-      }
-    ];
-
-    console.log(`Found ${mockFines.length} fines for vehicle ${plate}`);
-
     // Initialize Supabase client
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
+    // Fetch fines from the website
+    const fines = await scrapeFines(plate);
+    console.log(`Found ${fines.length} fines for vehicle ${plate}`);
+
     let successCount = 0;
     
     // Store the fines in the database
-    for (const fine of mockFines) {
-      console.log(`Storing fine: ${JSON.stringify(fine)}`);
+    for (const fine of fines) {
+      console.log(`Processing fine: ${JSON.stringify(fine)}`);
       
       const { error } = await supabaseAdmin
         .from('vehicle_fines')
@@ -59,12 +104,12 @@ serve(async (req) => {
           vehicle_id: vehicleId,
           fine_code: fine.code,
           fine_description: fine.description,
-          fine_date: fine.date,
+          fine_date: new Date(fine.date).toISOString(),
           fine_location: fine.location,
           fine_amount: fine.amount,
           fine_points: fine.points,
           fine_status: fine.status,
-          source_url: `https://consulta-fines.example.com/${plate}`,
+          source_url: `https://multa.consultaplacas.com.br/${plate}`,
           raw_data: fine
         }, {
           onConflict: 'vehicle_id,fine_code'
@@ -84,7 +129,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        fines: mockFines,
+        fines,
         stored: successCount,
         message: `Successfully imported ${successCount} fines` 
       }),
@@ -96,7 +141,7 @@ serve(async (req) => {
       }
     );
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error processing request:', error);
     return new Response(
       JSON.stringify({ 
