@@ -9,6 +9,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Steps, checkoutSteps } from "@/components/checkout/Steps";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
 import type { Plans } from "@/types/supabase/plans";
 
 interface Category {
@@ -117,14 +119,24 @@ export const PlansPage = () => {
             <Steps currentStep={1} steps={checkoutSteps} />
           </div>
 
-          <motion.h1 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="text-3xl sm:text-4xl font-bold text-center mb-6 sm:mb-8 text-white"
-          >
-            Qual pacote de proteção você precisa?
-          </motion.h1>
+          <div className="flex items-center gap-4 mb-8">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/')}
+              className="text-gray-400 hover:text-white"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            <motion.h1 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+            >
+              Qual pacote de proteção você precisa?
+            </motion.h1>
+          </div>
 
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
             {plans?.sort((a, b) => a.display_order - b.display_order).map((plan, index) => (
