@@ -114,7 +114,7 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
       transition={{ duration: 0.5 }}
       className="max-w-2xl mx-auto"
     >
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 shadow-2xl">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 shadow-2xl">
         <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/20" />
         
@@ -156,7 +156,7 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
 
                   <Button 
                     onClick={form.handleSubmit(handleFormSubmit)}
-                    className="w-full h-12 text-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-primary-500/20"
+                    className="w-full h-12 text-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-primary-500/20"
                   >
                     Continuar
                   </Button>

@@ -27,9 +27,9 @@ export const Steps = ({ currentStep, steps = checkoutSteps }: StepsProps) => {
           return (
             <div key={step.number} className="flex flex-col items-center relative z-10">
               {index > 0 && (
-                <div className="absolute w-full h-0.5 bg-gray-800 top-5 -left-1/2 -z-10">
+                <div className="absolute w-full h-0.5 bg-gray-800/50 top-5 -left-1/2 -z-10">
                   <motion.div
-                    className="h-full bg-gradient-to-r from-primary-500 to-primary-600"
+                    className="h-full bg-gradient-to-r from-primary-500/80 to-primary-600"
                     initial={{ width: "0%" }}
                     animate={{ width: isCompleted ? "100%" : "0%" }}
                     transition={{ duration: 0.5 }}
@@ -40,8 +40,8 @@ export const Steps = ({ currentStep, steps = checkoutSteps }: StepsProps) => {
               <motion.div
                 className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                   isActive || isCompleted 
-                    ? 'bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 shadow-lg shadow-primary-500/20' 
-                    : 'bg-gray-800 text-gray-400'
+                    ? 'bg-gradient-to-br from-primary-500/90 via-primary-600 to-primary-700 shadow-lg shadow-primary-500/20' 
+                    : 'bg-gray-800/50 backdrop-blur-sm'
                 }`}
                 initial={false}
                 animate={{
@@ -49,13 +49,13 @@ export const Steps = ({ currentStep, steps = checkoutSteps }: StepsProps) => {
                 }}
                 transition={{ duration: 0.2 }}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className={`w-5 h-5 ${isActive || isCompleted ? 'text-white' : 'text-gray-400'}`} />
               </motion.div>
 
               <motion.span
                 className={`mt-2 text-sm font-medium ${
                   isActive 
-                    ? 'text-primary-400 font-semibold' 
+                    ? 'text-white font-semibold' 
                     : isCompleted 
                       ? 'text-gray-300' 
                       : 'text-gray-500'
@@ -70,9 +70,9 @@ export const Steps = ({ currentStep, steps = checkoutSteps }: StepsProps) => {
               <motion.span
                 className={`text-xs ${
                   isActive 
-                    ? 'text-primary-500' 
+                    ? 'bg-gradient-to-r from-primary-400 to-primary-500 bg-clip-text text-transparent' 
                     : isCompleted 
-                      ? 'text-green-500' 
+                      ? 'text-green-400' 
                       : 'text-gray-600'
                 }`}
                 initial={{ opacity: 0 }}
