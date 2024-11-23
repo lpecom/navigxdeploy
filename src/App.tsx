@@ -50,40 +50,46 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const AppContent = () => {
+  return (
+    <BrowserRouter>
+      <TooltipProvider>
+        <AuthProvider>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/plans" element={<PlansPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/login" element={<DriverLogin />} />
+            
+            {/* Driver Routes */}
+            <Route path="/driver/*" element={<DriverDashboard />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/*" element={<AdminRoutes />} />
+            
+            {/* Legacy route redirect */}
+            <Route path="/dashboard/*" element={<Navigate to="/admin" replace />} />
+            
+            {/* Catch all redirect */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AuthProvider>
+      </TooltipProvider>
+    </BrowserRouter>
+  );
+};
+
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionContextProvider supabaseClient={supabase}>
-        <AuthProvider>
-          <CartProvider>
-            <BrowserRouter>
-              <TooltipProvider>
-                <Routes>
-                  {/* Public Routes */}
-                  <Route path="/" element={<Home />} />
-                  <Route path="/plans" element={<PlansPage />} />
-                  <Route path="/checkout" element={<CheckoutPage />} />
-                  <Route path="/login" element={<DriverLogin />} />
-                  
-                  {/* Driver Routes */}
-                  <Route path="/driver/*" element={<DriverDashboard />} />
-                  
-                  {/* Admin Routes */}
-                  <Route path="/admin/login" element={<AdminLogin />} />
-                  <Route path="/admin/*" element={<AdminRoutes />} />
-                  
-                  {/* Legacy route redirect */}
-                  <Route path="/dashboard/*" element={<Navigate to="/admin" replace />} />
-                  
-                  {/* Catch all redirect */}
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-                <Toaster />
-                <Sonner />
-              </TooltipProvider>
-            </BrowserRouter>
-          </CartProvider>
-        </AuthProvider>
+        <CartProvider>
+          <AppContent />
+          <Toaster />
+          <Sonner />
+        </CartProvider>
       </SessionContextProvider>
     </QueryClientProvider>
   );
