@@ -88,23 +88,23 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
             </div>
           </div>
 
-          <div className="border-t border-gray-700/50 pt-4 space-y-3">
+          <div className="border-t border-gray-700/50 pt-4 space-y-6">
             <div>
-              <div className="flex items-center gap-2 text-primary-400 mb-1">
+              <div className="flex items-center gap-2 text-gray-400 mb-1">
                 <Wallet className="w-4 h-4" />
                 <span className="text-sm font-medium">Valor Semanal</span>
               </div>
-              <span className="text-2xl font-bold text-white">
+              <span className="text-xl font-bold text-white">
                 R$ 450
               </span>
             </div>
 
-            <div className="bg-emerald-500/10 rounded-lg p-4">
-              <div className="flex items-center gap-2 text-emerald-400 mb-1">
-                <TrendingUp className="w-4 h-4" />
-                <span className="text-sm font-medium">Lucro Estimado por Semana</span>
+            <div>
+              <div className="flex items-center gap-2 text-emerald-400 mb-2">
+                <TrendingUp className="w-5 h-5" />
+                <span className="text-base font-medium">Lucro Estimado por Semana</span>
               </div>
-              <div className="text-2xl font-bold text-emerald-400">
+              <div className="text-3xl font-bold text-emerald-400">
                 R$ 1.200 - R$ 2.500
               </div>
             </div>
