@@ -41,16 +41,19 @@ export const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Button 
                 size="lg"
-                className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-6 text-lg rounded-full shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/20 transition-all duration-300"
+                className="relative overflow-hidden group bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-6 text-lg rounded-full shadow-xl shadow-primary-500/20 hover:shadow-primary-500/40 transition-all duration-300"
               >
-                Ver ofertas
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <span className="relative z-10 flex items-center gap-2">
+                  Ver ofertas
+                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </Button>
               
               <Button 
                 size="lg"
                 variant="outline"
-                className="border-gray-700 text-gray-300 hover:bg-gray-800/50 px-8 py-6 text-lg rounded-full backdrop-blur-sm"
+                className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800/50 px-8 py-6 text-lg rounded-full backdrop-blur-sm transition-colors duration-300"
               >
                 Saiba mais
               </Button>
