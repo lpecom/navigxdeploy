@@ -6,7 +6,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
-import { PlanList } from "@/components/plans/PlanList";
+import { PlanList } from "@/pages/plans/components/PlanList";
 import type { Plans } from "@/types/supabase/plans";
 
 interface PlanSelectionStepProps {
@@ -38,7 +38,7 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
       type: 'ADD_ITEM',
       payload: {
         id: plan.id,
-        type: 'plan',
+        type: "optional",
         quantity: 1,
         unitPrice: plan.base_price,
         totalPrice: plan.base_price,
