@@ -74,6 +74,8 @@ export const CheckoutContent = ({
     })
   }
 
+  const shouldShowSidebar = step !== 1 && step !== 2; // Hide sidebar in steps 1 and 2
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -94,8 +96,8 @@ export const CheckoutContent = ({
 
       <CheckoutProgress currentStep={step} />
       
-      <div className={`grid gap-4 ${step === 1 ? '' : 'lg:grid-cols-3'}`}>
-        <div className={step === 1 ? '' : 'lg:col-span-2'}>
+      <div className={`grid gap-4 ${shouldShowSidebar ? 'lg:grid-cols-3' : ''}`}>
+        <div className={shouldShowSidebar ? 'lg:col-span-2' : ''}>
           <motion.div
             key={step}
             initial={{ opacity: 0, x: 20 }}
@@ -166,7 +168,7 @@ export const CheckoutContent = ({
           </motion.div>
         </div>
 
-        {step > 1 && (
+        {shouldShowSidebar && (
           <div className="space-y-4">
             <EnhancedSummary />
             {step < 7 && <SupportCard />}
