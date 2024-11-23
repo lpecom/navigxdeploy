@@ -1535,6 +1535,56 @@ export type Database = {
           },
         ]
       }
+      vehicle_fines: {
+        Row: {
+          created_at: string | null
+          fine_amount: number | null
+          fine_code: string | null
+          fine_date: string | null
+          fine_description: string | null
+          fine_location: string | null
+          fine_points: number | null
+          fine_status: string | null
+          id: string
+          updated_at: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          fine_amount?: number | null
+          fine_code?: string | null
+          fine_date?: string | null
+          fine_description?: string | null
+          fine_location?: string | null
+          fine_points?: number | null
+          fine_status?: string | null
+          id?: string
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          fine_amount?: number | null
+          fine_code?: string | null
+          fine_date?: string | null
+          fine_description?: string | null
+          fine_location?: string | null
+          fine_points?: number | null
+          fine_status?: string | null
+          id?: string
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_fines_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicles: {
         Row: {
           car_group_id: string | null
