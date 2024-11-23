@@ -23,19 +23,19 @@ export const Hero = () => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 text-primary-100 font-medium text-sm mb-6 border border-primary-500/20 backdrop-blur-sm">
               <Sparkles className="w-4 h-4" />
-              <span>BLACK FRIDAY NAVIG 2024</span>
+              <span>PROMOÇÃO EXCLUSIVA NAVIG</span>
             </div>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-semibold text-white mb-6 leading-[1.1] tracking-tight">
-              Aluguel de carros com{" "}
+              Dirija o carro dos seus{" "}
               <span className="text-gradient bg-gradient-to-r from-primary-400 to-primary-600">
-                R$1.200 de desconto!
+                sonhos hoje mesmo
               </span>
             </h1>
             
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Black Friday Navig: estoque limitado por um valor imperdível! 
-              Aproveite as melhores ofertas do ano.
+              Alugue carros premium com as melhores condições do mercado. 
+              Planos flexíveis que se adaptam ao seu estilo de vida.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -43,7 +43,7 @@ export const Hero = () => {
                 size="lg"
                 className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-6 text-lg rounded-full shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/20 transition-all duration-300"
               >
-                Ver ofertas
+                Ver planos
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               
@@ -57,7 +57,7 @@ export const Hero = () => {
             </div>
 
             <p className="text-gray-400 text-sm mt-6">
-              *Desconto válido apenas nos planos Navig Próprio e Navig Anual.
+              *Sujeito à análise de crédito e disponibilidade
             </p>
           </motion.div>
 
@@ -72,7 +72,7 @@ export const Hero = () => {
               <div className="absolute inset-0 bg-gradient-to-tr from-gray-900 via-transparent to-transparent z-10" />
               <img
                 src="https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80"
-                alt="Black Friday Car Deal"
+                alt="Carro Premium"
                 className="w-full h-auto rounded-2xl transform hover:scale-105 transition-transform duration-700"
               />
             </div>
@@ -86,7 +86,7 @@ export const Hero = () => {
             >
               <div className="text-center leading-tight">
                 <div className="text-sm font-medium opacity-90">ATÉ</div>
-                <div className="text-3xl font-display">50%</div>
+                <div className="text-3xl font-display">30%</div>
                 <div className="text-sm font-medium opacity-90">OFF</div>
               </div>
             </motion.div>

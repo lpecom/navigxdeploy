@@ -4,23 +4,23 @@ import { DollarSign, Users, Truck, HeadphonesIcon } from "lucide-react";
 const features = [
   {
     icon: DollarSign,
-    title: "Melhor preço garantido",
-    description: "Encontrou preço menor? Devolvemos 100% da diferença."
+    title: "Preço justo garantido",
+    description: "Oferecemos as melhores condições do mercado, com transparência e sem surpresas."
   },
   {
     icon: Users,
-    title: "Motorista experiente",
-    description: "Não tem motorista? Não se preocupe, temos vários motoristas experientes para você."
+    title: "Motoristas qualificados",
+    description: "Nossa equipe de motoristas passa por rigoroso processo de seleção e treinamento."
   },
   {
     icon: Truck,
-    title: "Entrega 24 horas",
-    description: "Reserve seu carro a qualquer momento e entregaremos diretamente para você."
+    title: "Entrega onde você estiver",
+    description: "Entregamos seu carro no local de sua preferência, com toda comodidade que você merece."
   },
   {
     icon: HeadphonesIcon,
-    title: "Suporte técnico 24/7",
-    description: "Tem alguma dúvida? Entre em contato com nosso suporte de aluguel a qualquer momento."
+    title: "Suporte 24 horas",
+    description: "Nossa equipe está sempre disponível para ajudar você, 24 horas por dia, 7 dias por semana."
   }
 ];
 
@@ -39,7 +39,7 @@ export const WhyChooseUs = () => {
           >
             <img
               src="https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80"
-              alt="Luxury Car"
+              alt="Carro Luxuoso"
               className="w-full h-auto rounded-2xl shadow-xl"
             />
             {/* Decorative Elements */}
@@ -57,10 +57,10 @@ export const WhyChooseUs = () => {
               className="space-y-4"
             >
               <h2 className="text-sm font-medium text-primary-400 uppercase tracking-wider">
-                POR QUE NOS ESCOLHER
+                POR QUE ESCOLHER A NAVIG
               </h2>
               <h3 className="text-4xl font-display font-semibold text-white leading-tight">
-                Oferecemos a melhor experiência com nossos planos de aluguel
+                A melhor experiência em aluguel de carros premium
               </h3>
             </motion.div>
 
