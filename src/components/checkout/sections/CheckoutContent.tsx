@@ -74,6 +74,12 @@ export const CheckoutContent = ({
     })
   }
 
+  // Function to determine if side cards should be shown
+  const shouldShowSideCards = (currentStep: number) => {
+    // Hide cards for step 2 (insurance step)
+    return currentStep !== 2;
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -166,7 +172,7 @@ export const CheckoutContent = ({
           </motion.div>
         </div>
 
-        {step > 1 && (
+        {step > 1 && shouldShowSideCards(step) && (
           <div className="space-y-4">
             <EnhancedSummary />
             {step < 7 && <SupportCard />}
