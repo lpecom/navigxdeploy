@@ -1,112 +1,140 @@
-import { Card } from "@/components/ui/card";
-import { PlanDetails } from "../../sections/PlanDetails";
-import { useCart } from "@/contexts/CartContext";
+import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
 import { CarModelCarousel } from "./CarModelCarousel";
-import type { CarModel } from "@/types/vehicles";
+import { 
+  Car, 
+  Gauge, 
+  Snowflake, 
+  Music2, 
+  Wifi, 
+  ShieldCheck, 
+  Wrench, 
+  Clock 
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface PlanSelectionStepProps {
   onNext: () => void;
 }
 
-export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
-  const { state: cartState } = useCart();
-  const selectedPlan = cartState.items.find((item: any) => item.type === 'car_group');
+const DEMO_CATEGORY_BENEFITS = {
+  name: "SUV Black",
+  description: "Experimente o máximo em conforto e sofisticação",
+  benefits: [
+    {
+      icon: Gauge,
+      title: "Câmbio Automático",
+      description: "Transmissão automática para maior conforto"
+    },
+    {
+      icon: Snowflake,
+      title: "Ar Condicionado Digital",
+      description: "Controle preciso da temperatura"
+    },
+    {
+      icon: Music2,
+      title: "Sistema de Som Premium",
+      description: "Áudio de alta qualidade com Bluetooth"
+    },
+    {
+      icon: Wifi,
+      title: "Conectividade",
+      description: "Wi-Fi e USB para seus dispositivos"
+    },
+    {
+      icon: ShieldCheck,
+      title: "Segurança Avançada",
+      description: "Airbags e freios ABS"
+    },
+    {
+      icon: Wrench,
+      title: "Manutenção Inclusa",
+      description: "Revisões periódicas cobertas"
+    }
+  ],
+  additionalFeatures: [
+    "Sensor de Estacionamento",
+    "Câmera de Ré",
+    "Bancos em Couro",
+    "Start/Stop",
+  ]
+};
 
-  const { data: carModels, isLoading, error } = useQuery({
-    queryKey: ['car-models', selectedPlan?.category],
+export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
+  const { data: carModels, isLoading } = useQuery({
+    queryKey: ['car-models'],
     queryFn: async () => {
-      if (!selectedPlan?.category) return null;
-      
       const { data, error } = await supabase
         .from('car_models')
-        .select(`
-          *,
-          category:categories!inner(
-            name
-          )
-        `)
-        .eq('category.name', selectedPlan.category);
+        .select('*')
+        .eq('category', 'SUV Black');
       
-      if (error) {
-        console.error('Error fetching car models:', error);
-        throw error;
-      }
-
-      return data as CarModel[];
-    },
-    enabled: !!selectedPlan?.category
+      if (error) throw error;
+      return data;
+    }
   });
 
-  const planDetails = selectedPlan ? {
-    type: selectedPlan.period,
-    name: selectedPlan.name,
-    features: [
-      'Seguro completo incluso',
-      'Manutenção preventiva',
-      'Assistência 24h',
-      'Documentação e IPVA'
-    ],
-    price: selectedPlan.unitPrice,
-    period: 'mês'
-  } : null;
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card className="p-4">
-        <div className="text-center text-red-500">
-          Erro ao carregar veículos. Por favor, tente novamente.
-        </div>
-      </Card>
-    );
-  }
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="space-y-8"
-    >
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 shadow-2xl">
-        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/20" />
-        
-        <div className="relative p-8 space-y-8">
-          {carModels && carModels.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="mb-8"
-            >
-              <CarModelCarousel carModels={carModels} />
-            </motion.div>
-          )}
-
-          {planDetails && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="mt-8"
-            >
-              <PlanDetails plan={planDetails} />
-            </motion.div>
-          )}
-        </div>
+    <div className="space-y-8">
+      <div className="space-y-4">
+        <Badge 
+          variant="secondary" 
+          className="bg-primary/20 text-primary border-0"
+        >
+          {DEMO_CATEGORY_BENEFITS.name}
+        </Badge>
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-white via-gray-300 to-gray-400 bg-clip-text text-transparent">
+          {DEMO_CATEGORY_BENEFITS.description}
+        </h2>
       </div>
-    </motion.div>
+
+      {!isLoading && carModels && (
+        <CarModelCarousel carModels={carModels} />
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {DEMO_CATEGORY_BENEFITS.benefits.map((benefit, index) => (
+          <motion.div
+            key={benefit.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.1 }}
+            className="relative overflow-hidden rounded-xl bg-white/5 p-6 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors group"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <benefit.icon className="w-8 h-8 text-primary mb-4" />
+            <h3 className="text-lg font-semibold text-white mb-2">
+              {benefit.title}
+            </h3>
+            <p className="text-sm text-gray-400">
+              {benefit.description}
+            </p>
+          </motion.div>
+        ))}
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.6 }}
+        className="bg-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10"
+      >
+        <h3 className="text-xl font-semibold text-white mb-4">
+          Características Adicionais
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {DEMO_CATEGORY_BENEFITS.additionalFeatures.map((feature, index) => (
+            <div 
+              key={feature}
+              className="flex items-center gap-2 text-gray-300"
+            >
+              <Clock className="w-4 h-4 text-primary" />
+              <span className="text-sm">{feature}</span>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    </div>
   );
 };
