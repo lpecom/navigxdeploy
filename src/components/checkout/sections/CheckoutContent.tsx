@@ -12,13 +12,6 @@ import { PlanSelectionStep } from "./steps/PlanSelectionStep"
 import { InsurancePackageStep } from "./steps/InsurancePackageStep"
 import { OptionalsList } from "@/components/optionals/OptionalsList"
 import { Card } from "@/components/ui/card"
-import { CategorySelector } from "@/pages/reservation/components/CategorySelector"
-import { useQuery } from "@tanstack/react-query"
-import { supabase } from "@/integrations/supabase/client"
-import { useState, useEffect } from "react"
-import type { Category } from "@/types/offers"
-import { handleCustomerData } from "@/components/checkout/handlers/CustomerHandler"
-import { useNavigate } from "react-router-dom"
 
 interface CheckoutContentProps {
   step: number;
@@ -39,117 +32,47 @@ export const CheckoutContent = ({
   setStep,
   setCustomerId
 }: CheckoutContentProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const navigate = useNavigate();
-
-  // Ensure we have the necessary data in sessionStorage
-  useEffect(() => {
-    if (step > 1 && !sessionStorage.getItem('selectedCategory')) {
-      navigate('/reservar');
-      return;
-    }
-    if (step > 2 && !sessionStorage.getItem('selectedPlan')) {
-      setStep(2);
-      return;
-    }
-  }, [step, navigate, setStep]);
-
-  const { data: categories } = useQuery({
-    queryKey: ['categories'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order');
-      
-      if (error) throw error;
-      return data as Category[];
-    }
-  });
-
-  const handleCustomerSubmit = async (data: any) => {
+  const handleCustomerSubmit = async (customerData: any) => {
     try {
-      const customer = await handleCustomerData(data);
-      setCustomerId(customer.id);
-      setStep(6);
+      setCustomerId(customerData.id)
+      setStep(5)
       toast({
         title: "Dados salvos com sucesso!",
-        description: "Agora vamos agendar sua retirada.",
-      });
-    } catch (error) {
-      console.error('Error saving customer data:', error);
+        description: "Seus dados foram salvos. Vamos agendar sua retirada.",
+      })
+    } catch (error: any) {
+      console.error('Error saving customer details:', error)
       toast({
         title: "Erro ao salvar dados",
-        description: "Ocorreu um erro ao salvar seus dados. Por favor, tente novamente.",
+        description: error.message || "Ocorreu um erro ao salvar seus dados.",
         variant: "destructive",
-      });
+      })
     }
-  };
+  }
 
-  const renderStep = () => {
-    switch (step) {
-      case 1:
-        return (
-          <CategorySelector 
-            categories={categories}
-            selectedCategory={selectedCategory}
-            onCategorySelect={(category) => {
-              setSelectedCategory(category);
-              sessionStorage.setItem('selectedCategory', JSON.stringify(category));
-              setStep(2);
-              toast({
-                title: "Categoria selecionada!",
-                description: "Agora vamos escolher seu plano.",
-              });
-            }}
-          />
-        );
-      case 2:
-        return (
-          <PlanSelectionStep 
-            onNext={() => setStep(3)}
-          />
-        );
-      case 3:
-        return (
-          <InsurancePackageStep 
-            onSelect={(insuranceId) => {
-              setStep(4);
-              toast({
-                title: "Proteção selecionada!",
-                description: "Agora vamos escolher seus opcionais.",
-              });
-            }}
-            onBack={() => setStep(2)}
-          />
-        );
-      case 4:
-        return (
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Escolha seus opcionais</h3>
-            <OptionalsList />
-            <div className="flex justify-end mt-4">
-              <Button 
-                onClick={() => {
-                  setStep(5);
-                  toast({
-                    title: "Opcionais selecionados!",
-                    description: "Agora vamos preencher seus dados.",
-                  });
-                }}
-                className="bg-primary hover:bg-primary/90 text-white gap-1.5"
-              >
-                Continuar
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
-          </Card>
-        );
-      default:
-        return null;
+  const handleScheduleSubmit = async (scheduleData: any) => {
+    try {
+      setStep(6)
+      toast({
+        title: "Agendamento confirmado!",
+        description: "Seu horário foi agendado com sucesso.",
+      })
+    } catch (error: any) {
+      toast({
+        title: "Erro ao agendar",
+        description: "Ocorreu um erro ao agendar seu horário.",
+        variant: "destructive",
+      })
     }
-  };
+  }
+
+  const handlePaymentSuccess = () => {
+    setStep(7)
+    toast({
+      title: "Pagamento confirmado!",
+      description: "Seu pagamento foi processado com sucesso.",
+    })
+  }
 
   return (
     <motion.div
@@ -158,9 +81,6 @@ export const CheckoutContent = ({
       transition={{ duration: 0.5 }}
       className="space-y-4"
     >
-      <EnhancedSummary />
-      <SupportCard />
-      
       {step > 1 && (
         <Button
           variant="ghost"
@@ -176,8 +96,82 @@ export const CheckoutContent = ({
       
       <div className={`grid gap-4 ${step === 1 ? '' : 'lg:grid-cols-3'}`}>
         <div className={step === 1 ? '' : 'lg:col-span-2'}>
-          {renderStep()}
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {step === 1 && (
+              <PlanSelectionStep 
+                onNext={() => {
+                  setStep(2)
+                  toast({
+                    title: "Plano selecionado!",
+                    description: "Agora vamos escolher sua proteção.",
+                  })
+                }}
+              />
+            )}
+
+            {step === 2 && (
+              <InsurancePackageStep 
+                onSelect={(insuranceId) => {
+                  setStep(3)
+                  toast({
+                    title: "Proteção selecionada!",
+                    description: "Agora vamos escolher seus opcionais.",
+                  })
+                }}
+                onBack={() => setStep(1)}
+              />
+            )}
+
+            {step === 3 && (
+              <Card className="p-6 bg-white/5 backdrop-blur-sm border-white/10">
+                <h2 className="text-xl font-semibold mb-4 text-white">Escolha seus opcionais</h2>
+                <OptionalsList />
+                <div className="flex justify-end mt-4">
+                  <Button 
+                    onClick={() => setStep(4)} 
+                    className="bg-primary hover:bg-primary/90 text-white gap-1.5"
+                  >
+                    Continuar
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </Card>
+            )}
+            
+            {step === 4 && (
+              <CustomerForm onSubmit={handleCustomerSubmit} />
+            )}
+            
+            {step === 5 && (
+              <PickupScheduler onSubmit={handleScheduleSubmit} />
+            )}
+            
+            {step === 6 && customerId && (
+              <PaymentSection
+                amount={cartState.total}
+                driverId={customerId}
+                onPaymentSuccess={handlePaymentSuccess}
+              />
+            )}
+            
+            {step === 7 && (
+              <SuccessSection />
+            )}
+          </motion.div>
         </div>
+
+        {step > 1 && (
+          <div className="space-y-4">
+            <EnhancedSummary />
+            {step < 7 && <SupportCard />}
+          </div>
+        )}
       </div>
     </motion.div>
   );

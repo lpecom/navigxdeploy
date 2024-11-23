@@ -1,9 +1,7 @@
-import { CheckoutLayout } from "./ui/CheckoutLayout";
-import { EmptyCartMessage } from "./ui/EmptyCartMessage";
-import { CheckoutContent } from "./sections/CheckoutContent";
-import { useCheckoutState } from "./sections/CheckoutContainer";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { CheckoutLayout } from "./ui/CheckoutLayout"
+import { EmptyCartMessage } from "./ui/EmptyCartMessage"
+import { CheckoutContent } from "./sections/CheckoutContent"
+import { useCheckoutState } from "./sections/CheckoutContainer"
 
 export const CheckoutPage = () => {
   const {
@@ -14,38 +12,15 @@ export const CheckoutPage = () => {
     cartState,
     dispatch,
     toast
-  } = useCheckoutState();
-  
-  const navigate = useNavigate();
+  } = useCheckoutState()
 
-  // Redirect to plans if no items and no session
-  useEffect(() => {
-    if (cartState.items.length === 0 && !cartState.checkoutSessionId) {
-      navigate('/plans');
-    }
-  }, [cartState.items.length, cartState.checkoutSessionId, navigate]);
-
-  // Handle browser back button
-  useEffect(() => {
-    const handlePopState = () => {
-      if (step > 1) {
-        setStep(step - 1);
-      } else {
-        navigate('/plans');
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [step, setStep, navigate]);
-
-  // Show empty cart message if needed
+  // Only show empty cart message if there are no items and user hasn't started checkout
   if (cartState.items.length === 0 && !cartState.checkoutSessionId) {
     return (
       <CheckoutLayout>
         <EmptyCartMessage />
       </CheckoutLayout>
-    );
+    )
   }
 
   return (
@@ -60,5 +35,5 @@ export const CheckoutPage = () => {
         toast={toast}
       />
     </CheckoutLayout>
-  );
-};
+  )
+}

@@ -1,15 +1,5 @@
 import { Json } from "@/integrations/supabase/types";
 
-export interface Category {
-  id: string;
-  name: string;
-  description?: string | null;
-  badge_text?: string | null;
-  display_order?: number | null;
-  is_active?: boolean | null;
-  created_at?: string;
-}
-
 export interface Plans {
   id: string;
   name: string;
