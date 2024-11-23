@@ -111,6 +111,7 @@ export const CheckoutContent = ({
                     description: "Agora vamos preencher seus dados.",
                   })
                 }}
+                onBack={() => window.history.back()}
               />
             )}
             
