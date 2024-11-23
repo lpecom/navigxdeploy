@@ -30,11 +30,6 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
     navigate('/plans');
   };
 
-  const formatCurrency = (value: number | null) => {
-    if (!value) return "R$ 0";
-    return `R$ ${Math.round(value)}`;
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -44,22 +39,22 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
     >
       <div 
         onClick={() => !isExpanded && setIsExpanded(true)}
-        className={`relative overflow-hidden rounded-lg bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm border border-gray-700/50 cursor-pointer transition-all duration-300 ${
+        className={`relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm border border-gray-700/50 cursor-pointer transition-all duration-300 hover:border-gray-600/50 ${
           isExpanded ? 'col-span-2' : ''
         }`}
       >
-        <div className="p-6">
-          <h3 className="text-xl font-semibold text-white mb-2">
+        <div className="p-6 pb-4">
+          <h3 className="text-xl font-semibold text-white mb-1">
             {vehicle.name}
           </h3>
         </div>
 
-        <div className="relative aspect-[16/9] overflow-hidden">
+        <div className="relative aspect-[16/10] overflow-hidden">
           {vehicle.image_url ? (
             <img
               src={vehicle.image_url}
               alt={vehicle.name}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
             />
           ) : (
             <div className="w-full h-full bg-gray-800 flex items-center justify-center">
@@ -68,23 +63,23 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
           )}
         </div>
 
-        <div className="p-6 space-y-4">
-          <div className="flex items-center justify-between text-gray-300 text-sm">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              <span>{vehicle.passengers || 5} lugares</span>
+        <div className="p-6 space-y-6">
+          <div className="grid grid-cols-4 gap-2">
+            <div className="flex flex-col items-center justify-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
+              <Users className="h-4 w-4 text-primary mb-2" />
+              <span className="text-xs text-gray-300 text-center">{vehicle.passengers || 5} lugares</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4" />
-              <span>{vehicle.luggage || 2} malas</span>
+            <div className="flex flex-col items-center justify-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
+              <Briefcase className="h-4 w-4 text-primary mb-2" />
+              <span className="text-xs text-gray-300 text-center">{vehicle.luggage || 2} malas</span>
             </div>
-            <div className="flex items-center gap-2">
-              <GaugeCircle className="h-4 w-4" />
-              <span>Automático</span>
+            <div className="flex flex-col items-center justify-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
+              <GaugeCircle className="h-4 w-4 text-primary mb-2" />
+              <span className="text-xs text-gray-300 text-center">Automático</span>
             </div>
-            <div className="flex items-center gap-2">
-              <DoorOpen className="h-4 w-4" />
-              <span>4 portas</span>
+            <div className="flex flex-col items-center justify-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
+              <DoorOpen className="h-4 w-4 text-primary mb-2" />
+              <span className="text-xs text-gray-300 text-center">4 portas</span>
             </div>
           </div>
 
