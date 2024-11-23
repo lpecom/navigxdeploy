@@ -35,7 +35,7 @@ export const CheckoutContent = ({
   const handleCustomerSubmit = async (customerData: any) => {
     try {
       setCustomerId(customerData.id)
-      setStep(4)
+      setStep(5)
       toast({
         title: "Dados salvos com sucesso!",
         description: "Seus dados foram salvos. Vamos agendar sua retirada.",
@@ -52,7 +52,7 @@ export const CheckoutContent = ({
 
   const handleScheduleSubmit = async (scheduleData: any) => {
     try {
-      setStep(5)
+      setStep(6)
       toast({
         title: "Agendamento confirmado!",
         description: "Seu horário foi agendado com sucesso.",
@@ -67,7 +67,7 @@ export const CheckoutContent = ({
   }
 
   const handlePaymentSuccess = () => {
-    setStep(6)
+    setStep(7)
     toast({
       title: "Pagamento confirmado!",
       description: "Seu pagamento foi processado com sucesso.",
@@ -104,25 +104,37 @@ export const CheckoutContent = ({
             transition={{ duration: 0.3 }}
           >
             {step === 1 && (
+              <PlanSelectionStep 
+                onNext={() => {
+                  setStep(2)
+                  toast({
+                    title: "Plano selecionado!",
+                    description: "Agora vamos escolher sua proteção.",
+                  })
+                }}
+              />
+            )}
+
+            {step === 2 && (
               <InsurancePackageStep 
                 onSelect={(insuranceId) => {
-                  setStep(2)
+                  setStep(3)
                   toast({
                     title: "Proteção selecionada!",
                     description: "Agora vamos escolher seus opcionais.",
                   })
                 }}
-                onBack={() => window.history.back()}
+                onBack={() => setStep(1)}
               />
             )}
 
-            {step === 2 && (
+            {step === 3 && (
               <Card className="p-6 bg-white/5 backdrop-blur-sm border-white/10">
                 <h2 className="text-xl font-semibold mb-4 text-white">Escolha seus opcionais</h2>
                 <OptionalsList />
                 <div className="flex justify-end mt-4">
                   <Button 
-                    onClick={() => setStep(3)} 
+                    onClick={() => setStep(4)} 
                     className="bg-primary hover:bg-primary/90 text-white gap-1.5"
                   >
                     Continuar
@@ -132,15 +144,15 @@ export const CheckoutContent = ({
               </Card>
             )}
             
-            {step === 3 && (
+            {step === 4 && (
               <CustomerForm onSubmit={handleCustomerSubmit} />
             )}
             
-            {step === 4 && (
+            {step === 5 && (
               <PickupScheduler onSubmit={handleScheduleSubmit} />
             )}
             
-            {step === 5 && customerId && (
+            {step === 6 && customerId && (
               <PaymentSection
                 amount={cartState.total}
                 driverId={customerId}
@@ -148,7 +160,7 @@ export const CheckoutContent = ({
               />
             )}
             
-            {step === 6 && (
+            {step === 7 && (
               <SuccessSection />
             )}
           </motion.div>
@@ -157,7 +169,7 @@ export const CheckoutContent = ({
         {step > 1 && (
           <div className="space-y-4">
             <EnhancedSummary />
-            {step < 6 && <SupportCard />}
+            {step < 7 && <SupportCard />}
           </div>
         )}
       </div>
