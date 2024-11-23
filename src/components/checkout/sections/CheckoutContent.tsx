@@ -35,7 +35,7 @@ export const CheckoutContent = ({
   const handleCustomerSubmit = async (customerData: any) => {
     try {
       setCustomerId(customerData.id)
-      setStep(4) // Move to scheduling after customer data
+      setStep(4)
       toast({
         title: "Dados salvos com sucesso!",
         description: "Seus dados foram salvos. Vamos agendar sua retirada.",
@@ -88,7 +88,7 @@ export const CheckoutContent = ({
           className="flex items-center gap-1.5 text-white/60 hover:text-white hover:bg-white/10"
         >
           <ChevronLeft className="w-4 h-4" />
-          Back
+          Voltar
         </Button>
       )}
 
@@ -108,8 +108,8 @@ export const CheckoutContent = ({
                 onSelect={(insuranceId) => {
                   setStep(2)
                   toast({
-                    title: "Protection selected!",
-                    description: "Now let's choose your add-ons.",
+                    title: "Proteção selecionada!",
+                    description: "Agora vamos escolher seus opcionais.",
                   })
                 }}
                 onBack={() => window.history.back()}
@@ -118,14 +118,14 @@ export const CheckoutContent = ({
 
             {step === 2 && (
               <Card className="p-6 bg-white/5 backdrop-blur-sm border-white/10">
-                <h2 className="text-xl font-semibold mb-4 text-white">Choose your add-ons</h2>
+                <h2 className="text-xl font-semibold mb-4 text-white">Escolha seus opcionais</h2>
                 <OptionalsList />
                 <div className="flex justify-end mt-4">
                   <Button 
                     onClick={() => setStep(3)} 
                     className="bg-primary hover:bg-primary/90 text-white gap-1.5"
                   >
-                    Continue
+                    Continuar
                     <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>

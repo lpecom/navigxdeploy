@@ -27,7 +27,7 @@ export const Steps = ({ currentStep, steps }: StepsProps) => {
             <div key={step.number} className="flex flex-col items-center relative z-10">
               {index > 0 && (
                 <div className="absolute w-full h-1 bg-gray-200 dark:bg-gray-800 top-5 -left-1/2 -z-10">
-                  <div
+                  <motion.div
                     className={`h-full transition-all duration-300 ${
                       isCompleted ? "bg-primary" : "bg-transparent"
                     }`}
@@ -45,13 +45,23 @@ export const Steps = ({ currentStep, steps }: StepsProps) => {
                 <Icon className="w-5 h-5" />
               </div>
 
-              <span
-                className={`mt-2 text-sm font-medium ${
-                  isActive ? "text-primary" : "text-gray-500 dark:text-gray-400"
-                }`}
+              <motion.span
+                className={`mt-2 text-sm font-medium ${isActive ? 'text-primary' : 'text-gray-500 dark:text-gray-400'}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
               >
                 {step.title}
-              </span>
+              </motion.span>
+              
+              <motion.span
+                className="text-xs text-gray-400 mt-1"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                {isCompleted ? "Concluído" : isActive ? "Em Andamento" : "Pendente"}
+              </motion.span>
             </div>
           );
         })}
