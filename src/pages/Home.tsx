@@ -44,11 +44,11 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-900">
       <Navigation />
       <Hero />
       <VehicleShowcase />
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -57,10 +57,10 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-white mb-4">
               Escolha sua Categoria
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
               Selecione a categoria ideal para suas necessidades
             </p>
           </motion.div>
@@ -70,7 +70,7 @@ const Home = () => {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="h-[400px] bg-gray-100 rounded-lg animate-pulse"
+                  className="h-[400px] bg-gray-800/50 rounded-lg animate-pulse"
                 />
               ))}
             </div>

@@ -27,37 +27,42 @@ export const CarCategoryCard = ({ category, cars = [] }: CarCategoryCardProps) =
 
   return (
     <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
       whileHover={{ y: -5 }}
       className="h-full"
     >
       <Card 
-        className="relative overflow-hidden h-full cursor-pointer group transition-all duration-300 hover:shadow-xl bg-white"
+        className="relative overflow-hidden h-full cursor-pointer group transition-all duration-300 hover:shadow-xl bg-gray-900/50 backdrop-blur-xl border border-gray-800/50"
         onClick={handleCategorySelect}
       >
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-48 overflow-hidden rounded-t-xl">
           <CarSlider cars={cars} category={category.name} />
           {category.badge_text && (
             <Badge 
               variant="secondary" 
-              className="absolute top-4 right-4 z-10 bg-white/90 text-navig hover:bg-white font-medium tracking-wide px-3 py-1"
+              className="absolute top-4 right-4 z-10 bg-white/10 backdrop-blur-md text-white hover:bg-white/20 font-medium tracking-wide px-3 py-1"
             >
               {category.badge_text}
             </Badge>
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-50" />
         </div>
         
-        <div className="relative p-6 flex flex-col h-full">
-          <h3 className="text-xl font-medium text-gray-900 mb-2 tracking-tight group-hover:text-navig transition-colors duration-300">
+        <div className="relative p-6 flex flex-col h-full bg-gradient-to-b from-gray-900/50 to-gray-800/50">
+          <h3 className="text-xl font-medium text-white mb-2 tracking-tight group-hover:text-primary-400 transition-colors duration-300">
             {category.name}
           </h3>
           
           {category.description && (
-            <p className="text-sm leading-relaxed text-gray-600 font-light mb-4">
+            <p className="text-sm leading-relaxed text-gray-300 font-light mb-4">
               {category.description}
             </p>
           )}
           
-          <div className="mt-auto flex items-center text-navig">
+          <div className="mt-auto flex items-center text-primary-400 group-hover:text-primary-300 transition-colors duration-300">
             <span className="text-sm font-medium tracking-wide uppercase">Ver planos</span>
             <svg 
               className="w-5 h-5 ml-2 transform group-hover:translate-x-2 transition-transform duration-300" 
