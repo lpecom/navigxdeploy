@@ -18,14 +18,3 @@ export interface Plans {
   display_order: number;
   conditions?: Json | null;
 }
-
-export interface InsuranceOptions {
-  id: string;
-  name: string;
-  description?: string | null;
-  coverage_details: Record<string, boolean>;
-  price: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
