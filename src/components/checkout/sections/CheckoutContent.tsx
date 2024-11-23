@@ -17,6 +17,7 @@ import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import { useState } from "react"
 import type { Category } from "@/types/offers"
+import { handleCustomerData } from "@/components/checkout/handlers/CustomerHandler"
 
 interface CheckoutContentProps {
   step: number;
@@ -52,6 +53,49 @@ export const CheckoutContent = ({
       return data as Category[];
     }
   });
+
+  const handleCustomerSubmit = async (data: any) => {
+    try {
+      const customer = await handleCustomerData(data);
+      setCustomerId(customer.id);
+      setStep(6);
+      toast({
+        title: "Dados salvos com sucesso!",
+        description: "Agora vamos agendar sua retirada.",
+      });
+    } catch (error) {
+      console.error('Error saving customer data:', error);
+      toast({
+        title: "Erro ao salvar dados",
+        description: "Ocorreu um erro ao salvar seus dados. Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleScheduleSubmit = (data: { date: string; time: string }) => {
+    dispatch({ 
+      type: 'UPDATE_PICKUP_SCHEDULE', 
+      payload: data 
+    });
+    setStep(7);
+    toast({
+      title: "Agendamento confirmado!",
+      description: "Agora vamos finalizar seu pagamento.",
+    });
+  };
+
+  const handlePaymentSuccess = (paymentId: string) => {
+    dispatch({ 
+      type: 'SET_PAYMENT_ID', 
+      payload: paymentId 
+    });
+    setStep(8);
+    toast({
+      title: "Pagamento confirmado!",
+      description: "Sua reserva foi finalizada com sucesso.",
+    });
+  };
 
   if (step === 1) {
     return (
