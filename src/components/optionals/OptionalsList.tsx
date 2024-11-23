@@ -6,6 +6,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { motion } from "framer-motion";
 
 interface Optional {
   id: string;
@@ -82,59 +83,80 @@ export const OptionalsList = () => {
   }
 
   if (isLoading) {
-    return <div className="animate-pulse space-y-4">
-      {[1, 2, 3].map(i => (
-        <div key={i} className="h-24 bg-slate-100 rounded-lg"></div>
-      ))}
-    </div>;
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="h-24 bg-gray-800/50 rounded-lg animate-pulse" />
+        ))}
+      </div>
+    );
   }
 
   if (!optionals?.length) {
-    return <div className="text-gray-500">No optionals available.</div>;
+    return <div className="text-gray-400">No optionals available.</div>;
   }
 
   return (
-    <div className="space-y-6">
-      {optionals.map((optional) => {
+    <div className="space-y-4">
+      {optionals.map((optional, index) => {
         const currentQuantity = state.items.find(item => item.id === optional.id)?.quantity || 0;
         const thumbnailUrl = optional.thumbnail_url || defaultThumbnails[Math.floor(Math.random() * defaultThumbnails.length)];
 
         return (
-          <div key={optional.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-slate-50 transition-colors">
-            <Avatar className="h-16 w-16 rounded-md">
-              <AvatarImage 
-                src={thumbnailUrl}
-                alt={optional.name}
-              />
-              <AvatarFallback>{optional.name[0]}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <h3 className="font-medium">{optional.name}</h3>
-              <p className="text-sm text-gray-600">{optional.description}</p>
-              <p className="text-sm font-medium text-primary mt-1">
-                R$ {optional.price.toFixed(2)} {optional.price_period === 'per_rental' ? 'por aluguel' : 'por dia'}
-              </p>
-            </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.1 }}
+            key={optional.id}
+            className="group relative overflow-hidden rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors p-6"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => updateQuantity(optional, -1)}
-                disabled={currentQuantity === 0}
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
-              <span className="w-8 text-center">{currentQuantity}</span>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => updateQuantity(optional, 1)}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
+            <div className="flex items-center gap-6">
+              <Avatar className="h-16 w-16 rounded-lg border border-white/10">
+                <AvatarImage 
+                  src={thumbnailUrl}
+                  alt={optional.name}
+                  className="object-cover"
+                />
+                <AvatarFallback className="bg-gray-800 text-gray-200">
+                  {optional.name[0]}
+                </AvatarFallback>
+              </Avatar>
+
+              <div className="flex-1 min-w-0">
+                <h3 className="font-medium text-white mb-1">{optional.name}</h3>
+                <p className="text-sm text-gray-400 line-clamp-2">{optional.description}</p>
+                <p className="text-sm font-medium text-primary mt-2">
+                  R$ {optional.price.toFixed(2)} 
+                  <span className="text-gray-400 ml-1">
+                    {optional.price_period === 'per_rental' ? 'por aluguel' : 'por dia'}
+                  </span>
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => updateQuantity(optional, -1)}
+                  disabled={currentQuantity === 0}
+                  className="border-white/10 hover:bg-white/10"
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="w-8 text-center text-white">{currentQuantity}</span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => updateQuantity(optional, 1)}
+                  className="border-white/10 hover:bg-white/10"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          </div>
+          </motion.div>
         );
       })}
     </div>
