@@ -12,6 +12,7 @@ import { PlanSelectionStep } from "./steps/PlanSelectionStep"
 import { InsurancePackageStep } from "./steps/InsurancePackageStep"
 import { OptionalsList } from "@/components/optionals/OptionalsList"
 import { Card } from "@/components/ui/card"
+import { CategorySelector } from "@/pages/reservation/components/CategorySelector"
 
 interface CheckoutContentProps {
   step: number;
@@ -110,9 +111,22 @@ export const CheckoutContent = ({
             transition={{ duration: 0.3 }}
           >
             {step === 1 && (
+              <CategorySelector 
+                onCategorySelect={(category) => {
+                  sessionStorage.setItem('selectedCategory', JSON.stringify(category));
+                  setStep(2);
+                  toast({
+                    title: "Categoria selecionada!",
+                    description: "Agora vamos escolher seu plano.",
+                  });
+                }}
+              />
+            )}
+
+            {step === 2 && (
               <PlanSelectionStep 
                 onNext={() => {
-                  setStep(2)
+                  setStep(3)
                   toast({
                     title: "Plano selecionado!",
                     description: "Agora vamos escolher sua proteção.",
@@ -121,26 +135,26 @@ export const CheckoutContent = ({
               />
             )}
 
-            {step === 2 && (
+            {step === 3 && (
               <InsurancePackageStep 
                 onSelect={(insuranceId) => {
-                  setStep(3)
+                  setStep(4)
                   toast({
                     title: "Proteção selecionada!",
                     description: "Agora vamos escolher seus opcionais.",
                   })
                 }}
-                onBack={() => setStep(1)}
+                onBack={() => setStep(2)}
               />
             )}
 
-            {step === 3 && (
+            {step === 4 && (
               <Card className="p-6 bg-white/5 backdrop-blur-sm border-white/10">
                 <h2 className="text-xl font-semibold mb-4 text-white">Escolha seus opcionais</h2>
                 <OptionalsList />
                 <div className="flex justify-end mt-4">
                   <Button 
-                    onClick={() => setStep(4)} 
+                    onClick={() => setStep(5)} 
                     className="bg-primary hover:bg-primary/90 text-white gap-1.5"
                   >
                     Continuar
@@ -150,15 +164,15 @@ export const CheckoutContent = ({
               </Card>
             )}
             
-            {step === 4 && (
+            {step === 5 && (
               <CustomerForm onSubmit={handleCustomerSubmit} />
             )}
             
-            {step === 5 && (
+            {step === 6 && (
               <PickupScheduler onSubmit={handleScheduleSubmit} />
             )}
             
-            {step === 6 && customerId && (
+            {step === 7 && customerId && (
               <PaymentSection
                 amount={cartState.total}
                 driverId={customerId}
@@ -166,7 +180,7 @@ export const CheckoutContent = ({
               />
             )}
             
-            {step === 7 && (
+            {step === 8 && (
               <SuccessSection />
             )}
           </motion.div>
@@ -175,7 +189,7 @@ export const CheckoutContent = ({
         {step > 1 && shouldShowSideCards(step) && (
           <div className="space-y-4">
             <EnhancedSummary />
-            {step < 7 && <SupportCard />}
+            {step < 8 && <SupportCard />}
           </div>
         )}
       </div>
