@@ -1,5 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 import type { Category } from "@/types/offers";
 
 interface CategorySelectorProps {
@@ -13,7 +15,20 @@ export const CategorySelector = ({
   selectedCategory, 
   onCategorySelect 
 }: CategorySelectorProps) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
   if (!categories?.length) return null;
+
+  const handleCategorySelect = (category: Category) => {
+    onCategorySelect(category);
+    sessionStorage.setItem('selectedCategory', JSON.stringify(category));
+    toast({
+      title: "Categoria selecionada!",
+      description: "Agora vamos escolher seu plano.",
+    });
+    navigate('/reservar/planos');
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -27,7 +42,7 @@ export const CategorySelector = ({
                 ? 'bg-white/10 border-primary'
                 : 'hover:bg-white/5'
             }`}
-            onClick={() => onCategorySelect(category)}
+            onClick={() => handleCategorySelect(category)}
           >
             <h3 className="text-lg font-semibold text-white">{category.name}</h3>
             {category.description && (

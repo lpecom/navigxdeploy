@@ -1,19 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Navigation } from "@/components/website/Navigation";
 import { Steps, checkoutSteps } from "@/components/checkout/Steps";
 import { motion } from "framer-motion";
 import { CategorySelector } from "./reservation/components/CategorySelector";
-import { PlanList } from "./reservation/components/PlanList";
 import { useState } from "react";
 import type { Category } from "@/types/offers";
-import type { Plans } from "@/types/supabase/plans";
 
 export const ReservationPage = () => {
-  const navigate = useNavigate();
   const { dispatch } = useCart();
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -31,49 +27,6 @@ export const ReservationPage = () => {
       return data as Category[];
     }
   });
-
-  const { data: plans } = useQuery({
-    queryKey: ['plans'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('plans')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order');
-      
-      if (error) throw error;
-      return data as Plans[];
-    }
-  });
-
-  const handlePlanSelect = (plan: Plans) => {
-    if (!selectedCategory) {
-      toast({
-        title: "Erro",
-        description: "Por favor, selecione uma categoria primeiro.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    dispatch({ type: 'CLEAR_CART' });
-    dispatch({
-      type: 'ADD_ITEM',
-      payload: {
-        id: `${selectedCategory.id}-${plan.type}`,
-        type: 'car_group',
-        quantity: 1,
-        unitPrice: plan.base_price,
-        totalPrice: plan.base_price,
-        name: `${selectedCategory.name} - ${plan.name}`,
-        category: selectedCategory.name,
-        period: plan.type
-      }
-    });
-
-    sessionStorage.setItem('selectedPlan', plan.type);
-    navigate('/reservar/checkout');
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
@@ -93,34 +46,8 @@ export const ReservationPage = () => {
           <CategorySelector 
             categories={categories}
             selectedCategory={selectedCategory}
-            onCategorySelect={(category) => {
-              setSelectedCategory(category);
-              sessionStorage.setItem('selectedCategory', JSON.stringify(category));
-            }}
+            onCategorySelect={setSelectedCategory}
           />
-
-          {selectedCategory && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="mt-12"
-            >
-              <motion.h1 
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-                className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-8"
-              >
-                Escolha o plano mais lucrativo pro seu bolso
-              </motion.h1>
-
-              <PlanList 
-                plans={plans}
-                onPlanSelect={handlePlanSelect}
-              />
-            </motion.div>
-          )}
         </div>
       </motion.div>
     </div>
