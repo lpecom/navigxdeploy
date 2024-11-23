@@ -30,25 +30,35 @@ export const Steps = ({ currentStep, steps }: StepsProps) => {
               {index > 0 && (
                 <div className="absolute w-full h-1 bg-gray-200 dark:bg-gray-800 top-5 -left-1/2 -z-10">
                   <motion.div
-                    className={`h-full transition-all duration-300 ${
+                    className={`h-full ${
                       isCompleted ? "bg-primary" : "bg-transparent"
                     }`}
+                    initial={{ width: "0%" }}
+                    animate={{ width: isCompleted ? "100%" : "0%" }}
+                    transition={{ duration: 0.3 }}
                   />
                 </div>
               )}
 
-              <div
+              <motion.div
                 className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-200 ${
                   isActive || isCompleted
                     ? "bg-primary text-primary-foreground"
                     : "bg-gray-100 dark:bg-gray-800 text-gray-400"
                 }`}
+                initial={false}
+                animate={{
+                  scale: isActive ? 1.2 : 1,
+                }}
+                transition={{ duration: 0.2 }}
               >
                 <Icon className="w-5 h-5" />
-              </div>
+              </motion.div>
 
               <motion.span
-                className={`mt-2 text-sm font-medium ${isActive ? 'text-primary' : 'text-gray-500 dark:text-gray-400'}`}
+                className={`mt-2 text-sm font-medium ${
+                  isActive ? "text-primary" : "text-gray-500 dark:text-gray-400"
+                }`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
