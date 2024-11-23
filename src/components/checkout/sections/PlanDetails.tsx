@@ -22,17 +22,19 @@ export const PlanDetails = ({ plan }: PlanDetailsProps) => {
 
   return (
     <div className="text-white">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-8">
         <div>
           <Badge variant="secondary" className="mb-2 bg-primary/20 text-primary border-0">
             {plan.type}
           </Badge>
-          <h2 className="text-2xl font-bold">{plan.name}</h2>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-white via-gray-300 to-gray-400 bg-clip-text text-transparent">
+            {plan.name}
+          </h2>
         </div>
         <div className="text-right">
-          <div className="text-3xl font-bold text-primary">
+          <div className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
             R$ {plan.price}
-            <span className="text-base font-normal text-gray-400">/{plan.period}</span>
+            <span className="text-base font-normal text-gray-400 ml-1">/{plan.period}</span>
           </div>
         </div>
       </div>
@@ -48,7 +50,7 @@ export const PlanDetails = ({ plan }: PlanDetailsProps) => {
           return (
             <motion.div
               key={index}
-              className="flex items-center gap-3 p-4 bg-white/5 rounded-lg"
+              className="flex items-center gap-3 p-4 bg-white/5 rounded-lg backdrop-blur-sm border border-white/10 transition-colors hover:bg-white/10"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -56,7 +58,7 @@ export const PlanDetails = ({ plan }: PlanDetailsProps) => {
               <div className="flex-shrink-0">
                 <Icon className="w-5 h-5 text-primary" />
               </div>
-              <span className="text-sm">{feature}</span>
+              <span className="text-sm text-gray-200">{feature}</span>
             </motion.div>
           );
         })}

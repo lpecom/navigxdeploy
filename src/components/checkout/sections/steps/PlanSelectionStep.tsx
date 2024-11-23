@@ -79,8 +79,11 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
       transition={{ duration: 0.5 }}
       className="space-y-8"
     >
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl overflow-hidden shadow-xl">
-        <div className="p-8">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 shadow-2xl">
+        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/20" />
+        
+        <div className="relative p-8 space-y-8">
           {carModels && carModels.length > 0 && (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
