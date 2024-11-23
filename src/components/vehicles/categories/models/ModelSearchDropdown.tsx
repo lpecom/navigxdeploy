@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import type { CarModel } from "@/types/vehicles";
 
 interface ModelSearchDropdownProps {
@@ -31,25 +31,26 @@ export const ModelSearchDropdown = ({ categoryId, onSelect }: ModelSearchDropdow
     queryFn: async () => {
       if (!categoryId) return [];
 
-      const query = supabase
+      let query = supabase
         .from("car_models")
         .select("*")
         .is("category_id", null);
 
       if (search) {
-        query.ilike("name", `%${search}%`);
+        query = query.ilike("name", `%${search}%`);
       }
 
       const { data, error } = await query;
-      if (error) throw error;
-      return data as CarModel[];
+      
+      if (error) {
+        console.error('Error fetching available models:', error);
+        return [];
+      }
+      
+      return (data || []) as CarModel[];
     },
     enabled: Boolean(categoryId),
-    initialData: [], // Provide initial empty array
   });
-
-  // Ensure we always have a valid array to work with
-  const models = availableModels || [];
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -67,10 +68,16 @@ export const ModelSearchDropdown = ({ categoryId, onSelect }: ModelSearchDropdow
             onValueChange={setSearch}
           />
           <CommandEmpty>
-            {isLoading ? "Carregando..." : "Nenhum modelo encontrado."}
+            {isLoading ? (
+              <div className="flex items-center justify-center py-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+              </div>
+            ) : (
+              "Nenhum modelo encontrado."
+            )}
           </CommandEmpty>
           <CommandGroup className="max-h-[300px] overflow-auto">
-            {models.map((model) => (
+            {(availableModels || []).map((model) => (
               <CommandItem
                 key={model.id}
                 value={model.name}
@@ -79,7 +86,7 @@ export const ModelSearchDropdown = ({ categoryId, onSelect }: ModelSearchDropdow
                   setOpen(false);
                 }}
               >
-                {model.name} ({model.year})
+                {model.name} ({model.year || 'N/A'})
               </CommandItem>
             ))}
           </CommandGroup>
