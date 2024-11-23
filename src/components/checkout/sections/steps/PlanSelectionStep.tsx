@@ -1,20 +1,20 @@
-import { Card } from "@/components/ui/card"
-import { PlanDetails } from "../PlanDetails"
-import { useCart } from "@/contexts/CartContext"
-import { useQuery } from "@tanstack/react-query"
-import { supabase } from "@/integrations/supabase/client"
-import { getBrandFromModel } from "@/utils/brandLogos"
-import { motion } from "framer-motion"
-import { Loader2 } from "lucide-react"
-import type { CarModel } from "@/types/vehicles"
+import { Card } from "@/components/ui/card";
+import { PlanDetails } from "../PlanDetails";
+import { useCart } from "@/contexts/CartContext";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { getBrandFromModel } from "@/utils/brandLogos";
+import type { CarModel } from "@/types/vehicles";
+import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 
 interface PlanSelectionStepProps {
   onNext: () => void;
 }
 
 export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
-  const { state: cartState } = useCart()
-  const selectedPlan = cartState.items.find((item: any) => item.type === 'car_group')
+  const { state: cartState } = useCart();
+  const selectedPlan = cartState.items.find((item: any) => item.type === 'car_group');
 
   const { data: carModels, isLoading, error } = useQuery({
     queryKey: ['car-models', selectedPlan?.category],
@@ -23,14 +23,16 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
       
       console.log('Fetching car models for category:', selectedPlan.category);
       
-      // Query car models directly by category name
+      // Query car models through the categories table
       const { data, error } = await supabase
         .from('car_models')
         .select(`
           *,
-          category:categories(name)
+          category:categories!inner(
+            name
+          )
         `)
-        .eq('categories.name', selectedPlan.category);
+        .eq('category.name', selectedPlan.category);
       
       if (error) {
         console.error('Error fetching car models:', error);
