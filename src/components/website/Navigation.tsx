@@ -8,7 +8,7 @@ export const Navigation = () => {
     <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-secondary-900/90 backdrop-blur-sm border-b border-secondary-800/20"
+      className="fixed top-0 left-0 right-0 z-50 bg-gray-900/90 backdrop-blur-sm border-b border-gray-800/20"
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
@@ -48,7 +48,7 @@ export const Navigation = () => {
                 Central do Motorista
               </Button>
             </Link>
-            <Button className="bg-primary hover:bg-primary-600 text-white">
+            <Button className="bg-primary-500 hover:bg-primary-600 text-white">
               VENDAS
             </Button>
           </div>

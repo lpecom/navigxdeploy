@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 
 export const Hero = () => {
   return (
-    <div className="relative min-h-screen flex items-center pt-16 md:pt-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+    <div className="relative min-h-screen flex items-center pt-16 md:pt-20 bg-gradient-to-b from-gray-900 to-gray-800 overflow-hidden">
       {/* Subtle Pattern Background */}
       <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.02]" />
       
@@ -17,16 +17,16 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-center lg:text-left"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/5 text-primary-600 font-medium text-sm mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 text-primary-100 font-medium text-sm mb-6">
               <span>BLACK FRIDAY NAVIG 2024</span>
             </div>
             
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-semibold text-gray-900 mb-6 leading-[1.1] tracking-tight">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-semibold text-white mb-6 leading-[1.1] tracking-tight">
               Aluguel de carros com{" "}
-              <span className="text-primary-600">R$1.200 de desconto!</span>
+              <span className="text-primary-400">R$1.200 de desconto!</span>
             </h1>
             
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
               Black Friday Navig: estoque limitado por um valor imperdível! 
               Aproveite as melhores ofertas do ano.
             </p>
@@ -34,7 +34,7 @@ export const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Button 
                 size="lg"
-                className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-6 text-lg rounded-full shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/20 transition-all duration-300"
+                className="bg-primary-500 hover:bg-primary-600 text-white px-8 py-6 text-lg rounded-full shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/20 transition-all duration-300"
               >
                 Ver ofertas
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -43,13 +43,13 @@ export const Hero = () => {
               <Button 
                 size="lg"
                 variant="outline"
-                className="border-gray-200 text-gray-700 hover:bg-gray-50 px-8 py-6 text-lg rounded-full"
+                className="border-gray-700 text-gray-300 hover:bg-gray-800 px-8 py-6 text-lg rounded-full"
               >
                 Saiba mais
               </Button>
             </div>
 
-            <p className="text-gray-500 text-sm mt-6">
+            <p className="text-gray-400 text-sm mt-6">
               *Desconto válido apenas nos planos Navig Próprio e Navig Anual.
             </p>
           </motion.div>
@@ -72,7 +72,7 @@ export const Hero = () => {
               initial={{ rotate: 12 }}
               animate={{ rotate: [12, 8, 12] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -top-6 -right-6 w-32 h-32 bg-primary-600 rounded-full flex items-center justify-center text-white font-bold text-xl p-4 shadow-lg"
+              className="absolute -top-6 -right-6 w-32 h-32 bg-primary-500 rounded-full flex items-center justify-center text-white font-bold text-xl p-4 shadow-lg"
             >
               <div className="text-center leading-tight">
                 <div className="text-sm font-medium opacity-90">ATÉ</div>
