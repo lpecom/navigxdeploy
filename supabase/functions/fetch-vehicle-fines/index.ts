@@ -21,13 +21,21 @@ async function scrapeFines(plate: string): Promise<FineData[]> {
   try {
     console.log(`Scraping fines for plate: ${plate}`);
     
-    const response = await fetch(`https://multa.consultaplacas.com.br/${plate}`, {
+    // Format plate to match expected format (remove spaces and special characters)
+    const formattedPlate = plate.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    
+    const response = await fetch(`https://multa.consultaplacas.com.br/consulta/${formattedPlate}`, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
       }
     });
 
     if (!response.ok) {
+      console.error(`HTTP error! status: ${response.status}`);
       throw new Error(`Failed to fetch data: ${response.status}`);
     }
 
@@ -42,17 +50,21 @@ async function scrapeFines(plate: string): Promise<FineData[]> {
     const fines: FineData[] = [];
     const fineElements = document.querySelectorAll('.multa-item');
 
-    fineElements.forEach((element) => {
+    console.log(`Found ${fineElements.length} fine elements`);
+
+    fineElements.forEach((element, index) => {
       try {
         const fine: FineData = {
           code: element.querySelector('.codigo')?.textContent?.trim() || '',
           description: element.querySelector('.descricao')?.textContent?.trim() || '',
           date: element.querySelector('.data')?.textContent?.trim() || '',
           location: element.querySelector('.local')?.textContent?.trim() || '',
-          amount: parseFloat(element.querySelector('.valor')?.textContent?.replace('R$', '').trim() || '0'),
+          amount: parseFloat(element.querySelector('.valor')?.textContent?.replace('R$', '').replace(',', '.').trim() || '0'),
           points: parseInt(element.querySelector('.pontos')?.textContent?.trim() || '0'),
           status: element.querySelector('.status')?.textContent?.trim().toLowerCase() || 'pending'
         };
+
+        console.log(`Processing fine ${index + 1}:`, fine);
 
         if (fine.code && fine.description) {
           fines.push(fine);
@@ -109,7 +121,7 @@ serve(async (req) => {
           fine_amount: fine.amount,
           fine_points: fine.points,
           fine_status: fine.status,
-          source_url: `https://multa.consultaplacas.com.br/${plate}`,
+          source_url: `https://multa.consultaplacas.com.br/consulta/${plate}`,
           raw_data: fine
         }, {
           onConflict: 'vehicle_id,fine_code'
