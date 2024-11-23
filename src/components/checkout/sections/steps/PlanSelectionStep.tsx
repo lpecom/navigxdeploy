@@ -65,13 +65,29 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
   const { data: carModels, isLoading } = useQuery({
     queryKey: ['car-models'],
     queryFn: async () => {
+      // First get the category ID for "SUV Black"
+      const { data: categories, error: categoryError } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('name', 'SUV Black')
+        .single();
+      
+      if (categoryError) throw categoryError;
+      
+      // Then get car models for that category
       const { data, error } = await supabase
         .from('car_models')
         .select('*')
-        .eq('category', 'SUV Black');
+        .eq('category_id', categories.id);
       
       if (error) throw error;
-      return data;
+      
+      // Transform the data to match our CarModel type
+      return data.map(model => ({
+        ...model,
+        optionals: model.optionals || {},
+        features: model.features || []
+      }));
     }
   });
 
