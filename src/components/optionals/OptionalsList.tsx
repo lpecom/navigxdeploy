@@ -59,15 +59,13 @@ export const OptionalsList = () => {
       });
       toast({
         title: "Optional Added",
-        description: `${optional.name} has been added to your booking.`,
-        duration: 2000
+        description: `${optional.name} has been added to your booking.`
       });
     } else {
       dispatch({ type: 'REMOVE_ITEM', payload: optional.id });
       toast({
         title: "Optional Removed",
-        description: `${optional.name} has been removed from your booking.`,
-        duration: 2000
+        description: `${optional.name} has been removed from your booking.`
       });
     }
   };
@@ -112,9 +110,7 @@ export const OptionalsList = () => {
                       variant="ghost"
                       size="sm"
                       className="h-6 w-6 p-0 hover:bg-white/10"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
+                      onClick={() => {
                         toast({
                           title: optional.name,
                           description: optional.description,
