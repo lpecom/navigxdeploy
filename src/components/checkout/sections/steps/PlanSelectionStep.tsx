@@ -109,48 +109,53 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
         <CarModelCarousel carModels={carModels} />
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {DEMO_CATEGORY_BENEFITS.benefits.map((benefit, index) => (
-          <motion.div
-            key={benefit.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-            className="relative overflow-hidden rounded-xl bg-white/5 p-6 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <benefit.icon className="w-8 h-8 text-primary mb-4" />
-            <h3 className="text-lg font-semibold text-white mb-2">
-              {benefit.title}
-            </h3>
-            <p className="text-sm text-gray-400">
-              {benefit.description}
-            </p>
-          </motion.div>
-        ))}
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.6 }}
-        className="bg-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10"
-      >
-        <h3 className="text-xl font-semibold text-white mb-4">
-          Características Adicionais
+      <div className="mt-12">
+        <h3 className="text-xl font-semibold text-white mb-6">
+          Benefícios Inclusos
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {DEMO_CATEGORY_BENEFITS.additionalFeatures.map((feature, index) => (
-            <div 
-              key={feature}
-              className="flex items-center gap-2 text-gray-300"
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {DEMO_CATEGORY_BENEFITS.benefits.map((benefit, index) => (
+            <motion.div
+              key={benefit.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+              className="relative overflow-hidden rounded-xl bg-white/5 p-6 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors group"
             >
-              <Clock className="w-4 h-4 text-primary" />
-              <span className="text-sm">{feature}</span>
-            </div>
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <benefit.icon className="w-8 h-8 text-primary mb-4" />
+              <h3 className="text-lg font-semibold text-white mb-2">
+                {benefit.title}
+              </h3>
+              <p className="text-sm text-gray-400">
+                {benefit.description}
+              </p>
+            </motion.div>
           ))}
         </div>
-      </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.6 }}
+          className="mt-8 bg-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10"
+        >
+          <h3 className="text-xl font-semibold text-white mb-4">
+            Características Adicionais
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {DEMO_CATEGORY_BENEFITS.additionalFeatures.map((feature, index) => (
+              <div 
+                key={feature}
+                className="flex items-center gap-2 text-gray-300"
+              >
+                <Clock className="w-4 h-4 text-primary" />
+                <span className="text-sm">{feature}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 };
