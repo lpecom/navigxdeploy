@@ -33,10 +33,10 @@ export const CheckoutContent = ({
   const handleCustomerSubmit = async (customerData: any) => {
     try {
       setCustomerId(customerData.id)
-      setStep(4) // Move to date/time selection
+      setStep(2) // Move to plan selection after customer data
       toast({
         title: "Dados salvos com sucesso!",
-        description: "Seus dados foram salvos. Vamos agendar sua retirada.",
+        description: "Seus dados foram salvos. Vamos escolher seu plano.",
       })
     } catch (error: any) {
       console.error('Error saving customer details:', error)
@@ -95,15 +95,17 @@ export const CheckoutContent = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         <div className="lg:col-span-2 space-y-6">
           {step === 1 && (
-            <PlanSelectionStep onNext={() => setStep(2)} />
+            <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg p-6">
+              <CustomerForm onSubmit={handleCustomerSubmit} />
+            </div>
           )}
           
           {step === 2 && (
-            <InsuranceAndOptionalsStep onNext={() => setStep(3)} />
+            <PlanSelectionStep onNext={() => setStep(3)} />
           )}
           
           {step === 3 && (
-            <CustomerForm onSubmit={handleCustomerSubmit} />
+            <InsuranceAndOptionalsStep onNext={() => setStep(4)} />
           )}
           
           {step === 4 && (
