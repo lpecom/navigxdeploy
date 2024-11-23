@@ -1,5 +1,5 @@
-import { User, Calendar, CreditCard, ShieldCheck, CheckCircle, Package, FileText } from "lucide-react"
-import { motion } from "framer-motion"
+import { User, Calendar, CreditCard, ShieldCheck, CheckCircle, Package, FileText } from "lucide-react";
+import { motion } from "framer-motion";
 
 export const checkoutSteps = [
   { number: 1, title: "Plano", icon: FileText },
@@ -9,14 +9,14 @@ export const checkoutSteps = [
   { number: 5, title: "Agendamento", icon: Calendar },
   { number: 6, title: "Pagamento", icon: CreditCard },
   { number: 7, title: "Confirmação", icon: CheckCircle }
-]
+];
 
 interface StepsProps {
   currentStep: number;
   steps: typeof checkoutSteps;
 }
 
-export const StepsComponent = ({ currentStep, steps }: StepsProps) => {
+export const Steps = ({ currentStep, steps }: StepsProps) => {
   return (
     <div className="w-full max-w-4xl mx-auto">
       <div className="flex justify-between relative">
@@ -71,6 +71,3 @@ export const StepsComponent = ({ currentStep, steps }: StepsProps) => {
     </div>
   );
 };
-
-// Export both the component and steps
-export { StepsComponent as Steps };
