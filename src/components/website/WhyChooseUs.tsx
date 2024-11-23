@@ -4,23 +4,23 @@ import { DollarSign, Users, Truck, HeadphonesIcon } from "lucide-react";
 const features = [
   {
     icon: DollarSign,
-    title: "Preço justo garantido",
-    description: "Oferecemos as melhores condições do mercado, com transparência e sem surpresas."
+    title: "Maior rentabilidade do mercado",
+    description: "Ganhe até 40% mais com nossos carros premium e planos otimizados para motoristas de app."
   },
   {
     icon: Users,
-    title: "Motoristas qualificados",
-    description: "Nossa equipe de motoristas passa por rigoroso processo de seleção e treinamento."
+    title: "Suporte especializado",
+    description: "Nossa equipe está preparada para ajudar você a maximizar seus ganhos e resolver qualquer questão."
   },
   {
     icon: Truck,
-    title: "Entrega onde você estiver",
-    description: "Entregamos seu carro no local de sua preferência, com toda comodidade que você merece."
+    title: "Entrega e manutenção facilitada",
+    description: "Entregamos seu carro onde você estiver e cuidamos de toda a manutenção para você focar no que importa."
   },
   {
     icon: HeadphonesIcon,
-    title: "Suporte 24 horas",
-    description: "Nossa equipe está sempre disponível para ajudar você, 24 horas por dia, 7 dias por semana."
+    title: "Atendimento 24 horas",
+    description: "Suporte completo 24/7 para garantir que você nunca fique parado e sempre maximize seus ganhos."
   }
 ];
 
@@ -60,7 +60,7 @@ export const WhyChooseUs = () => {
                 POR QUE ESCOLHER A NAVIG
               </h2>
               <h3 className="text-4xl font-display font-semibold text-white leading-tight">
-                A melhor experiência em aluguel de carros premium
+                A melhor parceira para motoristas de aplicativo
               </h3>
             </motion.div>
 

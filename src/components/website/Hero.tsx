@@ -23,19 +23,19 @@ export const Hero = () => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 text-primary-100 font-medium text-sm mb-6 border border-primary-500/20 backdrop-blur-sm">
               <Sparkles className="w-4 h-4" />
-              <span>PROMOÇÃO EXCLUSIVA NAVIG</span>
+              <span>EXCLUSIVO PARA MOTORISTAS DE APP</span>
             </div>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-semibold text-white mb-6 leading-[1.1] tracking-tight">
-              Dirija o carro dos seus{" "}
+              Maximize seus ganhos com{" "}
               <span className="text-gradient bg-gradient-to-r from-primary-400 to-primary-600">
-                sonhos hoje mesmo
+                carros premium
               </span>
             </h1>
             
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Alugue carros premium com as melhores condições do mercado. 
-              Planos flexíveis que se adaptam ao seu estilo de vida.
+              A Navig oferece a maior rentabilidade do mercado para motoristas de aplicativo. 
+              Carros de luxo, planos flexíveis e suporte 24h para você lucrar mais.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -43,7 +43,7 @@ export const Hero = () => {
                 size="lg"
                 className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-6 text-lg rounded-full shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/20 transition-all duration-300"
               >
-                Ver planos
+                Começar agora
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               
@@ -52,7 +52,7 @@ export const Hero = () => {
                 variant="outline"
                 className="border-gray-700 text-gray-300 hover:bg-gray-800/50 px-8 py-6 text-lg rounded-full backdrop-blur-sm"
               >
-                Saiba mais
+                Calcular ganhos
               </Button>
             </div>
 
@@ -86,8 +86,8 @@ export const Hero = () => {
             >
               <div className="text-center leading-tight">
                 <div className="text-sm font-medium opacity-90">ATÉ</div>
-                <div className="text-3xl font-display">30%</div>
-                <div className="text-sm font-medium opacity-90">OFF</div>
+                <div className="text-3xl font-display">40%</div>
+                <div className="text-sm font-medium opacity-90">MAIS LUCRO</div>
               </div>
             </motion.div>
           </motion.div>
