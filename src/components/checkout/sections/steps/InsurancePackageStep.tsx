@@ -30,7 +30,7 @@ export const InsurancePackageStep = ({ onSelect, selectedInsurance, onBack }: In
         .order('price', { ascending: true });
       
       if (error) {
-        toast.error("Failed to load insurance options");
+        toast.error("Erro ao carregar opções de seguro");
         throw error;
       }
       return data as InsuranceOption[];
@@ -71,7 +71,7 @@ export const InsurancePackageStep = ({ onSelect, selectedInsurance, onBack }: In
           <ChevronLeft className="w-5 h-5" />
         </Button>
         <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-          Which protection package do you need?
+          Qual pacote de proteção você precisa?
         </h1>
       </div>
 
@@ -114,7 +114,7 @@ export const InsurancePackageStep = ({ onSelect, selectedInsurance, onBack }: In
                   </div>
 
                   <div className="py-2 px-3 bg-green-500/10 text-green-400 text-sm rounded-md inline-block">
-                    No deductible
+                    Sem franquia
                   </div>
 
                   <div className="space-y-3">
@@ -134,7 +134,7 @@ export const InsurancePackageStep = ({ onSelect, selectedInsurance, onBack }: In
                             onClick={(e) => {
                               e.stopPropagation();
                               toast.info(coverage.replace(/_/g, ' '), {
-                                description: "More details about this coverage will be available soon."
+                                description: "Mais detalhes sobre esta cobertura estarão disponíveis em breve."
                               });
                             }}
                           >
@@ -148,7 +148,7 @@ export const InsurancePackageStep = ({ onSelect, selectedInsurance, onBack }: In
                   <div className="pt-4">
                     <div className="text-2xl font-bold text-white">
                       {formatPrice(option.price)}
-                      <span className="text-sm font-normal text-gray-400 ml-1">/ day</span>
+                      <span className="text-sm font-normal text-gray-400 ml-1">/ dia</span>
                     </div>
                   </div>
                 </div>
