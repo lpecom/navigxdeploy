@@ -31,11 +31,8 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
   };
 
   const formatCurrency = (value: number | null) => {
-    if (!value) return "R$ 0,00";
-    return value.toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    });
+    if (!value) return "R$ 0";
+    return `R$ ${Math.round(value)}`;
   };
 
   return (
@@ -92,13 +89,13 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
           </div>
 
           <div className="border-t border-gray-700/50 pt-4 space-y-3">
-            <div className="bg-white/5 rounded-lg p-4">
+            <div>
               <div className="flex items-center gap-2 text-primary-400 mb-1">
                 <Wallet className="w-4 h-4" />
                 <span className="text-sm font-medium">Valor Semanal</span>
               </div>
               <span className="text-2xl font-bold text-white">
-                {formatCurrency(weeklyPrice)}
+                R$ 450
               </span>
             </div>
 
@@ -108,7 +105,7 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
                 <span className="text-sm font-medium">Lucro Estimado por Semana</span>
               </div>
               <div className="text-2xl font-bold text-emerald-400">
-                {formatCurrency(estimatedProfit.min)} - {formatCurrency(estimatedProfit.max)}
+                R$ 1.200 - R$ 2.500
               </div>
             </div>
           </div>
