@@ -12,6 +12,7 @@ import { Steps, checkoutSteps } from "@/components/checkout/Steps";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import type { Plans } from "@/types/supabase/plans";
+import { Card } from "@/components/ui/card";
 
 interface Category {
   id: string;
@@ -26,6 +27,20 @@ export const PlansPage = () => {
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order');
+      
+      if (error) throw error;
+      return data as Category[];
+    }
+  });
+
   const { data: plans, isLoading } = useQuery({
     queryKey: ['plans'],
     queryFn: async () => {
@@ -47,12 +62,9 @@ export const PlansPage = () => {
         setSelectedCategory(JSON.parse(categoryData));
       } catch (error) {
         console.error('Error parsing category data:', error);
-        navigate('/');
       }
-    } else {
-      navigate('/');
     }
-  }, [navigate]);
+  }, []);
 
   const handlePlanSelect = (plan: Plans) => {
     if (!selectedCategory) {
@@ -61,7 +73,6 @@ export const PlansPage = () => {
         description: "Por favor, selecione uma categoria primeiro.",
         variant: "destructive",
       });
-      navigate('/');
       return;
     }
     
@@ -83,8 +94,6 @@ export const PlansPage = () => {
     sessionStorage.setItem('selectedPlan', plan.type);
     navigate('/checkout');
   };
-
-  if (!selectedCategory) return null;
 
   if (isLoading) {
     return (
@@ -119,44 +128,72 @@ export const PlansPage = () => {
             <Steps currentStep={1} steps={checkoutSteps} />
           </div>
 
-          <div className="flex items-center gap-4 mb-8">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/')}
-              className="text-gray-400 hover:text-white"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </Button>
-            <motion.h1 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
-            >
-              Escolha o plano mais lucrativo pro seu bolso
-            </motion.h1>
-          </div>
+          {!selectedCategory ? (
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-2xl font-bold text-white mb-6">Escolha uma categoria</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {categories?.map((category) => (
+                  <Card 
+                    key={category.id}
+                    className="p-6 cursor-pointer hover:bg-white/5 transition-colors"
+                    onClick={() => {
+                      setSelectedCategory(category);
+                      sessionStorage.setItem('selectedCategory', JSON.stringify(category));
+                    }}
+                  >
+                    <h3 className="text-lg font-semibold text-white">{category.name}</h3>
+                    {category.description && (
+                      <p className="text-sm text-gray-400 mt-2">{category.description}</p>
+                    )}
+                  </Card>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center gap-4 mb-8">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    setSelectedCategory(null);
+                    sessionStorage.removeItem('selectedCategory');
+                  }}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </Button>
+                <motion.h1 
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.5 }}
+                  className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+                >
+                  Escolha o plano mais lucrativo pro seu bolso
+                </motion.h1>
+              </div>
 
-          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
-            {plans?.sort((a, b) => a.display_order - b.display_order).map((plan, index) => (
-              <motion.div 
-                key={plan.id} 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 + 0.3, duration: 0.5 }}
-                className={`${plan.highlight ? "transform hover:scale-105 transition-transform duration-300" : ""}`}
-              >
-                <PlanCard
-                  type={plan.type}
-                  price={plan.base_price.toFixed(2)}
-                  features={plan.features}
-                  kmRanges={plan.bullet_points}
-                  onSelect={() => handlePlanSelect(plan)}
-                />
-              </motion.div>
-            ))}
-          </div>
+              <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
+                {plans?.sort((a, b) => a.display_order - b.display_order).map((plan, index) => (
+                  <motion.div 
+                    key={plan.id} 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 + 0.3, duration: 0.5 }}
+                    className={`${plan.highlight ? "transform hover:scale-105 transition-transform duration-300" : ""}`}
+                  >
+                    <PlanCard
+                      type={plan.type}
+                      price={plan.base_price.toFixed(2)}
+                      features={plan.features}
+                      kmRanges={plan.bullet_points}
+                      onSelect={() => handlePlanSelect(plan)}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </motion.div>
     </div>
