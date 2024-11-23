@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import type { CarModel } from "@/types/vehicles";
 
 interface PlanSelectionStepProps {
   onNext: () => void;
@@ -98,11 +99,11 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
       }
       
       // Transform the data to match our CarModel type
-      return data.map(model => ({
+      return (data || []).map(model => ({
         ...model,
-        optionals: model.optionals || {},
-        features: model.features || []
-      }));
+        optionals: model.optionals ? (model.optionals as Record<string, any>) : {},
+        features: model.features ? (model.features as Record<string, any>[]) : []
+      })) as CarModel[];
     }
   });
 
