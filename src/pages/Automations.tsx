@@ -12,6 +12,7 @@ const Automations = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [showTemplates, setShowTemplates] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const automationTemplates = [
     {
@@ -50,7 +51,7 @@ const Automations = () => {
 
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <div className="flex-1 overflow-auto">
         <div className="container py-6 space-y-6">
           <div className="flex flex-col space-y-4 md:flex-row md:justify-between md:space-y-0">
