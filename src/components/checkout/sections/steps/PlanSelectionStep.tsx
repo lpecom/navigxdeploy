@@ -20,14 +20,18 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
       if (!selectedPlan?.id) return null;
       
       // First get the category_id from car_groups
-      const { data: carGroup, error: carGroupError } = await supabase
+      const { data: carGroups, error: carGroupError } = await supabase
         .from('car_groups')
         .select('id')
-        .eq('name', selectedPlan.category)
-        .single();
+        .eq('name', selectedPlan.category);
       
       if (carGroupError) {
         console.error('Error fetching car group:', carGroupError);
+        return null;
+      }
+
+      if (!carGroups?.length) {
+        console.error('No car group found for category:', selectedPlan.category);
         return null;
       }
 
@@ -35,7 +39,7 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
       const { data, error } = await supabase
         .from('car_models')
         .select('*')
-        .eq('category_id', carGroup.id);
+        .eq('category_id', carGroups[0].id);
       
       if (error) throw error;
       return data as CarModel[];
