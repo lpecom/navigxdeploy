@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useState } from "react";
 import Dashboard from "@/pages/Dashboard";
 import Vehicles from "@/pages/Vehicles";
 import VehicleDetails from "@/pages/VehicleDetails";
@@ -19,12 +20,15 @@ import CheckInList from "@/components/check-in/CheckInList";
 import CheckInProcess from "@/components/check-in/CheckInProcess";
 
 const AdminRoutes = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gray-50/50">
-      <Sidebar />
-      <div className="lg:pl-64">
-        <Header />
-        <main className="py-6 px-4 sm:px-6 lg:px-8">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      
+      <div className="lg:pl-64 flex flex-col min-h-screen">
+        <Header onMenuClick={() => setIsSidebarOpen(true)} />
+        <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <Routes>
               {/* Root admin route redirects to dashboard */}
