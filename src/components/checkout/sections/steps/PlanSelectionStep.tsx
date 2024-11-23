@@ -71,19 +71,15 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
       const { data: categories, error: categoryError } = await supabase
         .from('categories')
         .select('id, name')
-        .eq('is_active', true);
+        .eq('name', 'SUV Black')
+        .single();
       
       if (categoryError) {
         toast.error('Erro ao carregar categorias');
         throw categoryError;
       }
 
-      // Find the SUV Black category
-      const suvCategory = categories?.find(cat => 
-        cat.name.toLowerCase() === 'suv black'
-      );
-      
-      if (!suvCategory) {
+      if (!categories) {
         console.warn('SUV Black category not found');
         return [];
       }
@@ -95,8 +91,7 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
           *,
           category:categories(name)
         `)
-        .eq('category_id', suvCategory.id)
-        .eq('is_active', true);
+        .eq('category_id', categories.id);
       
       if (error) {
         toast.error('Erro ao carregar modelos');

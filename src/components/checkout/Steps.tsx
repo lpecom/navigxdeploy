@@ -16,7 +16,7 @@ interface StepsProps {
   steps: typeof checkoutSteps;
 }
 
-export const Steps = ({ currentStep, steps }: StepsProps) => {
+export const StepsComponent = ({ currentStep, steps }: StepsProps) => {
   return (
     <div className="w-full max-w-4xl mx-auto">
       <div className="flex justify-between relative">
@@ -71,3 +71,6 @@ export const Steps = ({ currentStep, steps }: StepsProps) => {
     </div>
   );
 };
+
+// Export both the component and steps
+export { StepsComponent as Steps };
