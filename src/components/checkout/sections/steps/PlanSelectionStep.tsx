@@ -67,31 +67,31 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
   const { data: carModels, isLoading } = useQuery({
     queryKey: ['car-models'],
     queryFn: async () => {
-      // First get all categories
+      // First get all categories that match our criteria
       const { data: categories, error: categoryError } = await supabase
         .from('categories')
         .select('id, name')
-        .eq('name', 'SUV Black')
-        .single();
+        .eq('name', 'SUV Black');
       
       if (categoryError) {
         toast.error('Erro ao carregar categorias');
         throw categoryError;
       }
 
-      if (!categories) {
+      // If no category found, return empty array
+      if (!categories || categories.length === 0) {
         console.warn('SUV Black category not found');
         return [];
       }
       
-      // Then get car models for that category
+      // Then get car models for the first matching category
       const { data, error } = await supabase
         .from('car_models')
         .select(`
           *,
           category:categories(name)
         `)
-        .eq('category_id', categories.id);
+        .eq('category_id', categories[0].id);
       
       if (error) {
         toast.error('Erro ao carregar modelos');
