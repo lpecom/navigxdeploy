@@ -8,7 +8,6 @@ import { AuthSection } from "./auth/AuthSection"
 import { PersonalInfoSection } from "./personal/PersonalInfoSection"
 import { AddressSection } from "./address/AddressSection"
 import { motion } from "framer-motion"
-import { Card } from "@/components/ui/card"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { useCart } from "@/contexts/CartContext"
@@ -113,54 +112,60 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
+      className="max-w-2xl mx-auto"
     >
-      <Card className="p-6 shadow-sm">
-        <Form {...form}>
-          <div className="space-y-6">
-            <AuthSection 
-              form={form}
-              hasAccount={hasAccount}
-              onHasAccountChange={setHasAccount}
-              onLogin={handleLogin}
-              isLoggingIn={isLoggingIn}
-            />
-            
-            {!hasAccount && (
-              <>
-                <PersonalInfoSection form={form} />
-                <AddressSection 
-                  form={form}
-                  isLoadingAddress={isLoadingAddress}
-                  onPostalCodeChange={async (postal_code: string) => {
-                    setIsLoadingAddress(true)
-                    try {
-                      const response = await fetch(`https://viacep.com.br/ws/${postal_code}/json/`)
-                      const data = await response.json()
-                      
-                      if (!data.erro) {
-                        form.setValue('address', data.logradouro)
-                        form.setValue('city', data.localidade)
-                        form.setValue('state', data.uf)
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 shadow-2xl">
+        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/20" />
+        
+        <div className="relative p-6 sm:p-8">
+          <Form {...form}>
+            <div className="space-y-6">
+              <AuthSection 
+                form={form}
+                hasAccount={hasAccount}
+                onHasAccountChange={setHasAccount}
+                onLogin={handleLogin}
+                isLoggingIn={isLoggingIn}
+              />
+              
+              {!hasAccount && (
+                <>
+                  <PersonalInfoSection form={form} />
+                  <AddressSection 
+                    form={form}
+                    isLoadingAddress={isLoadingAddress}
+                    onPostalCodeChange={async (postal_code: string) => {
+                      setIsLoadingAddress(true)
+                      try {
+                        const response = await fetch(`https://viacep.com.br/ws/${postal_code}/json/`)
+                        const data = await response.json()
+                        
+                        if (!data.erro) {
+                          form.setValue('address', data.logradouro)
+                          form.setValue('city', data.localidade)
+                          form.setValue('state', data.uf)
+                        }
+                      } catch (error) {
+                        console.error('Error fetching address:', error)
+                      } finally {
+                        setIsLoadingAddress(false)
                       }
-                    } catch (error) {
-                      console.error('Error fetching address:', error)
-                    } finally {
-                      setIsLoadingAddress(false)
-                    }
-                  }}
-                />
+                    }}
+                  />
 
-                <Button 
-                  onClick={form.handleSubmit(handleFormSubmit)}
-                  className="w-full h-12 text-lg font-medium transition-all duration-200 hover:scale-[1.02]"
-                >
-                  Continuar
-                </Button>
-              </>
-            )}
-          </div>
-        </Form>
-      </Card>
+                  <Button 
+                    onClick={form.handleSubmit(handleFormSubmit)}
+                    className="w-full h-12 text-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-primary-500/20"
+                  >
+                    Continuar
+                  </Button>
+                </>
+              )}
+            </div>
+          </Form>
+        </div>
+      </div>
     </motion.div>
   )
 }
