@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
@@ -8,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface FinesTabProps {
   vehicleId: string;
@@ -35,23 +35,15 @@ export const FinesTab = ({ vehicleId, plate }: FinesTabProps) => {
   const handleSync = async () => {
     setIsSyncing(true);
     try {
-      const response = await fetch('/functions/v1/fetch-vehicle-fines', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ plate, vehicleId }),
+      const { data, error } = await supabase.functions.invoke('fetch-vehicle-fines', {
+        body: { plate, vehicleId },
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to sync fines');
-      }
-
-      const result = await response.json();
+      if (error) throw error;
       
       toast({
         title: "Multas sincronizadas",
-        description: `${result.fines?.length || 0} multas encontradas.`,
+        description: `${data.fines?.length || 0} multas encontradas.`,
       });
 
       refetch();
