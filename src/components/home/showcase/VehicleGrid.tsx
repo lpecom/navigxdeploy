@@ -13,6 +13,11 @@ export const VehicleGrid = ({ vehicles }: VehicleGridProps) => {
           key={vehicle.id}
           vehicle={vehicle}
           index={index}
+          weeklyPrice={vehicle.daily_price ? vehicle.daily_price * 7 : null}
+          estimatedProfit={{
+            min: vehicle.daily_price ? vehicle.daily_price * 7 * 1.5 : null,
+            max: vehicle.daily_price ? vehicle.daily_price * 7 * 2.2 : null
+          }}
         />
       ))}
     </div>

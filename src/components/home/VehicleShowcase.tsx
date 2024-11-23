@@ -46,10 +46,10 @@ export const VehicleShowcase = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl font-bold text-white mb-4">
-            Which car do you want to drive?
+            O carro mais lucrativo disponível para você
           </h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Choose from our selection of premium vehicles
+            Maximize seus ganhos com nossa frota premium selecionada para motoristas de aplicativo
           </p>
         </motion.div>
 

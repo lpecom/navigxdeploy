@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Users, Briefcase, GaugeCircle, DoorOpen } from "lucide-react";
+import { motion } from "framer-motion";
+import { Users, Briefcase, GaugeCircle, DoorOpen, TrendingUp, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -10,9 +10,14 @@ import { useNavigate } from "react-router-dom";
 interface VehicleCardProps {
   vehicle: CarModel;
   index: number;
+  weeklyPrice: number | null;
+  estimatedProfit: {
+    min: number | null;
+    max: number | null;
+  };
 }
 
-export const VehicleCard = ({ vehicle, index }: VehicleCardProps) => {
+export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: VehicleCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [paymentOption, setPaymentOption] = useState("pay-now");
   const navigate = useNavigate();
@@ -23,6 +28,14 @@ export const VehicleCard = ({ vehicle, index }: VehicleCardProps) => {
       paymentOption
     }));
     navigate('/plans');
+  };
+
+  const formatCurrency = (value: number | null) => {
+    if (!value) return "R$ 0,00";
+    return value.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
   };
 
   return (
@@ -42,9 +55,20 @@ export const VehicleCard = ({ vehicle, index }: VehicleCardProps) => {
           <h3 className="text-xl font-semibold text-white mb-2">
             {vehicle.name}
           </h3>
-          <p className="text-gray-400 text-sm">
-            or similar | {vehicle.vehicle_type || 'Sedan'}
-          </p>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-2 bg-primary/10 px-3 py-1.5 rounded-full">
+              <Wallet className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-white">
+                {formatCurrency(weeklyPrice)} /semana
+              </span>
+            </div>
+            <div className="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-full">
+              <TrendingUp className="w-4 h-4 text-emerald-500" />
+              <span className="text-sm font-medium text-white">
+                Lucro estimado: {formatCurrency(estimatedProfit.min)} - {formatCurrency(estimatedProfit.max)} /semana
+              </span>
+            </div>
+          </div>
         </div>
 
         <div className="relative aspect-[16/9] overflow-hidden">
@@ -56,7 +80,7 @@ export const VehicleCard = ({ vehicle, index }: VehicleCardProps) => {
             />
           ) : (
             <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-              <span className="text-gray-500">No image available</span>
+              <span className="text-gray-500">Imagem indisponível</span>
             </div>
           )}
         </div>
@@ -65,19 +89,19 @@ export const VehicleCard = ({ vehicle, index }: VehicleCardProps) => {
           <div className="flex items-center justify-between text-gray-300 text-sm">
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              <span>{vehicle.passengers || 5}</span>
+              <span>{vehicle.passengers || 5} lugares</span>
             </div>
             <div className="flex items-center gap-2">
               <Briefcase className="h-4 w-4" />
-              <span>{vehicle.luggage || 2}</span>
+              <span>{vehicle.luggage || 2} malas</span>
             </div>
             <div className="flex items-center gap-2">
               <GaugeCircle className="h-4 w-4" />
-              <span>Auto</span>
+              <span>Automático</span>
             </div>
             <div className="flex items-center gap-2">
               <DoorOpen className="h-4 w-4" />
-              <span>4 Doors</span>
+              <span>4 portas</span>
             </div>
           </div>
 
@@ -90,7 +114,7 @@ export const VehicleCard = ({ vehicle, index }: VehicleCardProps) => {
                 className="space-y-6 border-t border-gray-700/50 pt-6"
               >
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-4">Booking Options</h4>
+                  <h4 className="text-lg font-semibold text-white mb-4">Opções de Reservas</h4>
                   <RadioGroup 
                     value={paymentOption} 
                     onValueChange={setPaymentOption}
@@ -99,19 +123,19 @@ export const VehicleCard = ({ vehicle, index }: VehicleCardProps) => {
                     <div className="flex items-center space-x-2 bg-white/5 p-4 rounded-lg cursor-pointer hover:bg-white/10 transition-colors">
                       <RadioGroupItem value="pay-now" id="pay-now" />
                       <Label htmlFor="pay-now" className="flex-1 cursor-pointer">
-                        <div className="text-white font-medium">Best Price</div>
-                        <div className="text-gray-400 text-sm">Pay now, cancel and rebook for a fee</div>
+                        <div className="text-white font-medium">Melhor Preço</div>
+                        <div className="text-gray-400 text-sm">Pague agora, cancele e reserte por uma taxa</div>
                       </Label>
-                      <span className="text-white font-medium">Included</span>
+                      <span className="text-white font-medium">Incluído</span>
                     </div>
                     
                     <div className="flex items-center space-x-2 bg-white/5 p-4 rounded-lg cursor-pointer hover:bg-white/10 transition-colors">
                       <RadioGroupItem value="pay-later" id="pay-later" />
                       <Label htmlFor="pay-later" className="flex-1 cursor-pointer">
-                        <div className="text-white font-medium">Stay Flexible</div>
-                        <div className="text-gray-400 text-sm">Pay at pick-up, free cancellation</div>
+                        <div className="text-white font-medium">Mantenha Flexível</div>
+                        <div className="text-gray-400 text-sm">Pague na retirada, cancelamento gratuito</div>
                       </Label>
-                      <span className="text-white font-medium">+$1/day</span>
+                      <span className="text-white font-medium">+$1/dia</span>
                     </div>
                   </RadioGroup>
                 </div>
@@ -119,19 +143,18 @@ export const VehicleCard = ({ vehicle, index }: VehicleCardProps) => {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-2xl font-bold text-white">
-                      ${vehicle.daily_price?.toFixed(2)}
+                      {formatCurrency(vehicle.daily_price)} /dia
                     </span>
-                    <span className="text-gray-400 text-sm">/day</span>
                   </div>
                   <div className="space-x-3">
                     <Button 
                       variant="ghost" 
                       onClick={() => setIsExpanded(false)}
                     >
-                      Cancel
+                      Cancelar
                     </Button>
                     <Button onClick={handleContinue}>
-                      Continue
+                      Continuar
                     </Button>
                   </div>
                 </div>
