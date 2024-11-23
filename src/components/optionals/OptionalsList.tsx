@@ -84,9 +84,9 @@ export const OptionalsList = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         {[1, 2, 3].map(i => (
-          <div key={i} className="h-24 bg-gray-800/50 rounded-lg animate-pulse" />
+          <div key={i} className="h-20 bg-gray-800/50 rounded-lg animate-pulse" />
         ))}
       </div>
     );
@@ -97,7 +97,7 @@ export const OptionalsList = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {optionals.map((optional, index) => {
         const currentQuantity = state.items.find(item => item.id === optional.id)?.quantity || 0;
         const thumbnailUrl = optional.thumbnail_url || defaultThumbnails[Math.floor(Math.random() * defaultThumbnails.length)];
@@ -108,12 +108,12 @@ export const OptionalsList = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
             key={optional.id}
-            className="group relative overflow-hidden rounded-xl bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 hover:bg-gray-700/40 transition-colors p-6"
+            className="group relative overflow-hidden rounded-lg bg-white/5 backdrop-blur-sm border border-gray-200/10 hover:bg-white/10 transition-colors p-4"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             
-            <div className="flex items-center gap-6">
-              <Avatar className="h-16 w-16 rounded-lg border border-gray-700/50">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-14 w-14 rounded-lg border border-gray-200/10">
                 <AvatarImage 
                   src={thumbnailUrl}
                   alt={optional.name}
@@ -125,34 +125,34 @@ export const OptionalsList = () => {
               </Avatar>
 
               <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-white mb-1">{optional.name}</h3>
-                <p className="text-sm text-gray-300 line-clamp-2">{optional.description}</p>
-                <p className="text-sm font-medium text-primary-300 mt-2">
+                <h3 className="font-medium text-gray-100 mb-0.5">{optional.name}</h3>
+                <p className="text-sm text-gray-400 line-clamp-2">{optional.description}</p>
+                <p className="text-sm font-medium text-primary-400 mt-1">
                   R$ {optional.price.toFixed(2)} 
-                  <span className="text-gray-300 ml-1">
+                  <span className="text-gray-400 ml-1">
                     {optional.price_period === 'per_rental' ? 'por aluguel' : 'por dia'}
                   </span>
                 </p>
               </div>
               
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={() => updateQuantity(optional, -1)}
                   disabled={currentQuantity === 0}
-                  className="border-gray-700 hover:bg-gray-700/50 text-white"
+                  className="h-8 w-8 border-gray-200/10 hover:bg-white/10 text-gray-200"
                 >
-                  <Minus className="h-4 w-4" />
+                  <Minus className="h-3 w-3" />
                 </Button>
-                <span className="w-8 text-center text-white">{currentQuantity}</span>
+                <span className="w-6 text-center text-gray-200 tabular-nums">{currentQuantity}</span>
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={() => updateQuantity(optional, 1)}
-                  className="border-gray-700 hover:bg-gray-700/50 text-white"
+                  className="h-8 w-8 border-gray-200/10 hover:bg-white/10 text-gray-200"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-3 w-3" />
                 </Button>
               </div>
             </div>

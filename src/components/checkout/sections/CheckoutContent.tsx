@@ -79,13 +79,13 @@ export const CheckoutContent = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="space-y-8"
+      className="space-y-6"
     >
       {step > 1 && (
         <Button
           variant="ghost"
           onClick={() => setStep(step - 1)}
-          className="flex items-center gap-2 text-gray-200 hover:text-white transition-colors"
+          className="flex items-center gap-1.5 text-gray-400 hover:text-gray-100 transition-colors -mb-2"
         >
           <ChevronLeft className="w-4 h-4" />
           Voltar
@@ -94,7 +94,7 @@ export const CheckoutContent = ({
 
       <CheckoutProgress currentStep={step} />
       
-      <div className={`grid grid-cols-1 ${step === 1 ? '' : 'lg:grid-cols-3'} gap-6 lg:gap-8`}>
+      <div className={`grid grid-cols-1 ${step === 1 ? '' : 'lg:grid-cols-3'} gap-4 lg:gap-6`}>
         <div className={step === 1 ? '' : 'lg:col-span-2'}>
           <motion.div
             key={step}
@@ -117,13 +117,16 @@ export const CheckoutContent = ({
             )}
 
             {step === 2 && (
-              <Card className="p-6 bg-gray-900/40 backdrop-blur-sm border-gray-800">
-                <h2 className="text-2xl font-semibold mb-6 text-white">Escolha seus opcionais</h2>
+              <Card className="p-5 bg-white border-gray-200/10">
+                <h2 className="text-xl font-semibold mb-4 text-gray-800">Escolha seus opcionais</h2>
                 <OptionalsList />
-                <div className="flex justify-end mt-6">
-                  <Button onClick={() => setStep(3)} className="bg-primary hover:bg-primary/90">
+                <div className="flex justify-end mt-4">
+                  <Button 
+                    onClick={() => setStep(3)} 
+                    className="bg-primary hover:bg-primary/90 text-white gap-1.5"
+                  >
                     Continuar
-                    <ChevronRight className="w-4 h-4 ml-2" />
+                    <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
               </Card>
@@ -152,12 +155,12 @@ export const CheckoutContent = ({
         </div>
 
         {step > 1 && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <EnhancedSummary />
             {step < 6 && <SupportCard />}
           </div>
         )}
       </div>
     </motion.div>
-  )
-}
+  );
+};
