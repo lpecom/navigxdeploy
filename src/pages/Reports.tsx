@@ -2,11 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Download, Filter } from "lucide-react";
 import Sidebar from "@/components/dashboard/Sidebar";
-import { useState } from "react";
 
 const Reports = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   const reports = [
     {
       title: "Relatório de Reservas",
@@ -30,7 +27,7 @@ const Reports = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Sidebar />
       <div className="flex-1 p-8 overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">Relatórios</h1>

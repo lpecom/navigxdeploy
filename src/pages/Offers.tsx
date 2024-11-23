@@ -24,7 +24,6 @@ const Offers = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [isAddingOffer, setIsAddingOffer] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const { data: categories, isLoading: categoriesLoading } = useQuery({
     queryKey: ["categories"],
@@ -131,7 +130,7 @@ const Offers = () => {
 
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Sidebar />
       <div className="flex-1 overflow-auto">
         <div className="container py-6 space-y-6">
           <div className="flex flex-col space-y-4 md:flex-row md:justify-between md:space-y-0">

@@ -10,7 +10,6 @@ const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -44,7 +43,7 @@ const Index = () => {
 
   return (
     <main className="flex-1 overflow-y-auto p-6">
-      <Header onMenuClick={() => setIsSidebarOpen(true)} />
+      <Header />
       <div className="max-w-7xl mx-auto space-y-6">
         <StatsPanel />
         <RentalsList />

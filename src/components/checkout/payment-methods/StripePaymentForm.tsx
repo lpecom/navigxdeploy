@@ -21,7 +21,6 @@ export const StripePaymentForm = ({ onSuccess }: StripePaymentFormProps) => {
     e.preventDefault()
 
     if (!stripe || !elements) {
-      console.error('Stripe or Elements not initialized')
       return
     }
 
@@ -37,7 +36,6 @@ export const StripePaymentForm = ({ onSuccess }: StripePaymentFormProps) => {
       })
 
       if (error) {
-        console.error('Payment error:', error)
         toast({
           title: "Erro no pagamento",
           description: error.message || "Ocorreu um erro ao processar seu pagamento.",

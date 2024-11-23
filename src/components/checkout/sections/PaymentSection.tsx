@@ -13,7 +13,8 @@ import { StripePaymentForm } from "../payment-methods/StripePaymentForm"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+// Initialize Stripe with the publishable key
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
 interface PaymentSectionProps {
   onPaymentSuccess: (id: string) => void
@@ -156,4 +157,3 @@ export const PaymentSection = ({
     </motion.div>
   )
 }
-

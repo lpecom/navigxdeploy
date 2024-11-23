@@ -11,11 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
-interface HeaderProps {
-  onMenuClick: () => void;
-}
-
-const Header = ({ onMenuClick }: HeaderProps) => {
+const Header = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -30,7 +26,6 @@ const Header = ({ onMenuClick }: HeaderProps) => {
           variant="ghost"
           size="icon"
           className="lg:hidden mr-2"
-          onClick={onMenuClick}
         >
           <Menu className="h-5 w-5" />
         </Button>

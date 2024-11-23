@@ -9,11 +9,10 @@ import Sidebar from "@/components/dashboard/Sidebar";
 
 const PlanManagement = () => {
   const [activeTab, setActiveTab] = useState("plans");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Sidebar />
       <div className="flex-1 overflow-auto">
         <div className="container py-6 space-y-6">
           <div>

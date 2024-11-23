@@ -14,10 +14,9 @@ interface MenuItem {
 interface SidebarMenuProps {
   items: MenuItem[];
   currentPath: string;
-  onItemClick?: () => void;
 }
 
-export function SidebarMenu({ items, currentPath, onItemClick }: SidebarMenuProps) {
+export function SidebarMenu({ items, currentPath }: SidebarMenuProps) {
   const [openMenus, setOpenMenus] = useState<string[]>([]);
 
   const isActive = (href?: string) => {
@@ -34,12 +33,6 @@ export function SidebarMenu({ items, currentPath, onItemClick }: SidebarMenuProp
         ? prev.filter(item => item !== title)
         : [...prev, title]
     );
-  };
-
-  const handleClick = () => {
-    if (onItemClick) {
-      onItemClick();
-    }
   };
 
   const renderMenuItem = (item: MenuItem) => {
@@ -95,7 +88,6 @@ export function SidebarMenu({ items, currentPath, onItemClick }: SidebarMenuProp
             ? "text-primary-600 bg-primary-50 font-medium"
             : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
         )}
-        onClick={handleClick}
       >
         {active && (
           <motion.div
