@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { useState } from "react"
 import type { Category } from "@/types/offers"
 import { handleCustomerData } from "@/components/checkout/handlers/CustomerHandler"
+import { useNavigate } from "react-router-dom"
 
 interface CheckoutContentProps {
   step: number;
@@ -39,6 +40,19 @@ export const CheckoutContent = ({
   setCustomerId
 }: CheckoutContentProps) => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const navigate = useNavigate();
+
+  // Ensure we have the necessary data in sessionStorage
+  useEffect(() => {
+    if (step > 1 && !sessionStorage.getItem('selectedCategory')) {
+      navigate('/reservar');
+      return;
+    }
+    if (step > 2 && !sessionStorage.getItem('selectedPlan')) {
+      setStep(2);
+      return;
+    }
+  }, [step, navigate, setStep]);
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
@@ -73,93 +87,69 @@ export const CheckoutContent = ({
     }
   };
 
-  const handleScheduleSubmit = (data: { date: string; time: string }) => {
-    dispatch({ 
-      type: 'UPDATE_PICKUP_SCHEDULE', 
-      payload: data 
-    });
-    setStep(7);
-    toast({
-      title: "Agendamento confirmado!",
-      description: "Agora vamos finalizar seu pagamento.",
-    });
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <CategorySelector 
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategorySelect={(category) => {
+              setSelectedCategory(category);
+              sessionStorage.setItem('selectedCategory', JSON.stringify(category));
+              setStep(2);
+              toast({
+                title: "Categoria selecionada!",
+                description: "Agora vamos escolher seu plano.",
+              });
+            }}
+          />
+        );
+      case 2:
+        return (
+          <PlanSelectionStep 
+            onNext={() => setStep(3)}
+          />
+        );
+      case 3:
+        return (
+          <InsurancePackageStep 
+            onSelect={(insuranceId) => {
+              setStep(4);
+              toast({
+                title: "Proteção selecionada!",
+                description: "Agora vamos escolher seus opcionais.",
+              });
+            }}
+            onBack={() => setStep(2)}
+          />
+        );
+      case 4:
+        return (
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4">Escolha seus opcionais</h3>
+            <OptionalsList />
+            <div className="flex justify-end mt-4">
+              <Button 
+                onClick={() => {
+                  setStep(5);
+                  toast({
+                    title: "Opcionais selecionados!",
+                    description: "Agora vamos preencher seus dados.",
+                  });
+                }}
+                className="bg-primary hover:bg-primary/90 text-white gap-1.5"
+              >
+                Continuar
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </Card>
+        );
+      default:
+        return null;
+    }
   };
-
-  const handlePaymentSuccess = (paymentId: string) => {
-    dispatch({ 
-      type: 'SET_PAYMENT_ID', 
-      payload: paymentId 
-    });
-    setStep(8);
-    toast({
-      title: "Pagamento confirmado!",
-      description: "Sua reserva foi finalizada com sucesso.",
-    });
-  };
-
-  if (step === 1) {
-    return (
-      <CategorySelector 
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onCategorySelect={(category) => {
-          setSelectedCategory(category);
-          setStep(2);
-          toast({
-            title: "Categoria selecionada!",
-            description: "Agora vamos escolher seu plano.",
-          });
-        }}
-      />
-    );
-  }
-
-  if (step === 2) {
-    return (
-      <PlanSelectionStep 
-        onNext={() => {
-          setStep(3);
-          toast({
-            title: "Plano selecionado!",
-            description: "Agora vamos escolher sua proteção.",
-          });
-        }}
-      />
-    );
-  }
-
-  if (step === 3) {
-    return (
-      <InsurancePackageStep 
-        onSelect={(insuranceId) => {
-          setStep(4);
-          toast({
-            title: "Proteção selecionada!",
-            description: "Agora vamos escolher seus opcionais.",
-          });
-        }}
-        onBack={() => setStep(2)}
-      />
-    );
-  }
-
-  if (step === 4) {
-    return (
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Escolha seus opcionais</h3>
-        <OptionalsList />
-        <div className="flex justify-end mt-4">
-          <Button 
-            onClick={() => setStep(5)} 
-            className="bg-primary hover:bg-primary/90 text-white gap-1.5"
-          >
-            Continuar
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
-        </div>
-      </Card>
-    );
-  }
 
   return (
     <motion.div
@@ -170,6 +160,7 @@ export const CheckoutContent = ({
     >
       <EnhancedSummary />
       <SupportCard />
+      
       {step > 1 && (
         <Button
           variant="ghost"
@@ -185,33 +176,7 @@ export const CheckoutContent = ({
       
       <div className={`grid gap-4 ${step === 1 ? '' : 'lg:grid-cols-3'}`}>
         <div className={step === 1 ? '' : 'lg:col-span-2'}>
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            {step === 5 && (
-              <CustomerForm onSubmit={handleCustomerSubmit} />
-            )}
-            
-            {step === 6 && (
-              <PickupScheduler onSubmit={handleScheduleSubmit} />
-            )}
-            
-            {step === 7 && customerId && (
-              <PaymentSection
-                amount={cartState.total}
-                driverId={customerId}
-                onPaymentSuccess={handlePaymentSuccess}
-              />
-            )}
-            
-            {step === 8 && (
-              <SuccessSection />
-            )}
-          </motion.div>
+          {renderStep()}
         </div>
       </div>
     </motion.div>

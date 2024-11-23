@@ -33,16 +33,31 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
   });
 
   const handlePlanSelect = (plan: Plans) => {
+    // Get the selected category from session storage
+    const categoryData = sessionStorage.getItem('selectedCategory');
+    if (!categoryData) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione uma categoria primeiro.",
+        variant: "destructive",
+      });
+      navigate('/reservar');
+      return;
+    }
+
+    const selectedCategory = JSON.parse(categoryData);
+
     dispatch({ type: 'CLEAR_CART' });
     dispatch({
       type: 'ADD_ITEM',
       payload: {
-        id: plan.id,
-        type: "optional",
+        id: `${selectedCategory.id}-${plan.id}`,
+        type: "car_group",
         quantity: 1,
         unitPrice: plan.base_price,
         totalPrice: plan.base_price,
-        name: plan.name,
+        name: `${selectedCategory.name} - ${plan.name}`,
+        category: selectedCategory.name,
         period: plan.period
       }
     });
