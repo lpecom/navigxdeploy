@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Plus, Minus } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useQuery } from "@tanstack/react-query";
@@ -79,7 +79,7 @@ export const OptionalsList = () => {
   };
 
   if (error) {
-    return <div className="text-red-500">Error loading optionals. Please try again.</div>;
+    return <div className="text-red-400">Error loading optionals. Please try again.</div>;
   }
 
   if (isLoading) {
@@ -93,7 +93,7 @@ export const OptionalsList = () => {
   }
 
   if (!optionals?.length) {
-    return <div className="text-gray-400">No optionals available.</div>;
+    return <div className="text-gray-200">No optionals available.</div>;
   }
 
   return (
@@ -108,12 +108,12 @@ export const OptionalsList = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
             key={optional.id}
-            className="group relative overflow-hidden rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-colors p-6"
+            className="group relative overflow-hidden rounded-xl bg-gray-800/40 backdrop-blur-sm border border-gray-700/50 hover:bg-gray-700/40 transition-colors p-6"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             
             <div className="flex items-center gap-6">
-              <Avatar className="h-16 w-16 rounded-lg border border-white/10">
+              <Avatar className="h-16 w-16 rounded-lg border border-gray-700/50">
                 <AvatarImage 
                   src={thumbnailUrl}
                   alt={optional.name}
@@ -126,10 +126,10 @@ export const OptionalsList = () => {
 
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-white mb-1">{optional.name}</h3>
-                <p className="text-sm text-gray-400 line-clamp-2">{optional.description}</p>
-                <p className="text-sm font-medium text-primary mt-2">
+                <p className="text-sm text-gray-300 line-clamp-2">{optional.description}</p>
+                <p className="text-sm font-medium text-primary-300 mt-2">
                   R$ {optional.price.toFixed(2)} 
-                  <span className="text-gray-400 ml-1">
+                  <span className="text-gray-300 ml-1">
                     {optional.price_period === 'per_rental' ? 'por aluguel' : 'por dia'}
                   </span>
                 </p>
@@ -141,7 +141,7 @@ export const OptionalsList = () => {
                   size="icon"
                   onClick={() => updateQuantity(optional, -1)}
                   disabled={currentQuantity === 0}
-                  className="border-white/10 hover:bg-white/10"
+                  className="border-gray-700 hover:bg-gray-700/50 text-white"
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
@@ -150,7 +150,7 @@ export const OptionalsList = () => {
                   variant="outline"
                   size="icon"
                   onClick={() => updateQuantity(optional, 1)}
-                  className="border-white/10 hover:bg-white/10"
+                  className="border-gray-700 hover:bg-gray-700/50 text-white"
                 >
                   <Plus className="h-4 w-4" />
                 </Button>

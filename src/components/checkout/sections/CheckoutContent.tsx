@@ -85,7 +85,7 @@ export const CheckoutContent = ({
         <Button
           variant="ghost"
           onClick={() => setStep(step - 1)}
-          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+          className="flex items-center gap-2 text-gray-200 hover:text-white transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
           Voltar
@@ -117,11 +117,11 @@ export const CheckoutContent = ({
             )}
 
             {step === 2 && (
-              <Card className="p-6">
-                <h2 className="text-2xl font-semibold mb-6">Escolha seus opcionais</h2>
+              <Card className="p-6 bg-gray-900/40 backdrop-blur-sm border-gray-800">
+                <h2 className="text-2xl font-semibold mb-6 text-white">Escolha seus opcionais</h2>
                 <OptionalsList />
                 <div className="flex justify-end mt-6">
-                  <Button onClick={() => setStep(3)}>
+                  <Button onClick={() => setStep(3)} className="bg-primary hover:bg-primary/90">
                     Continuar
                     <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
