@@ -83,7 +83,7 @@ export const CheckoutContent = ({
         <Button
           variant="ghost"
           onClick={() => setStep(step - 1)}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-4"
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
           Voltar
@@ -94,35 +94,47 @@ export const CheckoutContent = ({
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         <div className="lg:col-span-2 space-y-6">
-          {step === 1 && (
-            <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg p-6">
-              <CustomerForm onSubmit={handleCustomerSubmit} />
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 shadow-2xl"
+          >
+            <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/20" />
+            
+            <div className="relative p-6 sm:p-8">
+              {step === 1 && (
+                <CustomerForm onSubmit={handleCustomerSubmit} />
+              )}
+              
+              {step === 2 && (
+                <PlanSelectionStep onNext={() => setStep(3)} />
+              )}
+              
+              {step === 3 && (
+                <InsuranceAndOptionalsStep onNext={() => setStep(4)} />
+              )}
+              
+              {step === 4 && (
+                <PickupScheduler onSubmit={handleScheduleSubmit} />
+              )}
+              
+              {step === 5 && customerId && (
+                <PaymentSection
+                  amount={cartState.total}
+                  driverId={customerId}
+                  onPaymentSuccess={handlePaymentSuccess}
+                />
+              )}
+              
+              {step === 6 && (
+                <SuccessSection />
+              )}
             </div>
-          )}
-          
-          {step === 2 && (
-            <PlanSelectionStep onNext={() => setStep(3)} />
-          )}
-          
-          {step === 3 && (
-            <InsuranceAndOptionalsStep onNext={() => setStep(4)} />
-          )}
-          
-          {step === 4 && (
-            <PickupScheduler onSubmit={handleScheduleSubmit} />
-          )}
-          
-          {step === 5 && customerId && (
-            <PaymentSection
-              amount={cartState.total}
-              driverId={customerId}
-              onPaymentSuccess={handlePaymentSuccess}
-            />
-          )}
-          
-          {step === 6 && (
-            <SuccessSection />
-          )}
+          </motion.div>
         </div>
 
         <div className="space-y-6">

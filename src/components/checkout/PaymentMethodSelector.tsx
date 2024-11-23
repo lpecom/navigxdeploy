@@ -18,59 +18,36 @@ export const PaymentMethodSelector = ({
       onValueChange={onMethodChange}
       className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4"
     >
-      <motion.div
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <RadioGroupItem
-          value="credit"
-          id="credit"
-          className="peer sr-only"
-        />
-        <Label
-          htmlFor="credit"
-          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary transition-all duration-200"
+      {[
+        { value: 'credit', icon: CreditCard, label: 'Cartão de Crédito' },
+        { value: 'pix', icon: QrCode, label: 'PIX' },
+        { value: 'boleto', icon: Receipt, label: 'Boleto' }
+      ].map((method) => (
+        <motion.div
+          key={method.value}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
-          <CreditCard className="mb-2 sm:mb-3 h-5 w-5 sm:h-6 sm:w-6" />
-          <span className="text-sm sm:text-base">Cartão de Crédito</span>
-        </Label>
-      </motion.div>
-      
-      <motion.div
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <RadioGroupItem
-          value="pix"
-          id="pix"
-          className="peer sr-only"
-        />
-        <Label
-          htmlFor="pix"
-          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary transition-all duration-200"
-        >
-          <QrCode className="mb-2 sm:mb-3 h-5 w-5 sm:h-6 sm:w-6" />
-          <span className="text-sm sm:text-base">PIX</span>
-        </Label>
-      </motion.div>
-      
-      <motion.div
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <RadioGroupItem
-          value="boleto"
-          id="boleto"
-          className="peer sr-only"
-        />
-        <Label
-          htmlFor="boleto"
-          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary transition-all duration-200"
-        >
-          <Receipt className="mb-2 sm:mb-3 h-5 w-5 sm:h-6 sm:w-6" />
-          <span className="text-sm sm:text-base">Boleto</span>
-        </Label>
-      </motion.div>
+          <RadioGroupItem
+            value={method.value}
+            id={method.value}
+            className="peer sr-only"
+          />
+          <Label
+            htmlFor={method.value}
+            className="relative flex flex-col items-center justify-between rounded-xl border-2 border-white/10 bg-gradient-to-br from-gray-900/90 via-gray-800/90 to-gray-900/90 p-6 hover:bg-gray-800/50 peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary transition-all duration-200 backdrop-blur-sm overflow-hidden group"
+          >
+            <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/20" />
+            <div className="relative space-y-4">
+              <div className="bg-primary/10 p-3 rounded-full transition-colors group-hover:bg-primary/20">
+                <method.icon className="w-6 h-6 text-primary" />
+              </div>
+              <span className="text-base text-gray-200 font-medium">{method.label}</span>
+            </div>
+          </Label>
+        </motion.div>
+      ))}
     </RadioGroup>
   )
 }
