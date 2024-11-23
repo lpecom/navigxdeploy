@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Steps, checkoutSteps } from "@/components/checkout/Steps";
 import type { Plans } from "@/types/supabase/plans";
 
 interface Category {
@@ -112,15 +113,19 @@ export const PlansPage = () => {
         className="relative pt-20 sm:pt-28 pb-8 sm:pb-16"
       >
         <div className="container mx-auto px-4">
+          <div className="mb-12">
+            <Steps currentStep={1} steps={checkoutSteps} />
+          </div>
+
           <motion.h1 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
             className="text-3xl sm:text-4xl font-bold text-center mb-6 sm:mb-8 text-white"
           >
-            Escolha seu plano para{" "}
-            <span className="text-primary-400">{selectedCategory.name}</span>
+            Qual pacote de proteção você precisa?
           </motion.h1>
+
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
             {plans?.sort((a, b) => a.display_order - b.display_order).map((plan, index) => (
               <motion.div 
