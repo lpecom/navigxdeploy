@@ -1,11 +1,11 @@
 import { Card } from "@/components/ui/card"
 import { PlanDetails } from "../PlanDetails"
 import { useCart } from "@/contexts/CartContext"
-import { CarSlider } from "@/components/home/CarSlider"
 import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import { getBrandFromModel } from "@/utils/brandLogos"
 import { motion } from "framer-motion"
+import { Loader2 } from "lucide-react"
 import type { CarModel } from "@/types/vehicles"
 
 interface PlanSelectionStepProps {
@@ -16,10 +16,12 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
   const { state: cartState } = useCart()
   const selectedPlan = cartState.items.find((item: any) => item.type === 'car_group')
 
-  const { data: carModels } = useQuery({
+  const { data: carModels, isLoading, error } = useQuery({
     queryKey: ['car-models', selectedPlan?.id],
     queryFn: async () => {
       if (!selectedPlan?.id) return null;
+      
+      console.log('Fetching car models for category:', selectedPlan.category);
       
       // First get the category_id from car_groups
       const { data: carGroups, error: carGroupError } = await supabase
@@ -32,6 +34,8 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
         return null;
       }
 
+      console.log('Found car groups:', carGroups);
+
       if (!carGroups?.length) {
         console.error('No car group found for category:', selectedPlan.category);
         return null;
@@ -43,7 +47,12 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
         .select('*')
         .eq('category_id', carGroups[0].id);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching car models:', error);
+        throw error;
+      }
+
+      console.log('Found car models:', data);
       return data as CarModel[];
     },
     enabled: !!selectedPlan?.id
@@ -71,6 +80,24 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
     price: selectedPlan.unitPrice,
     period: 'mês'
   } : null;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="p-4">
+        <div className="text-center text-red-500">
+          Erro ao carregar veículos. Por favor, tente novamente.
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -117,7 +144,10 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
       ) : (
         <Card className="p-4">
           <div className="text-center text-gray-500">
-            Nenhum veículo disponível nesta categoria
+            {selectedPlan ? 
+              `Nenhum veículo disponível na categoria ${selectedPlan.category}` :
+              'Selecione um plano para ver os veículos disponíveis'
+            }
           </div>
         </Card>
       )}
