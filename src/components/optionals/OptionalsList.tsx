@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
-import { Users, Road, ShieldCheck, Navigation, Wifi, Info } from "lucide-react";
+import { Users, Car, ShieldCheck, Navigation, Wifi, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Optional {
@@ -19,7 +19,7 @@ interface Optional {
 const getIconForOptional = (name: string) => {
   const icons: Record<string, React.ReactNode> = {
     "Additional driver": <Users className="w-5 h-5" />,
-    "Toll pass/Express lane": <Road className="w-5 h-5" />,
+    "Toll pass/Express lane": <Car className="w-5 h-5" />,
     "Extended Roadside Protection": <ShieldCheck className="w-5 h-5" />,
     "GPS": <Navigation className="w-5 h-5" />,
     "SIXT Connect": <Wifi className="w-5 h-5" />,
