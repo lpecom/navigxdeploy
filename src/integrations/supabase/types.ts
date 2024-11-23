@@ -1546,6 +1546,8 @@ export type Database = {
           fine_points: number | null
           fine_status: string | null
           id: string
+          raw_data: Json | null
+          source_url: string | null
           updated_at: string | null
           vehicle_id: string | null
         }
@@ -1559,6 +1561,8 @@ export type Database = {
           fine_points?: number | null
           fine_status?: string | null
           id?: string
+          raw_data?: Json | null
+          source_url?: string | null
           updated_at?: string | null
           vehicle_id?: string | null
         }
@@ -1572,6 +1576,8 @@ export type Database = {
           fine_points?: number | null
           fine_status?: string | null
           id?: string
+          raw_data?: Json | null
+          source_url?: string | null
           updated_at?: string | null
           vehicle_id?: string | null
         }

@@ -1,9 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { corsHeaders } from '../_shared/cors.ts';
+import * as cheerio from 'https://esm.sh/cheerio@1.0.0-rc.12';
 
-const MULTAS_API_URL = 'https://multa.consultaplacas.com.br';
-
-interface FineResponse {
+interface FineData {
   code: string;
   description: string;
   date: string;
@@ -20,31 +19,48 @@ Deno.serve(async (req) => {
 
   try {
     const { plate, vehicleId } = await req.json();
-    const apiKey = Deno.env.get('MULTAS_API_KEY');
-
-    if (!apiKey) {
-      throw new Error('MULTAS_API_KEY is not configured');
-    }
 
     if (!plate) {
       throw new Error('Vehicle plate is required');
     }
 
-    // Call the Multas API
-    const response = await fetch(`${MULTAS_API_URL}/consulta`, {
-      method: 'POST',
+    console.log(`Fetching fines for plate: ${plate}`);
+
+    // Fetch the webpage
+    const response = await fetch(`https://multa.consultaplacas.com.br/consulta/${plate}`, {
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({ plate }),
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
     });
 
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.statusText}`);
+      throw new Error(`Failed to fetch data: ${response.statusText}`);
     }
 
-    const fines: FineResponse[] = await response.json();
+    const html = await response.text();
+    const $ = cheerio.load(html);
+    const fines: FineData[] = [];
+
+    // Parse the fines table
+    $('.fines-table tr').each((_, element) => {
+      const $row = $(element);
+      const $cols = $row.find('td');
+
+      if ($cols.length >= 6) {
+        const fine: FineData = {
+          code: $cols.eq(0).text().trim(),
+          description: $cols.eq(1).text().trim(),
+          date: $cols.eq(2).text().trim(),
+          location: $cols.eq(3).text().trim(),
+          amount: parseFloat($cols.eq(4).text().replace('R$', '').trim()) || 0,
+          points: parseInt($cols.eq(5).text().trim()) || 0,
+          status: 'pending'
+        };
+        fines.push(fine);
+      }
+    });
+
+    console.log(`Found ${fines.length} fines`);
 
     // Store the fines in the database
     const supabaseAdmin = createClient(
@@ -54,7 +70,7 @@ Deno.serve(async (req) => {
 
     // Insert or update fines in the database
     for (const fine of fines) {
-      await supabaseAdmin
+      const { error } = await supabaseAdmin
         .from('vehicle_fines')
         .upsert({
           vehicle_id: vehicleId,
@@ -65,9 +81,15 @@ Deno.serve(async (req) => {
           fine_amount: fine.amount,
           fine_points: fine.points,
           fine_status: fine.status,
+          source_url: `https://multa.consultaplacas.com.br/consulta/${plate}`,
+          raw_data: fine
         }, {
           onConflict: 'vehicle_id,fine_code'
         });
+
+      if (error) {
+        console.error('Error storing fine:', error);
+      }
     }
 
     return new Response(
