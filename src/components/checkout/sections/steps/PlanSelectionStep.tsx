@@ -79,7 +79,9 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
       }
 
       // Find the SUV Black category
-      const suvCategory = categories?.find(cat => cat.name === 'SUV Black');
+      const suvCategory = categories?.find(cat => 
+        cat.name.toLowerCase() === 'suv black'
+      );
       
       if (!suvCategory) {
         console.warn('SUV Black category not found');
@@ -93,15 +95,17 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
           *,
           category:categories(name)
         `)
-        .eq('category_id', suvCategory.id);
+        .eq('category_id', suvCategory.id)
+        .eq('is_active', true);
       
       if (error) {
         toast.error('Erro ao carregar modelos');
         throw error;
       }
       
-      return (data || []) as CarModel[];
-    }
+      return data as CarModel[];
+    },
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
   return (
@@ -118,7 +122,11 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
         </h2>
       </div>
 
-      {!isLoading && carModels && carModels.length > 0 && (
+      {isLoading ? (
+        <div className="relative py-8">
+          <div className="animate-pulse bg-gray-800/50 rounded-xl aspect-[16/9]" />
+        </div>
+      ) : carModels && carModels.length > 0 ? (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -128,6 +136,10 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
           <div className="absolute inset-0 bg-gradient-to-b from-gray-900/0 via-gray-900/50 to-gray-900/0" />
           <CarModelCarousel carModels={carModels} />
         </motion.div>
+      ) : (
+        <div className="text-center py-8 text-gray-400">
+          Nenhum veículo encontrado nesta categoria
+        </div>
       )}
 
       <div className="mt-12">
