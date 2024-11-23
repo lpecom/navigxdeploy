@@ -134,7 +134,7 @@ export const PlansPage = () => {
               transition={{ delay: 0.2, duration: 0.5 }}
               className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
             >
-              Qual pacote de proteção você precisa?
+              Escolha o plano mais lucrativo pro seu bolso
             </motion.h1>
           </div>
 
