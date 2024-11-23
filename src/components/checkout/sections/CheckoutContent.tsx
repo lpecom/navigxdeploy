@@ -7,7 +7,7 @@ import { PaymentSection } from "./PaymentSection"
 import { SuccessSection } from "./SuccessSection"
 import { SupportCard } from "./SupportCard"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { PlanSelectionStep } from "./steps/PlanSelectionStep"
 import { InsurancePackageStep } from "./steps/InsurancePackageStep"
 import { OptionalsList } from "@/components/optionals/OptionalsList"
@@ -74,8 +74,6 @@ export const CheckoutContent = ({
     })
   }
 
-  const showSidebar = step > 3;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -96,8 +94,8 @@ export const CheckoutContent = ({
 
       <CheckoutProgress currentStep={step} />
       
-      <div className={`grid gap-4 ${showSidebar ? 'lg:grid-cols-3' : ''}`}>
-        <div className={showSidebar ? 'lg:col-span-2' : ''}>
+      <div className={`grid gap-4 ${step === 1 ? '' : 'lg:grid-cols-3'}`}>
+        <div className={step === 1 ? '' : 'lg:col-span-2'}>
           <motion.div
             key={step}
             initial={{ opacity: 0, x: 20 }}
@@ -134,6 +132,15 @@ export const CheckoutContent = ({
               <Card className="p-6 bg-white/5 backdrop-blur-sm border-white/10">
                 <h2 className="text-xl font-semibold mb-4 text-white">Escolha seus opcionais</h2>
                 <OptionalsList />
+                <div className="flex justify-end mt-4">
+                  <Button 
+                    onClick={() => setStep(4)} 
+                    className="bg-primary hover:bg-primary/90 text-white gap-1.5"
+                  >
+                    Continuar
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
               </Card>
             )}
             
@@ -159,7 +166,7 @@ export const CheckoutContent = ({
           </motion.div>
         </div>
 
-        {showSidebar && (
+        {step > 1 && (
           <div className="space-y-4">
             <EnhancedSummary />
             {step < 7 && <SupportCard />}
