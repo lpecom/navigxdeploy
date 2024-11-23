@@ -13,6 +13,7 @@ import {
   Clock 
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 interface PlanSelectionStepProps {
   onNext: () => void;
@@ -65,22 +66,36 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
   const { data: carModels, isLoading } = useQuery({
     queryKey: ['car-models'],
     queryFn: async () => {
-      // First get the category ID for "SUV Black"
+      // First get all categories
       const { data: categories, error: categoryError } = await supabase
         .from('categories')
-        .select('id')
-        .eq('name', 'SUV Black')
-        .single();
+        .select('id, name')
+        .eq('is_active', true);
       
-      if (categoryError) throw categoryError;
+      if (categoryError) {
+        toast.error('Erro ao carregar categorias');
+        throw categoryError;
+      }
+
+      // Find the SUV Black category
+      const suvCategory = categories?.find(cat => cat.name === 'SUV Black');
+      
+      if (!suvCategory) {
+        // If category doesn't exist, return empty array
+        console.warn('SUV Black category not found');
+        return [];
+      }
       
       // Then get car models for that category
       const { data, error } = await supabase
         .from('car_models')
         .select('*')
-        .eq('category_id', categories.id);
+        .eq('category_id', suvCategory.id);
       
-      if (error) throw error;
+      if (error) {
+        toast.error('Erro ao carregar modelos');
+        throw error;
+      }
       
       // Transform the data to match our CarModel type
       return data.map(model => ({
