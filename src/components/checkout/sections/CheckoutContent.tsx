@@ -1,17 +1,16 @@
-import { motion } from "framer-motion"
-import { CheckoutProgress } from "./CheckoutProgress"
-import { EnhancedSummary } from "./EnhancedSummary"
-import { CustomerForm } from "./CustomerForm"
-import { PickupScheduler } from "./PickupScheduler"
-import { PaymentSection } from "./PaymentSection"
-import { SuccessSection } from "./SuccessSection"
-import { SupportCard } from "./SupportCard"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { PlanSelectionStep } from "./steps/PlanSelectionStep"
-import { InsurancePackageStep } from "./steps/InsurancePackageStep"
-import { OptionalsList } from "@/components/optionals/OptionalsList"
-import { Card } from "@/components/ui/card"
+import { motion } from "framer-motion";
+import { CheckoutProgress } from "./CheckoutProgress";
+import { EnhancedSummary } from "./EnhancedSummary";
+import { CustomerForm } from "./CustomerForm";
+import { PickupScheduler } from "./PickupScheduler";
+import { PaymentSection } from "./PaymentSection";
+import { SuccessSection } from "./SuccessSection";
+import { SupportCard } from "./SupportCard";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { InsurancePackageStep } from "./steps/InsurancePackageStep";
+import { OptionalsList } from "@/components/optionals/OptionalsList";
+import { Card } from "@/components/ui/card";
 
 interface CheckoutContentProps {
   step: number;
@@ -34,47 +33,48 @@ export const CheckoutContent = ({
 }: CheckoutContentProps) => {
   const handleCustomerSubmit = async (customerData: any) => {
     try {
-      setCustomerId(customerData.id)
-      setStep(5)
+      setCustomerId(customerData.id);
+      setStep(5);
       toast({
         title: "Dados salvos com sucesso!",
         description: "Seus dados foram salvos. Vamos agendar sua retirada.",
-      })
+      });
     } catch (error: any) {
-      console.error('Error saving customer details:', error)
+      console.error('Error saving customer details:', error);
       toast({
         title: "Erro ao salvar dados",
         description: error.message || "Ocorreu um erro ao salvar seus dados.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleScheduleSubmit = async (scheduleData: any) => {
     try {
-      setStep(6)
+      setStep(6);
       toast({
         title: "Agendamento confirmado!",
         description: "Seu horário foi agendado com sucesso.",
-      })
+      });
     } catch (error: any) {
       toast({
         title: "Erro ao agendar",
         description: "Ocorreu um erro ao agendar seu horário.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handlePaymentSuccess = () => {
-    setStep(7)
+    setStep(7);
     toast({
       title: "Pagamento confirmado!",
       description: "Seu pagamento foi processado com sucesso.",
-    })
-  }
+    });
+  };
 
-  const shouldShowSidebar = step !== 1 && step !== 2; // Hide sidebar in steps 1 and 2
+  // Only show sidebar in steps where it's relevant
+  const shouldShowSidebar = ![1, 2, 3].includes(step);
 
   return (
     <motion.div
@@ -105,26 +105,14 @@ export const CheckoutContent = ({
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
           >
-            {step === 1 && (
-              <PlanSelectionStep 
-                onNext={() => {
-                  setStep(2)
-                  toast({
-                    title: "Plano selecionado!",
-                    description: "Agora vamos escolher sua proteção.",
-                  })
-                }}
-              />
-            )}
-
             {step === 2 && (
               <InsurancePackageStep 
                 onSelect={(insuranceId) => {
-                  setStep(3)
+                  setStep(3);
                   toast({
                     title: "Proteção selecionada!",
                     description: "Agora vamos escolher seus opcionais.",
-                  })
+                  });
                 }}
                 onBack={() => setStep(1)}
               />
