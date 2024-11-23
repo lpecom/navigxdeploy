@@ -82,7 +82,6 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
       const suvCategory = categories?.find(cat => cat.name === 'SUV Black');
       
       if (!suvCategory) {
-        // If category doesn't exist, return empty array
         console.warn('SUV Black category not found');
         return [];
       }
@@ -90,7 +89,10 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
       // Then get car models for that category
       const { data, error } = await supabase
         .from('car_models')
-        .select('*')
+        .select(`
+          *,
+          category:categories(name)
+        `)
         .eq('category_id', suvCategory.id);
       
       if (error) {
@@ -98,12 +100,7 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
         throw error;
       }
       
-      // Transform the data to match our CarModel type
-      return (data || []).map(model => ({
-        ...model,
-        optionals: model.optionals ? (model.optionals as Record<string, any>) : {},
-        features: model.features ? (model.features as Record<string, any>[]) : []
-      })) as CarModel[];
+      return (data || []) as CarModel[];
     }
   });
 
@@ -121,8 +118,16 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
         </h2>
       </div>
 
-      {!isLoading && carModels && (
-        <CarModelCarousel carModels={carModels} />
+      {!isLoading && carModels && carModels.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="relative py-8"
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/0 via-gray-900/50 to-gray-900/0" />
+          <CarModelCarousel carModels={carModels} />
+        </motion.div>
       )}
 
       <div className="mt-12">
