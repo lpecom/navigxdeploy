@@ -8,7 +8,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { Car, Users, Gauge, Calendar, Shield, Tool, Fuel } from "lucide-react";
+import { Car, Users, Gauge, Calendar, Shield, Wrench, Fuel } from "lucide-react";
 import { getBrandLogo } from "@/utils/brandLogos";
 import type { CarModel } from "@/types/vehicles";
 
@@ -98,7 +98,7 @@ export const CarModelCarousel = ({ carModels }: CarModelCarouselProps) => {
                           <span className="text-sm text-gray-300">Seguro</span>
                         </div>
                         <div className="flex flex-col items-center text-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
-                          <Tool className="w-5 h-5 mb-2 text-primary" />
+                          <Wrench className="w-5 h-5 mb-2 text-primary" />
                           <span className="text-sm text-gray-300">Revisado</span>
                         </div>
                         <div className="flex flex-col items-center text-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
