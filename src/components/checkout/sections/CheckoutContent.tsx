@@ -7,7 +7,7 @@ import { PaymentSection } from "./PaymentSection"
 import { SuccessSection } from "./SuccessSection"
 import { SupportCard } from "./SupportCard"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft } from "lucide-react"
 import { PlanSelectionStep } from "./steps/PlanSelectionStep"
 import { InsurancePackageStep } from "./steps/InsurancePackageStep"
 import { OptionalsList } from "@/components/optionals/OptionalsList"
@@ -143,6 +143,24 @@ export const CheckoutContent = ({
     );
   }
 
+  if (step === 4) {
+    return (
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4">Escolha seus opcionais</h3>
+        <OptionalsList />
+        <div className="flex justify-end mt-4">
+          <Button 
+            onClick={() => setStep(5)} 
+            className="bg-primary hover:bg-primary/90 text-white gap-1.5"
+          >
+            Continuar
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -150,6 +168,8 @@ export const CheckoutContent = ({
       transition={{ duration: 0.5 }}
       className="space-y-4"
     >
+      <EnhancedSummary />
+      <SupportCard />
       {step > 1 && (
         <Button
           variant="ghost"
@@ -172,22 +192,6 @@ export const CheckoutContent = ({
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
           >
-            {step === 4 && (
-              <Card className="p-6 bg-white/5 backdrop-blur-sm border-white/10">
-                <h2 className="text-xl font-semibold mb-4 text-white">Escolha seus opcionais</h2>
-                <OptionalsList />
-                <div className="flex justify-end mt-4">
-                  <Button 
-                    onClick={() => setStep(5)} 
-                    className="bg-primary hover:bg-primary/90 text-white gap-1.5"
-                  >
-                    Continuar
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </Card>
-            )}
-            
             {step === 5 && (
               <CustomerForm onSubmit={handleCustomerSubmit} />
             )}
@@ -209,13 +213,6 @@ export const CheckoutContent = ({
             )}
           </motion.div>
         </div>
-
-        {step > 1 && (
-          <div className="space-y-4">
-            <EnhancedSummary />
-            {step < 8 && <SupportCard />}
-          </div>
-        )}
       </div>
     </motion.div>
   );
