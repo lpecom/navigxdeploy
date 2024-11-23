@@ -13,6 +13,10 @@ import { InsurancePackageStep } from "./steps/InsurancePackageStep"
 import { OptionalsList } from "@/components/optionals/OptionalsList"
 import { Card } from "@/components/ui/card"
 import { CategorySelector } from "@/pages/reservation/components/CategorySelector"
+import { useQuery } from "@tanstack/react-query"
+import { supabase } from "@/integrations/supabase/client"
+import { useState } from "react"
+import type { Category } from "@/types/offers"
 
 interface CheckoutContentProps {
   step: number;
@@ -33,6 +37,22 @@ export const CheckoutContent = ({
   setStep,
   setCustomerId
 }: CheckoutContentProps) => {
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order');
+      
+      if (error) throw error;
+      return data as Category[];
+    }
+  });
+
   const handleCustomerSubmit = async (customerData: any) => {
     try {
       setCustomerId(customerData.id)
@@ -112,7 +132,10 @@ export const CheckoutContent = ({
           >
             {step === 1 && (
               <CategorySelector 
+                categories={categories}
+                selectedCategory={selectedCategory}
                 onCategorySelect={(category) => {
+                  setSelectedCategory(category);
                   sessionStorage.setItem('selectedCategory', JSON.stringify(category));
                   setStep(2);
                   toast({
