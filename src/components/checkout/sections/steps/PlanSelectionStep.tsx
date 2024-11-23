@@ -17,35 +17,20 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
   const selectedPlan = cartState.items.find((item: any) => item.type === 'car_group')
 
   const { data: carModels, isLoading, error } = useQuery({
-    queryKey: ['car-models', selectedPlan?.id],
+    queryKey: ['car-models', selectedPlan?.category],
     queryFn: async () => {
-      if (!selectedPlan?.id) return null;
+      if (!selectedPlan?.category) return null;
       
       console.log('Fetching car models for category:', selectedPlan.category);
       
-      // First get the category_id from car_groups
-      const { data: carGroups, error: carGroupError } = await supabase
-        .from('car_groups')
-        .select('id')
-        .eq('name', selectedPlan.category);
-      
-      if (carGroupError) {
-        console.error('Error fetching car group:', carGroupError);
-        return null;
-      }
-
-      console.log('Found car groups:', carGroups);
-
-      if (!carGroups?.length) {
-        console.error('No car group found for category:', selectedPlan.category);
-        return null;
-      }
-
-      // Then use that ID to fetch the models
+      // Query car models directly by category name
       const { data, error } = await supabase
         .from('car_models')
-        .select('*')
-        .eq('category_id', carGroups[0].id);
+        .select(`
+          *,
+          category:categories(name)
+        `)
+        .eq('categories.name', selectedPlan.category);
       
       if (error) {
         console.error('Error fetching car models:', error);
@@ -55,7 +40,7 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
       console.log('Found car models:', data);
       return data as CarModel[];
     },
-    enabled: !!selectedPlan?.id
+    enabled: !!selectedPlan?.category
   });
 
   // Group cars by brand
