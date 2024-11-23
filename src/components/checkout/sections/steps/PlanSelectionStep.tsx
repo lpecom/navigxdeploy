@@ -67,36 +67,13 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
   const { data: carModels, isLoading } = useQuery({
     queryKey: ['car-models'],
     queryFn: async () => {
-      // First get all categories
-      const { data: categories, error: categoryError } = await supabase
-        .from('categories')
-        .select('id, name')
-        .eq('is_active', true);
-      
-      if (categoryError) {
-        toast.error('Erro ao carregar categorias');
-        throw categoryError;
-      }
-
-      // Find the SUV Black category
-      const suvCategory = categories?.find(cat => 
-        cat.name.toLowerCase() === 'suv black'
-      );
-      
-      if (!suvCategory) {
-        console.warn('SUV Black category not found');
-        return [];
-      }
-      
-      // Then get car models for that category
       const { data, error } = await supabase
         .from('car_models')
         .select(`
           *,
           category:categories(name)
         `)
-        .eq('category_id', suvCategory.id)
-        .eq('is_active', true);
+        .eq('category_id', '1b464396-048b-4b09-8c16-a7b9e60c7b24');
       
       if (error) {
         toast.error('Erro ao carregar modelos');
