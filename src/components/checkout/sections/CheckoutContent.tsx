@@ -53,53 +53,51 @@ export const CheckoutContent = ({
     }
   });
 
-  const handleCustomerSubmit = async (customerData: any) => {
-    try {
-      setCustomerId(customerData.id)
-      setStep(5)
-      toast({
-        title: "Dados salvos com sucesso!",
-        description: "Seus dados foram salvos. Vamos agendar sua retirada.",
-      })
-    } catch (error: any) {
-      console.error('Error saving customer details:', error)
-      toast({
-        title: "Erro ao salvar dados",
-        description: error.message || "Ocorreu um erro ao salvar seus dados.",
-        variant: "destructive",
-      })
-    }
+  if (step === 1) {
+    return (
+      <CategorySelector 
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onCategorySelect={(category) => {
+          setSelectedCategory(category);
+          setStep(2);
+          toast({
+            title: "Categoria selecionada!",
+            description: "Agora vamos escolher seu plano.",
+          });
+        }}
+      />
+    );
   }
 
-  const handleScheduleSubmit = async (scheduleData: any) => {
-    try {
-      setStep(6)
-      toast({
-        title: "Agendamento confirmado!",
-        description: "Seu horário foi agendado com sucesso.",
-      })
-    } catch (error: any) {
-      toast({
-        title: "Erro ao agendar",
-        description: "Ocorreu um erro ao agendar seu horário.",
-        variant: "destructive",
-      })
-    }
+  if (step === 2) {
+    return (
+      <PlanSelectionStep 
+        onNext={() => {
+          setStep(3);
+          toast({
+            title: "Plano selecionado!",
+            description: "Agora vamos escolher sua proteção.",
+          });
+        }}
+      />
+    );
   }
 
-  const handlePaymentSuccess = () => {
-    setStep(7)
-    toast({
-      title: "Pagamento confirmado!",
-      description: "Seu pagamento foi processado com sucesso.",
-    })
+  if (step === 3) {
+    return (
+      <InsurancePackageStep 
+        onSelect={(insuranceId) => {
+          setStep(4);
+          toast({
+            title: "Proteção selecionada!",
+            description: "Agora vamos escolher seus opcionais.",
+          });
+        }}
+        onBack={() => setStep(2)}
+      />
+    );
   }
-
-  // Function to determine if side cards should be shown
-  const shouldShowSideCards = (currentStep: number) => {
-    // Hide cards for step 2 (insurance step)
-    return currentStep !== 2;
-  };
 
   return (
     <motion.div
@@ -130,47 +128,6 @@ export const CheckoutContent = ({
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
           >
-            {step === 1 && (
-              <CategorySelector 
-                categories={categories}
-                selectedCategory={selectedCategory}
-                onCategorySelect={(category) => {
-                  setSelectedCategory(category);
-                  sessionStorage.setItem('selectedCategory', JSON.stringify(category));
-                  setStep(2);
-                  toast({
-                    title: "Categoria selecionada!",
-                    description: "Agora vamos escolher seu plano.",
-                  });
-                }}
-              />
-            )}
-
-            {step === 2 && (
-              <PlanSelectionStep 
-                onNext={() => {
-                  setStep(3)
-                  toast({
-                    title: "Plano selecionado!",
-                    description: "Agora vamos escolher sua proteção.",
-                  })
-                }}
-              />
-            )}
-
-            {step === 3 && (
-              <InsurancePackageStep 
-                onSelect={(insuranceId) => {
-                  setStep(4)
-                  toast({
-                    title: "Proteção selecionada!",
-                    description: "Agora vamos escolher seus opcionais.",
-                  })
-                }}
-                onBack={() => setStep(2)}
-              />
-            )}
-
             {step === 4 && (
               <Card className="p-6 bg-white/5 backdrop-blur-sm border-white/10">
                 <h2 className="text-xl font-semibold mb-4 text-white">Escolha seus opcionais</h2>
@@ -209,7 +166,7 @@ export const CheckoutContent = ({
           </motion.div>
         </div>
 
-        {step > 1 && shouldShowSideCards(step) && (
+        {step > 1 && (
           <div className="space-y-4">
             <EnhancedSummary />
             {step < 8 && <SupportCard />}

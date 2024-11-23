@@ -103,6 +103,11 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
+  const handleContinue = () => {
+    // Call the onNext prop to advance to the next step (insurance)
+    onNext();
+  };
+
   return (
     <div className="space-y-8">
       <div className="space-y-4">
@@ -130,6 +135,14 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
         >
           <div className="absolute inset-0 bg-gradient-to-b from-gray-900/0 via-gray-900/50 to-gray-900/0" />
           <CarModelCarousel carModels={carModels} />
+          <div className="mt-8 flex justify-end">
+            <button
+              onClick={handleContinue}
+              className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              Continuar para Seguros
+            </button>
+          </div>
         </motion.div>
       ) : (
         <div className="text-center py-8 text-gray-400">
