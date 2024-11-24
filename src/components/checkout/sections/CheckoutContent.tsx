@@ -10,6 +10,7 @@ import { SupportCard } from "./SupportCard"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { OverviewStep } from "./steps/OverviewStep"
+import { PlansStep } from "./steps/PlansStep"
 import { InsurancePackageStep } from "./steps/InsurancePackageStep"
 import { OptionalsList } from "@/components/optionals/OptionalsList"
 import { Card } from "@/components/ui/card"
@@ -121,41 +122,37 @@ export const CheckoutContent = ({
                   setStep(2)
                   toast({
                     title: "Categoria confirmada!",
-                    description: "Agora vamos escolher sua proteção.",
+                    description: "Agora vamos escolher seu plano.",
                   })
                 }}
               />
             )}
 
             {step === 2 && (
+              <PlansStep 
+                onSelect={() => {
+                  setStep(3)
+                  toast({
+                    title: "Plano selecionado!",
+                    description: "Agora vamos escolher sua proteção.",
+                  })
+                }}
+              />
+            )}
+
+            {step === 3 && (
               <InsurancePackageStep 
                 onSelect={(insuranceId) => {
-                  setStep(3)
+                  setStep(4)
                   toast({
                     title: "Proteção selecionada!",
                     description: "Agora vamos escolher seus opcionais.",
                   })
                 }}
-                onBack={() => setStep(1)}
+                onBack={() => setStep(2)}
               />
             )}
 
-            {step === 3 && (
-              <Card className="p-6 bg-white/5 backdrop-blur-sm border-white/10">
-                <h2 className="text-xl font-semibold mb-4 text-white">Escolha seus opcionais</h2>
-                <OptionalsList />
-                <div className="flex justify-end mt-4">
-                  <Button 
-                    onClick={() => setStep(4)} 
-                    className="bg-primary hover:bg-primary/90 text-white gap-1.5"
-                  >
-                    Continuar
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </Card>
-            )}
-            
             {step === 4 && (
               <CustomerForm onSubmit={handleCustomerSubmit} />
             )}
@@ -181,7 +178,7 @@ export const CheckoutContent = ({
         {step > 1 && (
           <div className="space-y-4">
             <EnhancedSummary />
-            {step < 7 && <SupportCard />}
+            {step < 8 && <SupportCard />}
           </div>
         )}
       </div>

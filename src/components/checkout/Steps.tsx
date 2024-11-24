@@ -1,14 +1,15 @@
-import { User, Calendar, CreditCard, ShieldCheck, CheckCircle, Package, FileText, LayoutDashboard } from "lucide-react"
+import { User, Calendar, CreditCard, ShieldCheck, CheckCircle, Package, LayoutDashboard, Wallet } from "lucide-react"
 import { motion } from "framer-motion"
 
 export const checkoutSteps = [
   { number: 1, title: "Visão Geral", icon: LayoutDashboard },
-  { number: 2, title: "Seguro e Proteção", icon: ShieldCheck },
-  { number: 3, title: "Opcionais", icon: Package },
-  { number: 4, title: "Seus Dados", icon: User },
-  { number: 5, title: "Agendamento", icon: Calendar },
-  { number: 6, title: "Pagamento", icon: CreditCard },
-  { number: 7, title: "Confirmação", icon: CheckCircle }
+  { number: 2, title: "Planos", icon: Wallet },
+  { number: 3, title: "Seguro e Proteção", icon: ShieldCheck },
+  { number: 4, title: "Opcionais", icon: Package },
+  { number: 5, title: "Seus Dados", icon: User },
+  { number: 6, title: "Agendamento", icon: Calendar },
+  { number: 7, title: "Pagamento", icon: CreditCard },
+  { number: 8, title: "Confirmação", icon: CheckCircle }
 ]
 
 interface StepsProps {
