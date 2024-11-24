@@ -55,11 +55,7 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
     setIsNavigating(true);
 
     if (!selectedCategory) {
-      toast({
-        title: "Erro",
-        description: "Por favor, selecione uma categoria primeiro.",
-        variant: "destructive",
-      });
+      toast.error("Por favor, selecione uma categoria primeiro.");
       navigate('/');
       return;
     }
@@ -81,13 +77,10 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
 
       sessionStorage.setItem('selectedPlan', plan.type);
       onSelect();
+      toast.success('Plano selecionado! Continue seu checkout.');
     } catch (error) {
       console.error('Error handling plan selection:', error);
-      toast({
-        title: "Erro",
-        description: "Ocorreu um erro ao selecionar o plano. Tente novamente.",
-        variant: "destructive",
-      });
+      toast.error("Ocorreu um erro ao selecionar o plano. Tente novamente.");
     } finally {
       setIsNavigating(false);
     }

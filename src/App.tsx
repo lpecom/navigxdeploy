@@ -15,6 +15,7 @@ import AdminRoutes from "./routes/AdminRoutes";
 import AdminLogin from "./pages/AdminLogin";
 import DriverLogin from "./pages/DriverLogin";
 
+// Move queryClient outside component to avoid recreation
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -58,36 +59,38 @@ const ProtectedRouteHandler = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const AppContent = () => {
+const AppRoutes = () => {
   return (
     <BrowserRouter>
       <TooltipProvider>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/login" element={<DriverLogin />} />
-          
-          {/* Protected Routes */}
-          <Route path="/driver/*" element={
-            <ProtectedRouteHandler>
-              <DriverDashboard />
-            </ProtectedRouteHandler>
-          } />
-          
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/*" element={
-            <ProtectedRouteHandler>
-              <AdminRoutes />
-            </ProtectedRouteHandler>
-          } />
-          
-          {/* Legacy route redirect */}
-          <Route path="/dashboard/*" element={<Navigate to="/admin" replace />} />
-          
-          {/* Catch all redirect */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <CartProvider>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/login" element={<DriverLogin />} />
+            
+            {/* Protected Routes */}
+            <Route path="/driver/*" element={
+              <ProtectedRouteHandler>
+                <DriverDashboard />
+              </ProtectedRouteHandler>
+            } />
+            
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/*" element={
+              <ProtectedRouteHandler>
+                <AdminRoutes />
+              </ProtectedRouteHandler>
+            } />
+            
+            {/* Legacy route redirect */}
+            <Route path="/dashboard/*" element={<Navigate to="/admin" replace />} />
+            
+            {/* Catch all redirect */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </CartProvider>
       </TooltipProvider>
     </BrowserRouter>
   );
@@ -97,11 +100,9 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionContextProvider supabaseClient={supabase}>
-        <CartProvider>
-          <AppContent />
-          <Toaster />
-          <Sonner />
-        </CartProvider>
+        <AppContent />
+        <Toaster />
+        <Sonner />
       </SessionContextProvider>
     </QueryClientProvider>
   );
