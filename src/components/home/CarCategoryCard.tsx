@@ -42,7 +42,7 @@ export const CarCategoryCard = ({ category, cars = [] }: CarCategoryCardProps) =
     // Store category data for the checkout process
     sessionStorage.setItem('selectedCategory', JSON.stringify(category));
     
-    // Navigate to checkout
+    // Navigate directly to checkout
     navigate('/checkout');
     
     toast.success('Categoria selecionada! Continue seu checkout.');
