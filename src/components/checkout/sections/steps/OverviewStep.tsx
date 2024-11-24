@@ -10,10 +10,12 @@ import {
   Wifi, 
   ShieldCheck, 
   Wrench, 
-  Clock 
+  Clock,
+  ChevronRight 
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import type { CarModel } from "@/types/vehicles";
 
 interface OverviewStepProps {
@@ -141,6 +143,16 @@ export const OverviewStep = ({ onNext }: OverviewStepProps) => {
             ))}
           </div>
         </motion.div>
+
+        <div className="flex justify-end mt-8">
+          <Button 
+            onClick={onNext}
+            className="bg-primary hover:bg-primary/90 text-white gap-2"
+          >
+            Continuar para planos
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
