@@ -2,7 +2,10 @@ import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PlanCard } from "@/components/plans/PlanCard";
+import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import type { Plans } from "@/types/supabase/plans";
 
 interface PlansStepProps {
@@ -10,6 +13,11 @@ interface PlansStepProps {
 }
 
 export const PlansStep = ({ onSelect }: PlansStepProps) => {
+  const navigate = useNavigate();
+  const { dispatch, state } = useCart();
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
+  
   const { data: plans, isLoading } = useQuery({
     queryKey: ['plans'],
     queryFn: async () => {
@@ -23,6 +31,67 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
       return data as Plans[];
     }
   });
+  
+  useEffect(() => {
+    const categoryData = sessionStorage.getItem('selectedCategory');
+    if (categoryData) {
+      try {
+        setSelectedCategory(JSON.parse(categoryData));
+      } catch (error) {
+        console.error('Error parsing category data:', error);
+        navigate('/');
+      }
+    } else {
+      // Only navigate home if there's no car_group in cart
+      const hasCarGroup = state.items.some(item => item.type === 'car_group');
+      if (!hasCarGroup) {
+        navigate('/');
+      }
+    }
+  }, [navigate, state.items]);
+
+  const handlePlanSelect = async (plan: Plans) => {
+    if (isNavigating) return;
+    setIsNavigating(true);
+
+    if (!selectedCategory) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione uma categoria primeiro.",
+        variant: "destructive",
+      });
+      navigate('/');
+      return;
+    }
+    
+    try {
+      dispatch({
+        type: 'UPDATE_CAR_GROUP',
+        payload: {
+          id: `${selectedCategory.id}-${plan.type}`,
+          type: 'car_group',
+          quantity: 1,
+          unitPrice: plan.base_price,
+          totalPrice: plan.base_price,
+          name: `${selectedCategory.name} - ${plan.name}`,
+          category: selectedCategory.name,
+          period: plan.type
+        }
+      });
+
+      sessionStorage.setItem('selectedPlan', plan.type);
+      onSelect();
+    } catch (error) {
+      console.error('Error handling plan selection:', error);
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao selecionar o plano. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsNavigating(false);
+    }
+  };
 
   if (isLoading) {
     return <div>Loading plans...</div>;
@@ -53,10 +122,7 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
               price={plan.base_price.toFixed(2)}
               features={plan.features}
               kmRanges={plan.bullet_points}
-              onSelect={() => {
-                sessionStorage.setItem('selectedPlan', plan.type);
-                onSelect();
-              }}
+              onSelect={() => handlePlanSelect(plan)}
             />
           </motion.div>
         ))}
@@ -64,3 +130,5 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
     </div>
   );
 };
+
+export default PlansStep;
