@@ -16,54 +16,11 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import type { CarModel } from "@/types/vehicles";
 
-interface PlanSelectionStepProps {
+interface OverviewStepProps {
   onNext: () => void;
 }
 
-const DEMO_CATEGORY_BENEFITS = {
-  name: "SUV Black",
-  description: "Experimente o máximo em conforto e sofisticação",
-  benefits: [
-    {
-      icon: Gauge,
-      title: "Câmbio Automático",
-      description: "Transmissão automática para maior conforto"
-    },
-    {
-      icon: Snowflake,
-      title: "Ar Condicionado Digital",
-      description: "Controle preciso da temperatura"
-    },
-    {
-      icon: Music2,
-      title: "Sistema de Som Premium",
-      description: "Áudio de alta qualidade com Bluetooth"
-    },
-    {
-      icon: Wifi,
-      title: "Conectividade",
-      description: "Wi-Fi e USB para seus dispositivos"
-    },
-    {
-      icon: ShieldCheck,
-      title: "Segurança Avançada",
-      description: "Airbags e freios ABS"
-    },
-    {
-      icon: Wrench,
-      title: "Manutenção Inclusa",
-      description: "Revisões periódicas cobertas"
-    }
-  ],
-  additionalFeatures: [
-    "Sensor de Estacionamento",
-    "Câmera de Ré",
-    "Bancos em Couro",
-    "Start/Stop",
-  ]
-};
-
-export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
+export const OverviewStep = ({ onNext }: OverviewStepProps) => {
   const { data: carModels, isLoading } = useQuery({
     queryKey: ['car-models'],
     queryFn: async () => {
@@ -190,4 +147,47 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
       </div>
     </div>
   );
+};
+
+const DEMO_CATEGORY_BENEFITS = {
+  name: "SUV Black",
+  description: "Experimente o máximo em conforto e sofisticação",
+  benefits: [
+    {
+      icon: Gauge,
+      title: "Câmbio Automático",
+      description: "Transmissão automática para maior conforto"
+    },
+    {
+      icon: Snowflake,
+      title: "Ar Condicionado Digital",
+      description: "Controle preciso da temperatura"
+    },
+    {
+      icon: Music2,
+      title: "Sistema de Som Premium",
+      description: "Áudio de alta qualidade com Bluetooth"
+    },
+    {
+      icon: Wifi,
+      title: "Conectividade",
+      description: "Wi-Fi e USB para seus dispositivos"
+    },
+    {
+      icon: ShieldCheck,
+      title: "Segurança Avançada",
+      description: "Airbags e freios ABS"
+    },
+    {
+      icon: Wrench,
+      title: "Manutenção Inclusa",
+      description: "Revisões periódicas cobertas"
+    }
+  ],
+  additionalFeatures: [
+    "Sensor de Estacionamento",
+    "Câmera de Ré",
+    "Bancos em Couro",
+    "Start/Stop",
+  ]
 };
