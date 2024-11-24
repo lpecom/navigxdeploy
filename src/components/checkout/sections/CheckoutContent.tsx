@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { CheckoutProgress } from "./CheckoutProgress"
 import { EnhancedSummary } from "./EnhancedSummary"
@@ -12,6 +13,7 @@ import { PlanSelectionStep } from "./steps/PlanSelectionStep"
 import { InsurancePackageStep } from "./steps/InsurancePackageStep"
 import { OptionalsList } from "@/components/optionals/OptionalsList"
 import { Card } from "@/components/ui/card"
+import { useNavigate } from "react-router-dom"
 
 interface CheckoutContentProps {
   step: number;
@@ -32,6 +34,16 @@ export const CheckoutContent = ({
   setStep,
   setCustomerId
 }: CheckoutContentProps) => {
+  const navigate = useNavigate();
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  useEffect(() => {
+    const categoryData = sessionStorage.getItem('selectedCategory');
+    if (!categoryData && step === 1) {
+      navigate('/');
+    }
+  }, [navigate, step]);
+
   const handleCustomerSubmit = async (customerData: any) => {
     try {
       setCustomerId(customerData.id)

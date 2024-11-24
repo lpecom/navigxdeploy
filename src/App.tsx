@@ -9,7 +9,6 @@ import { CartProvider } from '@/contexts/CartContext';
 import { useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import Home from "./pages/Home";
-import { PlansPage } from "./pages/Plans";
 import { CheckoutPage } from "./components/checkout/CheckoutPage";
 import DriverDashboard from "./pages/DriverDashboard";
 import AdminRoutes from "./routes/AdminRoutes";
@@ -58,7 +57,6 @@ const AppContent = () => {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
-            <Route path="/plans" element={<PlansPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/login" element={<DriverLogin />} />
             
@@ -71,6 +69,7 @@ const AppContent = () => {
             
             {/* Legacy route redirect */}
             <Route path="/dashboard/*" element={<Navigate to="/admin" replace />} />
+            <Route path="/plans" element={<Navigate to="/checkout" replace />} />
             
             {/* Catch all redirect */}
             <Route path="*" element={<Navigate to="/" replace />} />
