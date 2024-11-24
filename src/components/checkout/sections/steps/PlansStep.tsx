@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { PlanCard } from "@/components/plans/PlanCard";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Plans } from "@/types/supabase/plans";
 
@@ -13,7 +12,6 @@ interface PlansStepProps {
 }
 
 export const PlansStep = ({ onSelect }: PlansStepProps) => {
-  const navigate = useNavigate();
   const { dispatch, state } = useCart();
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [isNavigating, setIsNavigating] = useState(false);
@@ -39,16 +37,9 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
         setSelectedCategory(JSON.parse(categoryData));
       } catch (error) {
         console.error('Error parsing category data:', error);
-        navigate('/');
-      }
-    } else {
-      // Only navigate home if there's no car_group in cart
-      const hasCarGroup = state.items.some(item => item.type === 'car_group');
-      if (!hasCarGroup) {
-        navigate('/');
       }
     }
-  }, [navigate, state.items]);
+  }, []);
 
   const handlePlanSelect = async (plan: Plans) => {
     if (isNavigating) return;
@@ -56,13 +47,13 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
 
     if (!selectedCategory) {
       toast.error("Por favor, selecione uma categoria primeiro.");
-      navigate('/');
       return;
     }
     
     try {
+      dispatch({ type: 'CLEAR_CART' });
       dispatch({
-        type: 'UPDATE_CAR_GROUP',
+        type: 'ADD_ITEM',
         payload: {
           id: `${selectedCategory.id}-${plan.type}`,
           type: 'car_group',
@@ -76,8 +67,8 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
       });
 
       sessionStorage.setItem('selectedPlan', plan.type);
-      onSelect();
       toast.success('Plano selecionado! Continue seu checkout.');
+      onSelect(); // Call the onSelect prop instead of navigating directly
     } catch (error) {
       console.error('Error handling plan selection:', error);
       toast.error("Ocorreu um erro ao selecionar o plano. Tente novamente.");
@@ -101,7 +92,7 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
         Escolha o plano mais lucrativo pro seu bolso
       </motion.h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
         {plans?.sort((a, b) => a.display_order - b.display_order).map((plan, index) => (
           <motion.div 
             key={plan.id} 

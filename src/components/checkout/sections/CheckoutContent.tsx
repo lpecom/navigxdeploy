@@ -36,55 +36,51 @@ export const CheckoutContent = ({
   setCustomerId
 }: CheckoutContentProps) => {
   const navigate = useNavigate();
-  const [isNavigating, setIsNavigating] = useState(false);
 
-  useEffect(() => {
-    const categoryData = sessionStorage.getItem('selectedCategory');
-    if (!categoryData && step === 1) {
-      navigate('/');
-    }
-  }, [navigate, step]);
+  const handleStepComplete = () => {
+    setStep(step + 1);
+  };
 
   const handleCustomerSubmit = async (customerData: any) => {
     try {
       setCustomerId(customerData.id)
-      setStep(6)
+      handleStepComplete();
       toast({
         title: "Dados salvos com sucesso!",
         description: "Seus dados foram salvos. Vamos agendar sua retirada.",
-      })
+      });
     } catch (error: any) {
       console.error('Error saving customer details:', error)
       toast({
         title: "Erro ao salvar dados",
         description: error.message || "Ocorreu um erro ao salvar seus dados.",
         variant: "destructive",
-      })
+      });
     }
   }
 
   const handleScheduleSubmit = async (scheduleData: any) => {
     try {
-      setStep(7)
+      handleStepComplete();
       toast({
         title: "Agendamento confirmado!",
         description: "Seu horário foi agendado com sucesso.",
-      })
+      });
     } catch (error: any) {
       toast({
         title: "Erro ao agendar",
         description: "Ocorreu um erro ao agendar seu horário.",
         variant: "destructive",
-      })
+      });
     }
   }
 
   const handlePaymentSuccess = () => {
-    setStep(8)
+    handleStepComplete();
     toast({
       title: "Pagamento confirmado!",
       description: "Seu pagamento foi processado com sucesso.",
-    })
+    });
   }
 
   return (
@@ -117,55 +113,27 @@ export const CheckoutContent = ({
             transition={{ duration: 0.3 }}
           >
             {step === 1 && (
-              <OverviewStep 
-                onNext={() => {
-                  setStep(2)
-                  toast({
-                    title: "Categoria confirmada!",
-                    description: "Agora vamos escolher seu plano.",
-                  })
-                }}
-              />
+              <OverviewStep onNext={handleStepComplete} />
             )}
 
             {step === 2 && (
-              <PlansStep 
-                onSelect={() => {
-                  setStep(3)
-                  toast({
-                    title: "Plano selecionado!",
-                    description: "Agora vamos escolher sua proteção.",
-                  })
-                }}
-              />
+              <PlansStep onSelect={handleStepComplete} />
             )}
 
             {step === 3 && (
               <InsurancePackageStep 
-                onSelect={(insuranceId) => {
-                  setStep(4)
-                  toast({
-                    title: "Proteção selecionada!",
-                    description: "Agora vamos escolher seus opcionais.",
-                  })
-                }}
+                onSelect={() => handleStepComplete()}
                 onBack={() => setStep(2)}
               />
             )}
 
             {step === 4 && (
               <Card className="p-6">
-                <h2 className="text-xl font-semibold mb-6 text-white">Opcionais</h2>
+                <h2 className="text-xl font-semibold mb-6">Opcionais</h2>
                 <OptionalsList />
                 <div className="flex justify-end mt-6">
                   <Button 
-                    onClick={() => {
-                      setStep(5)
-                      toast({
-                        title: "Opcionais confirmados!",
-                        description: "Agora vamos preencher seus dados.",
-                      })
-                    }}
+                    onClick={handleStepComplete}
                     className="flex items-center gap-2"
                   >
                     Continuar
