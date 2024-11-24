@@ -18,8 +18,8 @@ interface StepsProps {
 
 export const Steps = ({ currentStep, steps }: StepsProps) => {
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="flex justify-between relative">
+    <div className="w-full max-w-4xl mx-auto overflow-x-auto">
+      <div className="flex justify-between min-w-[700px] sm:min-w-0 relative px-4 sm:px-0">
         {steps.map((step, index) => {
           const Icon = step.icon;
           const isActive = step.number === currentStep;
@@ -46,7 +46,7 @@ export const Steps = ({ currentStep, steps }: StepsProps) => {
               </div>
 
               <motion.span
-                className={`mt-2 text-sm font-medium ${isActive ? 'text-primary' : 'text-gray-500 dark:text-gray-400'}`}
+                className={`mt-2 text-xs sm:text-sm font-medium ${isActive ? 'text-primary' : 'text-gray-500 dark:text-gray-400'}`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
@@ -55,7 +55,7 @@ export const Steps = ({ currentStep, steps }: StepsProps) => {
               </motion.span>
               
               <motion.span
-                className="text-xs text-gray-400 mt-1"
+                className="text-[10px] sm:text-xs text-gray-400 mt-1"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}

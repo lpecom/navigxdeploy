@@ -16,18 +16,18 @@ export const PaymentTypeSelector = ({ amount, onSelect }: PaymentTypeSelectorPro
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="space-y-6"
+      className="space-y-6 w-full max-w-lg mx-auto px-4 sm:px-0"
     >
       <div className="text-center space-y-4">
-        <h2 className="text-2xl font-semibold bg-gradient-to-r from-white via-gray-300 to-gray-400 bg-clip-text text-transparent">
+        <h2 className="text-xl sm:text-2xl font-semibold bg-gradient-to-r from-white via-gray-300 to-gray-400 bg-clip-text text-transparent">
           Como você prefere pagar?
         </h2>
-        <p className="text-gray-400">
+        <p className="text-sm sm:text-base text-gray-400">
           Escolha entre pagar online com 10% de desconto ou na loja
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-4">
         {[
           {
             type: 'online',
@@ -56,7 +56,7 @@ export const PaymentTypeSelector = ({ amount, onSelect }: PaymentTypeSelectorPro
             <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
             <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/20" />
             
-            <div className="relative p-6 space-y-4">
+            <div className="relative p-4 sm:p-6 space-y-4">
               <div className={`bg-${option.color}/10 w-12 h-12 rounded-full flex items-center justify-center transition-colors group-hover:bg-${option.color}/20`}>
                 <option.icon className={`w-6 h-6 text-${option.color}`} />
               </div>
@@ -72,7 +72,7 @@ export const PaymentTypeSelector = ({ amount, onSelect }: PaymentTypeSelectorPro
                       R$ {option.originalAmount.toFixed(2)}
                     </p>
                   )}
-                  <p className="text-2xl font-semibold text-primary">
+                  <p className="text-xl sm:text-2xl font-semibold text-primary">
                     R$ {option.amount.toFixed(2)}
                   </p>
                 </div>
@@ -80,7 +80,7 @@ export const PaymentTypeSelector = ({ amount, onSelect }: PaymentTypeSelectorPro
 
               <Button 
                 variant={option.type === 'online' ? "default" : "outline"}
-                className="w-full transition-transform duration-200 hover:scale-[1.02]"
+                className="w-full py-6 text-base transition-transform duration-200 hover:scale-[1.02]"
               >
                 {option.title}
               </Button>

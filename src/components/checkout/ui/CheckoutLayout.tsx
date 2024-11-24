@@ -21,9 +21,9 @@ export const CheckoutLayout = ({ children }: CheckoutLayoutProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="relative pt-28 sm:pt-36 pb-12"
+        className="relative pt-24 sm:pt-28 pb-6 sm:pb-12"
       >
-        <div className="container mx-auto px-4 py-4 sm:py-8 max-w-5xl">
+        <div className="container mx-auto px-4 py-4 sm:py-8">
           {children}
         </div>
       </motion.main>

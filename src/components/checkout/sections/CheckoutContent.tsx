@@ -82,7 +82,7 @@ export const CheckoutContent = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="space-y-4"
+      className="space-y-4 sm:space-y-6"
     >
       {step > 1 && (
         <Button
@@ -98,7 +98,7 @@ export const CheckoutContent = ({
 
       <CheckoutProgress currentStep={step} />
       
-      <div className={`grid gap-4 ${step === 1 ? '' : 'lg:grid-cols-3'}`}>
+      <div className={`grid gap-4 sm:gap-6 ${step === 1 ? '' : 'lg:grid-cols-3'}`}>
         <div className={step === 1 ? '' : 'lg:col-span-2'}>
           <motion.div
             key={step}
@@ -106,6 +106,7 @@ export const CheckoutContent = ({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
+            className="w-full"
           >
             {step === 1 && (
               <OverviewStep onNext={handleStepComplete} />
@@ -123,13 +124,13 @@ export const CheckoutContent = ({
             )}
 
             {step === 4 && (
-              <Card className="p-6">
-                <h2 className="text-xl font-semibold mb-6">Opcionais</h2>
+              <Card className="p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-semibold mb-6">Opcionais</h2>
                 <OptionalsList />
                 <div className="flex justify-end mt-6">
                   <Button 
                     onClick={handleStepComplete}
-                    className="flex items-center gap-2"
+                    className="w-full sm:w-auto"
                     disabled={isProcessing}
                   >
                     Continuar
