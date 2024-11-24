@@ -704,13 +704,21 @@ export type Database = {
           cpf: string
           created_at: string
           crm_status: string | null
+          document_back_url: string | null
+          document_front_url: string | null
           email: string
           full_name: string
           id: string
+          kyc_rejection_reason: string | null
+          kyc_status: Database["public"]["Enums"]["kyc_status"] | null
+          kyc_submitted_at: string | null
+          kyc_verified_at: string | null
           license_expiry: string
           license_number: string
           phone: string
           postal_code: string | null
+          proof_of_address_url: string | null
+          selfie_url: string | null
           state: string | null
         }
         Insert: {
@@ -721,13 +729,21 @@ export type Database = {
           cpf: string
           created_at?: string
           crm_status?: string | null
+          document_back_url?: string | null
+          document_front_url?: string | null
           email: string
           full_name: string
           id?: string
+          kyc_rejection_reason?: string | null
+          kyc_status?: Database["public"]["Enums"]["kyc_status"] | null
+          kyc_submitted_at?: string | null
+          kyc_verified_at?: string | null
           license_expiry: string
           license_number: string
           phone: string
           postal_code?: string | null
+          proof_of_address_url?: string | null
+          selfie_url?: string | null
           state?: string | null
         }
         Update: {
@@ -738,13 +754,21 @@ export type Database = {
           cpf?: string
           created_at?: string
           crm_status?: string | null
+          document_back_url?: string | null
+          document_front_url?: string | null
           email?: string
           full_name?: string
           id?: string
+          kyc_rejection_reason?: string | null
+          kyc_status?: Database["public"]["Enums"]["kyc_status"] | null
+          kyc_submitted_at?: string | null
+          kyc_verified_at?: string | null
           license_expiry?: string
           license_number?: string
           phone?: string
           postal_code?: string | null
+          proof_of_address_url?: string | null
+          selfie_url?: string | null
           state?: string | null
         }
         Relationships: []
@@ -1729,6 +1753,7 @@ export type Database = {
     }
     Enums: {
       check_in_status: "pending" | "in_progress" | "completed" | "cancelled"
+      kyc_status: "pending" | "submitted" | "verified" | "rejected"
       vehicle_status:
         | "available"
         | "rented"
