@@ -25,6 +25,7 @@ export const PlansPage = () => {
   const { dispatch } = useCart();
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
   
   const { data: plans, isLoading } = useQuery({
     queryKey: ['plans'],
@@ -54,7 +55,10 @@ export const PlansPage = () => {
     }
   }, [navigate]);
 
-  const handlePlanSelect = (plan: Plans) => {
+  const handlePlanSelect = async (plan: Plans) => {
+    if (isNavigating) return; // Prevent multiple clicks
+    setIsNavigating(true);
+
     if (!selectedCategory) {
       toast({
         title: "Erro",
@@ -65,23 +69,34 @@ export const PlansPage = () => {
       return;
     }
     
-    dispatch({ type: 'CLEAR_CART' });
-    dispatch({
-      type: 'ADD_ITEM',
-      payload: {
-        id: `${selectedCategory.id}-${plan.type}`,
-        type: 'car_group',
-        quantity: 1,
-        unitPrice: plan.base_price,
-        totalPrice: plan.base_price,
-        name: `${selectedCategory.name} - ${plan.name}`,
-        category: selectedCategory.name,
-        period: plan.type
-      }
-    });
+    try {
+      dispatch({ type: 'CLEAR_CART' });
+      dispatch({
+        type: 'ADD_ITEM',
+        payload: {
+          id: `${selectedCategory.id}-${plan.type}`,
+          type: 'car_group',
+          quantity: 1,
+          unitPrice: plan.base_price,
+          totalPrice: plan.base_price,
+          name: `${selectedCategory.name} - ${plan.name}`,
+          category: selectedCategory.name,
+          period: plan.type
+        }
+      });
 
-    sessionStorage.setItem('selectedPlan', plan.type);
-    navigate('/checkout');
+      sessionStorage.setItem('selectedPlan', plan.type);
+      navigate('/checkout');
+    } catch (error) {
+      console.error('Error handling plan selection:', error);
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao selecionar o plano. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsNavigating(false);
+    }
   };
 
   if (!selectedCategory) return null;
