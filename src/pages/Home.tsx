@@ -6,6 +6,7 @@ import { WhyChooseUs } from "@/components/website/WhyChooseUs";
 import { Testimonials } from "@/components/website/Testimonials";
 import { Footer } from "@/components/website/Footer";
 import { VehicleShowcase } from "@/components/home/VehicleShowcase";
+import { VehicleGroups } from "@/components/home/VehicleGroups";
 
 const Home = () => {
   return (
@@ -14,6 +15,7 @@ const Home = () => {
       <Navigation />
       <Hero />
       <VehicleShowcase />
+      <VehicleGroups />
       <Features />
       <HowItWorks />
       <WhyChooseUs />
