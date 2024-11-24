@@ -5,8 +5,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
-import { Users, Car, ShieldCheck, Navigation, Wifi, Info } from "lucide-react";
+import { Users, Car, ShieldCheck, Navigation, Wifi, Info, Package2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Optional {
   id: string;
@@ -18,13 +19,13 @@ interface Optional {
 
 const getIconForOptional = (name: string) => {
   const icons: Record<string, React.ReactNode> = {
-    "Additional driver": <Users className="w-5 h-5" />,
-    "Toll pass/Express lane": <Car className="w-5 h-5" />,
-    "Extended Roadside Protection": <ShieldCheck className="w-5 h-5" />,
+    "Motorista adicional": <Users className="w-5 h-5" />,
+    "Tag de pedágio": <Car className="w-5 h-5" />,
+    "Proteção estendida": <ShieldCheck className="w-5 h-5" />,
     "GPS": <Navigation className="w-5 h-5" />,
-    "SIXT Connect": <Wifi className="w-5 h-5" />,
+    "Wi-Fi": <Wifi className="w-5 h-5" />,
   };
-  return icons[name] || <Info className="w-5 h-5" />;
+  return icons[name] || <Package2 className="w-5 h-5" />;
 };
 
 export const OptionalsList = () => {
@@ -58,34 +59,38 @@ export const OptionalsList = () => {
         }
       });
       toast({
-        title: "Optional Added",
-        description: `${optional.name} has been added to your booking.`
+        title: "Opcional adicionado",
+        description: `${optional.name} foi adicionado à sua reserva.`
       });
     } else {
       dispatch({ type: 'REMOVE_ITEM', payload: optional.id });
       toast({
-        title: "Optional Removed",
-        description: `${optional.name} has been removed from your booking.`
+        title: "Opcional removido",
+        description: `${optional.name} foi removido da sua reserva.`
       });
     }
   };
 
   if (isLoading) {
     return (
-      <div className="space-y-3">
+      <div className="space-y-4">
         {[1, 2, 3].map(i => (
-          <div key={i} className="h-16 bg-white/5 rounded-lg animate-pulse" />
+          <Skeleton key={i} className="h-24 w-full rounded-lg bg-gray-200/20" />
         ))}
       </div>
     );
   }
 
   if (!optionals?.length) {
-    return <div className="text-white/60">No optionals available.</div>;
+    return (
+      <div className="text-center py-8 text-gray-500">
+        Nenhum opcional disponível no momento.
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {optionals.map((optional, index) => {
         const isSelected = !!state.items.find(item => item.id === optional.id);
 
@@ -95,45 +100,64 @@ export const OptionalsList = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
             key={optional.id}
-            className="group relative overflow-hidden rounded-lg bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all p-4"
+            className={`
+              relative overflow-hidden rounded-xl border transition-all duration-200
+              ${isSelected 
+                ? 'border-primary/20 bg-primary/5 shadow-lg shadow-primary/10' 
+                : 'border-gray-200 bg-white hover:border-primary/20 hover:bg-gray-50'
+              }
+            `}
           >
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  {getIconForOptional(optional.name)}
+            <div className="p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className={`
+                    flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center
+                    ${isSelected 
+                      ? 'bg-primary/10 text-primary' 
+                      : 'bg-gray-100 text-gray-600'
+                    }
+                  `}>
+                    {getIconForOptional(optional.name)}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-gray-900 mb-1 flex items-center gap-2">
+                      {optional.name}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-gray-100"
+                        onClick={() => {
+                          toast({
+                            title: optional.name,
+                            description: optional.description,
+                          });
+                        }}
+                      >
+                        <Info className="h-4 w-4 text-gray-500" />
+                      </Button>
+                    </h3>
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="font-medium text-primary">
+                        R$ {optional.price.toFixed(2)}
+                      </span>
+                      <span className="text-gray-500">
+                        {optional.price_period === 'per_rental' ? 'por aluguel' : 'por dia'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-white mb-0.5 flex items-center gap-2">
-                    {optional.name}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0 hover:bg-white/10"
-                      onClick={() => {
-                        toast({
-                          title: optional.name,
-                          description: optional.description,
-                        });
-                      }}
-                    >
-                      <Info className="h-4 w-4 text-white/60" />
-                    </Button>
-                  </h3>
-                  <p className="text-sm text-white/60">
-                    ${optional.price.toFixed(2)} 
-                    <span className="ml-1">
-                      {optional.price_period === 'per_rental' ? 'per rental' : 'per day'}
-                    </span>
-                  </p>
-                </div>
-              </div>
 
-              <Switch
-                checked={isSelected}
-                onCheckedChange={(checked) => handleToggle(optional, checked)}
-                className="data-[state=checked]:bg-primary"
-              />
+                <Switch
+                  checked={isSelected}
+                  onCheckedChange={(checked) => handleToggle(optional, checked)}
+                  className={`
+                    data-[state=checked]:bg-primary
+                    data-[state=unchecked]:bg-gray-200
+                  `}
+                />
+              </div>
             </div>
           </motion.div>
         );
