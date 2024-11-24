@@ -85,7 +85,7 @@ export const PersonalInfoFields = ({ form }: PersonalInfoFieldsProps) => {
                     const value = e.target.value.replace(/\D/g, "")
                     field.onChange(value)
                   }}
-                  value={field.value.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3")}
+                  value={field.value ? field.value.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3") : ""}
                 />
               </FormControl>
               <FormMessage />
@@ -108,7 +108,7 @@ export const PersonalInfoFields = ({ form }: PersonalInfoFieldsProps) => {
                     const value = e.target.value.replace(/\D/g, "")
                     field.onChange(value)
                   }}
-                  value={field.value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")}
+                  value={field.value ? field.value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4") : ""}
                 />
               </FormControl>
               <FormMessage />

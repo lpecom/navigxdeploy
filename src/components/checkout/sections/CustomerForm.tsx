@@ -3,7 +3,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Form } from "@/components/ui/form"
 import { Card } from "@/components/ui/card"
-import { ChevronRight } from "lucide-react"
 import { motion } from "framer-motion"
 import { PersonalInfoFields } from "./form/PersonalInfoFields"
 
