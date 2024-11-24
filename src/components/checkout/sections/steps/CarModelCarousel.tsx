@@ -8,7 +8,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { Car, Users, Gauge, Calendar, Shield, Wrench, Fuel } from "lucide-react";
+import { Car, Users, Gauge, Calendar } from "lucide-react";
 import { getBrandLogo } from "@/utils/brandLogos";
 import type { CarModel } from "@/types/vehicles";
 
@@ -31,7 +31,7 @@ export const CarModelCarousel = ({ carModels }: CarModelCarouselProps) => {
             const brandLogo = getBrandLogo(car.name);
             
             return (
-              <CarouselItem key={car.id} className="md:basis-1/2 lg:basis-1/2">
+              <CarouselItem key={car.id} className="md:basis-1/2 lg:basis-1/3">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -40,17 +40,17 @@ export const CarModelCarousel = ({ carModels }: CarModelCarouselProps) => {
                 >
                   <Card className="overflow-hidden bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-0 backdrop-blur-sm">
                     <div className="relative">
-                      <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-full p-2">
+                      <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 bg-white/10 backdrop-blur-md rounded-full p-1.5">
                         {brandLogo ? (
                           <img
                             src={brandLogo}
                             alt="Brand logo"
-                            className="w-6 h-6 object-contain"
+                            className="w-4 h-4 object-contain"
                           />
                         ) : (
-                          <Car className="w-6 h-6 text-primary" />
+                          <Car className="w-4 h-4 text-primary" />
                         )}
-                        <span className="text-sm font-medium text-white pr-2">
+                        <span className="text-xs font-medium text-white pr-1.5">
                           {car.name}
                         </span>
                       </div>
@@ -64,46 +64,31 @@ export const CarModelCarousel = ({ carModels }: CarModelCarouselProps) => {
                           />
                         ) : (
                           <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                            <Car className="w-12 h-12 text-gray-600" />
+                            <Car className="w-8 h-8 text-gray-600" />
                           </div>
                         )}
                         <Badge 
                           variant="secondary" 
-                          className="absolute top-4 right-4 bg-white/10 backdrop-blur-sm text-white border-0"
+                          className="absolute top-2 right-2 bg-white/10 backdrop-blur-sm text-white border-0 text-xs"
                         >
                           {car.category?.name}
                         </Badge>
                       </div>
                     </div>
 
-                    <div className="p-6 space-y-6">
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="flex flex-col items-center text-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
-                          <Users className="w-5 h-5 mb-2 text-primary" />
-                          <span className="text-sm text-gray-300">{car.passengers || 5} lugares</span>
+                    <div className="p-3 space-y-3">
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="flex flex-col items-center text-center p-2 bg-white/5 rounded-md backdrop-blur-sm transition-colors hover:bg-white/10">
+                          <Users className="w-4 h-4 mb-1 text-primary" />
+                          <span className="text-xs text-gray-300">{car.passengers || 5}</span>
                         </div>
-                        <div className="flex flex-col items-center text-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
-                          <Gauge className="w-5 h-5 mb-2 text-primary" />
-                          <span className="text-sm text-gray-300">{car.transmission || "Auto"}</span>
+                        <div className="flex flex-col items-center text-center p-2 bg-white/5 rounded-md backdrop-blur-sm transition-colors hover:bg-white/10">
+                          <Gauge className="w-4 h-4 mb-1 text-primary" />
+                          <span className="text-xs text-gray-300">{car.transmission || "Auto"}</span>
                         </div>
-                        <div className="flex flex-col items-center text-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
-                          <Calendar className="w-5 h-5 mb-2 text-primary" />
-                          <span className="text-sm text-gray-300">{car.year}</span>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="flex flex-col items-center text-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
-                          <Shield className="w-5 h-5 mb-2 text-primary" />
-                          <span className="text-sm text-gray-300">Seguro</span>
-                        </div>
-                        <div className="flex flex-col items-center text-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
-                          <Wrench className="w-5 h-5 mb-2 text-primary" />
-                          <span className="text-sm text-gray-300">Revisado</span>
-                        </div>
-                        <div className="flex flex-col items-center text-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
-                          <Fuel className="w-5 h-5 mb-2 text-primary" />
-                          <span className="text-sm text-gray-300">Flex</span>
+                        <div className="flex flex-col items-center text-center p-2 bg-white/5 rounded-md backdrop-blur-sm transition-colors hover:bg-white/10">
+                          <Calendar className="w-4 h-4 mb-1 text-primary" />
+                          <span className="text-xs text-gray-300">{car.year}</span>
                         </div>
                       </div>
                     </div>
@@ -113,8 +98,8 @@ export const CarModelCarousel = ({ carModels }: CarModelCarouselProps) => {
             );
           })}
         </CarouselContent>
-        <CarouselPrevious className="absolute -left-12 bg-white/10 text-white hover:bg-white/20 border-0" />
-        <CarouselNext className="absolute -right-12 bg-white/10 text-white hover:bg-white/20 border-0" />
+        <CarouselPrevious className="absolute -left-8 bg-white/10 text-white hover:bg-white/20 border-0 w-8 h-8" />
+        <CarouselNext className="absolute -right-8 bg-white/10 text-white hover:bg-white/20 border-0 w-8 h-8" />
       </Carousel>
     </div>
   );
