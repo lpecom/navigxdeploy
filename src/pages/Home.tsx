@@ -6,11 +6,8 @@ import { WhyChooseUs } from "@/components/website/WhyChooseUs";
 import { Testimonials } from "@/components/website/Testimonials";
 import { Footer } from "@/components/website/Footer";
 import { VehicleShowcase } from "@/components/home/VehicleShowcase";
-import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-  const navigate = useNavigate();
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
       <Navigation />

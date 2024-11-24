@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { SessionContextProvider, AuthChangeEvent } from '@supabase/auth-helpers-react';
+import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { CartProvider } from '@/contexts/CartContext';
 import { useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
@@ -24,18 +24,14 @@ const queryClient = new QueryClient({
   },
 });
 
-const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+const ProtectedRouteHandler = ({ children }: { children: React.ReactNode }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session) => {
-      if (event === 'TOKEN_REFRESHED') {
-        console.log('Token refreshed successfully');
-      }
-      
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
         toast({
           title: "Sessão encerrada",
@@ -44,18 +40,15 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         navigate('/login');
       }
 
-      // Handle session expiration
-      if (!session && event !== 'SIGNED_OUT') {
+      if (!session) {
         toast({
           title: "Sessão expirada",
           description: "Por favor, faça login novamente.",
           variant: "destructive",
         });
         
-        // Clear any existing session
-        supabase.auth.signOut().then(() => {
-          navigate('/login');
-        });
+        await supabase.auth.signOut();
+        navigate('/login');
       }
     });
 
@@ -69,27 +62,32 @@ const AppContent = () => {
   return (
     <BrowserRouter>
       <TooltipProvider>
-        <AuthProvider>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/login" element={<DriverLogin />} />
-            
-            {/* Driver Routes */}
-            <Route path="/driver/*" element={<DriverDashboard />} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/*" element={<AdminRoutes />} />
-            
-            {/* Legacy route redirect */}
-            <Route path="/dashboard/*" element={<Navigate to="/admin" replace />} />
-            
-            {/* Catch all redirect */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </AuthProvider>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/login" element={<DriverLogin />} />
+          
+          {/* Protected Routes */}
+          <Route path="/driver/*" element={
+            <ProtectedRouteHandler>
+              <DriverDashboard />
+            </ProtectedRouteHandler>
+          } />
+          
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/*" element={
+            <ProtectedRouteHandler>
+              <AdminRoutes />
+            </ProtectedRouteHandler>
+          } />
+          
+          {/* Legacy route redirect */}
+          <Route path="/dashboard/*" element={<Navigate to="/admin" replace />} />
+          
+          {/* Catch all redirect */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </TooltipProvider>
     </BrowserRouter>
   );
