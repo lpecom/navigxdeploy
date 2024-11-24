@@ -1,37 +1,38 @@
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { CarCategoryCard } from "./CarCategoryCard";
 import type { CarModel } from "@/types/vehicles";
-import { VehicleGrid } from "./showcase/VehicleGrid";
 
 export const VehicleShowcase = () => {
-  const { data: vehicles, isLoading } = useQuery({
-    queryKey: ['showcase-vehicles'],
+  const { data: categories, isLoading } = useQuery({
+    queryKey: ['showcase-categories'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('car_models')
-        .select(`
-          *,
-          category:categories(name)
-        `)
-        .order('name')
-        .limit(6);
+      const { data: categories, error: categoriesError } = await supabase
+        .from('categories')
+        .select('*, car_models!car_models_category_id_fkey(*)')
+        .eq('is_active', true)
+        .order('display_order');
       
-      if (error) throw error;
-      return data as CarModel[];
+      if (categoriesError) throw categoriesError;
+      return categories;
     },
   });
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3].map((i) => (
-          <div 
-            key={i}
-            className="h-[400px] bg-gray-800/50 rounded-lg animate-pulse"
-          />
-        ))}
-      </div>
+      <section className="py-24 bg-gradient-to-b from-gray-900 to-gray-800">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div 
+                key={i}
+                className="h-[400px] bg-gray-800/50 rounded-lg animate-pulse"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
     );
   }
 
@@ -53,7 +54,15 @@ export const VehicleShowcase = () => {
           </p>
         </motion.div>
 
-        <VehicleGrid vehicles={vehicles || []} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {categories?.map((category) => (
+            <CarCategoryCard
+              key={category.id}
+              category={category}
+              cars={category.car_models as CarModel[]}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
