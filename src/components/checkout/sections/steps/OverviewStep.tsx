@@ -95,8 +95,7 @@ export const PlanSelectionStep = ({ onNext }: PlanSelectionStepProps) => {
           *,
           category:categories(name)
         `)
-        .eq('category_id', suvCategory.id)
-        .eq('is_active', true);
+        .eq('category_id', suvCategory.id);
       
       if (error) {
         toast.error('Erro ao carregar modelos');
