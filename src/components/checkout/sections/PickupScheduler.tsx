@@ -48,8 +48,8 @@ export const PickupScheduler = ({ onSubmit }: PickupSchedulerProps) => {
 
   return (
     <div className="space-y-6">
-      <Card className="p-6 animate-fade-in">
-        <h2 className="text-xl font-semibold mb-6">Selecione a Data</h2>
+      <Card className="p-6 animate-fade-in bg-gray-900/50 border-gray-800">
+        <h2 className="text-xl font-semibold mb-6 text-white">Selecione a Data</h2>
         <div>
           <Calendar
             mode="single"
@@ -57,19 +57,19 @@ export const PickupScheduler = ({ onSubmit }: PickupSchedulerProps) => {
             onSelect={setDate}
             locale={ptBR}
             disabled={(date) => date < new Date() || date > addDays(new Date(), 30)}
-            className="rounded-md border mx-auto"
+            className="rounded-md border mx-auto text-white"
           />
         </div>
       </Card>
 
-      <Card className="p-6 animate-fade-in">
-        <h2 className="text-xl font-semibold mb-6">Selecione o Horário</h2>
+      <Card className="p-6 animate-fade-in bg-gray-900/50 border-gray-800">
+        <h2 className="text-xl font-semibold mb-6 text-white">Selecione o Horário</h2>
         <div className="space-y-4">
           <Select 
             value={time} 
             onValueChange={setTime}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full text-gray-200 bg-gray-800/50 border-gray-700">
               <SelectValue placeholder="Selecione um horário">
                 {time ? (
                   <div className="flex items-center gap-2">
@@ -81,9 +81,9 @@ export const PickupScheduler = ({ onSubmit }: PickupSchedulerProps) => {
                 )}
               </SelectValue>
             </SelectTrigger>
-            <SelectContent className="max-h-[200px]">
+            <SelectContent className="max-h-[200px] bg-gray-800 border-gray-700">
               {timeSlots.map((slot) => (
-                <SelectItem key={slot} value={slot}>
+                <SelectItem key={slot} value={slot} className="text-gray-200 focus:bg-gray-700 focus:text-white">
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4" />
                     <span>{slot}</span>
