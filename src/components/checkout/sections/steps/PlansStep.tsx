@@ -12,9 +12,9 @@ interface PlansStepProps {
 }
 
 export const PlansStep = ({ onSelect }: PlansStepProps) => {
-  const { dispatch, state } = useCart();
+  const { dispatch } = useCart();
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
-  const [isNavigating, setIsNavigating] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const { data: plans, isLoading } = useQuery({
     queryKey: ['plans'],
@@ -42,15 +42,15 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
   }, []);
 
   const handlePlanSelect = async (plan: Plans) => {
-    if (isNavigating) return;
-    setIsNavigating(true);
+    if (isProcessing) return;
+    setIsProcessing(true);
 
-    if (!selectedCategory) {
-      toast.error("Por favor, selecione uma categoria primeiro.");
-      return;
-    }
-    
     try {
+      if (!selectedCategory) {
+        toast.error("Por favor, selecione uma categoria primeiro.");
+        return;
+      }
+      
       dispatch({ type: 'CLEAR_CART' });
       dispatch({
         type: 'ADD_ITEM',
@@ -68,16 +68,20 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
 
       sessionStorage.setItem('selectedPlan', plan.type);
       toast.success('Plano selecionado! Continue seu checkout.');
-      onSelect(); // Call onSelect to progress to next step
+      onSelect();
     } catch (error) {
       console.error('Error handling plan selection:', error);
       toast.error("Ocorreu um erro ao selecionar o plano. Tente novamente.");
     } finally {
-      setIsNavigating(false);
+      setIsProcessing(false);
     }
   };
 
-  if (!selectedCategory) return null;
+  if (!selectedCategory || isLoading) {
+    return <div className="flex items-center justify-center p-8">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -90,7 +94,7 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
         Escolha o plano mais lucrativo pro seu bolso
       </motion.h1>
 
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
         {plans?.sort((a, b) => a.display_order - b.display_order).map((plan, index) => (
           <motion.div 
             key={plan.id} 
@@ -112,5 +116,3 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
     </div>
   );
 };
-
-export default PlansStep;

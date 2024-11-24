@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { CheckoutProgress } from "./CheckoutProgress";
 import { EnhancedSummary } from "./EnhancedSummary";
@@ -8,13 +8,12 @@ import { PaymentSection } from "./PaymentSection";
 import { SuccessSection } from "./SuccessSection";
 import { SupportCard } from "./SupportCard";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { OverviewStep } from "./steps/OverviewStep";
 import { PlansStep } from "./steps/PlansStep";
 import { InsurancePackageStep } from "./steps/InsurancePackageStep";
 import { OptionalsList } from "@/components/optionals/OptionalsList";
 import { Card } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
 
 interface CheckoutContentProps {
   step: number;
@@ -35,10 +34,14 @@ export const CheckoutContent = ({
   setStep,
   setCustomerId
 }: CheckoutContentProps) => {
-  const navigate = useNavigate();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleStepComplete = () => {
-    setStep(step + 1);
+    if (!isProcessing) {
+      setIsProcessing(true);
+      setStep(step + 1);
+      setIsProcessing(false);
+    }
   };
 
   const handleCustomerSubmit = async (customerData: any) => {
@@ -93,8 +96,9 @@ export const CheckoutContent = ({
       {step > 1 && (
         <Button
           variant="ghost"
-          onClick={() => setStep(step - 1)}
+          onClick={() => !isProcessing && setStep(step - 1)}
           className="flex items-center gap-1.5 text-white/60 hover:text-white hover:bg-white/10"
+          disabled={isProcessing}
         >
           <ChevronLeft className="w-4 h-4" />
           Voltar
@@ -122,7 +126,7 @@ export const CheckoutContent = ({
 
             {step === 3 && (
               <InsurancePackageStep 
-                onSelect={() => handleStepComplete()}
+                onSelect={handleStepComplete}
                 onBack={() => setStep(2)}
               />
             )}
@@ -135,9 +139,9 @@ export const CheckoutContent = ({
                   <Button 
                     onClick={handleStepComplete}
                     className="flex items-center gap-2"
+                    disabled={isProcessing}
                   >
                     Continuar
-                    <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
               </Card>
