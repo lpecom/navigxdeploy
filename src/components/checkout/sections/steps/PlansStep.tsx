@@ -68,7 +68,7 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
 
       sessionStorage.setItem('selectedPlan', plan.type);
       toast.success('Plano selecionado! Continue seu checkout.');
-      onSelect(); // Call the onSelect prop instead of navigating directly
+      onSelect(); // Call onSelect to progress to next step
     } catch (error) {
       console.error('Error handling plan selection:', error);
       toast.error("Ocorreu um erro ao selecionar o plano. Tente novamente.");
@@ -77,9 +77,7 @@ export const PlansStep = ({ onSelect }: PlansStepProps) => {
     }
   };
 
-  if (isLoading) {
-    return <div>Loading plans...</div>;
-  }
+  if (!selectedCategory) return null;
 
   return (
     <div className="space-y-6">

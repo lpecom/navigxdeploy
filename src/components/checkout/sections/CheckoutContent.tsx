@@ -1,20 +1,20 @@
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { CheckoutProgress } from "./CheckoutProgress"
-import { EnhancedSummary } from "./EnhancedSummary"
-import { CustomerForm } from "./CustomerForm"
-import { PickupScheduler } from "./PickupScheduler"
-import { PaymentSection } from "./PaymentSection"
-import { SuccessSection } from "./SuccessSection"
-import { SupportCard } from "./SupportCard"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { OverviewStep } from "./steps/OverviewStep"
-import { PlansStep } from "./steps/PlansStep"
-import { InsurancePackageStep } from "./steps/InsurancePackageStep"
-import { OptionalsList } from "@/components/optionals/OptionalsList"
-import { Card } from "@/components/ui/card"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { CheckoutProgress } from "./CheckoutProgress";
+import { EnhancedSummary } from "./EnhancedSummary";
+import { CustomerForm } from "./CustomerForm";
+import { PickupScheduler } from "./PickupScheduler";
+import { PaymentSection } from "./PaymentSection";
+import { SuccessSection } from "./SuccessSection";
+import { SupportCard } from "./SupportCard";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { OverviewStep } from "./steps/OverviewStep";
+import { PlansStep } from "./steps/PlansStep";
+import { InsurancePackageStep } from "./steps/InsurancePackageStep";
+import { OptionalsList } from "@/components/optionals/OptionalsList";
+import { Card } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 interface CheckoutContentProps {
   step: number;
@@ -43,21 +43,21 @@ export const CheckoutContent = ({
 
   const handleCustomerSubmit = async (customerData: any) => {
     try {
-      setCustomerId(customerData.id)
+      setCustomerId(customerData.id);
       handleStepComplete();
       toast({
         title: "Dados salvos com sucesso!",
         description: "Seus dados foram salvos. Vamos agendar sua retirada.",
       });
     } catch (error: any) {
-      console.error('Error saving customer details:', error)
+      console.error('Error saving customer details:', error);
       toast({
         title: "Erro ao salvar dados",
         description: error.message || "Ocorreu um erro ao salvar seus dados.",
         variant: "destructive",
       });
     }
-  }
+  };
 
   const handleScheduleSubmit = async (scheduleData: any) => {
     try {
@@ -73,7 +73,7 @@ export const CheckoutContent = ({
         variant: "destructive",
       });
     }
-  }
+  };
 
   const handlePaymentSuccess = () => {
     handleStepComplete();
@@ -81,7 +81,7 @@ export const CheckoutContent = ({
       title: "Pagamento confirmado!",
       description: "Seu pagamento foi processado com sucesso.",
     });
-  }
+  };
 
   return (
     <motion.div
