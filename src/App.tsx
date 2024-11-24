@@ -14,6 +14,7 @@ import DriverDashboard from "./pages/DriverDashboard";
 import AdminRoutes from "./routes/AdminRoutes";
 import AdminLogin from "./pages/AdminLogin";
 import DriverLogin from "./pages/DriverLogin";
+import KYCOnboarding from "./pages/KYCOnboarding";
 
 // Move queryClient outside component to avoid recreation
 const queryClient = new QueryClient({
@@ -74,6 +75,12 @@ const AppRoutes = () => {
             <Route path="/driver/*" element={
               <ProtectedRouteHandler>
                 <DriverDashboard />
+              </ProtectedRouteHandler>
+            } />
+            
+            <Route path="/kyc" element={
+              <ProtectedRouteHandler>
+                <KYCOnboarding />
               </ProtectedRouteHandler>
             } />
             

@@ -10,6 +10,7 @@ import { DriverFinancial } from "@/components/driver-dashboard/DriverFinancial";
 import { DriverPromotions } from "@/components/driver-dashboard/DriverPromotions";
 import { DriverOverview } from "@/components/driver-dashboard/DriverOverview";
 import { DriverNotifications } from "@/components/driver-dashboard/DriverNotifications";
+import KYCOnboarding from "./KYCOnboarding";
 
 const DriverDashboard = () => {
   const navigate = useNavigate();
@@ -103,6 +104,7 @@ const DriverDashboard = () => {
               <Route path="financial" element={<DriverFinancial driverId={driverId} />} />
               <Route path="promotions" element={<DriverPromotions driverId={driverId} />} />
               <Route path="notifications" element={<DriverNotifications />} />
+              <Route path="kyc" element={<KYCOnboarding />} />
               <Route path="*" element={<Navigate to="/driver" replace />} />
             </Routes>
           </div>
