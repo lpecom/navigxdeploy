@@ -1,4 +1,4 @@
-import { User, Calendar, CreditCard, ShieldCheck, CheckCircle, Package, LayoutDashboard, Wallet } from "lucide-react"
+import { User, Calendar, ShieldCheck, CheckCircle, Package, LayoutDashboard, Wallet } from "lucide-react"
 import { motion } from "framer-motion"
 
 export const checkoutSteps = [
@@ -8,8 +8,7 @@ export const checkoutSteps = [
   { number: 4, title: "Opcionais", icon: Package },
   { number: 5, title: "Seus Dados", icon: User },
   { number: 6, title: "Agendamento", icon: Calendar },
-  { number: 7, title: "Pagamento", icon: CreditCard },
-  { number: 8, title: "Confirmação", icon: CheckCircle }
+  { number: 7, title: "Confirmação", icon: CheckCircle }
 ]
 
 interface StepsProps {
@@ -31,9 +30,7 @@ export const Steps = ({ currentStep, steps }: StepsProps) => {
               {index > 0 && (
                 <div className="absolute w-full h-1 bg-gray-200 dark:bg-gray-800 top-5 -left-1/2 -z-10">
                   <motion.div
-                    className={`h-full transition-all duration-300 ${
-                      isCompleted ? "bg-primary" : "bg-transparent"
-                    }`}
+                    className={`h-full transition-all duration-300 ${isCompleted ? "bg-primary" : "bg-transparent"}`}
                   />
                 </div>
               )}

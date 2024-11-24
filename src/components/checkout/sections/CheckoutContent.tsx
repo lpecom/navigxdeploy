@@ -4,7 +4,6 @@ import { CheckoutProgress } from "./CheckoutProgress";
 import { EnhancedSummary } from "./EnhancedSummary";
 import { CustomerForm } from "./CustomerForm";
 import { PickupScheduler } from "./PickupScheduler";
-import { PaymentSection } from "./PaymentSection";
 import { SuccessSection } from "./SuccessSection";
 import { SupportCard } from "./SupportCard";
 import { Button } from "@/components/ui/button";
@@ -78,14 +77,6 @@ export const CheckoutContent = ({
     }
   };
 
-  const handlePaymentSuccess = () => {
-    handleStepComplete();
-    toast({
-      title: "Pagamento confirmado!",
-      description: "Seu pagamento foi processado com sucesso.",
-    });
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -155,15 +146,7 @@ export const CheckoutContent = ({
               <PickupScheduler onSubmit={handleScheduleSubmit} />
             )}
             
-            {step === 7 && customerId && (
-              <PaymentSection
-                amount={cartState.total}
-                driverId={customerId}
-                onPaymentSuccess={handlePaymentSuccess}
-              />
-            )}
-            
-            {step === 8 && (
+            {step === 7 && (
               <SuccessSection />
             )}
           </motion.div>
@@ -172,7 +155,7 @@ export const CheckoutContent = ({
         {step > 1 && (
           <div className="space-y-4">
             <EnhancedSummary />
-            {step < 8 && <SupportCard />}
+            {step < 7 && <SupportCard />}
           </div>
         )}
       </div>
