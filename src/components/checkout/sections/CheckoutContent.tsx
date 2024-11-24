@@ -48,7 +48,7 @@ export const CheckoutContent = ({
   const handleCustomerSubmit = async (customerData: any) => {
     try {
       setCustomerId(customerData.id)
-      setStep(5)
+      setStep(6)
       toast({
         title: "Dados salvos com sucesso!",
         description: "Seus dados foram salvos. Vamos agendar sua retirada.",
@@ -65,7 +65,7 @@ export const CheckoutContent = ({
 
   const handleScheduleSubmit = async (scheduleData: any) => {
     try {
-      setStep(6)
+      setStep(7)
       toast({
         title: "Agendamento confirmado!",
         description: "Seu horário foi agendado com sucesso.",
@@ -80,7 +80,7 @@ export const CheckoutContent = ({
   }
 
   const handlePaymentSuccess = () => {
-    setStep(7)
+    setStep(8)
     toast({
       title: "Pagamento confirmado!",
       description: "Seu pagamento foi processado com sucesso.",
@@ -154,14 +154,36 @@ export const CheckoutContent = ({
             )}
 
             {step === 4 && (
-              <CustomerForm onSubmit={handleCustomerSubmit} />
+              <Card className="p-6">
+                <h2 className="text-xl font-semibold mb-6">Opcionais</h2>
+                <OptionalsList />
+                <div className="flex justify-end mt-6">
+                  <Button 
+                    onClick={() => {
+                      setStep(5)
+                      toast({
+                        title: "Opcionais confirmados!",
+                        description: "Agora vamos preencher seus dados.",
+                      })
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    Continuar
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </Card>
             )}
             
             {step === 5 && (
+              <CustomerForm onSubmit={handleCustomerSubmit} />
+            )}
+            
+            {step === 6 && (
               <PickupScheduler onSubmit={handleScheduleSubmit} />
             )}
             
-            {step === 6 && customerId && (
+            {step === 7 && customerId && (
               <PaymentSection
                 amount={cartState.total}
                 driverId={customerId}
@@ -169,7 +191,7 @@ export const CheckoutContent = ({
               />
             )}
             
-            {step === 7 && (
+            {step === 8 && (
               <SuccessSection />
             )}
           </motion.div>
