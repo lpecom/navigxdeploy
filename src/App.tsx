@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { CartProvider } from '@/contexts/CartContext';
@@ -26,25 +26,40 @@ const queryClient = new QueryClient({
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'TOKEN_REFRESHED') {
         console.log('Token refreshed successfully');
       }
-      if (event === 'SIGNED_OUT') {
+      
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        toast({
+          title: "Sessão encerrada",
+          description: "Por favor, faça login novamente.",
+        });
+        navigate('/login');
+      }
+
+      // Handle token refresh error
+      if (event === 'TOKEN_REFRESH_FAILED') {
         toast({
           title: "Sessão expirada",
           description: "Por favor, faça login novamente.",
+          variant: "destructive",
         });
-        window.location.href = '/login';
+        
+        // Clear any existing session
+        await supabase.auth.signOut();
+        navigate('/login');
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [toast]);
+  }, [toast, navigate]);
 
   return <>{children}</>;
 };
@@ -69,7 +84,6 @@ const AppContent = () => {
             
             {/* Legacy route redirect */}
             <Route path="/dashboard/*" element={<Navigate to="/admin" replace />} />
-            <Route path="/plans" element={<Navigate to="/checkout" replace />} />
             
             {/* Catch all redirect */}
             <Route path="*" element={<Navigate to="/" replace />} />
