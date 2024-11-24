@@ -11,16 +11,11 @@ import { useNavigate } from "react-router-dom";
 const Home = () => {
   const navigate = useNavigate();
 
-  const handleCategorySelect = (category: any) => {
-    sessionStorage.setItem('selectedCategory', JSON.stringify(category));
-    navigate('/checkout');
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
       <Navigation />
       <Hero />
-      <VehicleShowcase onCategorySelect={handleCategorySelect} />
+      <VehicleShowcase />
       <Features />
       <HowItWorks />
       <WhyChooseUs />
