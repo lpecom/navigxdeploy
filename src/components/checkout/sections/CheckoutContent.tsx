@@ -9,7 +9,7 @@ import { SuccessSection } from "./SuccessSection"
 import { SupportCard } from "./SupportCard"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { PlanSelectionStep } from "./steps/PlanSelectionStep"
+import { OverviewStep } from "./steps/OverviewStep"
 import { InsurancePackageStep } from "./steps/InsurancePackageStep"
 import { OptionalsList } from "@/components/optionals/OptionalsList"
 import { Card } from "@/components/ui/card"
@@ -116,11 +116,11 @@ export const CheckoutContent = ({
             transition={{ duration: 0.3 }}
           >
             {step === 1 && (
-              <PlanSelectionStep 
+              <OverviewStep 
                 onNext={() => {
                   setStep(2)
                   toast({
-                    title: "Plano selecionado!",
+                    title: "Categoria confirmada!",
                     description: "Agora vamos escolher sua proteção.",
                   })
                 }}

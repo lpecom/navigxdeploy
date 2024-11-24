@@ -1,8 +1,8 @@
-import { User, Calendar, CreditCard, ShieldCheck, CheckCircle, Package, FileText } from "lucide-react"
+import { User, Calendar, CreditCard, ShieldCheck, CheckCircle, Package, FileText, LayoutDashboard } from "lucide-react"
 import { motion } from "framer-motion"
 
 export const checkoutSteps = [
-  { number: 1, title: "Plano", icon: FileText },
+  { number: 1, title: "Visão Geral", icon: LayoutDashboard },
   { number: 2, title: "Seguro e Proteção", icon: ShieldCheck },
   { number: 3, title: "Opcionais", icon: Package },
   { number: 4, title: "Seus Dados", icon: User },
