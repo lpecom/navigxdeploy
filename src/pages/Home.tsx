@@ -10,6 +10,7 @@ import { VehicleShowcase } from "@/components/home/VehicleShowcase";
 const Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px] pointer-events-none" />
       <Navigation />
       <Hero />
       <VehicleShowcase />
