@@ -100,7 +100,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionContextProvider supabaseClient={supabase}>
-        <AppContent />
+        <AppRoutes />
         <Toaster />
         <Sonner />
       </SessionContextProvider>
