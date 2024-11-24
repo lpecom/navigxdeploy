@@ -155,7 +155,7 @@ export const CheckoutContent = ({
 
             {step === 4 && (
               <Card className="p-6">
-                <h2 className="text-xl font-semibold mb-6">Opcionais</h2>
+                <h2 className="text-xl font-semibold mb-6 text-white">Opcionais</h2>
                 <OptionalsList />
                 <div className="flex justify-end mt-6">
                   <Button 
