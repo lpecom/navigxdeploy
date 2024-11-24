@@ -83,7 +83,7 @@ export const OptionalsList = () => {
 
   if (!optionals?.length) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-gray-400">
         Nenhum opcional disponível no momento.
       </div>
     );
@@ -104,7 +104,7 @@ export const OptionalsList = () => {
               relative overflow-hidden rounded-xl border transition-all duration-200
               ${isSelected 
                 ? 'border-primary/20 bg-primary/5 shadow-lg shadow-primary/10' 
-                : 'border-gray-200 bg-white hover:border-primary/20 hover:bg-gray-50'
+                : 'border-gray-800 bg-gray-900/50 hover:border-primary/20 hover:bg-gray-800/50'
               }
             `}
           >
@@ -115,19 +115,19 @@ export const OptionalsList = () => {
                     flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center
                     ${isSelected 
                       ? 'bg-primary/10 text-primary' 
-                      : 'bg-gray-100 text-gray-600'
+                      : 'bg-gray-800 text-gray-400'
                     }
                   `}>
                     {getIconForOptional(optional.name)}
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900 mb-1 flex items-center gap-2">
+                    <h3 className="font-medium text-gray-100 mb-1 flex items-center gap-2">
                       {optional.name}
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-6 w-6 p-0 hover:bg-gray-100"
+                        className="h-6 w-6 p-0 hover:bg-gray-800"
                         onClick={() => {
                           toast({
                             title: optional.name,
@@ -135,14 +135,14 @@ export const OptionalsList = () => {
                           });
                         }}
                       >
-                        <Info className="h-4 w-4 text-gray-500" />
+                        <Info className="h-4 w-4 text-gray-400" />
                       </Button>
                     </h3>
                     <div className="flex items-center gap-2 text-sm">
                       <span className="font-medium text-primary">
                         R$ {optional.price.toFixed(2)}
                       </span>
-                      <span className="text-gray-500">
+                      <span className="text-gray-400">
                         {optional.price_period === 'per_rental' ? 'por aluguel' : 'por dia'}
                       </span>
                     </div>
@@ -154,7 +154,7 @@ export const OptionalsList = () => {
                   onCheckedChange={(checked) => handleToggle(optional, checked)}
                   className={`
                     data-[state=checked]:bg-primary
-                    data-[state=unchecked]:bg-gray-200
+                    data-[state=unchecked]:bg-gray-700
                   `}
                 />
               </div>
