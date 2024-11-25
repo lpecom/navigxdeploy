@@ -64,22 +64,22 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
         </div>
 
         <div className="p-6 space-y-6">
-          <div className="grid grid-cols-4 gap-2">
-            <div className="flex flex-col items-center justify-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
-              <Users className="h-4 w-4 text-primary mb-2" />
-              <span className="text-xs text-gray-300 text-center">{vehicle.passengers || 5} lugares</span>
+          <div className="grid grid-cols-4 gap-3 px-1">
+            <div className="flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-300 hover:transform hover:scale-105 hover:bg-white/5">
+              <Users className="h-5 w-5 text-primary-400 mb-2" />
+              <span className="text-xs font-medium text-gray-300 text-center">{vehicle.passengers || 5} lugares</span>
             </div>
-            <div className="flex flex-col items-center justify-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
-              <Briefcase className="h-4 w-4 text-primary mb-2" />
-              <span className="text-xs text-gray-300 text-center">{vehicle.luggage || 2} malas</span>
+            <div className="flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-300 hover:transform hover:scale-105 hover:bg-white/5">
+              <Briefcase className="h-5 w-5 text-primary-400 mb-2" />
+              <span className="text-xs font-medium text-gray-300 text-center">{vehicle.luggage || 2} malas</span>
             </div>
-            <div className="flex flex-col items-center justify-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
-              <GaugeCircle className="h-4 w-4 text-primary mb-2" />
-              <span className="text-xs text-gray-300 text-center">Automático</span>
+            <div className="flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-300 hover:transform hover:scale-105 hover:bg-white/5">
+              <GaugeCircle className="h-5 w-5 text-primary-400 mb-2" />
+              <span className="text-xs font-medium text-gray-300 text-center">Automático</span>
             </div>
-            <div className="flex flex-col items-center justify-center p-3 bg-white/5 rounded-lg backdrop-blur-sm transition-colors hover:bg-white/10">
-              <DoorOpen className="h-4 w-4 text-primary mb-2" />
-              <span className="text-xs text-gray-300 text-center">4 portas</span>
+            <div className="flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-300 hover:transform hover:scale-105 hover:bg-white/5">
+              <DoorOpen className="h-5 w-5 text-primary-400 mb-2" />
+              <span className="text-xs font-medium text-gray-300 text-center">4 portas</span>
             </div>
           </div>
 
