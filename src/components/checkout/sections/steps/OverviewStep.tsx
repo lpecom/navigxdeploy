@@ -35,18 +35,18 @@ export const OverviewStep = ({ onNext }: OverviewStepProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="space-y-8 max-w-6xl mx-auto"
+      className="space-y-6 max-w-5xl mx-auto"
     >
-      <div className="space-y-6">
+      <div className="space-y-4">
         <CarModelDisplay categoryId={selectedCategory.id} />
         <CategoryBenefits category={selectedCategory} />
       </div>
 
-      <div className="flex justify-end pt-4">
+      <div className="flex justify-end">
         <Button 
           onClick={onNext}
           size="lg"
-          className="bg-primary hover:bg-primary/90 text-white gap-2 px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+          className="bg-primary hover:bg-primary/90 text-white gap-2 px-6 py-5 text-base rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
         >
           Continuar para planos
           <ChevronRight className="w-5 h-5" />
