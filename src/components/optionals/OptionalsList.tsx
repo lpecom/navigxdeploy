@@ -84,7 +84,7 @@ export const OptionalsList = () => {
 
   if (!optionals?.length) {
     return (
-      <div className="text-center py-12 bg-gray-900/50 rounded-xl border border-gray-800">
+      <div className="text-center py-12 bg-gray-900/50 rounded-xl">
         <Package2 className="w-12 h-12 mx-auto text-gray-400 mb-3" />
         <p className="text-gray-400">Nenhum opcional disponível no momento.</p>
       </div>
@@ -103,11 +103,11 @@ export const OptionalsList = () => {
             transition={{ duration: 0.3, delay: index * 0.1 }}
             key={optional.id}
             className={`
-              relative overflow-hidden rounded-xl border p-6
+              relative overflow-hidden rounded-xl p-6
               transition-all duration-300 hover:shadow-lg
               ${isSelected 
-                ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10' 
-                : 'border-gray-800 bg-gray-900/50 hover:border-primary/20 hover:bg-gray-800/50'
+                ? 'bg-primary/5 shadow-lg shadow-primary/10' 
+                : 'bg-gray-900/50 hover:bg-gray-800/50'
               }
             `}
           >

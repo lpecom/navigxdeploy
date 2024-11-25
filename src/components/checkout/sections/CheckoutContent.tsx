@@ -8,11 +8,10 @@ import { SuccessSection } from "./SuccessSection";
 import { SupportCard } from "./SupportCard";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
+import { OptionalsStep } from "./steps/OptionalsStep";
 import { OverviewStep } from "./steps/OverviewStep";
 import { PlansStep } from "./steps/PlansStep";
 import { InsurancePackageStep } from "./steps/InsurancePackageStep";
-import { OptionalsList } from "@/components/optionals/OptionalsList";
-import { Card } from "@/components/ui/card";
 
 interface CheckoutContentProps {
   step: number;
@@ -124,19 +123,7 @@ export const CheckoutContent = ({
             )}
 
             {step === 4 && (
-              <Card className="p-4 sm:p-6">
-                <h2 className="text-lg sm:text-xl font-semibold mb-6">Opcionais</h2>
-                <OptionalsList />
-                <div className="flex justify-end mt-6">
-                  <Button 
-                    onClick={handleStepComplete}
-                    className="w-full sm:w-auto"
-                    disabled={isProcessing}
-                  >
-                    Continuar
-                  </Button>
-                </div>
-              </Card>
+              <OptionalsStep onNext={handleStepComplete} />
             )}
             
             {step === 5 && (
