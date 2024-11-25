@@ -1,5 +1,6 @@
 import { User, Calendar, ShieldCheck, CheckCircle, Package, LayoutDashboard, Wallet } from "lucide-react"
 import { motion } from "framer-motion"
+import { Progress } from "@/components/ui/progress"
 
 export const checkoutSteps = [
   { number: 1, title: "Visão Geral", icon: LayoutDashboard },
@@ -17,55 +18,52 @@ interface StepsProps {
 }
 
 export const Steps = ({ currentStep, steps }: StepsProps) => {
+  const progress = (currentStep / steps.length) * 100;
+  const currentStepData = steps[currentStep - 1];
+  const Icon = currentStepData?.icon;
+
   return (
-    <div className="w-full max-w-4xl mx-auto overflow-x-auto">
-      <div className="flex justify-between min-w-[700px] sm:min-w-0 relative px-4 sm:px-0">
-        {steps.map((step, index) => {
-          const Icon = step.icon;
-          const isActive = step.number === currentStep;
-          const isCompleted = step.number < currentStep;
-
-          return (
-            <div key={step.number} className="flex flex-col items-center relative z-10">
-              {index > 0 && (
-                <div className="absolute w-full h-1 bg-gray-200 dark:bg-gray-800 top-5 -left-1/2 -z-10">
-                  <motion.div
-                    className={`h-full transition-all duration-300 ${isCompleted ? "bg-primary" : "bg-transparent"}`}
-                  />
-                </div>
-              )}
-
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-200 ${
-                  isActive || isCompleted
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-gray-100 dark:bg-gray-800 text-gray-400"
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-              </div>
-
-              <motion.span
-                className={`mt-2 text-xs sm:text-sm font-medium ${isActive ? 'text-primary' : 'text-gray-500 dark:text-gray-400'}`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-              >
-                {step.title}
-              </motion.span>
-              
-              <motion.span
-                className="text-[10px] sm:text-xs text-gray-400 mt-1"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                {isCompleted ? "Concluído" : isActive ? "Em Andamento" : "Pendente"}
-              </motion.span>
-            </div>
-          );
-        })}
+    <div className="w-full max-w-2xl mx-auto">
+      <div className="flex items-center gap-3 mb-2">
+        {Icon && (
+          <div className="bg-primary/10 text-primary rounded-full p-1.5">
+            <Icon className="w-4 h-4" />
+          </div>
+        )}
+        <span className="text-sm font-medium text-primary">
+          {currentStepData?.title}
+        </span>
+        <span className="text-xs text-muted-foreground ml-auto">
+          Etapa {currentStep} de {steps.length}
+        </span>
       </div>
+      
+      <Progress value={progress} className="h-1.5" />
+      
+      <motion.div 
+        className="flex justify-between mt-1.5 relative"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        {steps.map((step) => (
+          <motion.div
+            key={step.number}
+            className={`w-2 h-2 rounded-full ${
+              step.number === currentStep
+                ? 'bg-primary scale-125'
+                : step.number < currentStep
+                ? 'bg-primary'
+                : 'bg-gray-200'
+            }`}
+            initial={false}
+            animate={{
+              scale: step.number === currentStep ? 1.25 : 1,
+            }}
+            transition={{ duration: 0.2 }}
+          />
+        ))}
+      </motion.div>
     </div>
   );
 };
