@@ -41,16 +41,19 @@ export const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
               <Button 
                 size="lg"
-                className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-6 text-lg rounded-full shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/20 transition-all duration-300"
+                className="relative overflow-hidden group bg-primary-500 hover:bg-primary-600 text-white px-8 py-6 text-lg rounded-full shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/20 transition-all duration-300"
               >
-                Começar agora
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <span className="relative z-10 flex items-center gap-2">
+                  Começar agora
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </Button>
               
               <Button 
                 size="lg"
                 variant="outline"
-                className="border-gray-700 text-gray-300 hover:bg-gray-800/50 px-8 py-6 text-lg rounded-full backdrop-blur-sm"
+                className="bg-white/10 hover:bg-white/20 text-white border-white/20 hover:border-white/30 px-8 py-6 text-lg rounded-full backdrop-blur-sm transition-all duration-300"
               >
                 Calcular ganhos
               </Button>
