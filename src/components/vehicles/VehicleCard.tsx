@@ -1,107 +1,93 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Edit2, Users, Briefcase, GaugeCircle } from "lucide-react";
+import { VehicleImage } from "./card/VehicleImage";
 import { Badge } from "@/components/ui/badge";
-import { Car, Pencil } from "lucide-react";
 import { getBrandLogo, getBrandFromModel } from "@/utils/brandLogos";
 import type { CarModel } from "@/types/vehicles";
-import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { VehicleImage } from "./card/VehicleImage";
-import { VehicleStats } from "./card/VehicleStats";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { ModelEditDialog } from "./card/ModelEditDialog";
 
 interface VehicleCardProps {
-  car: CarModel;
-  onEdit?: (car: CarModel) => void;
+  vehicle: CarModel;
+  onEdit?: (vehicle: CarModel) => void;
 }
 
-export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const brandLogoUrl = getBrandLogo(car.name);
-  const brandName = getBrandFromModel(car.name);
-
-  const { data: fleetStats } = useQuery({
-    queryKey: ['fleet-stats', car.id],
-    queryFn: async () => {
-      const { data: vehicles, error } = await supabase
-        .from('fleet_vehicles')
-        .select('status')
-        .eq('car_model_id', car.id);
-
-      if (error) {
-        console.error('Error fetching fleet stats:', error);
-        return null;
-      }
-
-      const statuses = vehicles?.map(v => v.status) || [];
-      
-      return {
-        rented: statuses.filter(s => s === 'rented').length,
-        available: statuses.filter(s => s === 'available').length,
-        forSale: statuses.filter(s => s === 'for_sale').length,
-        maintenance: statuses.filter(s => s === 'maintenance').length,
-        bodyShop: statuses.filter(s => s === 'body_shop').length,
-        deactivated: statuses.filter(s => s === 'deactivated').length,
-        management: statuses.filter(s => s === 'management').length,
-        accident: statuses.filter(s => s === 'accident').length,
-        total: statuses.length
-      };
-    }
-  });
+export const VehicleCard = ({ vehicle, onEdit }: VehicleCardProps) => {
+  const brandLogo = getBrandLogo(vehicle.name);
+  const brandName = getBrandFromModel(vehicle.name);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <Card className="group overflow-hidden hover:shadow-lg transition-shadow duration-300">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex items-center gap-3">
-            {brandLogoUrl ? (
+    <Card className="overflow-hidden group">
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-4">
+          <Badge 
+            variant="outline" 
+            className="flex items-center gap-2 bg-white/5 backdrop-blur-sm"
+          >
+            {brandLogo && (
               <img 
-                src={brandLogoUrl} 
-                alt={`${brandName} brand`}
-                className="w-8 h-8 object-contain"
+                src={brandLogo} 
+                alt={`${brandName} logo`} 
+                className="w-6 h-6 object-contain brightness-0 invert"
               />
-            ) : (
-              <Car className="w-8 h-8 text-muted-foreground" />
             )}
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">{brandName}</p>
-              <h3 className="font-semibold text-lg">{car.name}</h3>
+            <span>{brandName}</span>
+          </Badge>
+          {onEdit && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onEdit(vehicle)}
+              className="opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <Edit2 className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
+
+        <h3 className="text-lg font-semibold mb-2">{vehicle.name}</h3>
+        {vehicle.description && (
+          <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+            {vehicle.description}
+          </p>
+        )}
+      </div>
+
+      <VehicleImage car={vehicle} />
+
+      <div className="p-4 pt-6 space-y-6">
+        <div className="grid grid-cols-3 gap-4">
+          <div className="flex flex-col items-center text-center">
+            <Users className="h-5 w-5 text-muted-foreground mb-1" />
+            <span className="text-sm text-muted-foreground">
+              {vehicle.passengers || 5} Lugares
+            </span>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <Briefcase className="h-5 w-5 text-muted-foreground mb-1" />
+            <span className="text-sm text-muted-foreground">
+              {vehicle.luggage || 2} Malas
+            </span>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <GaugeCircle className="h-5 w-5 text-muted-foreground mb-1" />
+            <span className="text-sm text-muted-foreground">
+              {vehicle.transmission || "Auto"}
+            </span>
+          </div>
+        </div>
+
+        {vehicle.daily_price && (
+          <div className="border-t pt-4">
+            <div className="text-center">
+              <span className="text-sm text-muted-foreground">A partir de</span>
+              <div className="text-2xl font-bold">
+                R$ {vehicle.daily_price.toFixed(2)}
+                <span className="text-sm font-normal text-muted-foreground">/dia</span>
+              </div>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onEdit ? onEdit(car) : setIsEditing(true)}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <VehicleImage car={car} />
-          
-          {fleetStats && fleetStats.total > 0 && (
-            <VehicleStats stats={fleetStats} />
-          )}
-
-          {car.category?.name && (
-            <Badge variant="secondary" className="w-fit">
-              {car.category.name}
-            </Badge>
-          )}
-        </CardContent>
-      </Card>
-
-      <ModelEditDialog
-        model={car}
-        open={isEditing}
-        onOpenChange={setIsEditing}
-      />
-    </motion.div>
+        )}
+      </div>
+    </Card>
   );
 };

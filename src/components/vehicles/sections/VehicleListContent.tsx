@@ -8,13 +8,15 @@ interface VehicleListContentProps {
   onEdit?: (vehicle: CarModel) => void;
 }
 
-export const VehicleListContent = ({ view, vehicles, onEdit }: VehicleListContentProps) => {
-  if (!vehicles || vehicles.length === 0) {
+export const VehicleListContent = ({ 
+  view, 
+  vehicles,
+  onEdit 
+}: VehicleListContentProps) => {
+  if (!vehicles?.length) {
     return (
-      <div className="col-span-full text-center py-12">
-        <p className="text-muted-foreground">
-          Nenhum veículo encontrado
-        </p>
+      <div className="text-center py-12">
+        <p className="text-gray-500">No vehicles found</p>
       </div>
     );
   }
@@ -23,14 +25,14 @@ export const VehicleListContent = ({ view, vehicles, onEdit }: VehicleListConten
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
       {vehicles.map((vehicle) => (
         view === 'models' ? (
-          <VehicleCard 
-            key={vehicle.id} 
-            car={vehicle as CarModel}
+          <VehicleCard
+            key={vehicle.id}
+            vehicle={vehicle as CarModel}
             onEdit={onEdit}
           />
         ) : (
-          <FleetVehicleCard 
-            key={vehicle.id} 
+          <FleetVehicleCard
+            key={vehicle.id}
             vehicle={vehicle as FleetVehicle}
           />
         )
