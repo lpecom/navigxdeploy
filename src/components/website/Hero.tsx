@@ -13,13 +13,13 @@ export const Hero = () => {
       <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-secondary-500/20 rounded-full blur-3xl" />
       
       <div className="relative z-10 container mx-auto px-4 py-8 md:py-16">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-1 gap-16 items-center max-w-4xl mx-auto">
           {/* Content */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-center lg:text-left space-y-8"
+            className="text-center space-y-8"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 text-primary-100 font-medium text-sm mb-4 border border-primary-500/20 backdrop-blur-sm">
               <Sparkles className="w-4 h-4" />
@@ -33,12 +33,40 @@ export const Hero = () => {
               </span>
             </h1>
             
-            <p className="text-lg text-gray-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-light">
+            <p className="text-lg text-gray-300 max-w-xl mx-auto leading-relaxed font-light">
               A Navig oferece a maior rentabilidade do mercado para motoristas de aplicativo. 
               Carros de luxo, planos flexíveis e suporte 24h para você lucrar mais.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+            {/* Image moved here */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="relative mx-auto max-w-3xl"
+            >
+              <img
+                src="https://navig.com.br/wp-content/uploads/2024/11/carro.png"
+                alt="Carro Premium"
+                className="w-full h-auto transform hover:scale-105 transition-transform duration-700"
+              />
+              
+              {/* Floating Badge */}
+              <motion.div 
+                initial={{ rotate: 12 }}
+                animate={{ rotate: [12, 8, 12] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -top-6 -right-6 w-28 h-28 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-bold text-xl p-4 shadow-lg border border-primary-400/20 backdrop-blur-sm"
+              >
+                <div className="text-center leading-tight">
+                  <div className="text-xs font-medium opacity-90">ATÉ</div>
+                  <div className="text-2xl font-display">40%</div>
+                  <div className="text-xs font-medium opacity-90">MAIS LUCRO</div>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button 
                 size="lg"
                 className="relative overflow-hidden group bg-primary-500 hover:bg-primary-600 text-white px-8 py-6 text-lg rounded-full shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/20 transition-all duration-300"
@@ -62,34 +90,6 @@ export const Hero = () => {
             <p className="text-gray-400 text-sm">
               *Sujeito à análise de crédito e disponibilidade
             </p>
-          </motion.div>
-
-          {/* Image */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="relative lg:-mr-8"
-          >
-            <img
-              src="https://navig.com.br/wp-content/uploads/2024/11/carro.png"
-              alt="Carro Premium"
-              className="w-[120%] h-auto transform hover:scale-105 transition-transform duration-700"
-            />
-            
-            {/* Floating Badge */}
-            <motion.div 
-              initial={{ rotate: 12 }}
-              animate={{ rotate: [12, 8, 12] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -top-6 -right-6 w-28 h-28 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-bold text-xl p-4 shadow-lg border border-primary-400/20 backdrop-blur-sm"
-            >
-              <div className="text-center leading-tight">
-                <div className="text-xs font-medium opacity-90">ATÉ</div>
-                <div className="text-2xl font-display">40%</div>
-                <div className="text-xs font-medium opacity-90">MAIS LUCRO</div>
-              </div>
-            </motion.div>
           </motion.div>
         </div>
       </div>
