@@ -29,7 +29,7 @@ export const CarModelDisplay = ({ categoryId }: { categoryId: string }) => {
 
   if (isLoading) {
     return (
-      <div className="relative py-4">
+      <div className="relative py-8">
         <div className="animate-pulse bg-gray-800/50 rounded-xl aspect-[16/9]" />
       </div>
     );
@@ -37,7 +37,7 @@ export const CarModelDisplay = ({ categoryId }: { categoryId: string }) => {
 
   if (!carModels?.length) {
     return (
-      <div className="text-center py-4 text-gray-400">
+      <div className="text-center py-8 text-gray-400">
         Nenhum veículo encontrado nesta categoria
       </div>
     );
@@ -48,7 +48,7 @@ export const CarModelDisplay = ({ categoryId }: { categoryId: string }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className="relative py-4"
+      className="relative py-8"
     >
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/0 via-gray-900/50 to-gray-900/0" />
       <CarModelCarousel carModels={carModels} />
