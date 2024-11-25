@@ -4,16 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Car, CreditCard, Package, Calendar } from "lucide-react";
-import type { CheckInReservation, Optional } from "../types";
+import { OrderOptionals } from "./order/OrderOptionals";
+import { OrderPaymentStatus } from "./order/OrderPaymentStatus";
+import { OrderPlanSelector } from "./order/OrderPlanSelector";
+import { OrderGroupSelector } from "./order/OrderGroupSelector";
+import type { CheckInReservation } from "../types";
 
 interface OrderReviewProps {
   sessionId: string;
@@ -47,7 +45,6 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
           }))
         : [];
 
-      // Set initial values from the session data
       setSelectedGroup(selectedCar.category || '');
       setSelectedPlan(selectedCar.plan_type || '');
 
@@ -66,84 +63,6 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
     },
   });
 
-  const { data: categories } = useQuery({
-    queryKey: ['categories'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order');
-      
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: plans } = useQuery({
-    queryKey: ['plans'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('plans')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order');
-      
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const handleGroupChange = async (newGroup: string) => {
-    try {
-      setIsChanging(true);
-      const { error } = await supabase
-        .from('checkout_sessions')
-        .update({
-          selected_car: { 
-            ...session?.selected_car, 
-            category: newGroup 
-          }
-        })
-        .eq('id', sessionId);
-
-      if (error) throw error;
-
-      toast.success('Grupo alterado com sucesso');
-      setSelectedGroup(newGroup);
-    } catch (error) {
-      console.error('Error changing group:', error);
-      toast.error('Erro ao alterar grupo');
-    } finally {
-      setIsChanging(false);
-    }
-  };
-
-  const handlePlanChange = async (newPlan: string) => {
-    try {
-      setIsChanging(true);
-      const { error } = await supabase
-        .from('checkout_sessions')
-        .update({
-          selected_car: { 
-            ...session?.selected_car, 
-            plan_type: newPlan 
-          }
-        })
-        .eq('id', sessionId);
-
-      if (error) throw error;
-
-      toast.success('Plano alterado com sucesso');
-      setSelectedPlan(newPlan);
-    } catch (error) {
-      console.error('Error changing plan:', error);
-      toast.error('Erro ao alterar plano');
-    } finally {
-      setIsChanging(false);
-    }
-  };
-
   if (!session) return null;
 
   return (
@@ -151,96 +70,24 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
       <h2 className="text-2xl font-bold">Revisão do Pedido</h2>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Car className="w-5 h-5" />
-              Categoria do Veículo
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Select
-              value={selectedGroup}
-              onValueChange={handleGroupChange}
-              disabled={isChanging}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione a categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories?.map((category) => (
-                  <SelectItem key={category.id} value={category.name}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </CardContent>
-        </Card>
+        <OrderGroupSelector
+          selectedGroup={selectedGroup}
+          onGroupChange={setSelectedGroup}
+          isChanging={isChanging}
+          sessionId={sessionId}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              Plano
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Select
-              value={selectedPlan}
-              onValueChange={handlePlanChange}
-              disabled={isChanging}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o plano" />
-              </SelectTrigger>
-              <SelectContent>
-                {plans?.map((plan) => (
-                  <SelectItem key={plan.id} value={plan.type}>
-                    Navig {plan.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </CardContent>
-        </Card>
+        <OrderPlanSelector
+          selectedPlan={selectedPlan}
+          onPlanChange={setSelectedPlan}
+          isChanging={isChanging}
+          sessionId={sessionId}
+          categoryId={session.selected_car.group_id}
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5" />
-              Status do Pagamento
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Badge variant="success">Aprovado</Badge>
-          </CardContent>
-        </Card>
+        <OrderPaymentStatus />
 
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="w-5 h-5" />
-              Opcionais Solicitados
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {session.selected_optionals?.length > 0 ? (
-              <div className="space-y-4">
-                {session.selected_optionals.map((optional: Optional, index: number) => (
-                  <div key={index} className="flex justify-between items-center">
-                    <span>{optional.name}</span>
-                    <Badge variant="secondary">
-                      R$ {optional.price.toFixed(2)}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted-foreground">Nenhum opcional selecionado</p>
-            )}
-          </CardContent>
-        </Card>
+        <OrderOptionals optionals={session.selected_optionals} />
       </div>
 
       <div className="flex justify-end">
