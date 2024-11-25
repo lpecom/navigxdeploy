@@ -49,12 +49,12 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
           </h3>
         </div>
 
-        <div className="relative aspect-[16/10] overflow-hidden">
+        <div className="relative aspect-[16/9] mx-4 mb-4 overflow-hidden rounded-lg">
           {vehicle.image_url ? (
             <img
               src={vehicle.image_url}
               alt={vehicle.name}
-              className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+              className="w-full h-full object-contain bg-gray-800/50 p-2 transition-transform duration-700 hover:scale-102"
             />
           ) : (
             <div className="w-full h-full bg-gray-800 flex items-center justify-center">
