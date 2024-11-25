@@ -68,14 +68,11 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="relative lg:-mr-8"
           >
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-tr from-gray-900 via-transparent to-transparent z-10" />
-              <img
-                src="https://navig.com.br/wp-content/uploads/2024/11/carro.png"
-                alt="Carro Premium"
-                className="w-full h-auto rounded-2xl transform hover:scale-105 transition-transform duration-700"
-              />
-            </div>
+            <img
+              src="https://navig.com.br/wp-content/uploads/2024/11/carro.png"
+              alt="Carro Premium"
+              className="w-[120%] h-auto transform hover:scale-105 transition-transform duration-700"
+            />
             
             {/* Floating Badge */}
             <motion.div 
