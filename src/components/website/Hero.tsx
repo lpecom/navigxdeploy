@@ -71,7 +71,7 @@ export const Hero = () => {
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
               <div className="absolute inset-0 bg-gradient-to-tr from-gray-900 via-transparent to-transparent z-10" />
               <img
-                src="https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80"
+                src="https://navig.com.br/wp-content/uploads/2024/11/carro.png"
                 alt="Carro Premium"
                 className="w-full h-auto rounded-2xl transform hover:scale-105 transition-transform duration-700"
               />
