@@ -4,6 +4,8 @@ import { Users, Briefcase, GaugeCircle, DoorOpen, TrendingUp, Wallet } from "luc
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { getBrandLogo, getBrandFromModel } from "@/utils/brandLogos";
 import type { CarModel } from "@/types/vehicles";
 import { useNavigate } from "react-router-dom";
 
@@ -21,6 +23,8 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
   const [isExpanded, setIsExpanded] = useState(false);
   const [paymentOption, setPaymentOption] = useState("pay-now");
   const navigate = useNavigate();
+  const brandLogo = getBrandLogo(vehicle.name);
+  const brandName = getBrandFromModel(vehicle.name);
 
   const handleContinue = () => {
     sessionStorage.setItem('selectedCar', JSON.stringify({
@@ -44,6 +48,19 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
         }`}
       >
         <div className="p-6 pb-4">
+          <Badge 
+            variant="outline" 
+            className="mb-3 flex items-center gap-2 w-fit bg-white/5 backdrop-blur-sm text-white hover:bg-white/10 transition-colors"
+          >
+            {brandLogo && (
+              <img 
+                src={brandLogo} 
+                alt={`${brandName} logo`} 
+                className="w-4 h-4 object-contain"
+              />
+            )}
+            <span className="text-xs font-medium">{brandName}</span>
+          </Badge>
           <h3 className="text-xl font-semibold text-white mb-1">
             {vehicle.name}
           </h3>
