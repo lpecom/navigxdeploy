@@ -56,7 +56,7 @@ export const VehicleCard = ({ vehicle, index, weeklyPrice, estimatedProfit }: Ve
               <img 
                 src={brandLogo} 
                 alt={`${brandName} logo`} 
-                className="w-4 h-4 object-contain"
+                className="w-5 h-5 object-contain brightness-0 invert"
               />
             )}
             <span className="text-xs font-medium">{brandName}</span>
