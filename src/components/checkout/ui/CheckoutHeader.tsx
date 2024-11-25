@@ -1,7 +1,5 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export const CheckoutHeader = () => {
   return (
@@ -14,7 +12,7 @@ export const CheckoutHeader = () => {
           className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-900/80 via-gray-800/80 to-gray-900/80 backdrop-blur-md border border-white/10"
         >
           <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
-          <div className="relative flex items-center justify-between h-16 sm:h-20 px-6">
+          <div className="relative flex items-center justify-center h-16 sm:h-20 px-6">
             <Link to="/" className="flex items-center">
               <motion.img 
                 initial={{ opacity: 0 }}
@@ -25,14 +23,9 @@ export const CheckoutHeader = () => {
                 className="h-6 sm:h-8 w-auto"
               />
             </Link>
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-400 hidden sm:flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                Checkout seguro
-              </div>
-              <Button variant="ghost" size="icon" className="sm:hidden text-gray-400 hover:text-white">
-                <Menu className="h-5 w-5" />
-              </Button>
+            <div className="absolute right-6 hidden sm:flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-sm text-gray-400">Checkout seguro</span>
             </div>
           </div>
         </motion.div>
