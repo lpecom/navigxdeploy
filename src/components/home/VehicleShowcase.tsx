@@ -3,8 +3,12 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import type { CarModel } from "@/types/vehicles";
 import { VehicleGrid } from "./showcase/VehicleGrid";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 export const VehicleShowcase = () => {
+  const [sortBy, setSortBy] = useState<'newest' | 'profitable'>('newest');
+
   const { data: vehicles, isLoading } = useQuery({
     queryKey: ['showcase-vehicles'],
     queryFn: async () => {
@@ -20,6 +24,15 @@ export const VehicleShowcase = () => {
       if (error) throw error;
       return data as CarModel[];
     },
+  });
+
+  const sortedVehicles = vehicles?.slice().sort((a, b) => {
+    if (sortBy === 'newest') {
+      return parseInt(b.year || '0') - parseInt(a.year || '0');
+    } else {
+      // Sort by profitability (using daily_price as a proxy)
+      return (b.daily_price || 0) - (a.daily_price || 0);
+    }
   });
 
   if (isLoading) {
@@ -57,7 +70,34 @@ export const VehicleShowcase = () => {
           </p>
         </motion.div>
 
-        <VehicleGrid vehicles={vehicles || []} />
+        <div className="flex justify-center gap-4 mb-8">
+          <Button
+            variant={sortBy === 'newest' ? 'default' : 'outline'}
+            onClick={() => setSortBy('newest')}
+            className={`
+              px-6 py-2 rounded-full transition-all duration-300
+              ${sortBy === 'newest' 
+                ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25' 
+                : 'bg-white/10 text-white hover:bg-white/20 border-white/20'}
+            `}
+          >
+            Mais novos
+          </Button>
+          <Button
+            variant={sortBy === 'profitable' ? 'default' : 'outline'}
+            onClick={() => setSortBy('profitable')}
+            className={`
+              px-6 py-2 rounded-full transition-all duration-300
+              ${sortBy === 'profitable' 
+                ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25' 
+                : 'bg-white/10 text-white hover:bg-white/20 border-white/20'}
+            `}
+          >
+            Mais lucrativos
+          </Button>
+        </div>
+
+        <VehicleGrid vehicles={sortedVehicles || []} />
       </div>
     </section>
   );
