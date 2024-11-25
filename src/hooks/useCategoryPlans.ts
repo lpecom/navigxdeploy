@@ -21,6 +21,9 @@ interface CategoryPlan {
   category_id: string;
 }
 
+type PlanType = 'flex' | 'monthly' | 'black';
+type PeriodType = 'week' | 'month';
+
 export const useCategoryPlans = (categoryId?: string) => {
   return useQuery({
     queryKey: ['category-plans', categoryId],
@@ -36,13 +39,34 @@ export const useCategoryPlans = (categoryId?: string) => {
       
       if (error) throw error;
 
-      // Transform the data to ensure proper typing
-      const transformedData: CategoryPlan[] = data.map(plan => ({
-        ...plan,
-        features: Array.isArray(plan.features) ? plan.features : [],
-        bullet_points: Array.isArray(plan.bullet_points) ? plan.bullet_points : [],
-        conditions: plan.conditions || null
-      }));
+      // Transform and validate the data to ensure proper typing
+      const transformedData: CategoryPlan[] = data.map(plan => {
+        // Validate and cast plan type
+        const planType = plan.type as PlanType;
+        if (!['flex', 'monthly', 'black'].includes(planType)) {
+          throw new Error(`Invalid plan type: ${plan.type}`);
+        }
+
+        // Validate and cast period
+        const period = plan.period as PeriodType;
+        if (!['week', 'month'].includes(period)) {
+          throw new Error(`Invalid period: ${plan.period}`);
+        }
+
+        return {
+          ...plan,
+          type: planType,
+          period: period,
+          features: Array.isArray(plan.features) ? plan.features.map(f => String(f)) : [],
+          bullet_points: Array.isArray(plan.bullet_points) 
+            ? plan.bullet_points.map(bp => ({
+                km: String(bp.km || ''),
+                price: String(bp.price || '')
+              }))
+            : [],
+          conditions: plan.conditions || null
+        };
+      });
 
       return transformedData;
     },
