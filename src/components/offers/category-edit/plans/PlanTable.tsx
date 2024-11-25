@@ -8,10 +8,17 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import type { Plans } from "@/types/supabase/plans";
+
+interface CategoryPlan {
+  id: string;
+  name: string;
+  description?: string | null;
+  base_price: number;
+  period: string;
+}
 
 interface PlanTableProps {
-  plans: Plans[];
+  plans: CategoryPlan[];
   onDelete: (planId: string) => void;
 }
 
