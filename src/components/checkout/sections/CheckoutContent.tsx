@@ -6,6 +6,8 @@ import { CustomerForm } from "./CustomerForm";
 import { PickupScheduler } from "./PickupScheduler";
 import { SuccessSection } from "./SuccessSection";
 import { SupportCard } from "./SupportCard";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
 import { OptionalsStep } from "./steps/OptionalsStep";
 import { OverviewStep } from "./steps/OverviewStep";
 import { PlansStep } from "./steps/PlansStep";
@@ -37,12 +39,6 @@ export const CheckoutContent = ({
       setIsProcessing(true);
       setStep(step + 1);
       setIsProcessing(false);
-    }
-  };
-
-  const handleBack = () => {
-    if (!isProcessing) {
-      setStep(step - 1);
     }
   };
 
@@ -85,8 +81,20 @@ export const CheckoutContent = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="space-y-6"
+      className={step === 7 ? 'space-y-4 sm:space-y-6' : ''}
     >
+      {step > 1 && (
+        <Button
+          variant="ghost"
+          onClick={() => !isProcessing && setStep(step - 1)}
+          className="flex items-center gap-1.5 text-white/60 hover:text-white hover:bg-white/10"
+          disabled={isProcessing}
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Voltar
+        </Button>
+      )}
+
       <CheckoutProgress currentStep={step} />
       
       <div className={`grid gap-4 sm:gap-6 ${step === 1 ? '' : 'lg:grid-cols-3'}`}>
@@ -110,15 +118,12 @@ export const CheckoutContent = ({
             {step === 3 && (
               <InsurancePackageStep 
                 onSelect={handleStepComplete}
-                onBack={handleBack}
+                onBack={() => setStep(2)}
               />
             )}
 
             {step === 4 && (
-              <OptionalsStep 
-                onNext={handleStepComplete}
-                onBack={handleBack}
-              />
+              <OptionalsStep onNext={handleStepComplete} />
             )}
             
             {step === 5 && (
