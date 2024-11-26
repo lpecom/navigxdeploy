@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Json } from "@/integrations/supabase/types";
 
 interface CategoryPlan {
   id: string;
@@ -14,15 +15,20 @@ interface CategoryPlan {
   created_at?: string;
   updated_at?: string;
   features: string[];
-  bullet_points: { km: string; price: string; }[];
+  bullet_points: Array<{ km: string; price: string; }>;
   highlight: boolean;
   display_order: number;
-  conditions?: Record<string, any> | null;
+  conditions: Record<string, any> | null;
   category_id: string;
 }
 
 type PlanType = 'flex' | 'monthly' | 'black';
 type PeriodType = 'week' | 'month';
+
+interface BulletPoint {
+  km: string;
+  price: string;
+}
 
 export const useCategoryPlans = (categoryId?: string) => {
   return useQuery({
@@ -53,18 +59,36 @@ export const useCategoryPlans = (categoryId?: string) => {
           throw new Error(`Invalid period: ${plan.period}`);
         }
 
+        // Parse bullet points safely
+        const bulletPoints = Array.isArray(plan.bullet_points) 
+          ? plan.bullet_points.map((bp: any) => ({
+              km: typeof bp === 'object' && bp !== null ? String(bp.km || '') : '',
+              price: typeof bp === 'object' && bp !== null ? String(bp.price || '') : ''
+            }))
+          : [];
+
+        // Parse features safely
+        const features = Array.isArray(plan.features) 
+          ? plan.features.map(f => String(f))
+          : [];
+
+        // Parse conditions safely
+        const conditions = plan.conditions 
+          ? typeof plan.conditions === 'object' 
+            ? plan.conditions as Record<string, any>
+            : null
+          : null;
+
         return {
           ...plan,
           type: planType,
           period: period,
-          features: Array.isArray(plan.features) ? plan.features.map(f => String(f)) : [],
-          bullet_points: Array.isArray(plan.bullet_points) 
-            ? plan.bullet_points.map(bp => ({
-                km: String(bp.km || ''),
-                price: String(bp.price || '')
-              }))
-            : [],
-          conditions: plan.conditions || null
+          features,
+          bullet_points: bulletPoints,
+          conditions,
+          highlight: Boolean(plan.highlight),
+          display_order: Number(plan.display_order || 0),
+          is_active: Boolean(plan.is_active)
         };
       });
 
