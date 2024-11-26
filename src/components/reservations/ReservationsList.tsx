@@ -38,7 +38,6 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
             address
           )
         `)
-        .order('pickup_time', { ascending: true })
 
       if (filter === 'pending') {
         query = query.eq('status', status)
@@ -72,30 +71,38 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
 
       const { data, error } = await query
       
-      if (error) throw error
+      if (error) {
+        console.error('Query error:', error)
+        throw error
+      }
       
-      return (data || []).map((session: any): Reservation => ({
-        id: session.id,
-        reservationNumber: session.reservation_number || 0,
-        customerName: session.driver?.full_name || 'Cliente não identificado',
-        email: session.driver?.email || '',
-        cpf: session.driver?.cpf || '',
-        phone: session.driver?.phone || '',
-        address: session.driver?.address || '',
-        pickupDate: session.pickup_date || session.created_at,
-        pickupTime: session.pickup_time || '',
-        status: session.status || 'pending_approval',
-        paymentStatus: 'pending',
-        customerStatus: 'new',
-        riskScore: 25,
-        documentsSubmitted: false,
-        createdAt: session.created_at,
-        carCategory: session.selected_car?.category || 'Economy',
-        leadSource: 'form',
-        weeklyFare: session.total_amount || 0,
-        optionals: session.selected_optionals || [],
-        kilometersPerWeek: 1000,
-      }))
+      return (data || []).map((session: any): Reservation => {
+        // Log the session data to help debug
+        console.log('Processing session:', session)
+        
+        return {
+          id: session.id,
+          reservationNumber: session.reservation_number || 0,
+          customerName: session.driver?.full_name || 'Cliente não identificado',
+          email: session.driver?.email || '',
+          cpf: session.driver?.cpf || '',
+          phone: session.driver?.phone || '',
+          address: session.driver?.address || '',
+          pickupDate: session.pickup_date || session.created_at,
+          pickupTime: session.pickup_time || '',
+          status: session.status || 'pending_approval',
+          paymentStatus: 'pending',
+          customerStatus: 'new',
+          riskScore: 25,
+          documentsSubmitted: false,
+          createdAt: session.created_at,
+          carCategory: session.selected_car?.category || 'Economy',
+          leadSource: 'form',
+          weeklyFare: session.total_amount || 0,
+          optionals: session.selected_optionals || [],
+          kilometersPerWeek: 1000,
+        }
+      })
     },
   })
 
