@@ -25,6 +25,8 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
   const { data: reservations, isLoading, error } = useQuery({
     queryKey: ['reservations', filter, status, selectedDate?.toISOString()],
     queryFn: async () => {
+      console.log('Fetching reservations with status:', status);
+      
       let query = supabase
         .from('checkout_sessions')
         .select(`
@@ -75,19 +77,24 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
         console.error('Query error:', error)
         throw error
       }
+
+      console.log('Raw reservations data:', data);
       
       return (data || []).map((session: any): Reservation => {
-        // Log the session data to help debug
         console.log('Processing session:', session)
+        
+        const selectedCar = typeof session.selected_car === 'string' 
+          ? JSON.parse(session.selected_car)
+          : session.selected_car;
         
         return {
           id: session.id,
           reservationNumber: session.reservation_number || 0,
-          customerName: session.driver?.full_name || 'Cliente não identificado',
-          email: session.driver?.email || '',
-          cpf: session.driver?.cpf || '',
-          phone: session.driver?.phone || '',
-          address: session.driver?.address || '',
+          customerName: session.driver?.[0]?.full_name || 'Cliente não identificado',
+          email: session.driver?.[0]?.email || '',
+          cpf: session.driver?.[0]?.cpf || '',
+          phone: session.driver?.[0]?.phone || '',
+          address: session.driver?.[0]?.address || '',
           pickupDate: session.pickup_date || session.created_at,
           pickupTime: session.pickup_time || '',
           status: session.status || 'pending_approval',
@@ -96,7 +103,7 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
           riskScore: 25,
           documentsSubmitted: false,
           createdAt: session.created_at,
-          carCategory: session.selected_car?.category || 'Economy',
+          carCategory: selectedCar?.category || 'Economy',
           leadSource: 'form',
           weeklyFare: session.total_amount || 0,
           optionals: session.selected_optionals || [],
@@ -105,14 +112,6 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
       })
     },
   })
-
-  const sortedReservations = useMemo(() => {
-    if (!reservations) return []
-    return [...reservations].sort((a, b) => {
-      if (!a.pickupTime || !b.pickupTime) return 0
-      return a.pickupTime.localeCompare(b.pickupTime)
-    })
-  }, [reservations])
 
   if (error) {
     console.error('Error fetching reservations:', error)
@@ -135,7 +134,7 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
     )
   }
 
-  if (!sortedReservations?.length) {
+  if (!reservations?.length) {
     return (
       <div className="text-center py-12">
         <Car className="w-12 h-12 text-gray-300 mx-auto mb-4" />
@@ -146,13 +145,13 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
     )
   }
 
-  const timeSlots = Array.from(new Set(sortedReservations.map(r => r.pickupTime))).sort()
+  const timeSlots = Array.from(new Set(reservations.map(r => r.pickupTime))).sort()
 
   return (
     <div className="max-w-3xl mx-auto">
       <div className="space-y-8">
         {timeSlots.map(timeSlot => {
-          const slotReservations = sortedReservations.filter(r => r.pickupTime === timeSlot)
+          const slotReservations = reservations.filter(r => r.pickupTime === timeSlot)
           
           return (
             <div key={timeSlot} className="space-y-4">
