@@ -22,7 +22,7 @@ interface CarModelDetails {
 interface CheckoutSession {
   selected_car: SelectedCar;
   fleet_vehicles?: {
-    car_model: CarModelDetails;
+    car_models: CarModelDetails;
   }[];
 }
 
@@ -40,7 +40,7 @@ export const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
           .select(`
             selected_car,
             fleet_vehicles (
-              car_model (
+              car_models (
                 name,
                 image_url,
                 description
@@ -60,7 +60,7 @@ export const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
 
         // First cast to unknown, then to the specific type
         const selectedCar = data.selected_car as unknown as SelectedCar;
-        const fleetVehicles = data.fleet_vehicles as unknown as { car_model: CarModelDetails }[];
+        const fleetVehicles = data.fleet_vehicles as unknown as { car_models: CarModelDetails }[];
 
         return {
           selected_car: selectedCar,
@@ -100,7 +100,7 @@ export const VehicleInfo = ({ driverId }: VehicleInfoProps) => {
   }
 
   const { name, category, specs } = session.selected_car;
-  const carModel = session.fleet_vehicles?.[0]?.car_model;
+  const carModel = session.fleet_vehicles?.[0]?.car_models;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
