@@ -65,7 +65,7 @@ export interface CheckoutSession {
 }
 
 export interface FleetVehicleWithRelations extends FleetVehicle {
-  car_model?: CarModel & {
+  car_models?: CarModel & {
     car_group?: {
       id: string;
       name: string;
