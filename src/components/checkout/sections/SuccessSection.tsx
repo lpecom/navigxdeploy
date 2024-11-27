@@ -31,45 +31,6 @@ export const SuccessSection = () => {
         throw new Error('Não foi possível recuperar os dados da reserva')
       }
 
-      // If we don't have a driver_id in the session, we need to create one
-      let driverId = sessionData.driver_id
-      if (!driverId) {
-        const selectedCar = sessionData.selected_car as Record<string, any>
-        
-        // Create a new driver record
-        const { data: newDriver, error: driverError } = await supabase
-          .from('driver_details')
-          .insert([{
-            full_name: selectedCar.customer_name || 'Cliente não identificado',
-            email: selectedCar.customer_email || '',
-            cpf: '',  // These will be filled during KYC
-            phone: '',
-            birth_date: new Date().toISOString(),
-            license_number: 'PENDING',
-            license_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
-          }])
-          .select()
-          .single()
-
-        if (driverError) {
-          console.error('Driver creation error:', driverError)
-          throw new Error('Não foi possível criar o perfil do motorista')
-        }
-
-        driverId = newDriver.id
-
-        // Update the checkout session with the new driver_id
-        const { error: updateError } = await supabase
-          .from('checkout_sessions')
-          .update({ driver_id: driverId })
-          .eq('id', cartState.checkoutSessionId)
-
-        if (updateError) {
-          console.error('Session update error:', updateError)
-          throw new Error('Não foi possível atualizar a sessão')
-        }
-      }
-
       // Update the checkout session status
       const { error: sessionError } = await supabase
         .from('checkout_sessions')
@@ -83,11 +44,24 @@ export const SuccessSection = () => {
         throw new Error('Não foi possível atualizar o status da reserva')
       }
 
+      // Update driver KYC status
+      const { error: driverError } = await supabase
+        .from('driver_details')
+        .update({ 
+          kyc_status: 'pending',
+        })
+        .eq('id', sessionData.driver_id)
+
+      if (driverError) {
+        console.error('Driver update error:', driverError)
+        throw new Error('Não foi possível atualizar o status do motorista')
+      }
+
       // Create notification for the new reservation
       const { error: notificationError } = await supabase
         .from('notifications')
         .insert({
-          driver_id: driverId,
+          driver_id: sessionData.driver_id,
           title: 'Nova Reserva',
           message: 'Uma nova reserva está aguardando aprovação.',
           type: 'reservation'
@@ -100,11 +74,11 @@ export const SuccessSection = () => {
 
       toast({
         title: "Reserva enviada para aprovação",
-        description: "Você será redirecionado para verificação de documentos após a aprovação.",
+        description: "Complete seu cadastro no painel do motorista para finalizar a aprovação.",
       })
 
-      // Redirect to the driver reservations page
-      navigate('/driver/reservations')
+      // Redirect to the driver portal
+      navigate('/driver')
     } catch (error: any) {
       console.error('Error processing reservation:', error)
       toast({
@@ -130,7 +104,7 @@ export const SuccessSection = () => {
         </div>
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Reserva Pré-Aprovada!</h2>
         <p className="text-gray-600 mb-8">
-          Sua reserva foi recebida com sucesso e está em análise. Após a aprovação, você poderá prosseguir com a verificação de documentos.
+          Sua reserva foi recebida com sucesso. Complete seu cadastro no painel do motorista para finalizar a aprovação.
         </p>
         <div className="space-y-4">
           <Button
@@ -138,15 +112,8 @@ export const SuccessSection = () => {
             className="w-full sm:w-auto bg-primary hover:bg-primary/90"
             disabled={isProcessing}
           >
-            {isProcessing ? "Processando..." : "Enviar para Aprovação"}
+            {isProcessing ? "Processando..." : "Ir para Painel do Motorista"}
             <ChevronRight className="ml-2 h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => navigate('/')}
-            className="w-full sm:w-auto"
-          >
-            Voltar para Home
           </Button>
         </div>
       </Card>
