@@ -4,22 +4,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { createDriverDetails, DriverData } from "../../handlers/DriverHandler";
+import { LoginForm } from "./components/LoginForm";
+import { SignupForm } from "./components/SignupForm";
 
 const authSchema = z.object({
   email: z.string().email("Email inválido"),
   password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
-  full_name: z.string().min(3, "Nome completo é obrigatório"),
-  cpf: z.string().min(11, "CPF inválido"),
-  phone: z.string().min(11, "Telefone inválido"),
-  address: z.string().min(3, "Endereço é obrigatório"),
-  city: z.string().min(3, "Cidade é obrigatória"),
-  state: z.string().min(2, "Estado é obrigatório"),
-  postal_code: z.string().min(8, "CEP inválido"),
+  full_name: z.string().min(3, "Nome completo é obrigatório").optional(),
+  cpf: z.string().min(11, "CPF inválido").optional(),
+  phone: z.string().min(11, "Telefone inválido").optional(),
+  address: z.string().min(3, "Endereço é obrigatório").optional(),
+  city: z.string().min(3, "Cidade é obrigatória").optional(),
+  state: z.string().min(2, "Estado é obrigatório").optional(),
+  postal_code: z.string().min(8, "CEP inválido").optional(),
 });
 
 interface AuthFormProps {
@@ -29,8 +30,20 @@ interface AuthFormProps {
 export const AuthForm = ({ onSuccess }: AuthFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasAccount, setHasAccount] = useState(false);
+  
   const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      full_name: "",
+      cpf: "",
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      postal_code: "",
+    }
   });
 
   const handleSubmit = async (formData: z.infer<typeof authSchema>) => {
@@ -56,6 +69,12 @@ export const AuthForm = ({ onSuccess }: AuthFormProps) => {
         
         onSuccess(driverData.id);
       } else {
+        // Validate required fields for signup
+        if (!formData.full_name || !formData.cpf || !formData.phone || 
+            !formData.address || !formData.city || !formData.state || !formData.postal_code) {
+          throw new Error("Todos os campos são obrigatórios para criar uma conta");
+        }
+
         // Signup flow
         const { data: authData, error: signupError } = await supabase.auth.signUp({
           email: formData.email,
@@ -111,176 +130,10 @@ export const AuthForm = ({ onSuccess }: AuthFormProps) => {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white/60">Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="email"
-                      className="bg-white/5 border-white/10 text-white"
-                      placeholder="seu@email.com"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white/60">Senha</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      className="bg-white/5 border-white/10 text-white"
-                      placeholder="••••••••"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {!hasAccount && (
-              <>
-                <FormField
-                  control={form.control}
-                  name="full_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white/60">Nome Completo</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          className="bg-white/5 border-white/10 text-white"
-                          placeholder="João da Silva"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="cpf"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-white/60">CPF</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-white/5 border-white/10 text-white"
-                            placeholder="000.000.000-00"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-white/60">Telefone</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-white/5 border-white/10 text-white"
-                            placeholder="(00) 00000-0000"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white/60">Endereço</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          className="bg-white/5 border-white/10 text-white"
-                          placeholder="Rua, número, complemento"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-3 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-white/60">Cidade</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-white/5 border-white/10 text-white"
-                            placeholder="Sua cidade"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-white/60">Estado</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-white/5 border-white/10 text-white"
-                            placeholder="UF"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="postal_code"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-white/60">CEP</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="bg-white/5 border-white/10 text-white"
-                            placeholder="00000-000"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </>
+            {hasAccount ? (
+              <LoginForm form={form} />
+            ) : (
+              <SignupForm form={form} />
             )}
 
             <div className="space-y-4">
