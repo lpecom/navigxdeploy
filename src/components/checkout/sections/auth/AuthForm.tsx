@@ -7,20 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { createDriverDetails, DriverData } from "../../handlers/DriverHandler";
+import { createDriverDetails } from "../../handlers/DriverHandler";
+import { SignupFields } from "./components/SignupFields";
 import { LoginForm } from "./components/LoginForm";
-import { SignupForm } from "./components/SignupForm";
 
 const authSchema = z.object({
   email: z.string().email("Email inválido"),
   password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
-  full_name: z.string().min(3, "Nome completo é obrigatório").optional(),
-  cpf: z.string().min(11, "CPF inválido").optional(),
-  phone: z.string().min(11, "Telefone inválido").optional(),
-  address: z.string().min(3, "Endereço é obrigatório").optional(),
-  city: z.string().min(3, "Cidade é obrigatória").optional(),
-  state: z.string().min(2, "Estado é obrigatório").optional(),
-  postal_code: z.string().min(8, "CEP inválido").optional(),
+  full_name: z.string().min(3, "Nome completo é obrigatório"),
+  cpf: z.string().min(11, "CPF inválido"),
+  phone: z.string().min(10, "Telefone inválido"),
 });
 
 interface AuthFormProps {
@@ -39,10 +35,6 @@ export const AuthForm = ({ onSuccess }: AuthFormProps) => {
       full_name: "",
       cpf: "",
       phone: "",
-      address: "",
-      city: "",
-      state: "",
-      postal_code: "",
     }
   });
 
@@ -62,19 +54,13 @@ export const AuthForm = ({ onSuccess }: AuthFormProps) => {
         const { data: driverData, error: driverError } = await supabase
           .from('driver_details')
           .select('*')
-          .eq('auth_user_id', authData.user.id)
+          .eq('email', formData.email)
           .single();
 
         if (driverError) throw driverError;
         
         onSuccess(driverData.id);
       } else {
-        // Validate required fields for signup
-        if (!formData.full_name || !formData.cpf || !formData.phone || 
-            !formData.address || !formData.city || !formData.state || !formData.postal_code) {
-          throw new Error("Todos os campos são obrigatórios para criar uma conta");
-        }
-
         // Signup flow
         const { data: authData, error: signupError } = await supabase.auth.signUp({
           email: formData.email,
@@ -87,25 +73,21 @@ export const AuthForm = ({ onSuccess }: AuthFormProps) => {
           throw new Error("Failed to create user account");
         }
 
-        // Create driver details with all required fields
+        // Create driver details
         const driverData = await createDriverDetails({
           full_name: formData.full_name,
           email: formData.email,
           cpf: formData.cpf,
           phone: formData.phone,
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          postal_code: formData.postal_code,
           auth_user_id: authData.user.id,
+          birth_date: new Date().toISOString().split('T')[0],
+          license_number: 'PENDING',
+          license_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
         });
 
         onSuccess(driverData.id);
+        toast.success("Conta criada com sucesso!");
       }
-
-      toast.success(
-        hasAccount ? "Login realizado com sucesso!" : "Conta criada com sucesso!"
-      );
     } catch (error: any) {
       console.error('Auth error:', error);
       toast.error(error.message || "Erro ao processar autenticação");
@@ -133,7 +115,7 @@ export const AuthForm = ({ onSuccess }: AuthFormProps) => {
             {hasAccount ? (
               <LoginForm form={form} />
             ) : (
-              <SignupForm form={form} />
+              <SignupFields form={form} />
             )}
 
             <div className="space-y-4">
