@@ -1,60 +1,73 @@
 import { supabase } from "@/integrations/supabase/client"
 
-export const createDriverDetails = async (customer: any) => {
+interface DriverData {
+  first_name: string;
+  last_name: string;
+  email: string;
+  cpf: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  postal_code: string;
+}
+
+export const createDriverDetails = async (data: DriverData) => {
+  // First check if driver exists by email or CPF
   const { data: existingDriver } = await supabase
     .from('driver_details')
     .select()
-    .eq('email', customer.email)
-    .maybeSingle()
+    .or(`email.eq.${data.email},cpf.eq.${data.cpf}`)
+    .maybeSingle();
 
   if (existingDriver) {
-    // Update existing driver
+    // Update existing driver with new information
     const { data: updatedDriver, error: updateError } = await supabase
       .from('driver_details')
       .update({
-        full_name: customer.full_name,
-        email: customer.email,
-        cpf: customer.cpf,
-        phone: customer.phone,
-        address: customer.address,
-        city: customer.city,
-        state: customer.state,
-        postal_code: customer.postal_code,
-        auth_user_id: customer.auth_user_id,
-        // Set required fields with default values if not provided
-        birth_date: customer.birth_date || new Date().toISOString().split('T')[0],
-        license_number: customer.license_number || 'PENDING',
-        license_expiry: customer.license_expiry || new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0]
+        full_name: `${data.first_name} ${data.last_name}`,
+        email: data.email,
+        cpf: data.cpf,
+        phone: data.phone,
+        address: data.address,
+        city: data.city,
+        state: data.state,
+        postal_code: data.postal_code,
+        // Set required fields with default values
+        birth_date: new Date().toISOString().split('T')[0],
+        license_number: 'PENDING',
+        license_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+        crm_status: 'pending_approval'
       })
       .eq('id', existingDriver.id)
       .select()
-      .single()
+      .single();
 
-    if (updateError) throw updateError
-    return updatedDriver
+    if (updateError) throw updateError;
+    return updatedDriver;
   }
 
   // Create new driver
   const { data: newDriver, error: insertError } = await supabase
     .from('driver_details')
-    .insert({
-      full_name: customer.full_name,
-      email: customer.email,
-      cpf: customer.cpf,
-      phone: customer.phone,
-      address: customer.address,
-      city: customer.city,
-      state: customer.state,
-      postal_code: customer.postal_code,
-      auth_user_id: customer.auth_user_id,
+    .insert([{
+      full_name: `${data.first_name} ${data.last_name}`,
+      email: data.email,
+      cpf: data.cpf,
+      phone: data.phone,
+      address: data.address,
+      city: data.city,
+      state: data.state,
+      postal_code: data.postal_code,
       // Set required fields with default values
-      birth_date: customer.birth_date || new Date().toISOString().split('T')[0],
-      license_number: customer.license_number || 'PENDING',
-      license_expiry: customer.license_expiry || new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0]
-    })
+      birth_date: new Date().toISOString().split('T')[0],
+      license_number: 'PENDING',
+      license_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+      crm_status: 'pending_approval'
+    }])
     .select()
-    .single()
+    .single();
 
-  if (insertError) throw insertError
-  return newDriver
-}
+  if (insertError) throw insertError;
+  return newDriver;
+};
