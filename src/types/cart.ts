@@ -1,6 +1,6 @@
 export interface CartItem {
   id: string;
-  type: 'car_group' | 'optional' | 'insurance';
+  type: 'car_group' | 'optional';
   name: string;
   quantity: number;
   unitPrice: number;

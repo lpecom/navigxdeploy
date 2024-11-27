@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useCart } from "@/contexts/CartContext"
 import { useToast } from "@/components/ui/use-toast"
 import { supabase } from "@/integrations/supabase/client"
-import { useSession } from '@supabase/auth-helpers-react'
+import { useSession } from "@supabase/auth-helpers-react"
 import { useNavigate } from "react-router-dom"
 import { createCheckoutSession } from "../CheckoutSessionHandler"
 
@@ -18,71 +18,40 @@ export const useCheckoutState = () => {
   useEffect(() => {
     const checkSession = async () => {
       if (session?.user) {
-        try {
-          const { data: driverDetails, error } = await supabase
-            .from('driver_details')
-            .select('*')
-            .eq('auth_user_id', session.user.id)
-            .maybeSingle()
+        const { data: driverDetails, error } = await supabase
+          .from('driver_details')
+          .select('*')
+          .eq('auth_user_id', session.user.id)
+          .single()
 
-          if (error) {
-            console.error('Error fetching driver details:', error)
-            return
-          }
-
-          if (driverDetails) {
-            setCustomerId(driverDetails.id)
-            if (cartState.items.length > 0 && !cartState.checkoutSessionId) {
-              try {
-                await createCheckoutSession({
-                  driverId: driverDetails.id,
-                  cartItems: cartState.items,
-                  totalAmount: cartState.total,
-                  onSuccess: (sessionId) => {
-                    dispatch({ type: 'SET_CHECKOUT_SESSION', payload: sessionId })
-                  }
-                })
-              } catch (error) {
-                console.error('Error creating checkout session:', error)
-                toast({
-                  title: "Erro",
-                  description: "Não foi possível criar a sessão de checkout",
-                  variant: "destructive",
-                })
-              }
-            }
-          } else {
-            // If no driver details exist, redirect to login
-            toast({
-              title: "Login Necessário",
-              description: "Por favor, faça login para continuar",
-              variant: "destructive",
-            })
-            navigate('/login')
-          }
-        } catch (error) {
-          console.error('Error in checkSession:', error)
-          toast({
-            title: "Erro",
-            description: "Ocorreu um erro ao verificar seus dados",
-            variant: "destructive",
-          })
+        if (error) {
+          console.error('Error fetching driver details:', error)
+          return
         }
-      } else {
-        navigate('/login')
+
+        if (driverDetails) {
+          setCustomerId(driverDetails.id)
+          // Only create checkout session if we have items and no existing session
+          if (cartState.items.length > 0 && !cartState.checkoutSessionId) {
+            try {
+              await createCheckoutSession({
+                driverId: driverDetails.id,
+                cartItems: cartState.items,
+                totalAmount: cartState.total,
+                onSuccess: (sessionId) => {
+                  dispatch({ type: 'SET_CHECKOUT_SESSION', payload: sessionId })
+                }
+              })
+            } catch (error) {
+              console.error('Error creating checkout session:', error)
+            }
+          }
+        }
       }
     }
 
     checkSession()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || !session) {
-        navigate("/login")
-      }
-    })
-
-    return () => subscription.unsubscribe()
-  }, [session, cartState.items, cartState.total, cartState.checkoutSessionId, dispatch, navigate, toast])
+  }, [session, cartState.items, cartState.total, cartState.checkoutSessionId, dispatch])
 
   // Prevent empty cart access and handle category validation
   useEffect(() => {

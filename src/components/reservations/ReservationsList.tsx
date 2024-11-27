@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query"
 import type { Reservation, PickupFilter } from "@/types/reservation"
 import { ReservationCard } from "./ReservationCard"
 import { supabase } from "@/integrations/supabase/client"
-import { startOfWeek, endOfWeek, addWeeks, format } from "date-fns"
+import { startOfWeek, endOfWeek, addWeeks, format, isEqual, parseISO } from "date-fns"
 import { Car, Clock } from "lucide-react"
 
 interface ReservationsListProps {
@@ -25,8 +25,6 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
   const { data: reservations, isLoading, error } = useQuery({
     queryKey: ['reservations', filter, status, selectedDate?.toISOString()],
     queryFn: async () => {
-      console.log('Fetching reservations with status:', status);
-      
       let query = supabase
         .from('checkout_sessions')
         .select(`
@@ -37,9 +35,13 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
             email,
             cpf,
             phone,
-            address
+            address,
+            city,
+            state,
+            postal_code
           )
         `)
+        .order('pickup_time', { ascending: true })
 
       if (filter === 'pending') {
         query = query.eq('status', status)
@@ -73,85 +75,80 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
 
       const { data, error } = await query
       
-      if (error) {
-        console.error('Query error:', error)
-        throw error
-      }
-
-      console.log('Raw reservations data:', data);
+      if (error) throw error
       
-      return (data || []).map((session: any): Reservation => {
-        console.log('Processing session:', session)
-        
-        const selectedCar = typeof session.selected_car === 'string' 
-          ? JSON.parse(session.selected_car)
-          : session.selected_car;
-        
-        return {
-          id: session.id,
-          reservationNumber: session.reservation_number || 0,
-          customerName: session.driver?.[0]?.full_name || 'Cliente não identificado',
-          email: session.driver?.[0]?.email || '',
-          cpf: session.driver?.[0]?.cpf || '',
-          phone: session.driver?.[0]?.phone || '',
-          address: session.driver?.[0]?.address || '',
-          pickupDate: session.pickup_date || session.created_at,
-          pickupTime: session.pickup_time || '',
-          status: session.status || 'pending_approval',
-          paymentStatus: 'pending',
-          customerStatus: 'new',
-          riskScore: 25,
-          documentsSubmitted: false,
-          createdAt: session.created_at,
-          carCategory: selectedCar?.category || 'Economy',
-          leadSource: 'form',
-          weeklyFare: session.total_amount || 0,
-          optionals: session.selected_optionals || [],
-          kilometersPerWeek: 1000,
-        }
-      })
+      return (data || []).map((session: any): Reservation => ({
+        id: session.id,
+        reservationNumber: session.reservation_number,
+        customerName: session.driver?.full_name || 'Cliente não identificado',
+        email: session.driver?.email || '',
+        cpf: session.driver?.cpf || '',
+        phone: session.driver?.phone || '',
+        address: session.driver?.address || '',
+        pickupDate: session.pickup_date || session.created_at,
+        pickupTime: session.pickup_time || '',
+        status: session.status,
+        paymentStatus: 'pending',
+        customerStatus: 'new',
+        riskScore: 25,
+        documentsSubmitted: false,
+        createdAt: session.created_at,
+        carCategory: session.selected_car?.category || 'Economy',
+        leadSource: 'form',
+        weeklyFare: session.total_amount,
+        optionals: session.selected_optionals || [],
+        kilometersPerWeek: 1000,
+      }))
     },
   })
 
-  if (error) {
-    console.error('Error fetching reservations:', error)
+  const sortedReservations = useMemo(() => {
+    if (!reservations) return []
+    return [...reservations].sort((a, b) => {
+      if (!a.pickupTime || !b.pickupTime) return 0
+      return a.pickupTime.localeCompare(b.pickupTime)
+    })
+  }, [reservations])
+
+  const renderedReservations = useMemo(() => {
+    if (error) {
+      console.error('Error fetching reservations:', error)
+      return (
+        <div className="text-center py-8 text-gray-500">
+          Ocorreu um erro ao carregar as reservas.
+        </div>
+      )
+    }
+
+    if (isLoading) {
+      return (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="animate-pulse">
+              <div className="h-32 bg-gray-100 rounded-lg"></div>
+            </div>
+          ))}
+        </div>
+      )
+    }
+
+    if (!sortedReservations?.length) {
+      return (
+        <div className="text-center py-12">
+          <Car className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500 font-medium">
+            Nenhuma reserva encontrada
+          </p>
+        </div>
+      )
+    }
+
+    const timeSlots = Array.from(new Set(sortedReservations.map(r => r.pickupTime))).sort()
+
     return (
-      <div className="text-center py-8 text-gray-500">
-        Ocorreu um erro ao carregar as reservas.
-      </div>
-    )
-  }
-
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="animate-pulse">
-            <div className="h-32 bg-gray-100 rounded-lg"></div>
-          </div>
-        ))}
-      </div>
-    )
-  }
-
-  if (!reservations?.length) {
-    return (
-      <div className="text-center py-12">
-        <Car className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-        <p className="text-gray-500 font-medium">
-          Nenhuma reserva encontrada
-        </p>
-      </div>
-    )
-  }
-
-  const timeSlots = Array.from(new Set(reservations.map(r => r.pickupTime))).sort()
-
-  return (
-    <div className="max-w-3xl mx-auto">
       <div className="space-y-8">
         {timeSlots.map(timeSlot => {
-          const slotReservations = reservations.filter(r => r.pickupTime === timeSlot)
+          const slotReservations = sortedReservations.filter(r => r.pickupTime === timeSlot)
           
           return (
             <div key={timeSlot} className="space-y-4">
@@ -174,6 +171,12 @@ const ReservationsList = ({ filter, status = 'pending_approval', selectedDate }:
           )
         })}
       </div>
+    )
+  }, [sortedReservations, isLoading, error, expandedCards, toggleCard])
+
+  return (
+    <div className="max-w-3xl mx-auto">
+      {renderedReservations}
     </div>
   )
 }
