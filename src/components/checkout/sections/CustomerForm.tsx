@@ -4,10 +4,9 @@ import { z } from "zod";
 import { Form } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { AuthSection } from "./auth/AuthSection";
-import { handleCustomerData } from "../handlers/CustomerHandler";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { CustomerFormFields } from "./form/CustomerFormFields";
 
 const customerSchema = z.object({
   full_name: z.string().min(3, "Nome completo é obrigatório"),
@@ -19,7 +18,6 @@ const customerSchema = z.object({
   address: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
-  password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
 });
 
 type CustomerFormValues = z.infer<typeof customerSchema>;
@@ -44,22 +42,15 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
       address: "",
       city: "",
       state: "",
-      password: "",
     }
   });
 
   const handleSubmit = async (data: CustomerFormValues) => {
     try {
       const customerData = {
-        full_name: data.full_name,
-        email: data.email,
-        cpf: data.cpf,
-        phone: data.phone,
-        birth_date: data.birth_date,
-        postal_code: data.postal_code || undefined,
-        address: data.address || undefined,
-        city: data.city || undefined,
-        state: data.state || undefined,
+        ...data,
+        license_number: "",  // Add required fields with empty values
+        license_expiry: new Date().toISOString(),  // Add required fields with default values
       };
       
       const savedCustomer = await handleCustomerData(customerData);
@@ -103,103 +94,44 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
     <Card className="p-6">
       <h2 className="text-2xl font-semibold mb-6">Quem vai dirigir?</h2>
       
-      <AuthSection 
-        form={form}
-        hasAccount={hasAccount}
-        onHasAccountChange={setHasAccount}
-        onLogin={handleLogin}
-        isLoggingIn={isLoggingIn}
-      />
+      <div className="flex items-center space-x-2 mb-6">
+        <Checkbox
+          id="has_account"
+          checked={hasAccount}
+          onCheckedChange={(checked) => setHasAccount(checked as boolean)}
+        />
+        <label
+          htmlFor="has_account"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Já tenho uma conta Navig
+        </label>
+      </div>
 
-      {!hasAccount && (
+      {hasAccount ? (
+        <div className="space-y-4">
+          <Input
+            type="email"
+            placeholder="Email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input
+            type="password"
+            placeholder="Senha"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Button 
+            onClick={handleLoginSubmit}
+            className="w-full"
+            disabled={isLoggingIn}
+          >
+            {isLoggingIn ? "Entrando..." : "Entrar"}
+          </Button>
+        </div>
+      ) : (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="full_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome Completo</FormLabel>
-                    <FormControl>
-                      <Input placeholder="João da Silva" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="joao@exemplo.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="cpf"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>CPF</FormLabel>
-                    <FormControl>
-                      <Input placeholder="000.000.000-00" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Telefone</FormLabel>
-                    <FormControl>
-                      <Input placeholder="(00) 00000-0000" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="birth_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Data de Nascimento</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Senha</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
+            <CustomerFormFields form={form} />
             <Button type="submit" className="w-full">
               Continuar
             </Button>
