@@ -64,7 +64,8 @@ export const SuccessSection = () => {
           driver_id: sessionData.driver_id,
           title: 'Nova Reserva',
           message: 'Uma nova reserva está aguardando aprovação.',
-          type: 'reservation'
+          type: 'system', // Changed from 'reservation' to 'system'
+          is_read: false
         })
       
       if (notificationError) {
