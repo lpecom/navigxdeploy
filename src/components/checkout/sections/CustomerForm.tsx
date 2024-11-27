@@ -1,12 +1,16 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { CustomerFormFields } from "./form/CustomerFormFields";
+import { handleCustomerData } from "../handlers/CustomerHandler";
 
 const customerSchema = z.object({
   full_name: z.string().min(3, "Nome completo é obrigatório"),
@@ -18,6 +22,8 @@ const customerSchema = z.object({
   address: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
+  license_number: z.string().default(""),
+  license_expiry: z.string().default(new Date().toISOString()),
 });
 
 type CustomerFormValues = z.infer<typeof customerSchema>;
@@ -29,6 +35,8 @@ interface CustomerFormProps {
 export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
   const [hasAccount, setHasAccount] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
@@ -42,18 +50,14 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
       address: "",
       city: "",
       state: "",
+      license_number: "",
+      license_expiry: new Date().toISOString(),
     }
   });
 
   const handleSubmit = async (data: CustomerFormValues) => {
     try {
-      const customerData = {
-        ...data,
-        license_number: "",  // Add required fields with empty values
-        license_expiry: new Date().toISOString(),  // Add required fields with default values
-      };
-      
-      const savedCustomer = await handleCustomerData(customerData);
+      const savedCustomer = await handleCustomerData(data);
       onSubmit(savedCustomer);
     } catch (error: any) {
       toast.error("Erro ao salvar dados do cliente");
@@ -61,7 +65,8 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
     }
   };
 
-  const handleLogin = async (email: string, password: string) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoggingIn(true);
     try {
       const { data: { user }, error } = await supabase.auth.signInWithPassword({
