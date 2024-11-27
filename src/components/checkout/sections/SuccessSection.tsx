@@ -19,7 +19,58 @@ export const SuccessSection = () => {
     setIsProcessing(true)
 
     try {
-      // Update the checkout session status to pending_approval
+      // Get the checkout session details first
+      const { data: sessionData, error: sessionFetchError } = await supabase
+        .from('checkout_sessions')
+        .select('driver_id, selected_car')
+        .eq('id', cartState.checkoutSessionId)
+        .single()
+
+      if (sessionFetchError) {
+        console.error('Session fetch error:', sessionFetchError)
+        throw new Error('Não foi possível recuperar os dados da reserva')
+      }
+
+      // If we don't have a driver_id in the session, we need to create one
+      let driverId = sessionData.driver_id
+      if (!driverId) {
+        const selectedCar = sessionData.selected_car as Record<string, any>
+        
+        // Create a new driver record
+        const { data: newDriver, error: driverError } = await supabase
+          .from('driver_details')
+          .insert([{
+            full_name: selectedCar.customer_name || 'Cliente não identificado',
+            email: selectedCar.customer_email || '',
+            cpf: '',  // These will be filled during KYC
+            phone: '',
+            birth_date: new Date().toISOString(),
+            license_number: 'PENDING',
+            license_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
+          }])
+          .select()
+          .single()
+
+        if (driverError) {
+          console.error('Driver creation error:', driverError)
+          throw new Error('Não foi possível criar o perfil do motorista')
+        }
+
+        driverId = newDriver.id
+
+        // Update the checkout session with the new driver_id
+        const { error: updateError } = await supabase
+          .from('checkout_sessions')
+          .update({ driver_id: driverId })
+          .eq('id', cartState.checkoutSessionId)
+
+        if (updateError) {
+          console.error('Session update error:', updateError)
+          throw new Error('Não foi possível atualizar a sessão')
+        }
+      }
+
+      // Update the checkout session status
       const { error: sessionError } = await supabase
         .from('checkout_sessions')
         .update({ 
@@ -32,21 +83,19 @@ export const SuccessSection = () => {
         throw new Error('Não foi possível atualizar o status da reserva')
       }
 
-      // Only create notification if we have a customerId
-      if (cartState.customerId) {
-        const { error: notificationError } = await supabase
-          .from('notifications')
-          .insert({
-            driver_id: cartState.customerId,
-            title: 'Nova Reserva',
-            message: 'Uma nova reserva está aguardando aprovação.',
-            type: 'reservation'
-          })
-        
-        if (notificationError) {
-          console.error('Notification error:', notificationError)
-          throw new Error('Não foi possível criar a notificação')
-        }
+      // Create notification for the new reservation
+      const { error: notificationError } = await supabase
+        .from('notifications')
+        .insert({
+          driver_id: driverId,
+          title: 'Nova Reserva',
+          message: 'Uma nova reserva está aguardando aprovação.',
+          type: 'reservation'
+        })
+      
+      if (notificationError) {
+        console.error('Notification error:', notificationError)
+        throw new Error('Não foi possível criar a notificação')
       }
 
       toast({
@@ -54,7 +103,7 @@ export const SuccessSection = () => {
         description: "Você será redirecionado para verificação de documentos após a aprovação.",
       })
 
-      // Redirect to a pending approval page
+      // Redirect to the driver reservations page
       navigate('/driver/reservations')
     } catch (error: any) {
       console.error('Error processing reservation:', error)
