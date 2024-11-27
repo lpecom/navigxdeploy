@@ -1,6 +1,7 @@
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export interface LoginFormProps {
   form: UseFormReturn<any>;
@@ -8,9 +9,15 @@ export interface LoginFormProps {
   isLoading?: boolean;
 }
 
-export const LoginForm = ({ form }: LoginFormProps) => {
+export const LoginForm = ({ form, onSubmit, isLoading }: LoginFormProps) => {
+  const handleSubmit = async (data: any) => {
+    if (onSubmit) {
+      await onSubmit(data);
+    }
+  };
+
   return (
-    <>
+    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
       <FormField
         control={form.control}
         name="email"
@@ -48,6 +55,10 @@ export const LoginForm = ({ form }: LoginFormProps) => {
           </FormItem>
         )}
       />
-    </>
+
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? "Entrando..." : "Entrar"}
+      </Button>
+    </form>
   );
 };

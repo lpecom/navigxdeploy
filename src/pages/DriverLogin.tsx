@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,23 @@ const DriverLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  
+  const loginForm = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    }
+  });
+
+  const signupForm = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+      full_name: "",
+      cpf: "",
+      phone: "",
+    }
+  });
 
   useEffect(() => {
     const checkSession = async () => {
@@ -168,11 +185,19 @@ const DriverLogin = () => {
           </TabsList>
 
           <TabsContent value="login">
-            <LoginForm onSubmit={handleLogin} isLoading={isLoading} />
+            <LoginForm 
+              form={loginForm} 
+              onSubmit={handleLogin} 
+              isLoading={isLoading} 
+            />
           </TabsContent>
 
           <TabsContent value="signup">
-            <SignupForm onSubmit={handleSignup} isLoading={isLoading} />
+            <SignupForm 
+              form={signupForm} 
+              onSubmit={handleSignup} 
+              isLoading={isLoading} 
+            />
           </TabsContent>
         </Tabs>
 
