@@ -20,24 +20,28 @@ export const SuccessSection = () => {
 
     try {
       // Update the checkout session status to pending_approval
-      const { error } = await supabase
+      const { error: sessionError } = await supabase
         .from('checkout_sessions')
         .update({ 
           status: 'pending_approval',
         })
         .eq('id', cartState.checkoutSessionId)
 
-      if (error) throw error
+      if (sessionError) throw sessionError
 
-      // Create a notification for admin
-      await supabase
-        .from('notifications')
-        .insert({
-          driver_id: cartState.customerId,
-          title: 'Nova Reserva',
-          message: 'Uma nova reserva está aguardando aprovação.',
-          type: 'reservation'
-        })
+      // Only create notification if we have a customerId
+      if (cartState.customerId) {
+        const { error: notificationError } = await supabase
+          .from('notifications')
+          .insert({
+            driver_id: cartState.customerId,
+            title: 'Nova Reserva',
+            message: 'Uma nova reserva está aguardando aprovação.',
+            type: 'reservation'
+          })
+        
+        if (notificationError) throw notificationError
+      }
 
       toast({
         title: "Reserva enviada para aprovação",
