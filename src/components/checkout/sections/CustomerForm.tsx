@@ -1,56 +1,68 @@
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { Form } from "@/components/ui/form"
-import { Card } from "@/components/ui/card"
-import { motion } from "framer-motion"
-import { PersonalInfoFields } from "./form/PersonalInfoFields"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Form } from "@/components/ui/form";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { PersonalInfoFields } from "./form/PersonalInfoFields";
+import { handleCustomerData } from "../handlers/CustomerHandler";
+import { toast } from "sonner";
 
 const customerSchema = z.object({
-  first_name: z.string().min(2, "Nome é obrigatório"),
-  last_name: z.string().min(2, "Sobrenome é obrigatório"),
+  full_name: z.string().min(3, "Nome completo é obrigatório"),
   email: z.string().email("Email inválido"),
-  phone: z.string().min(11, "Telefone inválido").max(11, "Telefone inválido"),
-  cpf: z.string().min(11, "CPF inválido").max(11, "CPF inválido"),
-  is_over_25: z.boolean().refine((val) => val === true, {
-    message: "Você precisa ter 25 anos ou mais para alugar",
-  })
-})
+  cpf: z.string().min(11, "CPF inválido").max(14, "CPF inválido"),
+  phone: z.string().min(10, "Telefone inválido"),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  postal_code: z.string().optional(),
+});
 
-type CustomerFormValues = z.infer<typeof customerSchema>
+type CustomerFormValues = z.infer<typeof customerSchema>;
 
 interface CustomerFormProps {
-  onSubmit: (data: CustomerFormValues) => void;
+  onSubmit: (data: any) => void;
 }
 
 export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
     defaultValues: {
-      first_name: "",
-      last_name: "",
+      full_name: "",
       email: "",
-      phone: "",
       cpf: "",
-      is_over_25: false
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      postal_code: "",
     }
-  })
+  });
+
+  const handleSubmit = async (data: CustomerFormValues) => {
+    try {
+      const customerData = await handleCustomerData(data);
+      onSubmit(customerData);
+    } catch (error: any) {
+      toast.error("Erro ao salvar dados do cliente");
+      console.error('Error saving customer data:', error);
+    }
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <Card className="p-6 bg-black/40 backdrop-blur-xl border border-white/10">
-        <h2 className="text-2xl font-semibold mb-6 text-white">Quem vai dirigir?</h2>
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <PersonalInfoFields form={form} />
-          </form>
-        </Form>
-      </Card>
-    </motion.div>
-  )
-}
+    <Card className="p-6">
+      <h2 className="text-2xl font-semibold mb-6">Seus Dados</h2>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <PersonalInfoFields form={form} />
+          <div className="pt-4">
+            <Button type="submit" className="w-full">
+              Continuar para Agendamento
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </Card>
+  );
+};
