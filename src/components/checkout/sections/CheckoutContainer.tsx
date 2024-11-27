@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useCart } from "@/contexts/CartContext"
 import { useToast } from "@/components/ui/use-toast"
 import { supabase } from "@/integrations/supabase/client"
-import { useSession } from "@supabase/auth-helpers-react"
+import { useSession } from '@supabase/auth-helpers-react'
 import { useNavigate } from "react-router-dom"
 import { createCheckoutSession } from "../CheckoutSessionHandler"
 
@@ -23,17 +23,15 @@ export const useCheckoutState = () => {
             .from('driver_details')
             .select('*')
             .eq('auth_user_id', session.user.id)
-            .maybeSingle() // Use maybeSingle() instead of single()
+            .maybeSingle()
 
           if (error) {
             console.error('Error fetching driver details:', error)
             return
           }
 
-          // If driver details exist, proceed with checkout session
           if (driverDetails) {
             setCustomerId(driverDetails.id)
-            // Only create checkout session if we have items and no existing session
             if (cartState.items.length > 0 && !cartState.checkoutSessionId) {
               try {
                 await createCheckoutSession({
@@ -54,13 +52,13 @@ export const useCheckoutState = () => {
               }
             }
           } else {
-            // If no driver details exist, redirect to complete profile
+            // If no driver details exist, redirect to login
             toast({
-              title: "Perfil Incompleto",
-              description: "Por favor, complete seu perfil antes de continuar",
+              title: "Login Necessário",
+              description: "Por favor, faça login para continuar",
               variant: "destructive",
             })
-            navigate('/driver/profile')
+            navigate('/login')
           }
         } catch (error) {
           console.error('Error in checkSession:', error)
@@ -70,6 +68,8 @@ export const useCheckoutState = () => {
             variant: "destructive",
           })
         }
+      } else {
+        navigate('/login')
       }
     }
 
