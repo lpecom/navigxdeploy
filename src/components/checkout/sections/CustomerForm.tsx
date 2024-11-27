@@ -8,6 +8,7 @@ import { PersonalInfoFields } from "./form/PersonalInfoFields";
 import { handleCustomerData } from "../handlers/CustomerHandler";
 import { toast } from "sonner";
 
+// Match the schema with CustomerData interface requirements
 const customerSchema = z.object({
   full_name: z.string().min(3, "Nome completo é obrigatório"),
   email: z.string().email("Email inválido"),
@@ -42,8 +43,20 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
 
   const handleSubmit = async (data: CustomerFormValues) => {
     try {
-      const customerData = await handleCustomerData(data);
-      onSubmit(customerData);
+      // Ensure all required fields are present before calling handleCustomerData
+      const customerData = {
+        full_name: data.full_name,
+        email: data.email,
+        cpf: data.cpf,
+        phone: data.phone,
+        address: data.address || undefined,
+        city: data.city || undefined,
+        state: data.state || undefined,
+        postal_code: data.postal_code || undefined,
+      };
+      
+      const savedCustomer = await handleCustomerData(customerData);
+      onSubmit(savedCustomer);
     } catch (error: any) {
       toast.error("Erro ao salvar dados do cliente");
       console.error('Error saving customer data:', error);
