@@ -26,7 +26,9 @@ export const SignupTab = () => {
 
     try {
       // Try to sign up first
-      const { data: authData, error: signupError } = await supabase.auth.signUp({
+      let userData;
+      
+      const { data: signupData, error: signupError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
       });
@@ -41,13 +43,12 @@ export const SignupTab = () => {
         if (signInError) throw signInError;
         if (!signInData.user) throw new Error('Failed to sign in');
 
-        authData = signInData;
+        userData = signInData.user;
       } else if (signupError) {
         throw signupError;
-      }
-
-      if (!authData.user) {
-        throw new Error('Failed to create account');
+      } else {
+        if (!signupData.user) throw new Error('Failed to create account');
+        userData = signupData.user;
       }
 
       const { data: driverData, error: driverError } = await supabase
@@ -58,7 +59,7 @@ export const SignupTab = () => {
             email: formData.email,
             cpf: formData.cpf,
             phone: formData.phone,
-            auth_user_id: authData.user.id,
+            auth_user_id: userData.id,
             birth_date: new Date().toISOString(),
             license_number: 'PENDING',
             license_expiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
