@@ -4,11 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { createDriverDetails } from "../../handlers/DriverHandler";
+import { createDriverDetails, DriverData } from "../../handlers/DriverHandler";
 
 const authSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -33,14 +33,14 @@ export const AuthForm = ({ onSuccess }: AuthFormProps) => {
     resolver: zodResolver(authSchema),
   });
 
-  const handleSubmit = async (data: z.infer<typeof authSchema>) => {
+  const handleSubmit = async (formData: z.infer<typeof authSchema>) => {
     setIsLoading(true);
     try {
       if (hasAccount) {
         // Login flow
         const { data: authData, error: loginError } = await supabase.auth.signInWithPassword({
-          email: data.email,
-          password: data.password,
+          email: formData.email,
+          password: formData.password,
         });
 
         if (loginError) throw loginError;
@@ -58,16 +58,27 @@ export const AuthForm = ({ onSuccess }: AuthFormProps) => {
       } else {
         // Signup flow
         const { data: authData, error: signupError } = await supabase.auth.signUp({
-          email: data.email,
-          password: data.password,
+          email: formData.email,
+          password: formData.password,
         });
 
         if (signupError) throw signupError;
 
-        // Create driver details
+        if (!authData.user?.id) {
+          throw new Error("Failed to create user account");
+        }
+
+        // Create driver details with all required fields
         const driverData = await createDriverDetails({
-          ...data,
-          auth_user_id: authData.user?.id,
+          full_name: formData.full_name,
+          email: formData.email,
+          cpf: formData.cpf,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          postal_code: formData.postal_code,
+          auth_user_id: authData.user.id,
         });
 
         onSuccess(driverData.id);

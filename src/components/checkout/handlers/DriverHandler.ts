@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-interface DriverData {
+export interface DriverData {
   full_name: string;
   email: string;
   cpf: string;
