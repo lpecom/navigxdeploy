@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { CustomerFormFields } from "./form/CustomerFormFields";
 import { handleCustomerData } from "../handlers/CustomerHandler";
+import { CustomerData } from "@/types/customer";
 
 const customerSchema = z.object({
   full_name: z.string().min(3, "Nome completo é obrigatório"),
@@ -57,7 +58,22 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
 
   const handleSubmit = async (data: CustomerFormValues) => {
     try {
-      const savedCustomer = await handleCustomerData(data);
+      // Ensure all required fields are present before passing to handleCustomerData
+      const customerData: CustomerData = {
+        full_name: data.full_name,
+        email: data.email,
+        cpf: data.cpf,
+        phone: data.phone,
+        birth_date: data.birth_date,
+        postal_code: data.postal_code || "",
+        address: data.address || "",
+        city: data.city || "",
+        state: data.state || "",
+        license_number: data.license_number,
+        license_expiry: data.license_expiry
+      };
+      
+      const savedCustomer = await handleCustomerData(customerData);
       onSubmit(savedCustomer);
     } catch (error: any) {
       toast.error("Erro ao salvar dados do cliente");
