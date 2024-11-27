@@ -25,12 +25,26 @@ export const SignupTab = () => {
     setIsLoading(true);
 
     try {
+      // Try to sign up first
       const { data: authData, error: signupError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
       });
 
-      if (signupError) throw signupError;
+      // If user already exists, try to sign in
+      if (signupError?.message === "User already registered") {
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (signInError) throw signInError;
+        if (!signInData.user) throw new Error('Failed to sign in');
+
+        authData = signInData;
+      } else if (signupError) {
+        throw signupError;
+      }
 
       if (!authData.user) {
         throw new Error('Failed to create account');
@@ -38,7 +52,7 @@ export const SignupTab = () => {
 
       const { data: driverData, error: driverError } = await supabase
         .from('driver_details')
-        .insert([
+        .upsert([
           {
             full_name: formData.full_name,
             email: formData.email,
@@ -56,17 +70,9 @@ export const SignupTab = () => {
       if (driverError) throw driverError;
 
       toast({
-        title: "Conta criada com sucesso",
-        description: "Você será redirecionado para continuar seu cadastro.",
+        title: "Conta acessada com sucesso",
+        description: "Você será redirecionado para continuar.",
       });
-
-      // Auto login after signup
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
-      });
-
-      if (signInError) throw signInError;
 
       // Check if we're in the middle of a checkout
       const categoryData = sessionStorage.getItem('selectedCategory');
@@ -77,8 +83,8 @@ export const SignupTab = () => {
       }
     } catch (error: any) {
       toast({
-        title: "Erro ao criar conta",
-        description: error.message || "Falha ao criar conta",
+        title: "Erro ao acessar conta",
+        description: error.message || "Falha ao acessar conta",
         variant: "destructive",
       });
     } finally {
