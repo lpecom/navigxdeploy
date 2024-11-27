@@ -1,9 +1,9 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { CheckCircle, ArrowRight } from "lucide-react"
+import { ChevronRight, ShoppingCart } from "lucide-react"
 import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 import { useCart } from "@/contexts/CartContext"
 import { supabase } from "@/integrations/supabase/client"
 import { useState } from "react"
@@ -15,7 +15,7 @@ export const SuccessSection = () => {
   const [isProcessing, setIsProcessing] = useState(false)
   
   const handleKYCStart = async () => {
-    if (isProcessing) return
+    if (isProcessing || !cartState.checkoutSessionId) return
     setIsProcessing(true)
 
     try {
@@ -27,7 +27,10 @@ export const SuccessSection = () => {
         })
         .eq('id', cartState.checkoutSessionId)
 
-      if (sessionError) throw sessionError
+      if (sessionError) {
+        console.error('Session update error:', sessionError)
+        throw new Error('Não foi possível atualizar o status da reserva')
+      }
 
       // Only create notification if we have a customerId
       if (cartState.customerId) {
@@ -40,7 +43,10 @@ export const SuccessSection = () => {
             type: 'reservation'
           })
         
-        if (notificationError) throw notificationError
+        if (notificationError) {
+          console.error('Notification error:', notificationError)
+          throw new Error('Não foi possível criar a notificação')
+        }
       }
 
       toast({
@@ -54,7 +60,7 @@ export const SuccessSection = () => {
       console.error('Error processing reservation:', error)
       toast({
         title: "Erro ao processar reserva",
-        description: "Ocorreu um erro ao enviar sua reserva. Por favor, tente novamente.",
+        description: error.message || "Ocorreu um erro ao enviar sua reserva. Por favor, tente novamente.",
         variant: "destructive",
       })
     } finally {
@@ -71,7 +77,7 @@ export const SuccessSection = () => {
     >
       <Card className="p-8 text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-500 mb-6">
-          <CheckCircle className="w-8 h-8" />
+          <ShoppingCart className="w-8 h-8" />
         </div>
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Reserva Pré-Aprovada!</h2>
         <p className="text-gray-600 mb-8">
@@ -84,7 +90,7 @@ export const SuccessSection = () => {
             disabled={isProcessing}
           >
             {isProcessing ? "Processando..." : "Enviar para Aprovação"}
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ChevronRight className="ml-2 h-4 w-4" />
           </Button>
           <Button
             variant="outline"
