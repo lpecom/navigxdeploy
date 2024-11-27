@@ -65,7 +65,7 @@ export const CheckoutSteps = ({
       {step === 4 && customerId && checkoutSessionId && (
         <PaymentSection
           amount={0}
-          customerId={customerId}
+          driverId={customerId}
           onPaymentSuccess={onPaymentSuccess}
         />
       )}
