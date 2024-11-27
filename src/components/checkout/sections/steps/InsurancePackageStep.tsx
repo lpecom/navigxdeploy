@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useCart } from "@/contexts/CartContext";
 
 interface InsuranceOption {
   id: string;
@@ -14,12 +15,13 @@ interface InsuranceOption {
 }
 
 interface InsurancePackageStepProps {
-  onSelect: (insuranceId: string) => void;
-  selectedInsurance?: string;
+  onSelect: () => void;
   onBack: () => void;
 }
 
-export const InsurancePackageStep = ({ onSelect, selectedInsurance, onBack }: InsurancePackageStepProps) => {
+export const InsurancePackageStep = ({ onSelect, onBack }: InsurancePackageStepProps) => {
+  const { dispatch, state } = useCart();
+  
   const { data: insuranceOptions } = useQuery({
     queryKey: ['insurance-options'],
     queryFn: async () => {
@@ -36,6 +38,27 @@ export const InsurancePackageStep = ({ onSelect, selectedInsurance, onBack }: In
       return data as InsuranceOption[];
     }
   });
+
+  const handleInsuranceSelect = (insurance: InsuranceOption) => {
+    // Remove any existing insurance from cart
+    const nonInsuranceItems = state.items.filter(item => item.type !== 'insurance');
+    
+    // Add new insurance to cart
+    dispatch({
+      type: 'ADD_ITEM',
+      payload: {
+        id: insurance.id,
+        type: 'insurance',
+        name: insurance.name,
+        quantity: 1,
+        unitPrice: insurance.price,
+        totalPrice: insurance.price
+      }
+    });
+
+    toast.success("Seguro selecionado com sucesso!");
+    onSelect();
+  };
 
   const renderStars = (count: number) => {
     return Array(3).fill(0).map((_, i) => (
@@ -77,7 +100,7 @@ export const InsurancePackageStep = ({ onSelect, selectedInsurance, onBack }: In
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {insuranceOptions?.map((option, index) => {
-          const isSelected = selectedInsurance === option.id;
+          const isSelected = state.items.some(item => item.id === option.id && item.type === 'insurance');
           const coverageCount = Object.values(option.coverage_details).filter(Boolean).length;
 
           return (
@@ -93,7 +116,7 @@ export const InsurancePackageStep = ({ onSelect, selectedInsurance, onBack }: In
                     ? 'bg-primary/10 border-primary/50 shadow-primary/20' 
                     : 'bg-gray-900/50 hover:bg-gray-900/60 border-gray-800'
                 }`}
-                onClick={() => onSelect(option.id)}
+                onClick={() => handleInsuranceSelect(option)}
               >
                 <div className="absolute top-4 right-4">
                   <div className={`w-6 h-6 rounded-full border-2 transition-colors ${

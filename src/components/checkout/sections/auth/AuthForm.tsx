@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { createDriverDetails } from "../../handlers/DriverHandler";
 import { SignupFields } from "./components/SignupFields";
 import { LoginForm } from "./components/LoginForm";
+import { useCart } from "@/contexts/CartContext";
 
 const authSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -20,12 +20,13 @@ const authSchema = z.object({
 });
 
 interface AuthFormProps {
-  onSuccess: (driverId: string) => void;
+  onSuccess: (customerId: string) => void;
 }
 
 export const AuthForm = ({ onSuccess }: AuthFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasAccount, setHasAccount] = useState(false);
+  const { state: cartState } = useCart();
   
   const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
@@ -50,16 +51,16 @@ export const AuthForm = ({ onSuccess }: AuthFormProps) => {
 
         if (loginError) throw loginError;
 
-        // Get existing driver details
-        const { data: driverData, error: driverError } = await supabase
-          .from('driver_details')
+        // Get existing customer details
+        const { data: customerData, error: customerError } = await supabase
+          .from('customers')
           .select('*')
           .eq('email', formData.email)
           .single();
 
-        if (driverError) throw driverError;
+        if (customerError) throw customerError;
         
-        onSuccess(driverData.id);
+        onSuccess(customerData.id);
       } else {
         // Signup flow
         const { data: authData, error: signupError } = await supabase.auth.signUp({
@@ -73,19 +74,21 @@ export const AuthForm = ({ onSuccess }: AuthFormProps) => {
           throw new Error("Failed to create user account");
         }
 
-        // Create driver details
-        const driverData = await createDriverDetails({
-          full_name: formData.full_name,
-          email: formData.email,
-          cpf: formData.cpf,
-          phone: formData.phone,
-          auth_user_id: authData.user.id,
-          birth_date: new Date().toISOString().split('T')[0],
-          license_number: 'PENDING',
-          license_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-        });
+        // Create customer record
+        const { data: customerData, error: customerError } = await supabase
+          .from('customers')
+          .insert([{
+            full_name: formData.full_name,
+            email: formData.email,
+            cpf: formData.cpf,
+            phone: formData.phone,
+          }])
+          .select()
+          .single();
 
-        onSuccess(driverData.id);
+        if (customerError) throw customerError;
+
+        onSuccess(customerData.id);
         toast.success("Conta criada com sucesso!");
       }
     } catch (error: any) {
@@ -124,11 +127,7 @@ export const AuthForm = ({ onSuccess }: AuthFormProps) => {
                 className="w-full"
                 disabled={isLoading}
               >
-                {isLoading
-                  ? "Processando..."
-                  : hasAccount
-                  ? "Entrar"
-                  : "Criar Conta"}
+                {isLoading ? "Processando..." : "Continuar"}
               </Button>
 
               <Button

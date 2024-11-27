@@ -17,8 +17,7 @@ interface CheckoutStepsProps {
   onCustomerSubmit: (data: any) => void;
   onScheduleSubmit: (data: any) => void;
   onPaymentSuccess: (paymentId: string) => void;
-  onInsuranceSelect?: (insuranceId: string) => void;
-  selectedInsurance?: string;
+  onInsuranceSelect?: () => void;
 }
 
 export const CheckoutSteps = ({
@@ -30,8 +29,7 @@ export const CheckoutSteps = ({
   onCustomerSubmit,
   onScheduleSubmit,
   onPaymentSuccess,
-  onInsuranceSelect,
-  selectedInsurance
+  onInsuranceSelect
 }: CheckoutStepsProps) => {
   return (
     <>
@@ -49,7 +47,6 @@ export const CheckoutSteps = ({
       {step === 2 && onInsuranceSelect && (
         <InsurancePackageStep 
           onSelect={onInsuranceSelect}
-          selectedInsurance={selectedInsurance}
           onBack={() => window.history.back()}
         />
       )}
@@ -68,7 +65,7 @@ export const CheckoutSteps = ({
       {step === 4 && customerId && checkoutSessionId && (
         <PaymentSection
           amount={0}
-          driverId={customerId}
+          customerId={customerId}
           onPaymentSuccess={onPaymentSuccess}
         />
       )}
@@ -83,15 +80,15 @@ export const CheckoutSteps = ({
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 text-primary mb-6">
               <ShoppingCart className="w-8 h-8" />
             </div>
-            <h2 className="text-2xl font-semibold text-white mb-4">Reservation Confirmed!</h2>
+            <h2 className="text-2xl font-semibold text-white mb-4">Reserva Confirmada!</h2>
             <p className="text-gray-400 mb-8">
-              Your reservation has been received successfully. Our team will contact you soon to confirm the details.
+              Sua reserva foi recebida com sucesso. Nossa equipe entrará em contato para confirmar os detalhes.
             </p>
             <Button
               onClick={() => window.location.href = '/'}
               className="w-full sm:w-auto"
             >
-              Return to Home
+              Voltar para Home
             </Button>
           </Card>
         </motion.div>
