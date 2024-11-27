@@ -18,40 +18,71 @@ export const useCheckoutState = () => {
   useEffect(() => {
     const checkSession = async () => {
       if (session?.user) {
-        const { data: driverDetails, error } = await supabase
-          .from('driver_details')
-          .select('*')
-          .eq('auth_user_id', session.user.id)
-          .single()
+        try {
+          const { data: driverDetails, error } = await supabase
+            .from('driver_details')
+            .select('*')
+            .eq('auth_user_id', session.user.id)
+            .maybeSingle() // Use maybeSingle() instead of single()
 
-        if (error) {
-          console.error('Error fetching driver details:', error)
-          return
-        }
-
-        if (driverDetails) {
-          setCustomerId(driverDetails.id)
-          // Only create checkout session if we have items and no existing session
-          if (cartState.items.length > 0 && !cartState.checkoutSessionId) {
-            try {
-              await createCheckoutSession({
-                driverId: driverDetails.id,
-                cartItems: cartState.items,
-                totalAmount: cartState.total,
-                onSuccess: (sessionId) => {
-                  dispatch({ type: 'SET_CHECKOUT_SESSION', payload: sessionId })
-                }
-              })
-            } catch (error) {
-              console.error('Error creating checkout session:', error)
-            }
+          if (error) {
+            console.error('Error fetching driver details:', error)
+            return
           }
+
+          // If driver details exist, proceed with checkout session
+          if (driverDetails) {
+            setCustomerId(driverDetails.id)
+            // Only create checkout session if we have items and no existing session
+            if (cartState.items.length > 0 && !cartState.checkoutSessionId) {
+              try {
+                await createCheckoutSession({
+                  driverId: driverDetails.id,
+                  cartItems: cartState.items,
+                  totalAmount: cartState.total,
+                  onSuccess: (sessionId) => {
+                    dispatch({ type: 'SET_CHECKOUT_SESSION', payload: sessionId })
+                  }
+                })
+              } catch (error) {
+                console.error('Error creating checkout session:', error)
+                toast({
+                  title: "Erro",
+                  description: "Não foi possível criar a sessão de checkout",
+                  variant: "destructive",
+                })
+              }
+            }
+          } else {
+            // If no driver details exist, redirect to complete profile
+            toast({
+              title: "Perfil Incompleto",
+              description: "Por favor, complete seu perfil antes de continuar",
+              variant: "destructive",
+            })
+            navigate('/driver/profile')
+          }
+        } catch (error) {
+          console.error('Error in checkSession:', error)
+          toast({
+            title: "Erro",
+            description: "Ocorreu um erro ao verificar seus dados",
+            variant: "destructive",
+          })
         }
       }
     }
 
     checkSession()
-  }, [session, cartState.items, cartState.total, cartState.checkoutSessionId, dispatch])
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || !session) {
+        navigate("/login")
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [session, cartState.items, cartState.total, cartState.checkoutSessionId, dispatch, navigate, toast])
 
   // Prevent empty cart access and handle category validation
   useEffect(() => {
