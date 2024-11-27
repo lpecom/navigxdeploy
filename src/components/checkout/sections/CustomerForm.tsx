@@ -8,12 +8,14 @@ import { PersonalInfoFields } from "./form/PersonalInfoFields";
 import { handleCustomerData } from "../handlers/CustomerHandler";
 import { toast } from "sonner";
 
-// Match the schema with CustomerData interface requirements
 const customerSchema = z.object({
   full_name: z.string().min(3, "Nome completo é obrigatório"),
   email: z.string().email("Email inválido"),
   cpf: z.string().min(11, "CPF inválido").max(14, "CPF inválido"),
   phone: z.string().min(10, "Telefone inválido"),
+  birth_date: z.string().min(1, "Data de nascimento é obrigatória"),
+  license_number: z.string().min(1, "CNH é obrigatória"),
+  license_expiry: z.string().min(1, "Data de validade da CNH é obrigatória"),
   address: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
@@ -34,6 +36,9 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
       email: "",
       cpf: "",
       phone: "",
+      birth_date: "",
+      license_number: "",
+      license_expiry: "",
       address: "",
       city: "",
       state: "",
@@ -43,12 +48,14 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
 
   const handleSubmit = async (data: CustomerFormValues) => {
     try {
-      // Ensure all required fields are present before calling handleCustomerData
       const customerData = {
         full_name: data.full_name,
         email: data.email,
         cpf: data.cpf,
         phone: data.phone,
+        birth_date: data.birth_date,
+        license_number: data.license_number,
+        license_expiry: data.license_expiry,
         address: data.address || undefined,
         city: data.city || undefined,
         state: data.state || undefined,
@@ -69,11 +76,6 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <PersonalInfoFields form={form} />
-          <div className="pt-4">
-            <Button type="submit" className="w-full">
-              Continuar para Agendamento
-            </Button>
-          </div>
         </form>
       </Form>
     </Card>

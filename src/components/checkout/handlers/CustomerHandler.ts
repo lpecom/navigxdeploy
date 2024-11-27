@@ -5,24 +5,26 @@ interface CustomerData {
   email: string
   cpf: string
   phone: string
+  birth_date: string
+  license_number: string
+  license_expiry: string
   address?: string
   city?: string
   state?: string
   postal_code?: string
-  auth_user_id?: string
 }
 
 export const handleCustomerData = async (customerData: CustomerData) => {
   // First check if customer exists by email
   const { data: existingCustomerByEmail } = await supabase
-    .from('customers')
+    .from('driver_details')
     .select()
     .eq('email', customerData.email)
     .maybeSingle()
 
   // Then check if customer exists by CPF
   const { data: existingCustomerByCpf } = await supabase
-    .from('customers')
+    .from('driver_details')
     .select()
     .eq('cpf', customerData.cpf)
     .maybeSingle()
@@ -32,7 +34,7 @@ export const handleCustomerData = async (customerData: CustomerData) => {
   if (existingCustomer) {
     // Update existing customer
     const { data: updatedCustomer, error: updateError } = await supabase
-      .from('customers')
+      .from('driver_details')
       .update(customerData)
       .eq('id', existingCustomer.id)
       .select()
@@ -43,7 +45,7 @@ export const handleCustomerData = async (customerData: CustomerData) => {
   } else {
     // Insert new customer
     const { data: newCustomer, error: insertError } = await supabase
-      .from('customers')
+      .from('driver_details')
       .insert([customerData])
       .select()
       .single()

@@ -1,9 +1,8 @@
-import { UseFormReturn } from "react-hook-form"
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { ChevronRight } from "lucide-react"
+import { UseFormReturn } from "react-hook-form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ChevronRight } from "lucide-react";
 
 interface PersonalInfoFieldsProps {
   form: UseFormReturn<any>;
@@ -15,16 +14,12 @@ export const PersonalInfoFields = ({ form }: PersonalInfoFieldsProps) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
-          name="first_name"
+          name="full_name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-white/60">Nome</FormLabel>
+              <FormLabel>Nome Completo</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Digite seu nome" 
-                  className="bg-white/5 border-white/10 text-white"
-                  {...field} 
-                />
+                <Input placeholder="Digite seu nome completo" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -33,16 +28,72 @@ export const PersonalInfoFields = ({ form }: PersonalInfoFieldsProps) => {
 
         <FormField
           control={form.control}
-          name="last_name"
+          name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-white/60">Sobrenome</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Digite seu sobrenome" 
-                  className="bg-white/5 border-white/10 text-white"
-                  {...field} 
-                />
+                <Input type="email" placeholder="Digite seu email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          control={form.control}
+          name="cpf"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>CPF</FormLabel>
+              <FormControl>
+                <Input placeholder="000.000.000-00" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Telefone</FormLabel>
+              <FormControl>
+                <Input placeholder="(00) 00000-0000" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          control={form.control}
+          name="birth_date"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Data de Nascimento</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="license_number"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Número da CNH</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite o número da sua CNH" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -52,17 +103,12 @@ export const PersonalInfoFields = ({ form }: PersonalInfoFieldsProps) => {
 
       <FormField
         control={form.control}
-        name="email"
+        name="license_expiry"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-white/60">Email</FormLabel>
+            <FormLabel>Validade da CNH</FormLabel>
             <FormControl>
-              <Input 
-                type="email" 
-                placeholder="Digite seu email" 
-                className="bg-white/5 border-white/10 text-white"
-                {...field} 
-              />
+              <Input type="date" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -72,21 +118,12 @@ export const PersonalInfoFields = ({ form }: PersonalInfoFieldsProps) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
-          name="phone"
+          name="address"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-white/60">Telefone</FormLabel>
+              <FormLabel>Endereço</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="(00) 00000-0000" 
-                  className="bg-white/5 border-white/10 text-white"
-                  {...field}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "")
-                    field.onChange(value)
-                  }}
-                  value={field.value ? field.value.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3") : ""}
-                />
+                <Input placeholder="Digite seu endereço" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -95,21 +132,12 @@ export const PersonalInfoFields = ({ form }: PersonalInfoFieldsProps) => {
 
         <FormField
           control={form.control}
-          name="cpf"
+          name="postal_code"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-white/60">CPF</FormLabel>
+              <FormLabel>CEP</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="000.000.000-00" 
-                  className="bg-white/5 border-white/10 text-white"
-                  {...field}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "")
-                    field.onChange(value)
-                  }}
-                  value={field.value ? field.value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4") : ""}
-                />
+                <Input placeholder="00000-000" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -117,36 +145,42 @@ export const PersonalInfoFields = ({ form }: PersonalInfoFieldsProps) => {
         />
       </div>
 
-      <FormField
-        control={form.control}
-        name="is_over_25"
-        render={({ field }) => (
-          <FormItem className="flex flex-row items-start space-x-3 space-y-0 py-4">
-            <FormControl>
-              <Checkbox
-                checked={field.value}
-                onCheckedChange={field.onChange}
-                className="data-[state=checked]:bg-primary"
-              />
-            </FormControl>
-            <div className="space-y-1 leading-none">
-              <FormLabel className="text-white">
-                Tenho 25 anos ou mais
-              </FormLabel>
-            </div>
-          </FormItem>
-        )}
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          control={form.control}
+          name="city"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Cidade</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite sua cidade" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="state"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Estado</FormLabel>
+              <FormControl>
+                <Input placeholder="Digite seu estado" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
 
       <div className="pt-4">
-        <Button 
-          type="submit"
-          className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white"
-        >
-          Continuar para agendamento
+        <Button type="submit" className="w-full">
+          Continuar para Agendamento
           <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
     </>
-  )
-}
+  );
+};
