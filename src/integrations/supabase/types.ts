@@ -885,6 +885,51 @@ export type Database = {
           },
         ]
       }
+      fipe_cache: {
+        Row: {
+          brand: string
+          created_at: string | null
+          fipe_code: string
+          fuel: string | null
+          id: string
+          model: string
+          price: number | null
+          raw_data: Json | null
+          reference_month: string | null
+          updated_at: string | null
+          vehicle_type: Database["public"]["Enums"]["vehicle_type"]
+          year: string
+        }
+        Insert: {
+          brand: string
+          created_at?: string | null
+          fipe_code: string
+          fuel?: string | null
+          id?: string
+          model: string
+          price?: number | null
+          raw_data?: Json | null
+          reference_month?: string | null
+          updated_at?: string | null
+          vehicle_type: Database["public"]["Enums"]["vehicle_type"]
+          year: string
+        }
+        Update: {
+          brand?: string
+          created_at?: string | null
+          fipe_code?: string
+          fuel?: string | null
+          id?: string
+          model?: string
+          price?: number | null
+          raw_data?: Json | null
+          reference_month?: string | null
+          updated_at?: string | null
+          vehicle_type?: Database["public"]["Enums"]["vehicle_type"]
+          year?: string
+        }
+        Relationships: []
+      }
       fleet_vehicles: {
         Row: {
           branch: string | null
@@ -1835,6 +1880,7 @@ export type Database = {
         | "other_maintenance"
         | "for_sale"
         | "preparing"
+      vehicle_type: "cars" | "motorcycles" | "trucks"
     }
     CompositeTypes: {
       [_ in never]: never
