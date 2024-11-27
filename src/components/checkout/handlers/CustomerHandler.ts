@@ -35,7 +35,11 @@ export const handleCustomerData = async (customerData: CustomerData) => {
     // Update existing customer
     const { data: updatedCustomer, error: updateError } = await supabase
       .from('driver_details')
-      .update(customerData)
+      .update({
+        ...customerData,
+        kyc_status: 'pending',
+        crm_status: 'pending_payment'
+      })
       .eq('id', existingCustomer.id)
       .select()
       .single()
@@ -43,10 +47,14 @@ export const handleCustomerData = async (customerData: CustomerData) => {
     if (updateError) throw updateError
     return updatedCustomer
   } else {
-    // Insert new customer
+    // Insert new customer with temporary status
     const { data: newCustomer, error: insertError } = await supabase
       .from('driver_details')
-      .insert([customerData])
+      .insert([{
+        ...customerData,
+        kyc_status: 'pending',
+        crm_status: 'pending_payment'
+      }])
       .select()
       .single()
 
