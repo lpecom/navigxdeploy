@@ -28,9 +28,22 @@ const VehicleProfitability = () => {
             last_revision_date,
             next_revision_date,
             car_model:car_models(
+              id,
+              category_id,
               name,
               image_url,
-              daily_price
+              year,
+              brand_logo_url,
+              daily_price,
+              description,
+              engine_size,
+              transmission,
+              passengers,
+              luggage,
+              features,
+              vehicle_type,
+              optionals,
+              total_price
             )
           )
         `)
