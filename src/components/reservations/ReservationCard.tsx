@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, User, Calendar, Clock, MapPin } from "lucide-react";
+import { Check, X, User, Calendar, Clock, MapPin, Car, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { Reservation } from "@/types/reservation";
@@ -26,7 +26,7 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
   };
 
   return (
-    <Card className="mb-4 hover:shadow-md transition-all duration-200">
+    <Card className="group hover:shadow-lg transition-all duration-200">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
@@ -45,49 +45,49 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
         <div className="grid grid-cols-2 gap-8">
           <div className="space-y-6">
             <div className="flex items-center gap-4">
-              <Avatar className="h-12 w-12">
+              <Avatar className="h-12 w-12 border-2 border-primary/10">
                 <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${reservation.customerName}`} />
                 <AvatarFallback>
-                  <User className="h-6 w-6" />
+                  <User className="h-6 w-6 text-primary/60" />
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="text-sm text-gray-500">Customer name</p>
-                <p className="font-medium">{reservation.customerName}</p>
+                <p className="text-sm text-muted-foreground">Customer</p>
+                <p className="font-medium text-secondary-900">{reservation.customerName}</p>
               </div>
             </div>
 
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-gray-500">Phone number</p>
-                <p className="font-medium">{reservation.phone || 'Not provided'}</p>
+                <p className="text-sm text-muted-foreground">Phone</p>
+                <p className="font-medium text-secondary-900">{reservation.phone || 'Not provided'}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">E-Mail</p>
-                <p className="font-medium">{reservation.email}</p>
+                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="font-medium text-secondary-900">{reservation.email}</p>
               </div>
             </div>
           </div>
 
           <div className="space-y-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
-                <Calendar className="h-6 w-6 text-gray-600" />
+              <div className="h-12 w-12 rounded-full bg-primary/5 flex items-center justify-center">
+                <Car className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Date of register</p>
-                <p className="font-medium">{formattedDate}</p>
+                <p className="text-sm text-muted-foreground">Vehicle Category</p>
+                <p className="font-medium text-secondary-900">{reservation.carCategory}</p>
               </div>
             </div>
 
             <div className="space-y-3">
-              <div>
-                <p className="text-sm text-gray-500">Vehicle Category</p>
-                <p className="font-medium">{reservation.carCategory}</p>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-secondary-900">{formattedDate}</span>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Pickup Time</p>
-                <p className="font-medium">{reservation.pickupTime || 'Not scheduled'}</p>
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-secondary-900">{reservation.pickupTime || 'Not scheduled'}</span>
               </div>
             </div>
           </div>
@@ -96,15 +96,13 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
         <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
           <Button 
             variant="outline" 
-            className="w-32"
-            onClick={() => {}}
+            className="w-32 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300 transition-colors"
           >
             <X className="w-4 h-4 mr-2" />
             Decline
           </Button>
           <Button 
-            className="w-32 bg-blue-500 hover:bg-blue-600"
-            onClick={() => {}}
+            className="w-32 bg-primary hover:bg-primary/90 text-white transition-colors"
           >
             <Check className="w-4 h-4 mr-2" />
             Approve
