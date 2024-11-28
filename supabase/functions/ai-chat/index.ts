@@ -45,6 +45,62 @@ async function getCustomerInfo(supabase: any, customerName: string) {
   return customers;
 }
 
+async function getMaintenanceSchedule(supabase: any) {
+  const { data: vehicles } = await supabase
+    .from('fleet_vehicles')
+    .select(`
+      *,
+      car_model:car_models (name)
+    `)
+    .order('next_revision_date', { ascending: true })
+    .limit(5);
+
+  return vehicles;
+}
+
+async function getFinancialMetrics(supabase: any) {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const { data: payments } = await supabase
+    .from('payments')
+    .select('amount, status, payment_type, created_at')
+    .gte('created_at', thirtyDaysAgo.toISOString());
+
+  const metrics = {
+    totalRevenue: payments?.reduce((sum, p) => sum + (p.status === 'completed' ? Number(p.amount) : 0), 0) || 0,
+    pendingPayments: payments?.filter(p => p.status === 'pending').length || 0,
+    paymentMethods: payments?.reduce((acc, p) => {
+      acc[p.payment_type] = (acc[p.payment_type] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>) || {},
+  };
+
+  return metrics;
+}
+
+async function getCustomerTrends(supabase: any) {
+  const { data: customers } = await supabase
+    .from('customers')
+    .select('created_at, status')
+    .order('created_at', { ascending: false })
+    .limit(100);
+
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const trends = {
+    newCustomers30Days: customers?.filter(c => 
+      new Date(c.created_at) >= thirtyDaysAgo
+    ).length || 0,
+    activeCustomers: customers?.filter(c => 
+      c.status === 'active' || c.status === 'active_rental'
+    ).length || 0,
+  };
+
+  return trends;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -101,8 +157,11 @@ serve(async (req) => {
 
     if (historyError) throw historyError;
 
-    // Get fleet stats and format them
+    // Get all the business metrics
     const fleetStats = await getFleetStats(supabase);
+    const maintenanceSchedule = await getMaintenanceSchedule(supabase);
+    const financialMetrics = await getFinancialMetrics(supabase);
+    const customerTrends = await getCustomerTrends(supabase);
     
     // Extract customer name if the question is about a specific customer
     const customerNameMatch = message.match(/customer\s+([^?\.]+)/i);
@@ -123,6 +182,19 @@ Fleet Statistics:
 - Available vehicles: ${fleetStats.available}
 - Rented vehicles: ${fleetStats.rented}
 
+Maintenance Schedule (Next 5 vehicles due):
+${maintenanceSchedule?.map(v => `- ${v.car_model.name} (Plate: ${v.plate}) - Due: ${new Date(v.next_revision_date).toLocaleDateString()}`).join('\n')}
+
+Financial Metrics (Last 30 days):
+- Total Revenue: R$ ${financialMetrics.totalRevenue.toFixed(2)}
+- Pending Payments: ${financialMetrics.pendingPayments}
+- Payment Methods Distribution: ${Object.entries(financialMetrics.paymentMethods)
+  .map(([method, count]) => `${method}: ${count}`).join(', ')}
+
+Customer Trends:
+- New Customers (30 days): ${customerTrends.newCustomers30Days}
+- Active Customers: ${customerTrends.activeCustomers}
+
 ${customerInfo ? `Customer Information for "${customerNameMatch[1].trim()}":
 ${customerInfo.map(c => `- Name: ${c.full_name}
 - Total rentals: ${c.total_rentals || 0}
@@ -130,7 +202,14 @@ ${customerInfo.map(c => `- Name: ${c.full_name}
 - Status: ${c.status}
 `).join('\n')}` : ''}
 
-Please use this information to provide accurate responses about the fleet and customer status.`
+Please use this information to provide accurate responses about the business status. You can help with:
+1. Fleet management and vehicle status
+2. Maintenance scheduling and alerts
+3. Financial analysis and revenue tracking
+4. Customer behavior and rental patterns
+5. Operational efficiency suggestions based on the data
+
+When discussing money values, always format them in Brazilian Real (R$).`
       },
       ...messages?.map(msg => ({
         role: msg.role,
