@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import * as fipe from 'npm:fipe-promise'
+import { default as fipePromise } from 'npm:fipe-promise'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -28,13 +28,12 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    if (req.method !== 'POST') {
-      throw new Error('Method not allowed')
-    }
-
     const { action, vehicleType, brandId, modelId, year, fipeCode } = await req.json() as RequestParams
 
     console.log(`Processing FIPE request: ${action} for ${vehicleType}`)
+    
+    // Initialize FIPE client
+    const fipe = new fipePromise()
     
     // Handle different FIPE API actions
     let result
