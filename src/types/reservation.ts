@@ -32,4 +32,5 @@ export interface Reservation {
   weeklyFare: number;
   optionals: Optional[];
   kilometersPerWeek: number | 'unlimited';
+  planType?: string; // Added planType field
 }

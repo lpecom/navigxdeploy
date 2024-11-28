@@ -16,13 +16,14 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
   const pickupDate = new Date(reservation.pickupDate);
   const formattedDate = format(pickupDate, "dd MMM, yyyy", { locale: ptBR });
 
-  const getStatusBadge = (status: string) => {
+  const getPlanBadgeStyle = (planType: string) => {
     const styles = {
-      regular: "bg-blue-50 text-blue-600",
-      member: "bg-green-50 text-green-600",
-      assurance: "bg-orange-50 text-orange-600"
+      'Navig Black': "bg-black text-white",
+      'Navig Mensal': "bg-purple-50 text-purple-600",
+      'Navig Semanal': "bg-blue-50 text-blue-600",
+      'default': "bg-gray-50 text-gray-600"
     };
-    return styles[status as keyof typeof styles] || styles.regular;
+    return styles[planType as keyof typeof styles] || styles.default;
   };
 
   return (
@@ -35,9 +36,9 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
             </Badge>
             <Badge 
               variant="secondary" 
-              className={cn("rounded-full px-3", getStatusBadge('regular'))}
+              className={cn("rounded-full px-3", getPlanBadgeStyle(reservation.planType || 'default'))}
             >
-              Regular
+              {reservation.planType || 'Plano não selecionado'}
             </Badge>
           </div>
         </div>
