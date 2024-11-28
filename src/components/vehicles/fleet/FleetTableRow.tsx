@@ -95,7 +95,9 @@ export const FleetTableRow = ({
           >
             <div className="flex items-center justify-between w-full">
               <div>
-                <p className="font-medium text-sm">{vehicle.customer.full_name}</p>
+                <p className="font-medium text-sm">
+                {vehicle.customer.full_name.split(' ').slice(0, 2).join(' ')}
+              </p>
                 <p className="text-xs text-gray-500">{vehicle.customer.phone}</p>
               </div>
               <ChevronRight className="h-4 w-4 text-gray-400 transition-transform duration-200 group-hover:translate-x-1" />
