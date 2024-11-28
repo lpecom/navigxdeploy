@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { SinespClient } from 'npm:sinesp-client'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,22 +16,7 @@ interface VehicleInfo {
   state: string;
   city: string;
   status: string;
-}
-
-// Mock function to simulate SINESP API response
-// In production, this would be replaced with actual SINESP client integration
-function mockSinespCheck(plate: string): VehicleInfo {
-  // Simulated response
-  return {
-    plate: plate,
-    model: "COROLLA",
-    brand: "TOYOTA",
-    year: "2022",
-    color: "PRATA",
-    state: "SP",
-    city: "SAO PAULO",
-    status: "regular"
-  };
+  fines?: any[];
 }
 
 serve(async (req) => {
@@ -47,9 +33,26 @@ serve(async (req) => {
       throw new Error('License plate is required')
     }
 
-    // For now, using mock data
-    // TODO: Integrate with actual SINESP client when available
-    const vehicleInfo = mockSinespCheck(plate)
+    // Initialize SINESP client
+    const client = new SinespClient()
+    
+    // Search vehicle information
+    console.log('Querying SINESP for plate:', plate)
+    const sinespData = await client.search(plate)
+    console.log('SINESP response:', sinespData)
+
+    // Transform SINESP response to our format
+    const vehicleInfo: VehicleInfo = {
+      plate: plate,
+      model: sinespData.model,
+      brand: sinespData.brand,
+      year: sinespData.year,
+      color: sinespData.color,
+      state: sinespData.state,
+      city: sinespData.city,
+      status: sinespData.status.toLowerCase(),
+      fines: [] // We'll implement fines in a separate step
+    }
 
     // Store the result in Supabase for caching
     const supabaseClient = createClient(
