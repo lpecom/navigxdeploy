@@ -33,7 +33,7 @@ const ReservationsList = ({ filter, status, selectedDate }: ReservationsListProp
 
       return data.map((session): Reservation => ({
         id: session.id,
-        reservationNumber: String(session.reservation_number), // Convert to string
+        reservationNumber: session.reservation_number,
         customerName: session.driver?.full_name || 'Customer not identified',
         email: session.driver?.email || '',
         cpf: session.driver?.cpf || '',
