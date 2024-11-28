@@ -12,9 +12,10 @@ import { RiskAnalysisDialog } from "./RiskAnalysisDialog";
 
 interface ReservationCardProps {
   reservation: Reservation;
+  onRiskAnalysis: () => void;
 }
 
-export const ReservationCard = ({ reservation }: ReservationCardProps) => {
+export const ReservationCard = ({ reservation, onRiskAnalysis }: ReservationCardProps) => {
   const [showRiskAnalysis, setShowRiskAnalysis] = useState(false);
   const pickupDate = new Date(reservation.pickupDate);
   const formattedDate = format(pickupDate, "dd MMM, yyyy", { locale: ptBR });
@@ -130,5 +131,3 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
     </>
   );
 };
-
-export default ReservationCard;

@@ -26,13 +26,14 @@ import type { VehicleStatus } from "@/types/vehicles";
 
 interface DetailedReservationViewProps {
   reservationId: string;
+  onClose?: () => void;
 }
 
-const DetailedReservationView = ({ reservationId }: DetailedReservationViewProps) => {
+export const DetailedReservationView = ({ reservationId, onClose }: DetailedReservationViewProps) => {
   const { toast } = useToast();
   const [isCharging, setIsCharging] = useState(false);
 
-  // Mock data - Em uma aplicação real, isso viria de uma API
+  // Mock data - In a real application, this would come from an API
   const reservation = {
     id: reservationId,
     customer: {
@@ -124,8 +125,11 @@ const DetailedReservationView = ({ reservationId }: DetailedReservationViewProps
         <IncidentsSection incidents={reservation.incidents} />
       </div>
       <HistorySection history={reservation.customer.history} />
+      {onClose && (
+        <Button variant="outline" onClick={onClose} className="mt-4">
+          Fechar
+        </Button>
+      )}
     </div>
   );
 };
-
-export default DetailedReservationView;
