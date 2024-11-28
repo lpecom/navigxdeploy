@@ -29,11 +29,24 @@ async function checkSinespPlate(plate: string): Promise<VehicleInfo> {
       },
     });
 
+    // First check if we got a valid response
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      console.error('Invalid content type received:', contentType);
+      throw new Error('Invalid response from vehicle API');
+    }
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (e) {
+      console.error('Failed to parse JSON response:', e);
+      throw new Error('Invalid JSON response from vehicle API');
+    }
     
     return {
       plate: plate,
