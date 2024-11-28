@@ -59,24 +59,31 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    @apply dark:bg-background-dark dark:text-foreground-dark;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-semibold tracking-tight text-balance;
+    @apply font-display font-semibold tracking-tight;
   }
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@layer components {
+  .sidebar {
+    @apply hidden lg:flex h-screen w-64 flex-col fixed left-0 top-0 bottom-0 bg-white dark:bg-[#0F172A] border-r border-gray-200 dark:border-gray-800;
   }
-  
-  .text-shadow {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+  .sidebar-link {
+    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 dark:text-gray-400 transition-all hover:text-gray-900 dark:hover:text-white;
   }
-  
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-secondary-500;
+
+  .sidebar-link.active {
+    @apply bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white;
+  }
+
+  .sidebar-group {
+    @apply space-y-1;
+  }
+
+  .sidebar-submenu {
+    @apply pl-11 space-y-1 mt-1;
   }
 }
