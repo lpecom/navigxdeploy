@@ -1,38 +1,26 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChartBar, DollarSign, Wrench, Car } from "lucide-react";
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { Search, ChevronLeft, ChevronRight, Gauge, Zap } from "lucide-react";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
-interface VehicleProfitability {
-  id: string;
-  vehicle_id: string;
-  fipe_price: number;
-  last_fipe_update: string;
-  total_maintenance_cost: number;
-  total_revenue: number;
-  total_days_rented: number;
-  common_issues: any[];
-  monthly_metrics: any[];
-  vehicle?: {
-    plate: string;
-    car_model?: {
-      name: string;
-      year: string;
-    };
-  };
-}
+const brands = [
+  { name: "Tesla", logo: "https://i.imgur.com/3uJ3v7N.png" },
+  { name: "BMW", logo: "https://i.imgur.com/2RFcHk3.png" },
+  { name: "Ferrari", logo: "https://i.imgur.com/YHXuvkF.png" },
+  { name: "Mercedes", logo: "https://i.imgur.com/8e8KoZD.png" },
+];
 
 const VehicleProfitability = () => {
-  const [selectedVehicle, setSelectedVehicle] = useState<string>("");
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: profitabilityData, isLoading } = useQuery({
-    queryKey: ['vehicle-profitability', selectedVehicle],
+  const { data: vehicles, isLoading } = useQuery({
+    queryKey: ['vehicle-profitability', selectedBrand],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('vehicle_profitability')
@@ -40,149 +28,197 @@ const VehicleProfitability = () => {
           *,
           vehicle:fleet_vehicles(
             plate,
+            current_km,
             car_model:car_models(
               name,
-              year
+              image_url,
+              daily_price
             )
           )
         `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as VehicleProfitability[];
+      return data;
     },
   });
 
-  const filteredData = profitabilityData?.filter(item => 
-    item.vehicle?.car_model?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.vehicle?.plate?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredVehicles = vehicles?.filter(v => 
+    v.vehicle?.car_model?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const metrics = [
-    {
-      title: "Valor FIPE Médio",
-      value: "R$ " + (filteredData?.[0]?.fipe_price || 0).toLocaleString(),
-      icon: DollarSign,
-      description: "Última atualização: " + new Date(filteredData?.[0]?.last_fipe_update || "").toLocaleDateString(),
-    },
-    {
-      title: "Custo de Manutenção",
-      value: "R$ " + (filteredData?.[0]?.total_maintenance_cost || 0).toLocaleString(),
-      icon: Wrench,
-      description: "Total acumulado",
-    },
-    {
-      title: "Receita Total",
-      value: "R$ " + (filteredData?.[0]?.total_revenue || 0).toLocaleString(),
-      icon: ChartBar,
-      description: `${filteredData?.[0]?.total_days_rented || 0} dias alugados`,
-    },
-    {
-      title: "ROI",
-      value: ((filteredData?.[0]?.total_revenue || 0) / (filteredData?.[0]?.fipe_price || 1) * 100).toFixed(1) + "%",
-      icon: Car,
-      description: "Retorno sobre investimento",
-    },
-  ];
-
-  const monthlyData = filteredData?.[0]?.monthly_metrics || [];
-
   return (
-    <div className="space-y-6 p-6 animate-fade-in">
+    <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
+      {/* Header with Search */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Lucratividade da Frota</h1>
-        <div className="flex items-center gap-4">
+        <div className="relative w-72">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
-            placeholder="Buscar por modelo ou placa..."
+            placeholder="Buscar veículo..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-64"
+            className="pl-10 bg-white"
           />
-          <Select value={selectedVehicle} onValueChange={setSelectedVehicle}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filtrar por veículo" />
-            </SelectTrigger>
-            <SelectContent>
-              {profitabilityData?.map((item) => (
-                <SelectItem key={item.vehicle_id} value={item.vehicle_id}>
-                  {item.vehicle?.car_model?.name} - {item.vehicle?.plate}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button variant="outline">Exportar Relatório</Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {metrics.map((metric) => (
-          <Card key={metric.title} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {metric.title}
-              </CardTitle>
-              <metric.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{metric.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">{metric.description}</p>
-            </CardContent>
-          </Card>
+      {/* Brand Filters */}
+      <div className="flex items-center gap-4">
+        {brands.map((brand) => (
+          <motion.button
+            key={brand.name}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setSelectedBrand(brand.name)}
+            className={cn(
+              "flex items-center gap-2 px-6 py-3 rounded-lg bg-white shadow-sm hover:shadow transition-all",
+              selectedBrand === brand.name && "ring-2 ring-primary"
+            )}
+          >
+            <img src={brand.logo} alt={brand.name} className="w-6 h-6 object-contain" />
+            <span className="font-medium">{brand.name}</span>
+          </motion.button>
         ))}
+        <Button variant="ghost" onClick={() => setSelectedBrand(null)}>
+          ver todos
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Evolução da Receita</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area 
-                    type="monotone" 
-                    dataKey="revenue" 
-                    stroke="#0ea5e9" 
-                    fill="#0ea5e9" 
-                    fillOpacity={0.1} 
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Vehicle Cards */}
+      <div className="relative">
+        <div className="flex gap-6 overflow-x-auto pb-4">
+          {filteredVehicles?.map((vehicle) => (
+            <motion.div
+              key={vehicle.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="min-w-[300px]"
+            >
+              <Card className="overflow-hidden">
+                <div className="p-6 space-y-4" style={{ backgroundColor: '#FEF7CD' }}>
+                  <div className="flex items-center gap-2">
+                    <div className="p-1 bg-black/10 rounded-full">
+                      <Gauge className="w-4 h-4" />
+                    </div>
+                    <span className="text-sm font-medium">
+                      {Math.round((vehicle.total_revenue / vehicle.fipe_price) * 100)}% recommend
+                    </span>
+                  </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Problemas Comuns</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {filteredData?.[0]?.common_issues.map((issue: any, index: number) => (
-                <div key={index} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                  <Wrench className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <div className="relative aspect-[16/9]">
+                    <img
+                      src={vehicle.vehicle?.car_model?.image_url || '/placeholder.svg'}
+                      alt={vehicle.vehicle?.car_model?.name}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+
                   <div>
-                    <h4 className="font-medium">{issue.title}</h4>
-                    <p className="text-sm text-muted-foreground">{issue.description}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Ocorrências: {issue.occurrences}
-                    </p>
+                    <h3 className="text-lg font-semibold">
+                      {vehicle.vehicle?.car_model?.name}
+                    </h3>
+                    <div className="flex items-center justify-between mt-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <Gauge className="w-4 h-4" />
+                        <span>{vehicle.vehicle?.current_km} km</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Zap className="w-4 h-4" />
+                        <span>R$ {vehicle.vehicle?.car_model?.daily_price}/h</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              ))}
-              {(!filteredData?.[0]?.common_issues || filteredData[0].common_issues.length === 0) && (
-                <p className="text-center text-muted-foreground py-8">
-                  Nenhum problema comum registrado
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white shadow-lg"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white shadow-lg"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Top Rentals */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Top Rentals</h2>
+          <div className="flex gap-2">
+            <Button variant="ghost" size="icon">
+              <svg
+                viewBox="0 0 24 24"
+                className="w-4 h-4"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="2"/>
+                <rect x="8" y="8" width="8" height="8" rx="1" fill="currentColor"/>
+              </svg>
+            </Button>
+            <Button variant="ghost" size="icon">
+              <svg
+                viewBox="0 0 24 24"
+                className="w-4 h-4"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect x="4" y="6" width="16" height="2" rx="1" fill="currentColor"/>
+                <rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor"/>
+                <rect x="4" y="16" width="16" height="2" rx="1" fill="currentColor"/>
+              </svg>
+            </Button>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {vehicles?.slice(0, 5).map((vehicle) => (
+            <Card key={vehicle.id} className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden">
+                    <img
+                      src={vehicle.vehicle?.car_model?.image_url || '/placeholder.svg'}
+                      alt={vehicle.vehicle?.car_model?.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">{vehicle.vehicle?.car_model?.name}</h3>
+                    <p className="text-sm text-gray-500">São Paulo</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-8">
+                  <span className="text-sm text-gray-500">
+                    {new Date().toLocaleDateString()}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    {new Date().toLocaleTimeString()}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">By</span>
+                    <img
+                      src="https://i.imgur.com/YN3oE6N.png"
+                      alt="Rental company"
+                      className="w-6 h-6 object-contain"
+                    />
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   );
