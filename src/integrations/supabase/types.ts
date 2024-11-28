@@ -1683,7 +1683,9 @@ export type Database = {
           fine_points: number | null
           fine_status: string | null
           id: string
+          last_sinesp_check: string | null
           raw_data: Json | null
+          sinesp_data: Json | null
           source_url: string | null
           updated_at: string | null
           vehicle_id: string | null
@@ -1698,7 +1700,9 @@ export type Database = {
           fine_points?: number | null
           fine_status?: string | null
           id?: string
+          last_sinesp_check?: string | null
           raw_data?: Json | null
+          sinesp_data?: Json | null
           source_url?: string | null
           updated_at?: string | null
           vehicle_id?: string | null
@@ -1713,7 +1717,9 @@ export type Database = {
           fine_points?: number | null
           fine_status?: string | null
           id?: string
+          last_sinesp_check?: string | null
           raw_data?: Json | null
+          sinesp_data?: Json | null
           source_url?: string | null
           updated_at?: string | null
           vehicle_id?: string | null
