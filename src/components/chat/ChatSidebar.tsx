@@ -45,14 +45,20 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
       if (conversations?.[0]) {
         setConversationId(conversations[0].id);
         
-        const { data: messages } = await supabase
+        const { data: messagesData } = await supabase
           .from('chat_messages')
           .select('*')
           .eq('conversation_id', conversations[0].id)
           .order('created_at', { ascending: true });
 
-        if (messages) {
-          setMessages(messages);
+        if (messagesData) {
+          // Ensure the role is properly typed when setting messages
+          const typedMessages: Message[] = messagesData.map(msg => ({
+            role: msg.role as 'user' | 'assistant',
+            content: msg.content,
+            created_at: msg.created_at
+          }));
+          setMessages(typedMessages);
         }
       }
     } catch (error) {
