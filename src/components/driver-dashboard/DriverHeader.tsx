@@ -32,7 +32,6 @@ const DriverHeader = ({ onMenuClick }: DriverHeaderProps) => {
 
     getDriverDetails();
 
-    // Check if user previously enabled dark mode
     const isDark = localStorage.getItem('darkMode') === 'true';
     setIsDarkMode(isDark);
     if (isDark) {
@@ -49,7 +48,7 @@ const DriverHeader = ({ onMenuClick }: DriverHeaderProps) => {
 
   return (
     <>
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-40">
+      <header className="bg-background dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-40">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
@@ -101,8 +100,8 @@ const DriverHeader = ({ onMenuClick }: DriverHeaderProps) => {
                   </span>
                 </div>
                 <div className="hidden sm:block">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">{driverName}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Motorista</p>
+                  <p className="text-sm font-medium text-foreground dark:text-white">{driverName}</p>
+                  <p className="text-xs text-muted-foreground dark:text-gray-400">Motorista</p>
                 </div>
               </div>
             </div>
