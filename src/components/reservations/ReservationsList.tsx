@@ -33,7 +33,7 @@ const ReservationsList = ({ filter, status, selectedDate }: ReservationsListProp
 
       return data.map((session): Reservation => ({
         id: session.id,
-        reservationNumber: session.reservation_number.toString(),
+        reservationNumber: session.reservation_number,
         customerName: session.driver?.full_name || 'Customer not identified',
         email: session.driver?.email || '',
         cpf: session.driver?.cpf || '',
@@ -88,6 +88,8 @@ const ReservationsList = ({ filter, status, selectedDate }: ReservationsListProp
             ))}
           </div>
         </TabsContent>
+
+        {/* Add other TabsContent components for other statuses */}
       </Tabs>
     </div>
   );
