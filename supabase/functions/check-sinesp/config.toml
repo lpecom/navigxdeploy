@@ -2,6 +2,6 @@
 command = ""
 
 [deploy]
-allowed_http_hosts = []
+allowed_http_hosts = ["apicarros.com"]
 
 [env]
