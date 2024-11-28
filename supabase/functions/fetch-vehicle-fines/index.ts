@@ -53,62 +53,65 @@ serve(async (req) => {
 
   try {
     const { plate, vehicleId } = await req.json();
-    console.log(`Processing fines for vehicle: ${plate}, ID: ${vehicleId}`);
+    console.log(`Processing fines for vehicle: ${plate}`);
 
-    if (!plate || !vehicleId) {
-      throw new Error('Vehicle plate and ID are required');
+    if (!plate) {
+      throw new Error('Vehicle plate is required');
     }
-
-    // Initialize Supabase client
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
 
     // Fetch fines (using mock data for now)
     const fines = await scrapeFines(plate);
     console.log(`Found ${fines.length} fines for vehicle ${plate}`);
 
-    let successCount = 0;
-    
-    // Store the fines in the database
-    for (const fine of fines) {
-      console.log(`Processing fine: ${JSON.stringify(fine)}`);
-      
-      const { error } = await supabaseAdmin
-        .from('vehicle_fines')
-        .upsert({
-          vehicle_id: vehicleId,
-          fine_code: fine.code,
-          fine_description: fine.description,
-          fine_date: new Date(fine.date).toISOString(),
-          fine_location: fine.location,
-          fine_amount: fine.amount,
-          fine_points: fine.points,
-          fine_status: fine.status,
-          source_url: `https://multa.consultaplacas.com.br/consulta/${plate}`,
-          raw_data: fine
-        }, {
-          onConflict: 'vehicle_id,fine_code'
-        });
+    // If vehicleId is provided, store the fines in the database
+    if (vehicleId) {
+      const supabaseAdmin = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      );
 
-      if (error) {
-        console.error('Error storing fine:', error);
-        throw error;
+      let successCount = 0;
+      
+      for (const fine of fines) {
+        console.log(`Processing fine: ${JSON.stringify(fine)}`);
+        
+        const { error } = await supabaseAdmin
+          .from('vehicle_fines')
+          .upsert({
+            vehicle_id: vehicleId,
+            fine_code: fine.code,
+            fine_description: fine.description,
+            fine_date: new Date(fine.date).toISOString(),
+            fine_location: fine.location,
+            fine_amount: fine.amount,
+            fine_points: fine.points,
+            fine_status: fine.status,
+            source_url: `https://multa.consultaplacas.com.br/consulta/${plate}`,
+            raw_data: fine
+          }, {
+            onConflict: 'vehicle_id,fine_code'
+          });
+
+        if (error) {
+          console.error('Error storing fine:', error);
+          throw error;
+        }
+        
+        successCount++;
+        console.log(`Successfully stored fine ${fine.code}`);
       }
-      
-      successCount++;
-      console.log(`Successfully stored fine ${fine.code}`);
-    }
 
-    console.log(`Successfully stored ${successCount} fines for vehicle ${plate}`);
+      console.log(`Successfully stored ${successCount} fines for vehicle ${plate}`);
+    }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         fines,
-        stored: successCount,
-        message: `Successfully imported ${successCount} fines` 
+        stored: vehicleId ? fines.length : 0,
+        message: vehicleId 
+          ? `Successfully imported ${fines.length} fines` 
+          : `Found ${fines.length} fines`
       }),
       { 
         headers: { 
