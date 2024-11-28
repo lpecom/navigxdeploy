@@ -11,6 +11,40 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function getFleetStats(supabase: any) {
+  const { data: vehicles } = await supabase
+    .from('fleet_vehicles')
+    .select(`
+      status,
+      car_model:car_models (
+        name
+      )
+    `);
+
+  const stats = {
+    total: vehicles?.length || 0,
+    maintenance: vehicles?.filter(v => v.status === 'maintenance').length || 0,
+    available: vehicles?.filter(v => v.status === 'available').length || 0,
+    rented: vehicles?.filter(v => v.status === 'rented').length || 0,
+  };
+
+  return stats;
+}
+
+async function getCustomerInfo(supabase: any, customerName: string) {
+  const { data: customers } = await supabase
+    .from('customers')
+    .select(`
+      *,
+      fleet_vehicles!fleet_vehicles_customer_id_fkey (
+        id
+      )
+    `)
+    .ilike('full_name', `%${customerName}%`);
+
+  return customers;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -67,11 +101,43 @@ serve(async (req) => {
 
     if (historyError) throw historyError;
 
+    // Get fleet stats and format them
+    const fleetStats = await getFleetStats(supabase);
+    
+    // Extract customer name if the question is about a specific customer
+    const customerNameMatch = message.match(/customer\s+([^?\.]+)/i);
+    let customerInfo = null;
+    if (customerNameMatch) {
+      customerInfo = await getCustomerInfo(supabase, customerNameMatch[1].trim());
+    }
+
     // Format messages for OpenAI
-    const formattedMessages = messages?.map(msg => ({
-      role: msg.role,
-      content: msg.content
-    })) || [];
+    const formattedMessages = [
+      {
+        role: 'system',
+        content: `You are a helpful assistant for a car rental company administrator. You have access to the following real-time information:
+
+Fleet Statistics:
+- Total vehicles: ${fleetStats.total}
+- Vehicles in maintenance: ${fleetStats.maintenance}
+- Available vehicles: ${fleetStats.available}
+- Rented vehicles: ${fleetStats.rented}
+
+${customerInfo ? `Customer Information for "${customerNameMatch[1].trim()}":
+${customerInfo.map(c => `- Name: ${c.full_name}
+- Total rentals: ${c.total_rentals || 0}
+- Last rental: ${c.last_rental_date ? new Date(c.last_rental_date).toLocaleDateString() : 'Never'}
+- Status: ${c.status}
+`).join('\n')}` : ''}
+
+Please use this information to provide accurate responses about the fleet and customer status.`
+      },
+      ...messages?.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      })) || [],
+      { role: 'user', content: message }
+    ];
 
     // Get AI response
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -82,15 +148,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'gpt-4',
-        messages: [
-          {
-            role: 'system',
-            content: isAdmin 
-              ? 'You are a helpful assistant for a car rental company administrator. You can help with vehicle information, customer data, reservations, and general business inquiries.'
-              : 'You are a helpful assistant for car rental customers. You can help with vehicle information, reservations, and general inquiries about renting cars.'
-          },
-          ...formattedMessages
-        ],
+        messages: formattedMessages,
       }),
     });
 
