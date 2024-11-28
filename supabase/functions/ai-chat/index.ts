@@ -17,8 +17,20 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(supabaseUrl!, supabaseServiceKey!);
+    if (!openAIApiKey) {
+      throw new Error('OPENAI_API_KEY is not configured');
+    }
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error('Supabase configuration is missing');
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { message, conversationId, userId, isAdmin } = await req.json();
+
+    if (!message || !userId) {
+      throw new Error('Missing required parameters');
+    }
 
     // Create a new conversation if none exists
     let currentConversationId = conversationId;
@@ -38,18 +50,22 @@ serve(async (req) => {
     }
 
     // Save user message
-    await supabase.from('chat_messages').insert({
+    const { error: msgError } = await supabase.from('chat_messages').insert({
       conversation_id: currentConversationId,
       role: 'user',
       content: message
     });
 
+    if (msgError) throw msgError;
+
     // Get conversation history
-    const { data: messages } = await supabase
+    const { data: messages, error: historyError } = await supabase
       .from('chat_messages')
       .select('role, content')
       .eq('conversation_id', currentConversationId)
       .order('created_at', { ascending: true });
+
+    if (historyError) throw historyError;
 
     // Format messages for OpenAI
     const formattedMessages = messages?.map(msg => ({
@@ -65,7 +81,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4',
         messages: [
           {
             role: 'system',
@@ -78,27 +94,47 @@ serve(async (req) => {
       }),
     });
 
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.statusText}`);
+    }
+
     const data = await response.json();
     const aiMessage = data.choices[0].message.content;
 
     // Save AI response
-    await supabase.from('chat_messages').insert({
+    const { error: aiMsgError } = await supabase.from('chat_messages').insert({
       conversation_id: currentConversationId,
       role: 'assistant',
       content: aiMessage
     });
 
-    return new Response(JSON.stringify({ 
-      message: aiMessage, 
-      conversationId: currentConversationId 
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    if (aiMsgError) throw aiMsgError;
+
+    return new Response(
+      JSON.stringify({ 
+        message: aiMessage, 
+        conversationId: currentConversationId 
+      }), 
+      {
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        },
+      }
+    );
   } catch (error) {
     console.error('Error in ai-chat function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ 
+        error: error.message || 'An unexpected error occurred' 
+      }), 
+      {
+        status: 500,
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        },
+      }
+    );
   }
 });
