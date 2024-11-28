@@ -7,7 +7,6 @@ import { Testimonials } from "@/components/website/Testimonials";
 import { Footer } from "@/components/website/Footer";
 import { VehicleShowcase } from "@/components/home/VehicleShowcase";
 import { VehicleGroups } from "@/components/home/VehicleGroups";
-import { PlateLookup } from "@/components/home/PlateLookup";
 
 const Home = () => {
   return (
@@ -15,7 +14,6 @@ const Home = () => {
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px] pointer-events-none" />
       <Navigation />
       <Hero />
-      <PlateLookup />
       <VehicleShowcase />
       <VehicleGroups />
       <Features />

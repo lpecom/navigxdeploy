@@ -885,51 +885,6 @@ export type Database = {
           },
         ]
       }
-      fipe_cache: {
-        Row: {
-          brand: string
-          created_at: string | null
-          fipe_code: string
-          fuel: string | null
-          id: string
-          model: string
-          price: number | null
-          raw_data: Json | null
-          reference_month: string | null
-          updated_at: string | null
-          vehicle_type: Database["public"]["Enums"]["vehicle_type"]
-          year: string
-        }
-        Insert: {
-          brand: string
-          created_at?: string | null
-          fipe_code: string
-          fuel?: string | null
-          id?: string
-          model: string
-          price?: number | null
-          raw_data?: Json | null
-          reference_month?: string | null
-          updated_at?: string | null
-          vehicle_type: Database["public"]["Enums"]["vehicle_type"]
-          year: string
-        }
-        Update: {
-          brand?: string
-          created_at?: string | null
-          fipe_code?: string
-          fuel?: string | null
-          id?: string
-          model?: string
-          price?: number | null
-          raw_data?: Json | null
-          reference_month?: string | null
-          updated_at?: string | null
-          vehicle_type?: Database["public"]["Enums"]["vehicle_type"]
-          year?: string
-        }
-        Relationships: []
-      }
       fleet_vehicles: {
         Row: {
           branch: string | null
@@ -1683,9 +1638,7 @@ export type Database = {
           fine_points: number | null
           fine_status: string | null
           id: string
-          last_sinesp_check: string | null
           raw_data: Json | null
-          sinesp_data: Json | null
           source_url: string | null
           updated_at: string | null
           vehicle_id: string | null
@@ -1700,9 +1653,7 @@ export type Database = {
           fine_points?: number | null
           fine_status?: string | null
           id?: string
-          last_sinesp_check?: string | null
           raw_data?: Json | null
-          sinesp_data?: Json | null
           source_url?: string | null
           updated_at?: string | null
           vehicle_id?: string | null
@@ -1717,9 +1668,7 @@ export type Database = {
           fine_points?: number | null
           fine_status?: string | null
           id?: string
-          last_sinesp_check?: string | null
           raw_data?: Json | null
-          sinesp_data?: Json | null
           source_url?: string | null
           updated_at?: string | null
           vehicle_id?: string | null
@@ -1886,7 +1835,6 @@ export type Database = {
         | "other_maintenance"
         | "for_sale"
         | "preparing"
-      vehicle_type: "cars" | "motorcycles" | "trucks"
     }
     CompositeTypes: {
       [_ in never]: never
