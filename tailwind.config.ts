@@ -47,24 +47,28 @@ const config = {
       colors: {
         ...colors,
         border: {
-          DEFAULT: "hsl(var(--border))",
+          DEFAULT: "rgb(226, 232, 240)",
           dark: "#1E293B",
         },
         background: {
-          DEFAULT: "hsl(var(--background))",
+          DEFAULT: "#FFFFFF",
           dark: "#0F172A",
         },
         foreground: {
-          DEFAULT: "hsl(var(--foreground))",
+          DEFAULT: "#0F172A",
           dark: "#FFFFFF",
         },
         muted: {
           DEFAULT: "#F8FAFC",
           foreground: "#475569",
+          dark: "#1E293B",
+          "dark-foreground": "#94A3B8",
         },
         accent: {
           DEFAULT: "#F0F9FF",
           foreground: "#0369A1",
+          dark: "#0C4A6E",
+          "dark-foreground": "#38BDF8",
         },
         success: {
           DEFAULT: "#10B981",

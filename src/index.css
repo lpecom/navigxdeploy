@@ -58,7 +58,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground font-sans dark:bg-background-dark dark:text-foreground-dark;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -68,15 +68,15 @@
 
 @layer components {
   .sidebar {
-    @apply hidden lg:flex h-screen w-64 flex-col fixed left-0 top-0 bottom-0 bg-white dark:bg-[#0F172A] border-r border-gray-200 dark:border-gray-800;
+    @apply hidden lg:flex h-screen w-64 flex-col fixed left-0 top-0 bottom-0 bg-background border-r border-border dark:bg-background-dark dark:border-border-dark;
   }
 
   .sidebar-link {
-    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 dark:text-gray-400 transition-all hover:text-gray-900 dark:hover:text-white;
+    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground dark:text-muted-dark-foreground dark:hover:text-foreground-dark;
   }
 
   .sidebar-link.active {
-    @apply bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white;
+    @apply bg-muted text-foreground dark:bg-muted-dark dark:text-foreground-dark;
   }
 
   .sidebar-group {
