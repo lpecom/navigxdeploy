@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Car, Link as LinkIcon, DollarSign, Clock } from "lucide-react";
+import { Car } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { getUberToken, fetchUberEarnings, fetchUberTrips } from "./uber/uberApiUtils";
-import { Skeleton } from "@/components/ui/skeleton";
+import { UberConnect } from "./uber/UberConnect";
+import { UberConnected } from "./uber/UberConnected";
 
 interface UberIntegrationProps {
   driverId: string;
@@ -149,81 +149,15 @@ export const UberIntegration = ({ driverId }: UberIntegrationProps) => {
       <CardContent>
         <div className="space-y-4">
           {!isConnected ? (
-            <div>
-              <p className="text-sm text-gray-600 mb-4">
-                Conecte sua conta Uber para sincronizar seus ganhos e otimizar sua gestão financeira.
-              </p>
-              <Button
-                onClick={handleUberConnect}
-                disabled={isLoading}
-                className="w-full sm:w-auto"
-              >
-                <LinkIcon className="w-4 h-4 mr-2" />
-                {isLoading ? "Conectando..." : "Conectar conta Uber"}
-              </Button>
-            </div>
+            <UberConnect 
+              onConnect={handleUberConnect}
+              isLoading={isLoading}
+            />
           ) : (
-            <div className="space-y-4">
-              <div className="text-sm text-gray-600">
-                <p className="flex items-center gap-2 text-green-600 mb-4">
-                  <LinkIcon className="w-4 h-4" />
-                  Conta Uber conectada
-                </p>
-              </div>
-              
-              {isLoadingStats ? (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <Skeleton className="h-24" />
-                  <Skeleton className="h-24" />
-                  <Skeleton className="h-24" />
-                </div>
-              ) : stats && (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <Card>
-                    <CardContent className="pt-6">
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-green-600" />
-                        <div>
-                          <p className="text-sm text-gray-500">Ganhos Totais</p>
-                          <p className="text-lg font-semibold">
-                            R$ {stats.earnings.toFixed(2)}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardContent className="pt-6">
-                      <div className="flex items-center gap-2">
-                        <Car className="w-4 h-4 text-blue-600" />
-                        <div>
-                          <p className="text-sm text-gray-500">Total de Viagens</p>
-                          <p className="text-lg font-semibold">{stats.trips}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardContent className="pt-6">
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-purple-600" />
-                        <div>
-                          <p className="text-sm text-gray-500">Última Viagem</p>
-                          <p className="text-lg font-semibold">
-                            {stats.lastTripDate ? 
-                              new Date(stats.lastTripDate).toLocaleDateString('pt-BR') :
-                              'Nenhuma viagem'
-                            }
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
-            </div>
+            <UberConnected 
+              stats={stats}
+              isLoadingStats={isLoadingStats}
+            />
           )}
         </div>
       </CardContent>

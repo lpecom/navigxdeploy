@@ -1728,6 +1728,53 @@ export type Database = {
           },
         ]
       }
+      uber_vehicle_registrations: {
+        Row: {
+          created_at: string | null
+          document_urls: Json | null
+          fleet_vehicle_id: string
+          id: string
+          inspection_status: string | null
+          last_sync_attempt: string | null
+          last_sync_error: string | null
+          sync_status: string
+          uber_vehicle_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_urls?: Json | null
+          fleet_vehicle_id: string
+          id?: string
+          inspection_status?: string | null
+          last_sync_attempt?: string | null
+          last_sync_error?: string | null
+          sync_status?: string
+          uber_vehicle_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document_urls?: Json | null
+          fleet_vehicle_id?: string
+          id?: string
+          inspection_status?: string | null
+          last_sync_attempt?: string | null
+          last_sync_error?: string | null
+          sync_status?: string
+          uber_vehicle_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uber_vehicle_registrations_fleet_vehicle_id_fkey"
+            columns: ["fleet_vehicle_id"]
+            isOneToOne: true
+            referencedRelation: "fleet_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_fines: {
         Row: {
           created_at: string | null
