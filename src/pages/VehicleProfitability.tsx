@@ -7,6 +7,7 @@ import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { BrandFilters } from "@/components/vehicles/profitability/BrandFilters";
 import { VehicleCard } from "@/components/vehicles/profitability/VehicleCard";
 import { TopRentals } from "@/components/vehicles/profitability/TopRentals";
+import type { FleetVehicle } from "@/types/vehicles";
 
 const VehicleProfitability = () => {
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
@@ -85,9 +86,13 @@ const VehicleProfitability = () => {
               key={vehicle.id}
               vehicle={{
                 ...vehicle.vehicle,
+                car_model: {
+                  ...vehicle.vehicle.car_model,
+                  optionals: vehicle.vehicle.car_model.optionals as Record<string, any>
+                },
                 total_revenue: vehicle.total_revenue,
                 fipe_price: vehicle.fipe_price,
-              }}
+              } as FleetVehicle & { total_revenue?: number; fipe_price?: number }}
             />
           ))}
         </div>
@@ -109,15 +114,12 @@ const VehicleProfitability = () => {
       </div>
 
       <TopRentals vehicles={filteredVehicles?.map(v => ({
-        id: v.vehicle.id,
-        plate: v.vehicle.plate,
-        current_km: v.vehicle.current_km,
-        branch: v.vehicle.branch,
-        year: v.vehicle.year,
-        last_revision_date: v.vehicle.last_revision_date,
-        next_revision_date: v.vehicle.next_revision_date,
-        car_model: v.vehicle.car_model
-      })) || []} />
+        ...v.vehicle,
+        car_model: {
+          ...v.vehicle.car_model,
+          optionals: v.vehicle.car_model.optionals as Record<string, any>
+        }
+      } as FleetVehicle)) || []} />
     </div>
   );
 };
