@@ -1,139 +1,118 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Calendar, Clock, MapPin, User, Car, DollarSign, Package, ArrowRightToLine } from "lucide-react";
-import { ReservationExpandedContent } from "./ReservationExpandedContent";
-import { StatusBadges } from "./StatusBadges";
+import { Check, X, User, Calendar, Clock, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { Reservation } from "@/types/reservation";
-import { ReservationActions } from "./ReservationActions";
-import { memo } from "react";
-import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 interface ReservationCardProps {
   reservation: Reservation;
-  isExpanded: boolean;
-  onToggle: () => void;
 }
 
-const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: ReservationCardProps) => {
-  const navigate = useNavigate();
+export const ReservationCard = ({ reservation }: ReservationCardProps) => {
   const pickupDate = new Date(reservation.pickupDate);
-  const formattedDate = format(pickupDate, "dd 'de' MMMM", { locale: ptBR });
+  const formattedDate = format(pickupDate, "dd MMM, yyyy", { locale: ptBR });
 
-  const handleCheckIn = () => {
-    navigate(`/admin/check-in/${reservation.id}`);
+  const getStatusBadge = (status: string) => {
+    const styles = {
+      regular: "bg-blue-50 text-blue-600",
+      member: "bg-green-50 text-green-600",
+      assurance: "bg-orange-50 text-orange-600"
+    };
+    return styles[status as keyof typeof styles] || styles.regular;
   };
 
   return (
-    <Card className="bg-white shadow-sm hover:shadow-md transition-all duration-200">
+    <Card className="mb-4 hover:shadow-md transition-all duration-200">
       <CardContent className="p-6">
-        <div className="space-y-6">
-          {/* Risk Analysis Section */}
-          <div className="flex items-start justify-between">
-            <div className="space-y-4 flex-1">
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
-                  <User className="h-6 w-6 text-gray-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">{reservation.customerName}</h3>
-                  <p className="text-sm text-gray-500">#{reservation.reservationNumber}</p>
-                </div>
-              </div>
-              
-              <StatusBadges reservation={reservation} />
-            </div>
-            
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onToggle}
-              className="shrink-0"
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="rounded-full px-3">
+              #{reservation.reservationNumber}
+            </Badge>
+            <Badge 
+              variant="secondary" 
+              className={cn("rounded-full px-3", getStatusBadge('regular'))}
             >
-              {isExpanded ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
-            </Button>
+              Regular
+            </Badge>
           </div>
-
-          {/* Quick Info Grid */}
-          <div className="grid grid-cols-3 gap-4 pt-4 border-t">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Car className="w-4 h-4" />
-                <span>Veículo</span>
-              </div>
-              <p className="font-medium">{reservation.carCategory}</p>
-            </div>
-            
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Calendar className="w-4 h-4" />
-                <span>Data de Retirada</span>
-              </div>
-              <p className="font-medium">{formattedDate}</p>
-            </div>
-            
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Clock className="w-4 h-4" />
-                <span>Horário</span>
-              </div>
-              <p className="font-medium">{reservation.pickupTime || "Não definido"}</p>
-            </div>
-          </div>
-
-          {/* Optionals Section */}
-          {reservation.optionals && reservation.optionals.length > 0 && (
-            <div className="pt-4 border-t">
-              <h4 className="text-sm font-medium text-gray-600 mb-2 flex items-center gap-2">
-                <Package className="w-4 h-4" />
-                Opcionais Selecionados
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {reservation.optionals.map((optional, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
-                    {optional.name}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {!isExpanded && (
-            <div className="flex justify-between items-center pt-4 border-t">
-              <Button 
-                onClick={handleCheckIn}
-                className="flex items-center gap-2"
-                variant="default"
-              >
-                <ArrowRightToLine className="w-4 h-4" />
-                Iniciar Check-in
-              </Button>
-
-              <ReservationActions 
-                reservation={reservation}
-                currentStatus={reservation.status}
-                hideCheckIn={true}
-              />
-            </div>
-          )}
         </div>
 
-        {isExpanded && (
-          <ReservationExpandedContent 
-            reservation={reservation}
-            onApprove={() => {}}
-            onReject={() => {}}
-          />
-        )}
+        <div className="grid grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-12 w-12">
+                <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${reservation.customerName}`} />
+                <AvatarFallback>
+                  <User className="h-6 w-6" />
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-sm text-gray-500">Customer name</p>
+                <p className="font-medium">{reservation.customerName}</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-gray-500">Phone number</p>
+                <p className="font-medium">{reservation.phone || 'Not provided'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">E-Mail</p>
+                <p className="font-medium">{reservation.email}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
+                <Calendar className="h-6 w-6 text-gray-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Date of register</p>
+                <p className="font-medium">{formattedDate}</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-gray-500">Vehicle Category</p>
+                <p className="font-medium">{reservation.carCategory}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Pickup Time</p>
+                <p className="font-medium">{reservation.pickupTime || 'Not scheduled'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
+          <Button 
+            variant="outline" 
+            className="w-32"
+            onClick={() => {}}
+          >
+            <X className="w-4 h-4 mr-2" />
+            Decline
+          </Button>
+          <Button 
+            className="w-32 bg-blue-500 hover:bg-blue-600"
+            onClick={() => {}}
+          >
+            <Check className="w-4 h-4 mr-2" />
+            Approve
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
 };
 
-export const ReservationCard = memo(ReservationCardComponent);
+export default ReservationCard;
