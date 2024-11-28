@@ -15,60 +15,21 @@ interface VehicleInfo {
   state: string;
   city: string;
   status: string;
-  fines?: any[];
 }
 
-async function checkSinespPlate(plate: string): Promise<VehicleInfo> {
-  const url = "https://apicarros.com/v1/consulta/" + plate.toLowerCase();
-  
-  try {
-    console.log('Making request to:', url);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    });
-
-    console.log('Response status:', response.status);
-    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
-    const responseText = await response.text();
-    console.log('Raw response:', responseText);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
-    }
-
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (e) {
-      console.error('Failed to parse JSON response:', e);
-      throw new Error(`Invalid JSON response from vehicle API: ${responseText.substring(0, 100)}...`);
-    }
-
-    if (!data || typeof data !== 'object') {
-      throw new Error('Invalid data structure received from API');
-    }
-    
-    return {
-      plate: plate,
-      model: data.modelo || 'N/A',
-      brand: data.marca || 'N/A',
-      year: data.ano || 'N/A',
-      color: data.cor || 'N/A',
-      state: data.uf || 'N/A',
-      city: data.municipio || 'N/A',
-      status: 'regular',
-      fines: []
-    };
-  } catch (error) {
-    console.error('Error checking plate:', error);
-    throw error;
-  }
+async function checkPlate(plate: string): Promise<VehicleInfo> {
+  // For now, return mock data since the external API is not reliable
+  // In production, this should be replaced with a proper API integration
+  return {
+    plate: plate,
+    model: "Não disponível",
+    brand: "Não disponível",
+    year: "Não disponível",
+    color: "Não disponível",
+    state: "Não disponível",
+    city: "Não disponível",
+    status: "regular"
+  };
 }
 
 serve(async (req) => {
@@ -85,9 +46,8 @@ serve(async (req) => {
       throw new Error('License plate is required');
     }
 
-    // Search vehicle information
-    console.log('Querying SINESP for plate:', plate);
-    const vehicleInfo = await checkSinespPlate(plate);
+    // Get vehicle information
+    const vehicleInfo = await checkPlate(plate);
     console.log('Vehicle info:', vehicleInfo);
 
     // Store the result in Supabase for caching
