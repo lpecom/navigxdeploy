@@ -30,11 +30,11 @@ export const FleetTable = ({
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent border-0">
-              <TableHead className="w-[300px] font-medium">Veículo / ID</TableHead>
+              <TableHead className="w-[300px] font-medium">Veículo</TableHead>
               <TableHead className="w-[120px] font-medium">Status</TableHead>
-              <TableHead className="font-medium">Chassi e Placa</TableHead>
-              <TableHead className="w-[150px] font-medium">Motorista</TableHead>
-              <TableHead className="w-[120px] font-medium">Documentos</TableHead>
+              <TableHead className="font-medium">Placa / Ano</TableHead>
+              <TableHead className="w-[200px] font-medium">Motorista</TableHead>
+              <TableHead className="w-[150px] font-medium">Lucro Atual</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
