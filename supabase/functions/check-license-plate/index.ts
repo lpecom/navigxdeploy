@@ -22,30 +22,36 @@ async function checkSinespPlate(plate: string): Promise<VehicleInfo> {
   const url = "https://apicarros.com/v1/consulta/" + plate.toLowerCase();
   
   try {
+    console.log('Making request to:', url);
+    
     const response = await fetch(url, {
       method: 'GET',
       headers: {
+        'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
     });
 
-    // First check if we got a valid response
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      console.error('Invalid content type received:', contentType);
-      throw new Error('Invalid response from vehicle API');
-    }
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
+    const responseText = await response.text();
+    console.log('Raw response:', responseText);
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
     }
 
     let data;
     try {
-      data = await response.json();
+      data = JSON.parse(responseText);
     } catch (e) {
       console.error('Failed to parse JSON response:', e);
-      throw new Error('Invalid JSON response from vehicle API');
+      throw new Error(`Invalid JSON response from vehicle API: ${responseText.substring(0, 100)}...`);
+    }
+
+    if (!data || typeof data !== 'object') {
+      throw new Error('Invalid data structure received from API');
     }
     
     return {
