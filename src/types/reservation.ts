@@ -1,32 +1,16 @@
-export type ReservationStatus = 'pending_approval' | 'approved' | 'rejected';
-export type PaymentStatus = 'paid' | 'pending';
-export type CustomerStatus = 'new' | 'returning';
-
-export interface Optional {
-  name: string;
-  pricePerWeek: number;
-}
+export type ReservationFilter = 'pending' | 'pickup' | 'all';
 
 export interface Reservation {
   id: string;
-  reservationNumber: string;
-  customerName: string;
-  email: string;
-  cpf: string;
-  phone: string;
-  address: string;
-  pickupDate: string;
-  pickupTime?: string;
-  status: ReservationStatus;
-  paymentStatus: PaymentStatus;
-  customerStatus: CustomerStatus;
-  riskScore: number;
-  documentsSubmitted: boolean;
-  createdAt: string;
-  carCategory: string;
-  leadSource: string;
-  weeklyFare: number;
-  optionals: Optional[];
-  kilometersPerWeek: number | 'unlimited';
-  planType?: string;
+  driver_id: string;
+  vehicle_id: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  pickup_date: string;
+  return_date: string;
+  customer_id: string | null;
+  notes: string | null;
+  total_amount: number;
+  insurance_details: Record<string, any> | null;
 }

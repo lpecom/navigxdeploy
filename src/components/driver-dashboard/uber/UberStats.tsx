@@ -1,73 +1,81 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Car, DollarSign, Clock } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { DollarSign, Clock, MapPin, Car } from "lucide-react";
 
 interface UberStatsProps {
-  stats: {
-    earnings: number;
-    trips: number;
-    lastTripDate: string | null;
-  } | null;
-  isLoadingStats: boolean;
+  driverId: string;
 }
 
-export const UberStats = ({ stats, isLoadingStats }: UberStatsProps) => {
-  if (isLoadingStats) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Skeleton className="h-24" />
-        <Skeleton className="h-24" />
-        <Skeleton className="h-24" />
-      </div>
-    );
-  }
+export const UberStats = ({ driverId }: UberStatsProps) => {
+  const { data: stats } = useQuery({
+    queryKey: ['uber-stats', driverId],
+    queryFn: async () => {
+      const { data: integration } = await supabase
+        .from('driver_uber_integrations')
+        .select('*')
+        .eq('driver_id', driverId)
+        .single();
 
-  if (!stats) return null;
+      if (!integration) {
+        throw new Error('No Uber integration found');
+      }
+
+      const { data, error } = await supabase.functions.invoke('uber-stats', {
+        body: { integrationId: integration.id }
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!driverId,
+  });
+
+  const metrics = [
+    {
+      title: "Ganhos Totais",
+      value: stats?.earnings ? `R$ ${stats.earnings.toFixed(2)}` : "R$ 0,00",
+      icon: DollarSign,
+      description: "Últimos 30 dias"
+    },
+    {
+      title: "Horas Online",
+      value: stats?.hoursOnline?.toString() || "0",
+      icon: Clock,
+      description: "Últimos 30 dias"
+    },
+    {
+      title: "Distância",
+      value: stats?.distance ? `${stats.distance}km` : "0km",
+      icon: MapPin,
+      description: "Últimos 30 dias"
+    },
+    {
+      title: "Corridas",
+      value: stats?.trips?.toString() || "0",
+      icon: Car,
+      description: "Últimos 30 dias"
+    }
+  ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-green-600" />
-            <div>
-              <p className="text-sm text-gray-500">Ganhos Totais</p>
-              <p className="text-lg font-semibold">
-                R$ {stats.earnings.toFixed(2)}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-2">
-            <Car className="w-4 h-4 text-blue-600" />
-            <div>
-              <p className="text-sm text-gray-500">Total de Viagens</p>
-              <p className="text-lg font-semibold">{stats.trips}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-purple-600" />
-            <div>
-              <p className="text-sm text-gray-500">Última Viagem</p>
-              <p className="text-lg font-semibold">
-                {stats.lastTripDate ? 
-                  new Date(stats.lastTripDate).toLocaleDateString('pt-BR') :
-                  'Nenhuma viagem'
-                }
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {metrics.map((metric) => (
+        <Card key={metric.title}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {metric.title}
+            </CardTitle>
+            <metric.icon className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{metric.value}</div>
+            <p className="text-xs text-muted-foreground">
+              {metric.description}
+            </p>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };
