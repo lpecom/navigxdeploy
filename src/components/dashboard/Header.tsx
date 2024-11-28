@@ -23,6 +23,8 @@ const Header = () => {
     setIsDarkMode(isDark);
     if (isDark) {
       document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
   }, []);
 
@@ -40,18 +42,18 @@ const Header = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-gray-800 bg-[#0F172A]">
+      <header className="sticky top-0 z-40 w-full border-b bg-background dark:bg-background-dark dark:border-border-dark">
         <div className="flex h-16 items-center px-4 md:px-6">
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden mr-2 text-gray-400 hover:text-white hover:bg-gray-800"
+            className="lg:hidden mr-2 text-muted-foreground hover:text-foreground dark:text-gray-400 dark:hover:text-white"
           >
             <Menu className="h-5 w-5" />
           </Button>
 
           <div className="flex-1">
-            <h1 className="text-lg font-semibold text-white">Dashboard</h1>
+            <h1 className="text-lg font-semibold">Dashboard</h1>
           </div>
             
           <div className="flex items-center gap-4">
@@ -59,7 +61,7 @@ const Header = () => {
               variant="ghost" 
               size="icon"
               onClick={toggleDarkMode}
-              className="text-gray-400 hover:text-white hover:bg-gray-800"
+              className="text-muted-foreground hover:text-foreground dark:text-gray-400 dark:hover:text-white"
             >
               {isDarkMode ? (
                 <Sun className="h-5 w-5" />
@@ -72,7 +74,7 @@ const Header = () => {
               variant="ghost" 
               size="icon"
               onClick={() => setIsChatOpen(true)}
-              className="text-gray-400 hover:text-white hover:bg-gray-800"
+              className="text-muted-foreground hover:text-foreground dark:text-gray-400 dark:hover:text-white"
             >
               <Brain className="h-5 w-5" />
             </Button>
@@ -80,7 +82,7 @@ const Header = () => {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="relative text-gray-400 hover:text-white hover:bg-gray-800"
+              className="relative text-muted-foreground hover:text-foreground dark:text-gray-400 dark:hover:text-white"
             >
               <Bell className="h-5 w-5" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
@@ -91,18 +93,18 @@ const Header = () => {
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  className="text-gray-400 hover:text-white hover:bg-gray-800"
+                  className="text-muted-foreground hover:text-foreground dark:text-gray-400 dark:hover:text-white"
                 >
                   <User className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-[#1E293B] border-gray-800">
-                <DropdownMenuLabel className="text-gray-200">Minha Conta</DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-gray-800" />
-                <DropdownMenuItem className="text-gray-200 hover:bg-gray-800">Perfil</DropdownMenuItem>
-                <DropdownMenuItem className="text-gray-200 hover:bg-gray-800">Configurações</DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-gray-800" />
-                <DropdownMenuItem onClick={handleLogout} className="text-red-400 hover:bg-gray-800">
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Perfil</DropdownMenuItem>
+                <DropdownMenuItem>Configurações</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-red-500">
                   Sair
                 </DropdownMenuItem>
               </DropdownMenuContent>

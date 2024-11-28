@@ -58,7 +58,8 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans selection:bg-primary-500/20 selection:text-primary-500;
+    @apply bg-background text-foreground font-sans;
+    @apply dark:bg-background-dark dark:text-foreground-dark;
   }
 
   h1, h2, h3, h4, h5, h6 {
