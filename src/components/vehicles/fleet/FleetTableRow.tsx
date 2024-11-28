@@ -45,30 +45,32 @@ export const FleetTableRow = ({
       <TableCell>
         <div className="flex items-center gap-3">
           {vehicle.car_model?.image_url ? (
-            <div className="relative w-16 h-12 group">
-              <img
-                src={vehicle.car_model.image_url}
-                alt={vehicle.car_model?.name}
-                className="absolute inset-0 w-full h-full object-cover rounded-lg transition-transform duration-200 group-hover:scale-110"
-              />
-              {vehicle.car_model?.brand_logo_url && (
-                <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-white rounded-full shadow-sm p-1">
-                  <img 
-                    src={vehicle.car_model.brand_logo_url} 
-                    alt="Brand logo" 
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-              )}
+            <div className="relative w-24 h-16 flex-shrink-0">
+              <div className="absolute inset-0 rounded-lg overflow-hidden bg-gray-50">
+                <img
+                  src={vehicle.car_model.image_url}
+                  alt={vehicle.car_model?.name}
+                  className="w-full h-full object-contain transition-transform duration-200 group-hover:scale-110 p-1"
+                />
+                {vehicle.car_model?.brand_logo_url && (
+                  <div className="absolute -bottom-2 -right-2 w-7 h-7 bg-white rounded-full shadow-sm p-1">
+                    <img 
+                      src={vehicle.car_model.brand_logo_url} 
+                      alt="Brand logo" 
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
-            <div className="w-16 h-12 bg-gray-100 rounded-lg animate-pulse" />
+            <div className="w-24 h-16 bg-gray-100 rounded-lg animate-pulse flex-shrink-0" />
           )}
-          <div>
-            <p className="font-medium text-gray-900 line-clamp-1">
+          <div className="min-w-0">
+            <p className="font-medium text-gray-900 truncate">
               {vehicle.car_model?.name}
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 truncate">
               {vehicle.branch}
             </p>
           </div>
