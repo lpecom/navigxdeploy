@@ -325,32 +325,27 @@ export type Database = {
       }
       chat_conversations: {
         Row: {
+          admin_user_id: string | null
           created_at: string
           driver_id: string | null
           id: string
           updated_at: string
         }
         Insert: {
+          admin_user_id?: string | null
           created_at?: string
           driver_id?: string | null
           id?: string
           updated_at?: string
         }
         Update: {
+          admin_user_id?: string | null
           created_at?: string
           driver_id?: string | null
           id?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "chat_conversations_driver_id_fkey"
-            columns: ["driver_id"]
-            isOneToOne: false
-            referencedRelation: "driver_details"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       chat_messages: {
         Row: {

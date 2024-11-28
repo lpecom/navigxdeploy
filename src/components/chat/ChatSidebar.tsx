@@ -37,7 +37,7 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
       const { data: conversations } = await supabase
         .from('chat_conversations')
         .select('id')
-        .eq('driver_id', session?.user?.id)
+        .eq('admin_user_id', session?.user?.id)
         .order('created_at', { ascending: false })
         .limit(1);
 
@@ -79,7 +79,8 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
         body: {
           message: userMessage,
           conversationId,
-          driverId: session.user.id
+          userId: session.user.id,
+          isAdmin: true
         },
       });
 
