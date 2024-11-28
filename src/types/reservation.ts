@@ -30,15 +30,14 @@ export interface Reservation {
     phone: string;
   };
   reservation_number: number;
-  carCategory?: string;
-  weeklyFare?: number;
-  kilometersPerWeek?: 'unlimited' | 'limited';
-  paymentStatus?: string;
-  riskScore?: number;
-  documentsSubmitted?: boolean;
-  customerName?: string;
-  email?: string;
-  cpf?: string;
-  phone?: string;
-  address?: string;
+  optionals: Array<{
+    name: string;
+    pricePerWeek: number;
+  }>;
+  weeklyFare: number;
+  kilometersPerWeek: 'unlimited' | 'limited';
+  paymentStatus: 'paid' | 'pending';
+  riskScore: number;
+  documentsSubmitted: boolean;
+  planType?: string;
 }

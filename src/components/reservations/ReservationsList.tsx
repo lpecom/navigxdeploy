@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ReservationCard } from "./ReservationCard";
 import { RiskAnalysisDialog } from "./RiskAnalysisDialog";
-import { DetailedReservationView } from "./DetailedReservationView";
+import DetailedReservationView from "./DetailedReservationView";
 import type { Reservation } from "@/types/reservation";
 
 interface ReservationsListProps {
@@ -42,7 +42,6 @@ export const ReservationsList = ({ filter = 'all', status, selectedDate }: Reser
       
       if (error) throw error;
 
-      // Transform the data to match our Reservation type
       return data.map(session => ({
         id: session.id,
         driver_id: session.driver_id,
@@ -56,11 +55,13 @@ export const ReservationsList = ({ filter = 'all', status, selectedDate }: Reser
         selected_optionals: session.selected_optionals,
         driver: session.driver,
         reservation_number: session.reservation_number,
-        customerName: session.driver?.full_name,
-        email: session.driver?.email,
-        phone: session.driver?.phone,
-        carCategory: session.selected_car?.category,
-        weeklyFare: session.total_amount
+        optionals: session.selected_optionals || [],
+        weeklyFare: session.total_amount,
+        kilometersPerWeek: 'limited',
+        paymentStatus: 'pending',
+        riskScore: 50,
+        documentsSubmitted: false,
+        planType: session.selected_car?.plan_type
       })) as Reservation[];
     },
   });
@@ -106,11 +107,9 @@ export const ReservationsList = ({ filter = 'all', status, selectedDate }: Reser
           onOpenChange={setShowRiskAnalysis}
           reservation={selectedReservationForRisk}
           onApprove={() => {
-            // Handle approval
             setShowRiskAnalysis(false);
           }}
           onReject={() => {
-            // Handle rejection
             setShowRiskAnalysis(false);
           }}
         />
