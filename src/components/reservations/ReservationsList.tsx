@@ -4,9 +4,15 @@ import { ReservationCard } from "./ReservationCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const ReservationsList = () => {
+interface ReservationsListProps {
+  filter?: 'pending' | 'pickup' | 'checkin';
+  status?: 'pending_approval' | 'approved' | 'rejected';
+  selectedDate?: Date;
+}
+
+const ReservationsList = ({ filter, status, selectedDate }: ReservationsListProps) => {
   const { data: reservations, isLoading } = useQuery({
-    queryKey: ['reservations'],
+    queryKey: ['reservations', filter, status, selectedDate],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('checkout_sessions')
@@ -35,16 +41,16 @@ const ReservationsList = () => {
         address: session.driver?.address || '',
         pickupDate: session.pickup_date || session.created_at,
         pickupTime: session.pickup_time || '',
-        status: session.status,
+        status: session.status as Reservation['status'],
         paymentStatus: 'pending',
         customerStatus: 'new',
         riskScore: 25,
         documentsSubmitted: false,
         createdAt: session.created_at,
-        carCategory: session.selected_car?.category || 'Economy',
+        carCategory: (session.selected_car as { category: string })?.category || 'Economy',
         leadSource: 'form',
         weeklyFare: session.total_amount,
-        optionals: session.selected_optionals || [],
+        optionals: (session.selected_optionals as { name: string; pricePerWeek: number }[]) || [],
         kilometersPerWeek: 1000,
       }));
     },

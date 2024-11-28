@@ -119,13 +119,13 @@ const Reservations = ({ filter }: ReservationsProps) => {
                   <TabsTrigger value="next-week">Próxima Semana</TabsTrigger>
                 </TabsList>
                 <TabsContent value="today" className="mt-6">
-                  <ReservationsList filter="today" selectedDate={selectedDate} />
+                  <ReservationsList filter="pickup" selectedDate={selectedDate} />
                 </TabsContent>
                 <TabsContent value="this-week" className="mt-6">
-                  <ReservationsList filter="this-week" selectedDate={selectedDate} />
+                  <ReservationsList filter="pickup" selectedDate={selectedDate} />
                 </TabsContent>
                 <TabsContent value="next-week" className="mt-6">
-                  <ReservationsList filter="next-week" selectedDate={selectedDate} />
+                  <ReservationsList filter="pickup" selectedDate={selectedDate} />
                 </TabsContent>
               </Tabs>
             </div>
