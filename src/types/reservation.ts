@@ -1,43 +1,32 @@
-export type ReservationFilter = 'pending' | 'pickup' | 'all';
+export type ReservationStatus = 'pending_approval' | 'approved' | 'rejected';
+export type PaymentStatus = 'paid' | 'pending';
+export type CustomerStatus = 'new' | 'returning';
+
+export interface Optional {
+  name: string;
+  pricePerWeek: number;
+}
 
 export interface Reservation {
   id: string;
-  driver_id: string;
-  vehicle_id?: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  pickup_date: string;
-  pickup_time?: string;
-  return_date?: string;
-  customer_id?: string;
-  notes?: string;
-  total_amount: number;
-  insurance_details?: Record<string, any>;
-  selected_car: {
-    name: string;
-    category: string;
-    plan_type?: string;
-  };
-  selected_optionals: Array<{
-    name: string;
-    pricePerWeek: number;
-  }>;
-  driver: {
-    id: string;
-    full_name: string;
-    email: string;
-    phone: string;
-  };
-  reservation_number: number;
-  optionals: Array<{
-    name: string;
-    pricePerWeek: number;
-  }>;
-  weeklyFare: number;
-  kilometersPerWeek: 'unlimited' | 'limited';
-  paymentStatus: 'paid' | 'pending';
+  reservationNumber: string;
+  customerName: string;
+  email: string;
+  cpf: string;
+  phone: string;
+  address: string;
+  pickupDate: string;
+  pickupTime?: string;
+  status: ReservationStatus;
+  paymentStatus: PaymentStatus;
+  customerStatus: CustomerStatus;
   riskScore: number;
   documentsSubmitted: boolean;
+  createdAt: string;
+  carCategory: string;
+  leadSource: string;
+  weeklyFare: number;
+  optionals: Optional[];
+  kilometersPerWeek: number | 'unlimited';
   planType?: string;
 }

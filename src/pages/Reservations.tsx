@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { supabase } from "@/integrations/supabase/client"
-import { ReservationsList } from "@/components/reservations/ReservationsList"
+import ReservationsList from "@/components/reservations/ReservationsList"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { type ReservationFilter } from "@/types/reservation"
 import { motion } from "framer-motion"

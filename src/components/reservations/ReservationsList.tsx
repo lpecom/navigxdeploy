@@ -1,26 +1,20 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { ReservationCard } from "./ReservationCard";
-import { RiskAnalysisDialog } from "./RiskAnalysisDialog";
-import { DetailedReservationView } from "./DetailedReservationView";
 import type { Reservation } from "@/types/reservation";
+import { ReservationCard } from "./ReservationCard";
+import { supabase } from "@/integrations/supabase/client";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ReservationsListProps {
-  filter?: string;
-  status?: string;
+  filter?: 'pending' | 'pickup' | 'checkin';
+  status?: 'pending_approval' | 'approved' | 'rejected';
   selectedDate?: Date;
 }
 
-export const ReservationsList = ({ filter = 'all', status, selectedDate }: ReservationsListProps) => {
-  const [selectedReservation, setSelectedReservation] = useState<string | null>(null);
-  const [showRiskAnalysis, setShowRiskAnalysis] = useState(false);
-  const [selectedReservationForRisk, setSelectedReservationForRisk] = useState<Reservation | null>(null);
-
+const ReservationsList = ({ filter, status, selectedDate }: ReservationsListProps) => {
   const { data: reservations, isLoading } = useQuery({
     queryKey: ['reservations', filter, status, selectedDate],
     queryFn: async () => {
-      const query = supabase
+      const { data, error } = await supabase
         .from('checkout_sessions')
         .select(`
           *,
@@ -28,92 +22,77 @@ export const ReservationsList = ({ filter = 'all', status, selectedDate }: Reser
             id,
             full_name,
             email,
-            phone
+            cpf,
+            phone,
+            address
           )
-        `);
+        `)
+        .order('created_at', { ascending: false });
 
-      if (filter === 'pending') {
-        query.eq('status', status || 'pending_approval');
-      } else if (filter === 'pickup') {
-        query.eq('status', 'confirmed');
-      }
-
-      const { data, error } = await query;
-      
       if (error) throw error;
 
-      return data.map(session => ({
+      return data.map((session): Reservation => ({
         id: session.id,
-        driver_id: session.driver_id,
-        status: session.status,
-        created_at: session.created_at,
-        updated_at: session.updated_at,
-        pickup_date: session.pickup_date,
-        pickup_time: session.pickup_time,
-        total_amount: session.total_amount,
-        selected_car: session.selected_car,
-        selected_optionals: session.selected_optionals,
-        driver: session.driver,
-        reservation_number: session.reservation_number,
-        optionals: session.selected_optionals || [],
-        weeklyFare: session.total_amount,
-        kilometersPerWeek: 'limited',
+        reservationNumber: session.reservation_number,
+        customerName: session.driver?.full_name || 'Customer not identified',
+        email: session.driver?.email || '',
+        cpf: session.driver?.cpf || '',
+        phone: session.driver?.phone || '',
+        address: session.driver?.address || '',
+        pickupDate: session.pickup_date || session.created_at,
+        pickupTime: session.pickup_time || '',
+        status: session.status as Reservation['status'],
         paymentStatus: 'pending',
-        riskScore: 50,
+        customerStatus: 'new',
+        riskScore: 25,
         documentsSubmitted: false,
-        planType: session.selected_car?.plan_type
-      })) as Reservation[];
+        createdAt: session.created_at,
+        carCategory: (session.selected_car as { category: string })?.category || 'Economy',
+        leadSource: 'form',
+        weeklyFare: session.total_amount,
+        optionals: (session.selected_optionals as { name: string; pricePerWeek: number }[]) || [],
+        kilometersPerWeek: 1000,
+      }));
     },
   });
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        {[...Array(3)].map((_, i) => (
-          <div
-            key={i}
-            className="h-32 bg-gray-100 animate-pulse rounded-lg"
-          />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="animate-pulse">
+            <div className="h-64 bg-gray-100 rounded-lg"></div>
+          </div>
         ))}
       </div>
     );
   }
 
-  const handleRiskAnalysis = (reservation: Reservation) => {
-    setSelectedReservationForRisk(reservation);
-    setShowRiskAnalysis(true);
-  };
-
   return (
-    <div className="space-y-4">
-      {reservations?.map((reservation) => (
-        <ReservationCard
-          key={reservation.id}
-          reservation={reservation}
-          onRiskAnalysis={() => handleRiskAnalysis(reservation)}
-        />
-      ))}
+    <div className="max-w-7xl mx-auto">
+      <Tabs defaultValue="queue" className="w-full">
+        <TabsList className="mb-6">
+          <TabsTrigger value="accepted">Accepted</TabsTrigger>
+          <TabsTrigger value="queue">In Queue</TabsTrigger>
+          <TabsTrigger value="urgent">Urgent</TabsTrigger>
+          <TabsTrigger value="archive">Archive</TabsTrigger>
+        </TabsList>
 
-      {selectedReservation && (
-        <DetailedReservationView
-          reservationId={selectedReservation}
-          onClose={() => setSelectedReservation(null)}
-        />
-      )}
+        <TabsContent value="queue" className="space-y-0">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {reservations?.map((reservation) => (
+              <ReservationCard
+                key={reservation.id}
+                reservation={reservation}
+              />
+            ))}
+          </div>
+        </TabsContent>
 
-      {selectedReservationForRisk && (
-        <RiskAnalysisDialog
-          open={showRiskAnalysis}
-          onOpenChange={setShowRiskAnalysis}
-          reservation={selectedReservationForRisk}
-          onApprove={() => {
-            setShowRiskAnalysis(false);
-          }}
-          onReject={() => {
-            setShowRiskAnalysis(false);
-          }}
-        />
-      )}
+        {/* Add other TabsContent components for other statuses */}
+      </Tabs>
     </div>
   );
 };
+
+export default ReservationsList;

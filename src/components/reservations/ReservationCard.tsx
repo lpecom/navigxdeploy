@@ -12,12 +12,11 @@ import { RiskAnalysisDialog } from "./RiskAnalysisDialog";
 
 interface ReservationCardProps {
   reservation: Reservation;
-  onRiskAnalysis: () => void;
 }
 
-export const ReservationCard = ({ reservation, onRiskAnalysis }: ReservationCardProps) => {
+export const ReservationCard = ({ reservation }: ReservationCardProps) => {
   const [showRiskAnalysis, setShowRiskAnalysis] = useState(false);
-  const pickupDate = new Date(reservation.pickup_date);
+  const pickupDate = new Date(reservation.pickupDate);
   const formattedDate = format(pickupDate, "dd MMM, yyyy", { locale: ptBR });
 
   const getPlanBadgeStyle = (planType: string) => {
@@ -30,6 +29,16 @@ export const ReservationCard = ({ reservation, onRiskAnalysis }: ReservationCard
     return styles[planType as keyof typeof styles] || styles.default;
   };
 
+  const handleApprove = () => {
+    // Implement approval logic
+    setShowRiskAnalysis(false);
+  };
+
+  const handleReject = () => {
+    // Implement rejection logic
+    setShowRiskAnalysis(false);
+  };
+
   return (
     <>
       <Card className="group hover:shadow-lg transition-all duration-200">
@@ -37,13 +46,13 @@ export const ReservationCard = ({ reservation, onRiskAnalysis }: ReservationCard
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="rounded-full px-3">
-                #{reservation.reservation_number}
+                #{reservation.reservationNumber}
               </Badge>
               <Badge 
                 variant="secondary" 
-                className={cn("rounded-full px-3", getPlanBadgeStyle(reservation.selected_car?.plan_type || 'default'))}
+                className={cn("rounded-full px-3", getPlanBadgeStyle(reservation.planType || 'default'))}
               >
-                {reservation.selected_car?.plan_type || 'Plano não selecionado'}
+                {reservation.planType || 'Plano não selecionado'}
               </Badge>
             </div>
           </div>
@@ -52,25 +61,25 @@ export const ReservationCard = ({ reservation, onRiskAnalysis }: ReservationCard
             <div className="space-y-6">
               <div className="flex items-center gap-4">
                 <Avatar className="h-12 w-12 border-2 border-primary/10">
-                  <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${reservation.driver.full_name}`} />
+                  <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${reservation.customerName}`} />
                   <AvatarFallback>
                     <User className="h-6 w-6 text-primary/60" />
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <p className="text-sm text-muted-foreground">Cliente</p>
-                  <p className="font-medium text-secondary-900">{reservation.driver.full_name}</p>
+                  <p className="font-medium text-secondary-900">{reservation.customerName}</p>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <div>
                   <p className="text-sm text-muted-foreground">Telefone</p>
-                  <p className="font-medium text-secondary-900">{reservation.driver.phone || 'Não informado'}</p>
+                  <p className="font-medium text-secondary-900">{reservation.phone || 'Não informado'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium text-secondary-900">{reservation.driver.email}</p>
+                  <p className="font-medium text-secondary-900">{reservation.email}</p>
                 </div>
               </div>
             </div>
@@ -82,7 +91,7 @@ export const ReservationCard = ({ reservation, onRiskAnalysis }: ReservationCard
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Categoria</p>
-                  <p className="font-medium text-secondary-900">{reservation.selected_car.category}</p>
+                  <p className="font-medium text-secondary-900">{reservation.carCategory}</p>
                 </div>
               </div>
 
@@ -93,7 +102,7 @@ export const ReservationCard = ({ reservation, onRiskAnalysis }: ReservationCard
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-secondary-900">{reservation.pickup_time || 'Não agendado'}</span>
+                  <span className="text-sm text-secondary-900">{reservation.pickupTime || 'Não agendado'}</span>
                 </div>
               </div>
             </div>
@@ -115,13 +124,11 @@ export const ReservationCard = ({ reservation, onRiskAnalysis }: ReservationCard
         open={showRiskAnalysis}
         onOpenChange={setShowRiskAnalysis}
         reservation={reservation}
-        onApprove={() => {
-          setShowRiskAnalysis(false);
-        }}
-        onReject={() => {
-          setShowRiskAnalysis(false);
-        }}
+        onApprove={handleApprove}
+        onReject={handleReject}
       />
     </>
   );
 };
+
+export default ReservationCard;

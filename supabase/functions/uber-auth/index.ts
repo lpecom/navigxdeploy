@@ -6,41 +6,35 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const UBER_API_URL = 'https://api.uber.com/v1'
+
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { code, driver_id, refresh_token, grant_type } = await req.json()
-    console.log('Processing Uber auth for driver:', driver_id)
+    const { code, driver_id } = await req.json()
+    console.log('Received auth code for driver:', driver_id)
 
-    if (!driver_id) {
-      throw new Error('Missing driver_id')
+    if (!code || !driver_id) {
+      throw new Error('Missing required parameters')
     }
 
-    const body = new URLSearchParams()
-    if (grant_type === 'refresh_token') {
-      if (!refresh_token) throw new Error('Missing refresh_token')
-      body.append('grant_type', 'refresh_token')
-      body.append('refresh_token', refresh_token)
-    } else {
-      if (!code) throw new Error('Missing code')
-      body.append('grant_type', 'authorization_code')
-      body.append('code', code)
-      body.append('redirect_uri', Deno.env.get('UBER_REDIRECT_URI') || '')
-    }
-
-    body.append('client_id', Deno.env.get('UBER_CLIENT_ID') || '')
-    body.append('client_secret', Deno.env.get('UBER_CLIENT_SECRET') || '')
-
-    // Exchange code/refresh_token for tokens
+    // Exchange authorization code for tokens
     const tokenResponse = await fetch('https://auth.uber.com/oauth/v2/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: body.toString(),
+      body: new URLSearchParams({
+        client_id: Deno.env.get('UBER_CLIENT_ID') || '',
+        client_secret: Deno.env.get('UBER_CLIENT_SECRET') || '',
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: Deno.env.get('UBER_REDIRECT_URI') || '',
+      }),
     })
 
     const tokens = await tokenResponse.json()
@@ -48,25 +42,22 @@ serve(async (req) => {
 
     if (!tokenResponse.ok) {
       console.error('Token exchange failed:', tokens)
-      throw new Error('Failed to exchange authorization code/refresh token')
+      throw new Error('Failed to exchange authorization code')
     }
 
-    // Get Uber driver profile if this is initial auth
-    let profile
-    if (!grant_type || grant_type === 'authorization_code') {
-      const profileResponse = await fetch('https://api.uber.com/v1/partners/me', {
-        headers: {
-          'Authorization': `Bearer ${tokens.access_token}`,
-        },
-      })
+    // Get Uber driver profile
+    const profileResponse = await fetch(`${UBER_API_URL}/partners/me`, {
+      headers: {
+        'Authorization': `Bearer ${tokens.access_token}`,
+      },
+    })
 
-      profile = await profileResponse.json()
-      console.log('Retrieved Uber profile')
+    const profile = await profileResponse.json()
+    console.log('Retrieved Uber profile')
 
-      if (!profileResponse.ok) {
-        console.error('Profile fetch failed:', profile)
-        throw new Error('Failed to fetch Uber profile')
-      }
+    if (!profileResponse.ok) {
+      console.error('Profile fetch failed:', profile)
+      throw new Error('Failed to fetch Uber profile')
     }
 
     // Store integration data in Supabase
@@ -79,11 +70,10 @@ serve(async (req) => {
       .from('driver_uber_integrations')
       .upsert({
         driver_id,
-        uber_driver_id: profile?.id,
+        uber_driver_id: profile.id,
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token,
         token_expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
-        is_active: true,
       })
 
     if (upsertError) {

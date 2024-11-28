@@ -1,32 +1,23 @@
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Car } from "lucide-react";
+import { Car, Link as LinkIcon } from "lucide-react";
 import { useLocation } from "react-router-dom";
-import { getUberToken, fetchUberEarnings, fetchUberTrips } from "./uber/uberApiUtils";
-import { UberConnect } from "./uber/UberConnect";
-import { UberConnected } from "./uber/UberConnected";
 
 interface UberIntegrationProps {
   driverId: string;
 }
 
-interface UberStats {
-  earnings: number;
-  trips: number;
-  lastTripDate: string | null;
-}
-
 export const UberIntegration = ({ driverId }: UberIntegrationProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
-  const [stats, setStats] = useState<UberStats | null>(null);
-  const [isLoadingStats, setIsLoadingStats] = useState(false);
   const { toast } = useToast();
   const location = useLocation();
 
   useEffect(() => {
+    // Check if we have a code parameter in the URL (OAuth callback)
     const params = new URLSearchParams(location.search);
     const code = params.get('code');
     
@@ -34,14 +25,9 @@ export const UberIntegration = ({ driverId }: UberIntegrationProps) => {
       handleUberCallback(code);
     }
 
+    // Check existing integration
     checkIntegrationStatus();
   }, [driverId]);
-
-  useEffect(() => {
-    if (isConnected) {
-      fetchUberStats();
-    }
-  }, [isConnected]);
 
   const checkIntegrationStatus = async () => {
     try {
@@ -66,46 +52,17 @@ export const UberIntegration = ({ driverId }: UberIntegrationProps) => {
     }
   };
 
-  const fetchUberStats = async () => {
-    setIsLoadingStats(true);
-    try {
-      const token = await getUberToken(driverId);
-      if (!token) {
-        setIsConnected(false);
-        return;
-      }
-
-      const [earningsData, tripsData] = await Promise.all([
-        fetchUberEarnings(token),
-        fetchUberTrips(token)
-      ]);
-
-      setStats({
-        earnings: earningsData.total_earnings || 0,
-        trips: tripsData.count || 0,
-        lastTripDate: tripsData.trips?.[0]?.completed_at || null
-      });
-    } catch (error) {
-      console.error('Error fetching Uber stats:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar os dados do Uber.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoadingStats(false);
-    }
-  };
-
   const handleUberConnect = () => {
     const clientId = import.meta.env.VITE_UBER_CLIENT_ID;
     const redirectUri = import.meta.env.VITE_UBER_REDIRECT_URI;
-    const scope = 'partner.accounts partner.payments partner.trips';
+    const scope = 'partner.accounts';
     
     const authUrl = `https://auth.uber.com/oauth/v2/authorize?client_id=${clientId}&response_type=code&scope=${scope}&redirect_uri=${redirectUri}`;
     
+    // Store driver_id in localStorage for retrieval after redirect
     localStorage.setItem('uber_integration_driver_id', driverId);
     
+    // Redirect to Uber auth
     window.location.href = authUrl;
   };
 
@@ -125,6 +82,7 @@ export const UberIntegration = ({ driverId }: UberIntegrationProps) => {
       
       setIsConnected(true);
       
+      // Clean up URL
       window.history.replaceState({}, '', location.pathname);
     } catch (error) {
       console.error('Error connecting Uber account:', error);
@@ -149,15 +107,26 @@ export const UberIntegration = ({ driverId }: UberIntegrationProps) => {
       <CardContent>
         <div className="space-y-4">
           {!isConnected ? (
-            <UberConnect 
-              onConnect={handleUberConnect}
-              isLoading={isLoading}
-            />
+            <div>
+              <p className="text-sm text-gray-600 mb-4">
+                Conecte sua conta Uber para sincronizar seus ganhos e otimizar sua gestão financeira.
+              </p>
+              <Button
+                onClick={handleUberConnect}
+                disabled={isLoading}
+                className="w-full sm:w-auto"
+              >
+                <LinkIcon className="w-4 h-4 mr-2" />
+                {isLoading ? "Conectando..." : "Conectar conta Uber"}
+              </Button>
+            </div>
           ) : (
-            <UberConnected 
-              stats={stats}
-              isLoadingStats={isLoadingStats}
-            />
+            <div className="text-sm text-gray-600">
+              <p className="flex items-center gap-2 text-green-600">
+                <LinkIcon className="w-4 h-4" />
+                Conta Uber conectada
+              </p>
+            </div>
           )}
         </div>
       </CardContent>
