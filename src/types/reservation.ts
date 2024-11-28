@@ -1,10 +1,6 @@
-export type CustomerStatus = 'new' | 'returning' | 'blocked';
-export type PaymentStatus = 'paid' | 'pending';
 export type ReservationStatus = 'pending_approval' | 'approved' | 'rejected';
-export type CarCategory = 'SUV' | 'Luxury' | 'Economy' | 'Sports';
-export type LeadSource = 'facebook' | 'whatsapp' | 'form';
-export type ReservationFilter = 'pending' | 'pickup' | 'checkin';
-export type PickupFilter = 'today' | 'this-week' | 'next-week';
+export type PaymentStatus = 'paid' | 'pending';
+export type CustomerStatus = 'new' | 'returning';
 
 export interface Optional {
   name: string;
@@ -13,7 +9,7 @@ export interface Optional {
 
 export interface Reservation {
   id: string;
-  reservationNumber: number;
+  reservationNumber: string;
   customerName: string;
   email: string;
   cpf: string;
@@ -27,10 +23,10 @@ export interface Reservation {
   riskScore: number;
   documentsSubmitted: boolean;
   createdAt: string;
-  carCategory: CarCategory;
-  leadSource: LeadSource;
+  carCategory: string;
+  leadSource: string;
   weeklyFare: number;
   optionals: Optional[];
   kilometersPerWeek: number | 'unlimited';
-  planType?: string; // Added planType field
+  planType?: string;
 }
