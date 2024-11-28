@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { SinespClient } from 'npm:sinesp-client'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,79 +18,94 @@ interface VehicleInfo {
   fines?: any[];
 }
 
+async function checkSinespPlate(plate: string): Promise<VehicleInfo> {
+  const url = "https://apicarros.com/v1/consulta/" + plate.toLowerCase();
+  
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    return {
+      plate: plate,
+      model: data.modelo || 'N/A',
+      brand: data.marca || 'N/A',
+      year: data.ano || 'N/A',
+      color: data.cor || 'N/A',
+      state: data.uf || 'N/A',
+      city: data.municipio || 'N/A',
+      status: 'regular',
+      fines: []
+    };
+  } catch (error) {
+    console.error('Error checking plate:', error);
+    throw error;
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { plate } = await req.json()
-    console.log(`Checking plate: ${plate}`)
+    const { plate } = await req.json();
+    console.log(`Checking plate: ${plate}`);
 
     if (!plate) {
-      throw new Error('License plate is required')
+      throw new Error('License plate is required');
     }
 
-    // Initialize SINESP client
-    const client = new SinespClient()
-    
     // Search vehicle information
-    console.log('Querying SINESP for plate:', plate)
-    const sinespData = await client.search(plate)
-    console.log('SINESP response:', sinespData)
-
-    // Transform SINESP response to our format
-    const vehicleInfo: VehicleInfo = {
-      plate: plate,
-      model: sinespData.model,
-      brand: sinespData.brand,
-      year: sinespData.year,
-      color: sinespData.color,
-      state: sinespData.state,
-      city: sinespData.city,
-      status: sinespData.status.toLowerCase(),
-      fines: [] // We'll implement fines in a separate step
-    }
+    console.log('Querying SINESP for plate:', plate);
+    const vehicleInfo = await checkSinespPlate(plate);
+    console.log('Vehicle info:', vehicleInfo);
 
     // Store the result in Supabase for caching
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    );
 
     // Store the vehicle info in the database
     const { error: dbError } = await supabaseClient
       .from('vehicle_fines')
       .upsert([
         {
-          vehicle_id: null, // Will be linked later if vehicle exists in fleet
+          vehicle_id: null,
           fine_code: 'PLATE_CHECK',
           fine_description: 'License plate verification',
           fine_location: `${vehicleInfo.city}, ${vehicleInfo.state}`,
           raw_data: vehicleInfo
         }
-      ])
+      ]);
 
     if (dbError) {
-      console.error('Error storing vehicle info:', dbError)
+      console.error('Error storing vehicle info:', dbError);
     }
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        data: vehicleInfo
-      }),
+      JSON.stringify(vehicleInfo),
       { 
-        headers: { 
+        headers: {
           ...corsHeaders,
           'Content-Type': 'application/json'
-        } 
+        }
       }
-    )
+    );
 
   } catch (error) {
-    console.error('Error processing request:', error)
+    console.error('Error processing request:', error);
     
     return new Response(
       JSON.stringify({
@@ -106,6 +120,6 @@ serve(async (req) => {
           'Content-Type': 'application/json'
         }
       }
-    )
+    );
   }
-})
+});

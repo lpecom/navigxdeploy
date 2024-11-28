@@ -1,5 +1,0 @@
-{
-  "imports": {
-    "sinesp-client": "npm:sinesp-client"
-  }
-}
