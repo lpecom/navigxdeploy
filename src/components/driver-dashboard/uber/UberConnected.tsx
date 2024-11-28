@@ -8,13 +8,21 @@ interface UberConnectedProps {
   onDisconnect: () => void;
   onSync: () => Promise<void>;
   isSyncing: boolean;
+  stats: {
+    earnings: number;
+    trips: number;
+    lastTripDate: string | null;
+  };
+  isLoadingStats: boolean;
 }
 
 export const UberConnected = ({ 
   driverId,
   onDisconnect,
   onSync,
-  isSyncing 
+  isSyncing,
+  stats,
+  isLoadingStats
 }: UberConnectedProps) => {
   return (
     <div className="space-y-6">

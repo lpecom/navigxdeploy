@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ReservationCard } from "./ReservationCard";
 import { RiskAnalysisDialog } from "./RiskAnalysisDialog";
-import DetailedReservationView from "./DetailedReservationView";
+import { DetailedReservationView } from "./DetailedReservationView";
 import type { Reservation } from "@/types/reservation";
 
 interface ReservationsListProps {
