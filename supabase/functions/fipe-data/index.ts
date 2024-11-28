@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import fipe from 'npm:fipe-promise'
+import * as fipe from 'npm:fipe-promise'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,12 +8,16 @@ const corsHeaders = {
 }
 
 interface RequestParams {
-  action: 'getBrands' | 'getModels' | 'getYears' | 'getVehicle'
+  action: 'getBrands' | 'getModels' | 'getYears' | 'getVehicle' | 'getByPlateInfo'
   vehicleType: 'cars' | 'motorcycles' | 'trucks'
   brandId?: string
   modelId?: string
   year?: string
-  fipeCode?: string
+  plateInfo?: {
+    brand: string
+    model: string
+    year: string
+  }
 }
 
 serve(async (req) => {
@@ -28,57 +32,97 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { action, vehicleType, brandId, modelId, year, fipeCode } = await req.json() as RequestParams
-
-    console.log(`Processing FIPE request: ${action} for ${vehicleType}`)
+    const params = await req.json() as RequestParams
+    console.log(`Processing FIPE request:`, params)
     
-    // Handle different FIPE API actions
     let result
-    switch (action) {
-      case 'getBrands':
-        result = await fipe.getBrands(vehicleType)
-        break
-
-      case 'getModels':
-        if (!brandId) throw new Error('Brand ID is required')
-        result = await fipe.getModels(vehicleType, brandId)
-        break
-
-      case 'getYears':
-        if (!brandId || !modelId) throw new Error('Brand ID and Model ID are required')
-        result = await fipe.getYears(vehicleType, brandId, modelId)
-        break
-
-      case 'getVehicle':
-        if (!brandId || !modelId || !year) throw new Error('Brand ID, Model ID and Year are required')
-        const vehicleData = await fipe.getVehicle(vehicleType, brandId, modelId, year)
+    
+    if (params.action === 'getByPlateInfo' && params.plateInfo) {
+      // Search for the exact model using the plate info
+      const brands = await fipe.getBrands('cars')
+      const matchingBrand = brands.find(b => 
+        b.name.toLowerCase() === params.plateInfo.brand.toLowerCase()
+      )
+      
+      if (matchingBrand) {
+        const models = await fipe.getModels('cars', matchingBrand.id)
+        const matchingModel = models.find(m => 
+          m.name.toLowerCase().includes(params.plateInfo.model.toLowerCase())
+        )
         
-        // Cache the vehicle data if we have a FIPE code
-        if (vehicleData.fipeCode) {
-          const { error } = await supabaseClient
-            .from('fipe_cache')
-            .upsert({
-              fipe_code: vehicleData.fipeCode,
-              vehicle_type: vehicleType,
-              reference_month: vehicleData.referenceMonth,
-              brand: vehicleData.brand,
-              model: vehicleData.model,
-              year: vehicleData.modelYear?.toString(),
-              price: parseFloat(vehicleData.price.replace(/[^0-9.-]+/g, '')),
-              fuel: vehicleData.fuel,
-              raw_data: vehicleData
-            })
-
-          if (error) {
-            console.error('Error caching FIPE data:', error)
+        if (matchingModel) {
+          const years = await fipe.getYears('cars', matchingBrand.id, matchingModel.id)
+          const matchingYear = years.find(y => 
+            y.name.includes(params.plateInfo.year)
+          )
+          
+          if (matchingYear) {
+            result = await fipe.getVehicle(
+              'cars',
+              matchingBrand.id,
+              matchingModel.id,
+              matchingYear.id
+            )
           }
         }
-        
-        result = vehicleData
-        break
+      }
+    } else {
+      // Handle regular FIPE API actions
+      switch (params.action) {
+        case 'getBrands':
+          result = await fipe.getBrands(params.vehicleType)
+          break
 
-      default:
-        throw new Error('Invalid action')
+        case 'getModels':
+          if (!params.brandId) throw new Error('Brand ID is required')
+          result = await fipe.getModels(params.vehicleType, params.brandId)
+          break
+
+        case 'getYears':
+          if (!params.brandId || !params.modelId) 
+            throw new Error('Brand ID and Model ID are required')
+          result = await fipe.getYears(
+            params.vehicleType, 
+            params.brandId, 
+            params.modelId
+          )
+          break
+
+        case 'getVehicle':
+          if (!params.brandId || !params.modelId || !params.year) 
+            throw new Error('Brand ID, Model ID and Year are required')
+          result = await fipe.getVehicle(
+            params.vehicleType, 
+            params.brandId, 
+            params.modelId, 
+            params.year
+          )
+          
+          // Cache the vehicle data
+          if (result?.fipeCode) {
+            const { error } = await supabaseClient
+              .from('fipe_cache')
+              .upsert({
+                fipe_code: result.fipeCode,
+                vehicle_type: params.vehicleType,
+                reference_month: result.referenceMonth,
+                brand: result.brand,
+                model: result.model,
+                year: result.modelYear?.toString(),
+                price: parseFloat(result.price.replace(/[^0-9.-]+/g, '')),
+                fuel: result.fuel,
+                raw_data: result
+              })
+
+            if (error) {
+              console.error('Error caching FIPE data:', error)
+            }
+          }
+          break
+
+        default:
+          throw new Error('Invalid action')
+      }
     }
 
     return new Response(
