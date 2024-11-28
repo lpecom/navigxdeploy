@@ -41,30 +41,35 @@ export const FleetTableRow = ({
   };
 
   return (
-    <TableRow className="hover:bg-gray-50/50">
+    <>
       <TableCell>
         <div className="flex items-center gap-3">
           {vehicle.car_model?.image_url ? (
-            <img
-              src={vehicle.car_model.image_url}
-              alt={vehicle.car_model?.name}
-              className="w-16 h-12 object-cover rounded-lg"
-            />
+            <div className="relative w-16 h-12 group">
+              <img
+                src={vehicle.car_model.image_url}
+                alt={vehicle.car_model?.name}
+                className="absolute inset-0 w-full h-full object-cover rounded-lg transition-transform duration-200 group-hover:scale-110"
+              />
+              {vehicle.car_model?.brand_logo_url && (
+                <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-white rounded-full shadow-sm p-1">
+                  <img 
+                    src={vehicle.car_model.brand_logo_url} 
+                    alt="Brand logo" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              )}
+            </div>
           ) : (
-            <div className="w-16 h-12 bg-gray-100 rounded-lg" />
+            <div className="w-16 h-12 bg-gray-100 rounded-lg animate-pulse" />
           )}
           <div>
-            <p className="font-medium text-gray-900">
+            <p className="font-medium text-gray-900 line-clamp-1">
               {vehicle.car_model?.name}
             </p>
             <p className="text-sm text-gray-500">
-              {vehicle.car_model?.brand_logo_url && (
-                <img 
-                  src={vehicle.car_model.brand_logo_url} 
-                  alt="Brand logo" 
-                  className="h-4 w-auto inline mr-2"
-                />
-              )}
+              {vehicle.branch}
             </p>
           </div>
         </div>
@@ -84,20 +89,22 @@ export const FleetTableRow = ({
             variant="ghost"
             size="sm"
             onClick={handleCustomerClick}
-            className="text-left hover:bg-gray-100"
+            className="text-left hover:bg-gray-100 group w-full"
           >
-            <div>
-              <p className="font-medium text-sm">{vehicle.customer.full_name}</p>
-              <p className="text-xs text-gray-500">{vehicle.customer.phone}</p>
+            <div className="flex items-center justify-between w-full">
+              <div>
+                <p className="font-medium text-sm">{vehicle.customer.full_name}</p>
+                <p className="text-xs text-gray-500">{vehicle.customer.phone}</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-gray-400 transition-transform duration-200 group-hover:translate-x-1" />
             </div>
-            <ChevronRight className="h-4 w-4 ml-2" />
           </Button>
         ) : (
           <Button
             variant="outline"
             size="sm"
             onClick={() => onRentOut?.(vehicle.id)}
-            className="text-xs"
+            className="text-xs w-full bg-green-50 text-green-600 border-green-200 hover:bg-green-100 hover:text-green-700"
           >
             Disponível para locação
           </Button>
@@ -116,24 +123,24 @@ export const FleetTableRow = ({
       <TableCell>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="hover:bg-gray-100">
               <MoreVertical className="h-4 w-4" />
-              <span className="sr-only">Open menu</span>
+              <span className="sr-only">Abrir menu</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit?.(vehicle)}>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={() => onEdit?.(vehicle)} className="cursor-pointer">
               Editar detalhes
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onViewDocs?.(vehicle.id)}>
+            <DropdownMenuItem onClick={() => onViewDocs?.(vehicle.id)} className="cursor-pointer">
               Ver documentos
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/vehicles/${vehicle.id}`)} className="cursor-pointer">
               Ver perfil completo
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>
-    </TableRow>
+    </>
   );
 };
