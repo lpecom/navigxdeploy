@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import Fipe from 'npm:fipe-promise'
+import * as fipe from 'npm:fipe-promise'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -34,29 +34,28 @@ serve(async (req) => {
 
     const { action, vehicleType, brandId, modelId, year, fipeCode } = await req.json() as RequestParams
 
-    // Initialize FIPE client based on vehicle type
-    const fipeClient = new Fipe()
+    console.log(`Processing FIPE request: ${action} for ${vehicleType}`)
     
     // Handle different FIPE API actions
     let result
     switch (action) {
       case 'getBrands':
-        result = await fipeClient.getBrands(vehicleType)
+        result = await fipe.getBrands(vehicleType)
         break
 
       case 'getModels':
         if (!brandId) throw new Error('Brand ID is required')
-        result = await fipeClient.getModels(vehicleType, brandId)
+        result = await fipe.getModels(vehicleType, brandId)
         break
 
       case 'getYears':
         if (!brandId || !modelId) throw new Error('Brand ID and Model ID are required')
-        result = await fipeClient.getYears(vehicleType, brandId, modelId)
+        result = await fipe.getYears(vehicleType, brandId, modelId)
         break
 
       case 'getVehicle':
         if (!brandId || !modelId || !year) throw new Error('Brand ID, Model ID and Year are required')
-        const vehicleData = await fipeClient.getVehicle(vehicleType, brandId, modelId, year)
+        const vehicleData = await fipe.getVehicle(vehicleType, brandId, modelId, year)
         
         // Cache the vehicle data if we have a FIPE code
         if (vehicleData.fipeCode) {
