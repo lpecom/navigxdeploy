@@ -20,9 +20,13 @@ const VehicleProfitability = () => {
         .select(`
           *,
           vehicle:fleet_vehicles(
+            id,
             plate,
             current_km,
             branch,
+            year,
+            last_revision_date,
+            next_revision_date,
             car_model:car_models(
               name,
               image_url,
@@ -91,7 +95,16 @@ const VehicleProfitability = () => {
         </Button>
       </div>
 
-      <TopRentals vehicles={filteredVehicles?.map(v => v.vehicle) || []} />
+      <TopRentals vehicles={filteredVehicles?.map(v => ({
+        id: v.vehicle.id,
+        plate: v.vehicle.plate,
+        current_km: v.vehicle.current_km,
+        branch: v.vehicle.branch,
+        year: v.vehicle.year,
+        last_revision_date: v.vehicle.last_revision_date,
+        next_revision_date: v.vehicle.next_revision_date,
+        car_model: v.vehicle.car_model
+      })) || []} />
     </div>
   );
 };
