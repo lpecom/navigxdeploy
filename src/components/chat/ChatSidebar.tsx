@@ -34,7 +34,6 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
 
   const loadMessages = async () => {
     try {
-      // Get the most recent conversation
       const { data: conversations } = await supabase
         .from('chat_conversations')
         .select('id')
@@ -52,7 +51,6 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
           .order('created_at', { ascending: true });
 
         if (messagesData) {
-          // Ensure the role is properly typed when setting messages
           const typedMessages: Message[] = messagesData.map(msg => ({
             role: msg.role as 'user' | 'assistant',
             content: msg.content,
@@ -74,7 +72,6 @@ export const ChatSidebar = ({ isOpen, onClose }: ChatSidebarProps) => {
     const userMessage = message;
     setMessage("");
 
-    // Optimistically add user message
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
 
     try {

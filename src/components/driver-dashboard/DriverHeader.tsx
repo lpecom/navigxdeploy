@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Bell, Menu, Settings, BrainCircuit } from "lucide-react";
+import { Bell, Menu, Settings, Brain } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 
@@ -54,7 +54,7 @@ const DriverHeader = ({ onMenuClick }: DriverHeaderProps) => {
                 size="icon"
                 onClick={() => setIsChatOpen(true)}
               >
-                <BrainCircuit className="h-5 w-5 text-gray-500" />
+                <Brain className="h-5 w-5 text-gray-500" />
               </Button>
 
               <Button variant="ghost" size="icon" className="relative">
