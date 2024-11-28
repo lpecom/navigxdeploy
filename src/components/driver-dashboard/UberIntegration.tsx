@@ -3,21 +3,30 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Car, Link as LinkIcon } from "lucide-react";
+import { Car, Link as LinkIcon, DollarSign, Clock } from "lucide-react";
 import { useLocation } from "react-router-dom";
+import { getUberToken, fetchUberEarnings, fetchUberTrips } from "./uber/uberApiUtils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface UberIntegrationProps {
   driverId: string;
 }
 
+interface UberStats {
+  earnings: number;
+  trips: number;
+  lastTripDate: string | null;
+}
+
 export const UberIntegration = ({ driverId }: UberIntegrationProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const [stats, setStats] = useState<UberStats | null>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
   const { toast } = useToast();
   const location = useLocation();
 
   useEffect(() => {
-    // Check if we have a code parameter in the URL (OAuth callback)
     const params = new URLSearchParams(location.search);
     const code = params.get('code');
     
@@ -25,9 +34,14 @@ export const UberIntegration = ({ driverId }: UberIntegrationProps) => {
       handleUberCallback(code);
     }
 
-    // Check existing integration
     checkIntegrationStatus();
   }, [driverId]);
+
+  useEffect(() => {
+    if (isConnected) {
+      fetchUberStats();
+    }
+  }, [isConnected]);
 
   const checkIntegrationStatus = async () => {
     try {
@@ -52,17 +66,46 @@ export const UberIntegration = ({ driverId }: UberIntegrationProps) => {
     }
   };
 
+  const fetchUberStats = async () => {
+    setIsLoadingStats(true);
+    try {
+      const token = await getUberToken(driverId);
+      if (!token) {
+        setIsConnected(false);
+        return;
+      }
+
+      const [earningsData, tripsData] = await Promise.all([
+        fetchUberEarnings(token),
+        fetchUberTrips(token)
+      ]);
+
+      setStats({
+        earnings: earningsData.total_earnings || 0,
+        trips: tripsData.count || 0,
+        lastTripDate: tripsData.trips?.[0]?.completed_at || null
+      });
+    } catch (error) {
+      console.error('Error fetching Uber stats:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar os dados do Uber.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingStats(false);
+    }
+  };
+
   const handleUberConnect = () => {
     const clientId = import.meta.env.VITE_UBER_CLIENT_ID;
     const redirectUri = import.meta.env.VITE_UBER_REDIRECT_URI;
-    const scope = 'partner.accounts';
+    const scope = 'partner.accounts partner.payments partner.trips';
     
     const authUrl = `https://auth.uber.com/oauth/v2/authorize?client_id=${clientId}&response_type=code&scope=${scope}&redirect_uri=${redirectUri}`;
     
-    // Store driver_id in localStorage for retrieval after redirect
     localStorage.setItem('uber_integration_driver_id', driverId);
     
-    // Redirect to Uber auth
     window.location.href = authUrl;
   };
 
@@ -82,7 +125,6 @@ export const UberIntegration = ({ driverId }: UberIntegrationProps) => {
       
       setIsConnected(true);
       
-      // Clean up URL
       window.history.replaceState({}, '', location.pathname);
     } catch (error) {
       console.error('Error connecting Uber account:', error);
@@ -121,11 +163,66 @@ export const UberIntegration = ({ driverId }: UberIntegrationProps) => {
               </Button>
             </div>
           ) : (
-            <div className="text-sm text-gray-600">
-              <p className="flex items-center gap-2 text-green-600">
-                <LinkIcon className="w-4 h-4" />
-                Conta Uber conectada
-              </p>
+            <div className="space-y-4">
+              <div className="text-sm text-gray-600">
+                <p className="flex items-center gap-2 text-green-600 mb-4">
+                  <LinkIcon className="w-4 h-4" />
+                  Conta Uber conectada
+                </p>
+              </div>
+              
+              {isLoadingStats ? (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <Skeleton className="h-24" />
+                  <Skeleton className="h-24" />
+                  <Skeleton className="h-24" />
+                </div>
+              ) : stats && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-green-600" />
+                        <div>
+                          <p className="text-sm text-gray-500">Ganhos Totais</p>
+                          <p className="text-lg font-semibold">
+                            R$ {stats.earnings.toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center gap-2">
+                        <Car className="w-4 h-4 text-blue-600" />
+                        <div>
+                          <p className="text-sm text-gray-500">Total de Viagens</p>
+                          <p className="text-lg font-semibold">{stats.trips}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-purple-600" />
+                        <div>
+                          <p className="text-sm text-gray-500">Última Viagem</p>
+                          <p className="text-lg font-semibold">
+                            {stats.lastTripDate ? 
+                              new Date(stats.lastTripDate).toLocaleDateString('pt-BR') :
+                              'Nenhuma viagem'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </div>
           )}
         </div>
