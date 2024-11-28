@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "@/pages/Dashboard";
 import Vehicles from "@/pages/Vehicles";
 import VehicleDetails from "@/pages/VehicleDetails";
+import VehicleProfitability from "@/pages/VehicleProfitability";
 import Customers from "@/pages/Customers";
 import CustomerDetails from "@/pages/CustomerDetails";
 import Reservations from "@/pages/Reservations";
@@ -38,6 +39,7 @@ const AdminRoutes = () => {
                 <Route path="models" element={<Vehicles view="models" />} />
                 <Route path="fleet" element={<Vehicles view="fleet" />} />
                 <Route path="maintenance" element={<Vehicles view="maintenance" />} />
+                <Route path="profitability" element={<VehicleProfitability />} />
                 <Route path=":id" element={<VehicleDetails />} />
               </Route>
               

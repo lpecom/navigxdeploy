@@ -1790,6 +1790,56 @@ export type Database = {
           },
         ]
       }
+      vehicle_profitability: {
+        Row: {
+          common_issues: Json | null
+          created_at: string | null
+          fipe_price: number | null
+          id: string
+          last_fipe_update: string | null
+          monthly_metrics: Json | null
+          total_days_rented: number | null
+          total_maintenance_cost: number | null
+          total_revenue: number | null
+          updated_at: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          common_issues?: Json | null
+          created_at?: string | null
+          fipe_price?: number | null
+          id?: string
+          last_fipe_update?: string | null
+          monthly_metrics?: Json | null
+          total_days_rented?: number | null
+          total_maintenance_cost?: number | null
+          total_revenue?: number | null
+          updated_at?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          common_issues?: Json | null
+          created_at?: string | null
+          fipe_price?: number | null
+          id?: string
+          last_fipe_update?: string | null
+          monthly_metrics?: Json | null
+          total_days_rented?: number | null
+          total_maintenance_cost?: number | null
+          total_revenue?: number | null
+          updated_at?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_profitability_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicles: {
         Row: {
           car_group_id: string | null
