@@ -58,7 +58,7 @@ const ReservationsList = ({ filter, status, selectedDate }: ReservationsListProp
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[1, 2, 3].map((i) => (
           <div key={i} className="animate-pulse">
             <div className="h-64 bg-gray-100 rounded-lg"></div>
@@ -69,7 +69,7 @@ const ReservationsList = ({ filter, status, selectedDate }: ReservationsListProp
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-7xl mx-auto">
       <Tabs defaultValue="queue" className="w-full">
         <TabsList className="mb-6">
           <TabsTrigger value="accepted">Accepted</TabsTrigger>
@@ -78,13 +78,15 @@ const ReservationsList = ({ filter, status, selectedDate }: ReservationsListProp
           <TabsTrigger value="archive">Archive</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="queue" className="space-y-4">
-          {reservations?.map((reservation) => (
-            <ReservationCard
-              key={reservation.id}
-              reservation={reservation}
-            />
-          ))}
+        <TabsContent value="queue" className="space-y-0">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {reservations?.map((reservation) => (
+              <ReservationCard
+                key={reservation.id}
+                reservation={reservation}
+              />
+            ))}
+          </div>
         </TabsContent>
 
         {/* Add other TabsContent components for other statuses */}
