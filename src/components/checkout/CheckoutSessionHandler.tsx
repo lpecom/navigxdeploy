@@ -3,10 +3,12 @@ import { CartItem } from "@/types/cart";
 import { Json } from "@/integrations/supabase/types";
 
 interface CheckoutSessionHandlerProps {
-  driverId: string;
+  driverId?: string;
   cartItems: CartItem[];
   totalAmount: number;
   onSuccess: (sessionId: string) => void;
+  guestToken?: string;
+  guestEmail?: string;
 }
 
 const getValidUUID = (id: string) => {
@@ -20,6 +22,8 @@ export const createCheckoutSession = async ({
   cartItems,
   totalAmount,
   onSuccess,
+  guestToken,
+  guestEmail,
 }: CheckoutSessionHandlerProps) => {
   try {
     const selectedGroup = cartItems.find(item => item.type === 'car_group');
@@ -40,6 +44,8 @@ export const createCheckoutSession = async ({
       })) as unknown as Json,
       total_amount: totalAmount,
       status: 'pending',
+      guest_token: guestToken,
+      guest_email: guestEmail,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };

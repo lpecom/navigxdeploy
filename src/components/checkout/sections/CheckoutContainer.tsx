@@ -5,10 +5,19 @@ import { supabase } from "@/integrations/supabase/client"
 import { useSession } from "@supabase/auth-helpers-react"
 import { useNavigate } from "react-router-dom"
 import { createCheckoutSession } from "../CheckoutSessionHandler"
+import { nanoid } from 'nanoid'
 
 export const useCheckoutState = () => {
   const [step, setStep] = useState(1)
   const [customerId, setCustomerId] = useState<string | null>(null)
+  const [guestToken, setGuestToken] = useState<string>(() => {
+    const token = sessionStorage.getItem('guestToken')
+    if (token) return token
+    const newToken = nanoid()
+    sessionStorage.setItem('guestToken', newToken)
+    return newToken
+  })
+  const [guestEmail, setGuestEmail] = useState<string>('')
   const { toast } = useToast()
   const { state: cartState, dispatch } = useCart()
   const session = useSession()
@@ -31,7 +40,6 @@ export const useCheckoutState = () => {
 
         if (driverDetails) {
           setCustomerId(driverDetails.id)
-          // Only create checkout session if we have items and no existing session
           if (cartState.items.length > 0 && !cartState.checkoutSessionId) {
             try {
               await createCheckoutSession({
@@ -84,6 +92,9 @@ export const useCheckoutState = () => {
     setCustomerId,
     cartState,
     dispatch,
-    toast
+    toast,
+    guestToken,
+    guestEmail,
+    setGuestEmail
   }
 }
