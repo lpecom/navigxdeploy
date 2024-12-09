@@ -1,7 +1,6 @@
 export type ReservationStatus = 'pending_approval' | 'approved' | 'rejected';
 export type PaymentStatus = 'paid' | 'pending';
 export type CustomerStatus = 'new' | 'returning';
-export type ReservationFilter = 'pending' | 'pickup' | 'checkin';
 
 export interface Optional {
   name: string;

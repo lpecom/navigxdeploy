@@ -26,7 +26,7 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
-    --radius: 0.75rem;
+    --radius: 1rem;
   }
 
   .dark {
@@ -58,32 +58,24 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans dark:bg-background-dark dark:text-foreground-dark;
+    @apply bg-background text-foreground font-sans selection:bg-primary-500/20 selection:text-primary-500;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-semibold tracking-tight;
+    @apply font-display font-semibold tracking-tight text-balance;
   }
 }
 
-@layer components {
-  .sidebar {
-    @apply hidden lg:flex h-screen w-64 flex-col fixed left-0 top-0 bottom-0 bg-background border-r border-border dark:bg-background-dark dark:border-border-dark;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
-
-  .sidebar-link {
-    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground dark:text-muted-dark-foreground dark:hover:text-foreground-dark;
+  
+  .text-shadow {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
-
-  .sidebar-link.active {
-    @apply bg-muted text-foreground dark:bg-muted-dark dark:text-foreground-dark;
-  }
-
-  .sidebar-group {
-    @apply space-y-1;
-  }
-
-  .sidebar-submenu {
-    @apply pl-11 space-y-1 mt-1;
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-secondary-500;
   }
 }

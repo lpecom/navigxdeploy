@@ -11,10 +11,7 @@ export const CheckoutPage = () => {
     setCustomerId,
     cartState,
     dispatch,
-    toast,
-    guestToken,
-    guestEmail,
-    setGuestEmail
+    toast
   } = useCheckoutState()
 
   // Only show empty cart message if there's no selected category
@@ -37,9 +34,6 @@ export const CheckoutPage = () => {
         cartState={cartState}
         dispatch={dispatch}
         toast={toast}
-        guestToken={guestToken}
-        guestEmail={guestEmail}
-        setGuestEmail={setGuestEmail}
       />
     </CheckoutLayout>
   )

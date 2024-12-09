@@ -19,9 +19,6 @@ interface CheckoutContentProps {
   toast: any;
   setStep: (step: number) => void;
   setCustomerId: (id: string | null) => void;
-  guestToken: string;
-  guestEmail: string;
-  setGuestEmail: (email: string) => void;
 }
 
 export const CheckoutContent = ({
@@ -31,10 +28,7 @@ export const CheckoutContent = ({
   dispatch,
   toast,
   setStep,
-  setCustomerId,
-  guestToken,
-  guestEmail,
-  setGuestEmail
+  setCustomerId
 }: CheckoutContentProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -128,12 +122,7 @@ export const CheckoutContent = ({
             )}
             
             {step === 5 && (
-              <CustomerForm 
-                onSubmit={handleCustomerSubmit}
-                guestEmail={guestEmail}
-                setGuestEmail={setGuestEmail}
-                isGuest={true}
-              />
+              <CustomerForm onSubmit={handleCustomerSubmit} />
             )}
             
             {step === 6 && (
