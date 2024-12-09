@@ -14,8 +14,9 @@ export const CheckoutPage = () => {
     toast
   } = useCheckoutState()
 
-  // Only show empty cart message if there are no items and user hasn't started checkout
-  if (cartState.items.length === 0 && !cartState.checkoutSessionId) {
+  // Only show empty cart message if there's no selected category
+  const categoryData = sessionStorage.getItem('selectedCategory');
+  if (!categoryData) {
     return (
       <CheckoutLayout>
         <EmptyCartMessage />

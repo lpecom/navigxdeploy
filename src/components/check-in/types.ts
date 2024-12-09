@@ -1,5 +1,5 @@
 import { Json } from "@/integrations/supabase/types";
-import type { CarModel } from "@/types/vehicles";
+import type { CarModel, FleetVehicle } from "@/types/vehicles";
 
 export interface PhotoCategory {
   id: string;
@@ -9,6 +9,7 @@ export interface PhotoCategory {
 export interface SelectedCar {
   name: string;
   category: string;
+  plan_type?: string;
   group_id?: string;
   price?: number;
   period?: string;
@@ -22,6 +23,21 @@ export interface CheckInReservation {
     full_name: string;
     [key: string]: any;
   };
+  reservation_number: number;
+  pickup_date?: string;
+  pickup_time?: string;
+  status: string;
+  check_in_status?: string;
+  check_in_notes?: string;
+  check_in_photos?: Json;
+  check_in_completed_at?: string;
+  check_in_completed_by?: string;
+  assigned_vehicle_id?: string;
+  check_in_damages?: Json;
+  check_in_fuel_level?: number;
+  check_in_initial_km?: number;
+  check_in_contract_signed?: boolean;
+  check_in_documents_verified?: boolean;
   [key: string]: any;
 }
 
@@ -48,37 +64,24 @@ export interface CheckoutSession {
   selected_optionals: Optional[];
 }
 
-export interface CarGroup {
-  id: string;
-  name: string;
-  description: string | null;
-  display_order: number | null;
-  is_active: boolean | null;
-  created_at: string | null;
-  updated_at: string | null;
+export interface FleetVehicleWithRelations extends FleetVehicle {
+  car_models?: CarModel & {
+    car_group?: {
+      id: string;
+      name: string;
+      description?: string;
+      display_order?: number;
+      is_active?: boolean;
+      created_at?: string;
+      updated_at?: string;
+    };
+  };
 }
 
-export interface FleetVehicleWithRelations {
+export interface InspectionItem {
   id: string;
-  car_model_id: string | null;
-  car_model?: {
-    id: string;
-    name: string;
-    image_url: string | null;
-    car_group: CarGroup;
-  };
-  year: string;
-  current_km: number;
-  last_revision_date: string;
-  next_revision_date: string;
-  plate: string;
-  is_available?: boolean;
-  color?: string;
-  state?: string;
-  chassis_number?: string;
-  renavam_number?: string;
-  status?: string;
-  contract_number?: string;
-  customer_id?: string;
-  branch?: string;
+  name: string;
+  category: string;
+  display_order: number;
+  is_active: boolean;
 }

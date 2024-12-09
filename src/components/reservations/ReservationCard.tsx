@@ -1,147 +1,134 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { ChevronDown, ChevronUp, Calendar, Clock, MapPin } from "lucide-react"
-import { ReservationExpandedContent } from "./ReservationExpandedContent"
-import { format } from "date-fns"
-import { ptBR } from "date-fns/locale"
-import type { Reservation } from "@/types/reservation"
-import { supabase } from "@/integrations/supabase/client"
-import { toast } from "sonner"
-import { useQueryClient } from "@tanstack/react-query"
-import { memo } from "react"
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ShieldAlert, User, Calendar, Clock, Car } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import type { Reservation } from "@/types/reservation";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { RiskAnalysisDialog } from "./RiskAnalysisDialog";
 
 interface ReservationCardProps {
-  reservation: Reservation
-  isExpanded: boolean
-  onToggle: () => void
+  reservation: Reservation;
 }
 
-const ReservationCardComponent = ({ reservation, isExpanded, onToggle }: ReservationCardProps) => {
-  const queryClient = useQueryClient()
+export const ReservationCard = ({ reservation }: ReservationCardProps) => {
+  const [showRiskAnalysis, setShowRiskAnalysis] = useState(false);
+  const pickupDate = new Date(reservation.pickupDate);
+  const formattedDate = format(pickupDate, "dd MMM, yyyy", { locale: ptBR });
 
-  const handleApprove = async () => {
-    try {
-      const { error } = await supabase
-        .from('checkout_sessions')
-        .update({ status: 'approved' })
-        .eq('id', reservation.id)
+  const getPlanBadgeStyle = (planType: string) => {
+    const styles = {
+      'Navig Black': "bg-black text-white",
+      'Navig Mensal': "bg-purple-50 text-purple-600",
+      'Navig Semanal': "bg-blue-50 text-blue-600",
+      'default': "bg-gray-50 text-gray-600"
+    };
+    return styles[planType as keyof typeof styles] || styles.default;
+  };
 
-      if (error) throw error
+  const handleApprove = () => {
+    // Implement approval logic
+    setShowRiskAnalysis(false);
+  };
 
-      toast.success('Reserva aprovada com sucesso')
-      await queryClient.invalidateQueries({ queryKey: ['reservations'] })
-      onToggle()
-    } catch (error) {
-      console.error('Error approving reservation:', error)
-      toast.error('Erro ao aprovar reserva')
-    }
-  }
-
-  const handleReject = async () => {
-    try {
-      const { error } = await supabase
-        .from('checkout_sessions')
-        .update({ status: 'rejected' })
-        .eq('id', reservation.id)
-
-      if (error) throw error
-
-      toast.success('Reserva rejeitada com sucesso')
-      await queryClient.invalidateQueries({ queryKey: ['reservations'] })
-      onToggle()
-    } catch (error) {
-      console.error('Error rejecting reservation:', error)
-      toast.error('Erro ao rejeitar reserva')
-    }
-  }
-
-  const pickupDate = new Date(reservation.pickupDate)
-  const formattedDate = format(pickupDate, "dd 'de' MMMM", { locale: ptBR })
+  const handleReject = () => {
+    // Implement rejection logic
+    setShowRiskAnalysis(false);
+  };
 
   return (
-    <Card className="bg-white shadow-sm hover:shadow-md transition-all duration-200">
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start gap-4">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-base font-medium text-gray-900 truncate">
-                {reservation.customerName}
-              </h3>
-              <Badge variant="outline" className="text-xs">
+    <>
+      <Card className="group hover:shadow-lg transition-all duration-200">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="rounded-full px-3">
                 #{reservation.reservationNumber}
               </Badge>
+              <Badge 
+                variant="secondary" 
+                className={cn("rounded-full px-3", getPlanBadgeStyle(reservation.planType || 'default'))}
+              >
+                {reservation.planType || 'Plano não selecionado'}
+              </Badge>
             </div>
-            
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-gray-400" />
-                <span>{formattedDate}</span>
-              </div>
-              {reservation.pickupTime && (
-                <div className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-gray-400" />
-                  <span>{reservation.pickupTime}</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-12 w-12 border-2 border-primary/10">
+                  <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${reservation.customerName}`} />
+                  <AvatarFallback>
+                    <User className="h-6 w-6 text-primary/60" />
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm text-muted-foreground">Cliente</p>
+                  <p className="font-medium text-secondary-900">{reservation.customerName}</p>
                 </div>
-              )}
-              <div className="flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-gray-400" />
-                <span className="truncate">{reservation.address || 'Endereço não informado'}</span>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm text-muted-foreground">Telefone</p>
+                  <p className="font-medium text-secondary-900">{reservation.phone || 'Não informado'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Email</p>
+                  <p className="font-medium text-secondary-900">{reservation.email}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-primary/5 flex items-center justify-center">
+                  <Car className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Categoria</p>
+                  <p className="font-medium text-secondary-900">{reservation.carCategory}</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-secondary-900">{formattedDate}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-secondary-900">{reservation.pickupTime || 'Não agendado'}</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onToggle}
-            className="shrink-0"
-          >
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4 text-gray-500" />
-            ) : (
-              <ChevronDown className="h-4 w-4 text-gray-500" />
-            )}
-          </Button>
-        </div>
-
-        {!isExpanded && (
-          <div className="mt-4 flex items-center justify-between border-t pt-4">
-            <div className="flex items-baseline gap-1">
-              <span className="text-lg font-semibold text-primary">
-                R$ {reservation.weeklyFare.toFixed(2)}
-              </span>
-              <span className="text-sm text-gray-500">/semana</span>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleReject}
-                className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
-              >
-                Rejeitar
-              </Button>
-              <Button
-                size="sm"
-                onClick={handleApprove}
-                className="text-xs bg-primary hover:bg-primary/90 text-white"
-              >
-                Aprovar
-              </Button>
-            </div>
+          <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
+            <Button 
+              onClick={() => setShowRiskAnalysis(true)}
+              className="w-40 bg-amber-50 hover:bg-amber-100 text-amber-600 hover:text-amber-700 border-amber-200 hover:border-amber-300 transition-colors"
+            >
+              <ShieldAlert className="w-4 h-4 mr-2" />
+              Análise de Risco
+            </Button>
           </div>
-        )}
-      </CardContent>
-      {isExpanded && (
-        <ReservationExpandedContent 
-          reservation={reservation} 
-          onApprove={handleApprove}
-          onReject={handleReject}
-        />
-      )}
-    </Card>
-  )
-}
+        </CardContent>
+      </Card>
 
-export const ReservationCard = memo(ReservationCardComponent)
+      <RiskAnalysisDialog
+        open={showRiskAnalysis}
+        onOpenChange={setShowRiskAnalysis}
+        reservation={reservation}
+        onApprove={handleApprove}
+        onReject={handleReject}
+      />
+    </>
+  );
+};
+
+export default ReservationCard;

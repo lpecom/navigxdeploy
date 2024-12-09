@@ -31,6 +31,7 @@ export const useCheckoutState = () => {
 
         if (driverDetails) {
           setCustomerId(driverDetails.id)
+          // Only create checkout session if we have items and no existing session
           if (cartState.items.length > 0 && !cartState.checkoutSessionId) {
             try {
               await createCheckoutSession({
@@ -45,7 +46,6 @@ export const useCheckoutState = () => {
               console.error('Error creating checkout session:', error)
             }
           }
-          setStep(2)
         }
       }
     }
@@ -53,15 +53,27 @@ export const useCheckoutState = () => {
     checkSession()
   }, [session, cartState.items, cartState.total, cartState.checkoutSessionId, dispatch])
 
-  // Prevent empty cart access
+  // Prevent empty cart access and handle category validation
   useEffect(() => {
+    const categoryData = sessionStorage.getItem('selectedCategory')
+    
+    if (!categoryData) {
+      toast({
+        title: "Categoria não selecionada",
+        description: "Por favor, selecione uma categoria primeiro.",
+        variant: "destructive",
+      })
+      navigate('/')
+      return
+    }
+
     if (cartState.items.length === 0 && !cartState.checkoutSessionId) {
       toast({
         title: "Carrinho vazio",
         description: "Adicione itens ao carrinho antes de prosseguir.",
         variant: "destructive",
       })
-      navigate('/plans')
+      navigate('/')
     }
   }, [cartState.items.length, cartState.checkoutSessionId, toast, navigate])
 

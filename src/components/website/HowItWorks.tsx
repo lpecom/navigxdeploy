@@ -4,18 +4,18 @@ import { MapPin, Calendar, Car } from "lucide-react";
 const steps = [
   {
     icon: MapPin,
-    title: "Choose location",
-    description: "Choose your location and find your best car."
+    title: "Escolha sua região",
+    description: "Selecione a região onde você atua para encontrar o melhor carro."
   },
   {
     icon: Calendar,
-    title: "Pick-up date",
-    description: "Select your pick up date and time to book your car."
+    title: "Defina seu plano",
+    description: "Escolha o plano que melhor se adapta à sua rotina de trabalho."
   },
   {
     icon: Car,
-    title: "Book your car",
-    description: "Book your car and we will deliver it directly to you."
+    title: "Comece a lucrar",
+    description: "Receba seu carro e comece a maximizar seus ganhos imediatamente."
   }
 ];
 
@@ -31,10 +31,10 @@ export const HowItWorks = () => {
           className="text-center mb-16"
         >
           <h2 className="text-sm font-medium text-primary-600 mb-3 uppercase tracking-wider">
-            HOW IT WORKS
+            COMO FUNCIONA
           </h2>
           <h3 className="text-4xl font-display font-semibold text-gray-900">
-            Rent with following 3 working steps
+            Comece a lucrar em 3 passos simples
           </h3>
         </motion.div>
 

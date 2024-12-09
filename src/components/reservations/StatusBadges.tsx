@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { ThermometerSnowflake, ThermometerSun, CreditCard, Flag } from "lucide-react";
+import { ThermometerSnowflake, ThermometerSun, CreditCard, Flag, Clock, CheckCircle2, AlertTriangle } from "lucide-react";
 import { type Reservation } from "@/types/reservation";
 import { differenceInDays } from "date-fns";
 
@@ -34,21 +34,38 @@ export const StatusBadges = ({ reservation }: StatusBadgesProps) => {
     );
   };
 
-  const getPriorityBadge = (pickupDate: string) => {
-    const days = differenceInDays(new Date(pickupDate), new Date());
-    if (days === 1) {
+  const getDocumentsBadge = (submitted: boolean) => {
+    if (submitted) {
       return (
-        <Badge className="bg-red-600 text-white flex gap-1 items-center font-bold">
-          <Flag className="w-4 h-4" />
-          PRIORIDADE: PRÓXIMO DIA
+        <Badge className="bg-emerald-100 text-emerald-800 flex gap-1 items-center">
+          <CheckCircle2 className="w-4 h-4" />
+          Documentos OK
         </Badge>
       );
     }
-    if (days <= 2 && days >= 0) {
+    return (
+      <Badge className="bg-amber-100 text-amber-800 flex gap-1 items-center">
+        <AlertTriangle className="w-4 h-4" />
+        Documentos Pendentes
+      </Badge>
+    );
+  };
+
+  const getPriorityBadge = (pickupDate: string) => {
+    const days = differenceInDays(new Date(pickupDate), new Date());
+    if (days <= 1) {
       return (
         <Badge className="bg-red-600 text-white flex gap-1 items-center">
           <Flag className="w-4 h-4" />
-          Alta Prioridade
+          URGENTE: Retirada em {days === 0 ? 'Hoje' : 'Amanhã'}
+        </Badge>
+      );
+    }
+    if (days <= 3) {
+      return (
+        <Badge className="bg-amber-500 text-white flex gap-1 items-center">
+          <Clock className="w-4 h-4" />
+          Retirada em {days} dias
         </Badge>
       );
     }
@@ -57,9 +74,10 @@ export const StatusBadges = ({ reservation }: StatusBadgesProps) => {
 
   return (
     <div className="flex flex-wrap gap-2">
+      {getPriorityBadge(reservation.pickupDate)}
       {getRiskBadge(reservation.riskScore)}
       {getPaymentStatusBadge(reservation.paymentStatus)}
-      {getPriorityBadge(reservation.pickupDate)}
+      {getDocumentsBadge(reservation.documentsSubmitted)}
     </div>
   );
 };

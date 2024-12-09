@@ -31,7 +31,7 @@ const colors = {
   }
 };
 
-export default {
+const config = {
   darkMode: ["class"],
   content: ["./src/**/*.{ts,tsx}"],
   prefix: "",
@@ -46,18 +46,29 @@ export default {
     extend: {
       colors: {
         ...colors,
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        border: {
+          DEFAULT: "rgb(226, 232, 240)",
+          dark: "#1E293B",
+        },
+        background: {
+          DEFAULT: "#FFFFFF",
+          dark: "#0F172A",
+        },
+        foreground: {
+          DEFAULT: "#0F172A",
+          dark: "#FFFFFF",
+        },
         muted: {
           DEFAULT: "#F8FAFC",
           foreground: "#475569",
+          dark: "#1E293B",
+          "dark-foreground": "#94A3B8",
         },
         accent: {
           DEFAULT: "#F0F9FF",
           foreground: "#0369A1",
+          dark: "#0C4A6E",
+          "dark-foreground": "#38BDF8",
         },
         success: {
           DEFAULT: "#10B981",
@@ -69,39 +80,9 @@ export default {
         sans: ['Inter var', 'sans-serif'],
         display: ['Plus Jakarta Sans', 'sans-serif'],
       },
-      fontSize: {
-        'display-2xl': ['4.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '600' }],
-        'display-xl': ['3.75rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '600' }],
-        'display-lg': ['3rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '600' }],
-        'display-md': ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '600' }],
-        'display-sm': ['1.875rem', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '600' }],
-        'display-xs': ['1.5rem', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '600' }],
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
-      keyframes: {
-        "fade-up": {
-          "0%": { opacity: "0", transform: "translateY(20px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        "fade-down": {
-          "0%": { opacity: "0", transform: "translateY(-20px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        "scale-up": {
-          "0%": { opacity: "0", transform: "scale(0.95)" },
-          "100%": { opacity: "1", transform: "scale(1)" },
-        },
-      },
-      animation: {
-        "fade-up": "fade-up 0.5s ease-out",
-        "fade-down": "fade-down 0.5s ease-out",
-        "scale-up": "scale-up 0.5s ease-out",
-      },
     },
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+
+export default config;

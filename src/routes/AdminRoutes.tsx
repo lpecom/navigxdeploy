@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "@/pages/Dashboard";
 import Vehicles from "@/pages/Vehicles";
 import VehicleDetails from "@/pages/VehicleDetails";
+import VehicleProfitability from "@/pages/VehicleProfitability";
 import Customers from "@/pages/Customers";
 import CustomerDetails from "@/pages/CustomerDetails";
 import Reservations from "@/pages/Reservations";
@@ -12,6 +13,7 @@ import Analytics from "@/pages/Analytics";
 import Performance from "@/pages/Performance";
 import Reports from "@/pages/Reports";
 import Automations from "@/pages/Automations";
+import PlanManagement from "@/pages/PlanManagement";
 import Header from "@/components/dashboard/Header";
 import Sidebar from "@/components/dashboard/Sidebar";
 import CheckInList from "@/components/check-in/CheckInList";
@@ -26,7 +28,8 @@ const AdminRoutes = () => {
         <main className="py-6 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <Routes>
-              <Route index element={<Dashboard />} />
+              {/* Root admin route redirects to dashboard */}
+              <Route path="/" element={<Dashboard />} />
               
               {/* Vehicle Routes */}
               <Route path="vehicles">
@@ -36,6 +39,7 @@ const AdminRoutes = () => {
                 <Route path="models" element={<Vehicles view="models" />} />
                 <Route path="fleet" element={<Vehicles view="fleet" />} />
                 <Route path="maintenance" element={<Vehicles view="maintenance" />} />
+                <Route path="profitability" element={<VehicleProfitability />} />
                 <Route path=":id" element={<VehicleDetails />} />
               </Route>
               
@@ -60,7 +64,7 @@ const AdminRoutes = () => {
               
               {/* Tariff Routes */}
               <Route path="accessories" element={<Accessories />} />
-              <Route path="plans" element={<Optionals />} />
+              <Route path="plans" element={<PlanManagement />} />
               <Route path="fares" element={<Optionals />} />
               
               {/* Analytics Routes */}

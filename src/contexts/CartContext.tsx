@@ -6,7 +6,8 @@ type CartAction =
   | { type: 'REMOVE_ITEM'; payload: string }
   | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
   | { type: 'SET_CHECKOUT_SESSION'; payload: string }
-  | { type: 'CLEAR_CART' };
+  | { type: 'CLEAR_CART' }
+  | { type: 'UPDATE_CAR_GROUP'; payload: CartItem };
 
 const CartContext = createContext<{
   state: CartState;
@@ -16,6 +17,17 @@ const CartContext = createContext<{
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case 'ADD_ITEM': {
+      // If it's a car_group item, replace any existing car_group
+      if (action.payload.type === 'car_group') {
+        const nonCarItems = state.items.filter(item => item.type !== 'car_group');
+        return {
+          ...state,
+          items: [...nonCarItems, action.payload],
+          total: nonCarItems.reduce((sum, item) => sum + item.totalPrice, 0) + action.payload.totalPrice
+        };
+      }
+
+      // For optionals, update quantity if exists
       const existingItem = state.items.find(item => item.id === action.payload.id);
       if (existingItem) {
         const updatedItems = state.items.map(item =>
@@ -33,6 +45,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
           total: updatedItems.reduce((sum, item) => sum + item.totalPrice, 0)
         };
       }
+
       return {
         ...state,
         items: [...state.items, action.payload],
@@ -63,6 +76,15 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         ...state,
         items: updatedItems,
         total: updatedItems.reduce((sum, item) => sum + item.totalPrice, 0)
+      };
+    }
+
+    case 'UPDATE_CAR_GROUP': {
+      const nonCarItems = state.items.filter(item => item.type !== 'car_group');
+      return {
+        ...state,
+        items: [...nonCarItems, action.payload],
+        total: nonCarItems.reduce((sum, item) => sum + item.totalPrice, 0) + action.payload.totalPrice
       };
     }
 

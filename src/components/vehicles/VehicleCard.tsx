@@ -1,153 +1,81 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Edit2, Users, Briefcase, GaugeCircle } from "lucide-react";
+import { VehicleImage } from "./card/VehicleImage";
 import { Badge } from "@/components/ui/badge";
-import { Car } from "lucide-react";
-import { getBrandLogo, getBrandFromModel } from "@/utils/brandLogos";
 import type { CarModel } from "@/types/vehicles";
 
-import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-
 interface VehicleCardProps {
-  car: CarModel;
-  onEdit: (car: CarModel) => void;
+  vehicle: CarModel;
+  onEdit?: (vehicle: CarModel) => void;
 }
 
-export const VehicleCard = ({ car, onEdit }: VehicleCardProps) => {
-  const brandLogoUrl = getBrandLogo(car.name);
-  const brandName = getBrandFromModel(car.name);
-
-  const { data: fleetStats } = useQuery({
-    queryKey: ['fleet-stats', car.id],
-    queryFn: async () => {
-      const { data: vehicles, error } = await supabase
-        .from('fleet_vehicles')
-        .select('status')
-        .eq('car_model_id', car.id);
-
-      if (error) {
-        console.error('Error fetching fleet stats:', error);
-        return null;
-      }
-
-      const statuses = vehicles?.map(v => v.status) || [];
-      
-      return {
-        rented: statuses.filter(s => s === 'rented').length,
-        available: statuses.filter(s => s === 'available').length,
-        forSale: statuses.filter(s => s === 'for_sale').length,
-        maintenance: statuses.filter(s => s === 'maintenance').length,
-        bodyShop: statuses.filter(s => s === 'body_shop').length,
-        deactivated: statuses.filter(s => s === 'deactivated').length,
-        management: statuses.filter(s => s === 'management').length,
-        accident: statuses.filter(s => s === 'accident').length,
-        total: statuses.length
-      };
-    }
-  });
-
+export const VehicleCard = ({ vehicle, onEdit }: VehicleCardProps) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <Card className="group overflow-hidden hover:shadow-lg transition-shadow duration-300">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex items-center gap-3">
-            {brandLogoUrl ? (
-              <img 
-                src={brandLogoUrl} 
-                alt={`${brandName} brand`}
-                className="w-8 h-8 object-contain"
-              />
-            ) : (
-              <Car className="w-8 h-8 text-muted-foreground" />
-            )}
-            <div>
-              <p className="text-sm text-muted-foreground font-medium">{brandName}</p>
-              <h3 className="font-semibold text-lg">{car.name}</h3>
-            </div>
+    <Card className="overflow-hidden group">
+      <div className="relative aspect-[16/9] overflow-hidden">
+        {vehicle.image_url ? (
+          <img
+            src={vehicle.image_url}
+            alt={vehicle.name}
+            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+            <span className="text-gray-400">Sem imagem disponível</span>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {car.image_url && (
-            <div className="relative aspect-video w-full overflow-hidden rounded-md">
-              <img
-                src={car.image_url}
-                alt={car.name}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-            </div>
+        )}
+        {vehicle.category?.name && (
+          <Badge 
+            variant="secondary" 
+            className="absolute top-4 right-4 bg-white/90"
+          >
+            {vehicle.category.name}
+          </Badge>
+        )}
+      </div>
+
+      <div className="p-6 space-y-4">
+        <div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            {vehicle.name} {vehicle.year}
+          </h3>
+          <p className="text-sm text-gray-600 line-clamp-2">
+            {vehicle.description || "Experimente luxo e conforto com nosso veículo premium."}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4 py-4 border-y">
+          <div className="flex flex-col items-center text-center">
+            <Users className="h-5 w-5 text-gray-400 mb-1" />
+            <span className="text-sm text-gray-600">{vehicle.passengers || 5} Lugares</span>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <Briefcase className="h-5 w-5 text-gray-400 mb-1" />
+            <span className="text-sm text-gray-600">{vehicle.luggage || 4} Malas</span>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <GaugeCircle className="h-5 w-5 text-gray-400 mb-1" />
+            <span className="text-sm text-gray-600">{vehicle.transmission || "Auto"}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-gray-500">A partir de</p>
+            <p className="text-2xl font-bold text-primary">
+              R$ {vehicle.daily_price?.toFixed(2)}
+              <span className="text-sm font-normal text-gray-500">/dia</span>
+            </p>
+          </div>
+          {onEdit && (
+            <Button variant="outline" onClick={() => onEdit(vehicle)}>
+              <Edit2 className="w-4 h-4 mr-2" />
+              Editar
+            </Button>
           )}
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Categoria</span>
-              <span className="font-medium">{car.category?.name || 'Sem Categoria'}</span>
-            </div>
-
-            {fleetStats && fleetStats.total > 0 && (
-              <div className="space-y-2 pt-2 border-t text-sm">
-                {fleetStats.available > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Disponíveis</span>
-                    <span className="font-medium text-green-600">{fleetStats.available}</span>
-                  </div>
-                )}
-                {fleetStats.rented > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Alugados</span>
-                    <span className="font-medium text-orange-600">{fleetStats.rented}</span>
-                  </div>
-                )}
-                {fleetStats.maintenance > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Em Manutenção</span>
-                    <span className="font-medium text-yellow-600">{fleetStats.maintenance}</span>
-                  </div>
-                )}
-                {fleetStats.bodyShop > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Funilaria</span>
-                    <span className="font-medium text-purple-600">{fleetStats.bodyShop}</span>
-                  </div>
-                )}
-                {fleetStats.accident > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Acidente</span>
-                    <span className="font-medium text-red-600">{fleetStats.accident}</span>
-                  </div>
-                )}
-                {fleetStats.deactivated > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Desativados</span>
-                    <span className="font-medium text-gray-600">{fleetStats.deactivated}</span>
-                  </div>
-                )}
-                {fleetStats.management > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Diretoria</span>
-                    <span className="font-medium text-blue-600">{fleetStats.management}</span>
-                  </div>
-                )}
-                {fleetStats.forSale > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">À Venda</span>
-                    <span className="font-medium text-blue-600">{fleetStats.forSale}</span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {car.category?.name && (
-              <Badge variant="secondary" className="w-fit">
-                {car.category.name}
-              </Badge>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+        </div>
+      </div>
+    </Card>
   );
 };

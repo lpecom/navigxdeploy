@@ -57,7 +57,7 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
         .from('fleet_vehicles')
         .select(`
           *,
-          car_model:car_models(
+          car_models(
             id,
             name,
             image_url,
@@ -73,7 +73,7 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
           )
         `)
         .eq('status', 'available')
-        .eq('car_model.car_group.id', session?.selected_car?.group_id)
+        .eq('car_models.car_group.id', session?.selected_car?.group_id)
         .returns<FleetVehicleWithRelations[]>();
       
       if (error) throw error;
@@ -191,10 +191,10 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
             >
               <CardContent className="p-6">
                 <div className="space-y-4">
-                  {vehicle.car_model?.image_url ? (
+                  {vehicle.car_models?.image_url ? (
                     <img
-                      src={vehicle.car_model.image_url}
-                      alt={vehicle.car_model.name}
+                      src={vehicle.car_models.image_url}
+                      alt={vehicle.car_models.name}
                       className="w-full h-32 object-cover rounded-lg"
                     />
                   ) : (
@@ -205,13 +205,13 @@ export const VehicleAssignment = ({ sessionId, onComplete }: VehicleAssignmentPr
 
                   <div>
                     <h3 className="font-semibold">
-                      {vehicle.car_model?.name}
+                      {vehicle.car_models?.name}
                     </h3>
                     <p className="text-sm text-muted-foreground">
                       Placa: {vehicle.plate}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Grupo: {vehicle.car_model?.car_group?.name}
+                      Grupo: {vehicle.car_models?.car_group?.name}
                     </p>
                   </div>
 

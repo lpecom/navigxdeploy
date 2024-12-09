@@ -21,6 +21,7 @@ import {
   Megaphone,
   Settings,
   DollarSign,
+  ChartBar,
 } from "lucide-react";
 
 export type MenuItem = {
@@ -51,6 +52,7 @@ export const adminMenuItems: MenuItem[] = [
       { title: "Modelos", href: "/admin/vehicles/models", icon: CarFront },
       { title: "Veículos", href: "/admin/vehicles/fleet", icon: Car },
       { title: "Manutenção", href: "/admin/vehicles/maintenance", icon: Wrench },
+      { title: "Lucratividade", href: "/admin/vehicles/profitability", icon: ChartBar },
     ]
   },
   {

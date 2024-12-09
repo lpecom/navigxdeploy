@@ -1,9 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Wallet } from "lucide-react"
-import { useQuery } from "@tanstack/react-query"
-import { supabase } from "@/integrations/supabase/client"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Wallet as WalletType } from "@/types/payment"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Wallet } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { Wallet as WalletType } from "@/types/database";
 
 interface WalletCardProps {
   driverId: string;
@@ -17,25 +17,29 @@ export const WalletCard = ({ driverId }: WalletCardProps) => {
         .from('wallet')
         .select('*')
         .eq('driver_id', driverId)
-        .maybeSingle()
+        .maybeSingle();
 
-      if (error) throw error
+      if (error) throw error;
 
       // If no wallet exists, create one
       if (!data) {
         const { data: newWallet, error: createError } = await supabase
           .from('wallet')
-          .insert([{ driver_id: driverId, balance: 0 }])
+          .insert({
+            driver_id: driverId,
+            balance: 0,
+            updated_at: new Date().toISOString()
+          })
           .select()
-          .single()
+          .single();
 
-        if (createError) throw createError
-        return newWallet as WalletType
+        if (createError) throw createError;
+        return newWallet as WalletType;
       }
 
-      return data as WalletType
+      return data as WalletType;
     }
-  })
+  });
 
   if (isLoading) {
     return (
@@ -48,7 +52,7 @@ export const WalletCard = ({ driverId }: WalletCardProps) => {
           <Skeleton className="h-7 w-24" />
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -63,5 +67,5 @@ export const WalletCard = ({ driverId }: WalletCardProps) => {
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};

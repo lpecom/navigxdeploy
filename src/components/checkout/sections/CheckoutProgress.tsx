@@ -1,13 +1,5 @@
 import { motion } from "framer-motion";
-import { Steps } from "../Steps";
-import { User, Calendar, CreditCard, ShoppingCart } from "lucide-react";
-
-const steps = [
-  { number: 1, title: "Seus Dados", icon: User },
-  { number: 2, title: "Agendamento", icon: Calendar },
-  { number: 3, title: "Pagamento", icon: CreditCard },
-  { number: 4, title: "Confirmação", icon: ShoppingCart }
-];
+import { Steps, checkoutSteps } from "../Steps";
 
 export const CheckoutProgress = ({ currentStep }: { currentStep: number }) => {
   return (
@@ -17,7 +9,7 @@ export const CheckoutProgress = ({ currentStep }: { currentStep: number }) => {
       transition={{ duration: 0.5, delay: 0.2 }}
       className="mb-8"
     >
-      <Steps currentStep={currentStep} steps={steps} />
+      <Steps currentStep={currentStep} steps={checkoutSteps} />
     </motion.div>
   );
 };

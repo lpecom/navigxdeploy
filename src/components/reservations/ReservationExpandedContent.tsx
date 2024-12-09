@@ -7,9 +7,9 @@ import type { Reservation } from "@/types/reservation"
 import { motion } from "framer-motion"
 
 interface ReservationExpandedContentProps {
-  reservation: Reservation
-  onApprove: () => void
-  onReject: () => void
+  reservation: Reservation;
+  onApprove: () => void;
+  onReject: () => void;
 }
 
 export const ReservationExpandedContent = ({
@@ -50,7 +50,7 @@ export const ReservationExpandedContent = ({
       animate={{ opacity: 1, height: "auto" }}
       exit={{ opacity: 0, height: 0 }}
       transition={{ duration: 0.2 }}
-      className="border-t"
+      className="border-t mt-6"
     >
       <div className="p-6 space-y-6">
         <div className="grid gap-6">
@@ -60,23 +60,25 @@ export const ReservationExpandedContent = ({
 
         <Separator />
 
-        <div className="flex items-center justify-end gap-3">
-          <Button
-            variant="outline"
-            onClick={handleReject}
-            className="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300 transition-colors"
-          >
-            <X className="w-4 h-4 mr-2" />
-            Rejeitar
-          </Button>
-          <Button 
-            onClick={handleApprove} 
-            className="bg-primary hover:bg-primary/90 text-white transition-colors"
-          >
-            <Check className="w-4 h-4 mr-2" />
-            Aprovar
-          </Button>
-        </div>
+        {reservation.status === 'pending_approval' && (
+          <div className="flex items-center justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={handleReject}
+              className="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300 transition-colors"
+            >
+              <X className="w-4 h-4 mr-2" />
+              Rejeitar
+            </Button>
+            <Button 
+              onClick={handleApprove} 
+              className="bg-primary hover:bg-primary/90 text-white transition-colors"
+            >
+              <Check className="w-4 h-4 mr-2" />
+              Aprovar
+            </Button>
+          </div>
+        )}
       </div>
     </motion.div>
   )
