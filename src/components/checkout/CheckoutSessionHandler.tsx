@@ -9,7 +9,9 @@ interface CheckoutSessionHandlerProps {
   onSuccess: (sessionId: string) => void;
 }
 
+// Helper function to ensure valid UUID format
 const getValidUUID = (id: string) => {
+  // UUID format: 8-4-4-4-12 characters
   const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
   const match = id.match(uuidPattern);
   return match ? match[0] : id;
@@ -39,9 +41,7 @@ export const createCheckoutSession = async ({
         id: getValidUUID(opt.id)
       })) as unknown as Json,
       total_amount: totalAmount,
-      status: 'pending',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      status: 'pending'
     };
 
     const { data: session, error: sessionError } = await supabase
@@ -52,9 +52,11 @@ export const createCheckoutSession = async ({
 
     if (sessionError) throw sessionError;
 
+    // IMPORTANT: The cart_items table expects 'car' instead of 'car_group'
+    // This conversion is necessary to match the database constraints
     const cartItemsData = cartItems.map(item => ({
       checkout_session_id: session.id,
-      item_type: item.type === 'car_group' ? 'car' : item.type,
+      item_type: item.type === 'car_group' ? 'car' : item.type,  // Required: Convert 'car_group' to 'car' for database compatibility
       item_id: getValidUUID(item.id),
       quantity: item.quantity,
       unit_price: item.unitPrice,

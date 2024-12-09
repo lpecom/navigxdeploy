@@ -2,12 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Car, Calendar, Wrench, AlertTriangle, FileText } from "lucide-react";
+import { Car, Calendar, Wrench, AlertTriangle } from "lucide-react";
 import { VehicleInfoTab } from "./profile/VehicleInfoTab";
 import { MaintenanceTab } from "./profile/MaintenanceTab";
 import { HistoryTab } from "./profile/HistoryTab";
 import { IncidentsTab } from "./profile/IncidentsTab";
-import { FinesTab } from "./profile/FinesTab";
 import { StatusLabel } from "./status/StatusLabel";
 import type { MaintenanceRecord, FleetVehicle, CarModel } from "@/types/vehicles";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -152,10 +151,6 @@ export const FleetVehicleProfile = ({ vehicleId }: FleetVehicleProfileProps) => 
             <AlertTriangle className="w-4 h-4 mr-2" />
             Ocorrências
           </TabsTrigger>
-          <TabsTrigger value="fines">
-            <FileText className="w-4 h-4 mr-2" />
-            Multas
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="info">
@@ -172,13 +167,6 @@ export const FleetVehicleProfile = ({ vehicleId }: FleetVehicleProfileProps) => 
 
         <TabsContent value="incidents">
           <IncidentsTab />
-        </TabsContent>
-
-        <TabsContent value="fines">
-          <FinesTab 
-            vehicleId={vehicleId} 
-            plate={vehicleDetails.plate} 
-          />
         </TabsContent>
       </Tabs>
     </div>

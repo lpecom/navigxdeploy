@@ -8,7 +8,7 @@ export interface DashboardCheckoutSession {
   driver: {
     full_name: string;
     phone?: string;
-  } | null;
+  };
   created_at: string;
   status: string;
   selected_car: Json;

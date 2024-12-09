@@ -27,15 +27,15 @@ export const CarModelCard = ({ model, index }: CarModelCardProps) => {
             />
           ) : (
             <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-              <span className="text-gray-400">Sem imagem disponível</span>
+              <span className="text-gray-400">No image available</span>
             </div>
           )}
-          {model.category?.name && (
+          {model.vehicle_type && (
             <Badge 
               variant="secondary" 
               className="absolute top-4 right-4 bg-white/90"
             >
-              {model.category.name}
+              {model.vehicle_type}
             </Badge>
           )}
         </div>
@@ -46,18 +46,18 @@ export const CarModelCard = ({ model, index }: CarModelCardProps) => {
               {model.name} {model.year}
             </h3>
             <p className="text-sm text-gray-600 line-clamp-2">
-              {model.description || "Experimente luxo e conforto com nosso veículo premium."}
+              {model.description || "Experience luxury and comfort with our premium vehicle."}
             </p>
           </div>
 
           <div className="grid grid-cols-3 gap-4 py-4 border-y">
             <div className="flex flex-col items-center text-center">
               <Users className="h-5 w-5 text-gray-400 mb-1" />
-              <span className="text-sm text-gray-600">{model.passengers || 5} Lugares</span>
+              <span className="text-sm text-gray-600">{model.passengers || 5} Seats</span>
             </div>
             <div className="flex flex-col items-center text-center">
               <Briefcase className="h-5 w-5 text-gray-400 mb-1" />
-              <span className="text-sm text-gray-600">{model.luggage || 4} Malas</span>
+              <span className="text-sm text-gray-600">{model.luggage || 4} Bags</span>
             </div>
             <div className="flex flex-col items-center text-center">
               <GaugeCircle className="h-5 w-5 text-gray-400 mb-1" />
@@ -67,13 +67,13 @@ export const CarModelCard = ({ model, index }: CarModelCardProps) => {
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">A partir de</p>
+              <p className="text-sm text-gray-500">Starting from</p>
               <p className="text-2xl font-bold text-primary">
-                R$ {model.daily_price?.toFixed(2)}
-                <span className="text-sm font-normal text-gray-500">/dia</span>
+                ${model.daily_price?.toFixed(2)}
+                <span className="text-sm font-normal text-gray-500">/day</span>
               </p>
             </div>
-            <Button>Ver Detalhes</Button>
+            <Button>View Details</Button>
           </div>
         </div>
       </Card>

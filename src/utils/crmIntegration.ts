@@ -2,15 +2,11 @@ import { DriverFormValues } from "@/pages/DriverDetails";
 import { supabase } from "@/integrations/supabase/client";
 
 export const sendToCRM = async (data: DriverFormValues) => {
+  // In a real implementation, this would make an API call to your CRM system
+  // For now, we'll just update the driver_details table with the CRM status
   const { error } = await supabase
     .from('driver_details')
-    .update({
-      crm_status: 'pending_payment',
-      birth_date: new Date().toISOString(),
-      license_number: 'PENDING',
-      license_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
-      phone: 'PENDING'
-    })
+    .update({ crm_status: 'pending_payment' })
     .eq('email', data.email);
 
   if (error) throw error;

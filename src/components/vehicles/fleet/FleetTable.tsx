@@ -1,7 +1,6 @@
 import { Table, TableHeader, TableRow, TableHead, TableBody } from "@/components/ui/table";
 import { FleetTableRow } from "./FleetTableRow";
 import { Card } from "@/components/ui/card";
-import { motion } from "framer-motion";
 import type { FleetVehicle } from "@/types/vehicles";
 
 interface FleetTableProps {
@@ -26,48 +25,32 @@ export const FleetTable = ({
   onViewDocs 
 }: FleetTableProps) => {
   return (
-    <Card className="border-none shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
+    <Card className="border rounded-lg overflow-hidden">
       <div className="rounded-md">
         <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent border-0">
-              <TableHead className="w-[300px] font-medium text-sm text-muted-foreground">
-                Veículo
-              </TableHead>
-              <TableHead className="w-[120px] font-medium text-sm text-muted-foreground">
-                Status
-              </TableHead>
-              <TableHead className="font-medium text-sm text-muted-foreground">
-                Placa / Ano
-              </TableHead>
-              <TableHead className="w-[200px] font-medium text-sm text-muted-foreground">
-                Motorista
-              </TableHead>
-              <TableHead className="w-[150px] font-medium text-sm text-muted-foreground">
-                Lucro Atual
-              </TableHead>
+          <TableHeader className="bg-gray-50/50">
+            <TableRow className="hover:bg-gray-50/50 border-0">
+              <TableHead className="w-[300px] font-medium">Vehicle / ID</TableHead>
+              <TableHead className="w-[120px] font-medium">Status</TableHead>
+              <TableHead className="font-medium">VIN & License plate</TableHead>
+              <TableHead className="w-[150px] font-medium">Driver</TableHead>
+              <TableHead className="w-[120px] font-medium">Vehicle docs</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vehicles.map((vehicle, index) => (
-              <motion.tr
+            {vehicles.map((vehicle) => (
+              <FleetTableRow
                 key={vehicle.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-              >
-                <FleetTableRow
-                  vehicle={vehicle}
-                  isEditing={editingId === vehicle.id}
-                  editForm={editForm}
-                  onEdit={onEdit}
-                  onSave={onSave}
-                  onEditFormChange={onEditFormChange}
-                  onRentOut={onRentOut}
-                  onViewDocs={onViewDocs}
-                />
-              </motion.tr>
+                vehicle={vehicle}
+                isEditing={editingId === vehicle.id}
+                editForm={editForm}
+                onEdit={onEdit}
+                onSave={onSave}
+                onEditFormChange={onEditFormChange}
+                onRentOut={onRentOut}
+                onViewDocs={onViewDocs}
+              />
             ))}
           </TableBody>
         </Table>

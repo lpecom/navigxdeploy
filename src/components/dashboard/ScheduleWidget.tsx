@@ -17,24 +17,17 @@ const ScheduleWidget = () => {
         .from('checkout_sessions')
         .select(`
           id,
-          reservation_number,
           pickup_date,
           pickup_time,
           driver:driver_details(full_name),
-          selected_car,
-          created_at,
-          status
+          selected_car
         `)
         .gte('pickup_date', new Date().toISOString())
         .order('pickup_date', { ascending: true })
         .limit(10);
 
       if (error) throw error;
-      
-      return (data || []).map(item => ({
-        ...item,
-        driver: item.driver?.[0] || null // Convert array to single object
-      })) as DashboardCheckoutSession[];
+      return data as DashboardCheckoutSession[];
     },
   });
 

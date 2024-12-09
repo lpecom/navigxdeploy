@@ -41,8 +41,7 @@ const RentalsList = () => {
       
       return (data || []).map(item => ({
         ...item,
-        selected_car: item.selected_car as unknown as SelectedCar,
-        driver: item.driver?.[0] || null // Convert array to single object
+        selected_car: item.selected_car as unknown as SelectedCar
       })) as Rental[];
     },
   });

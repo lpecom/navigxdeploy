@@ -1,5 +1,9 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Card } from "@/components/ui/card"
+import { PaymentMethodSelector } from "../PaymentMethodSelector"
+import { CreditCardForm } from "../payment-methods/CreditCardForm"
+import { PixPayment } from "../payment-methods/PixPayment"
+import { BoletoPayment } from "../payment-methods/BoletoPayment"
 import { PaymentTypeSelector } from "../PaymentTypeSelector"
 import { motion } from "framer-motion"
 import { useCart } from "@/contexts/CartContext"
@@ -7,14 +11,6 @@ import { Separator } from "@/components/ui/separator"
 import { CheckCircle, Package } from "lucide-react"
 import { OptionalsList } from "@/components/optionals/OptionalsList"
 import { OrderSummary } from "@/components/optionals/OrderSummary"
-import { Elements } from "@stripe/react-stripe-js"
-import { loadStripe } from "@stripe/stripe-js"
-import { StripePaymentForm } from "../payment-methods/StripePaymentForm"
-import { supabase } from "@/integrations/supabase/client"
-import { useToast } from "@/components/ui/use-toast"
-
-// Initialize Stripe with the publishable key
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
 interface PaymentSectionProps {
   onPaymentSuccess: (id: string) => void
@@ -27,44 +23,16 @@ export const PaymentSection = ({
   amount,
   driverId,
 }: PaymentSectionProps) => {
+  const [selectedMethod, setSelectedMethod] = useState("")
   const [paymentType, setPaymentType] = useState<'online' | 'store' | null>(null)
   const [finalAmount, setFinalAmount] = useState(amount)
-  const [clientSecret, setClientSecret] = useState("")
   const { state: cartState } = useCart()
-  const { toast } = useToast()
   
   const optionalItems = cartState.items.filter(item => item.type === 'optional')
 
-  const handlePaymentTypeSelect = async (type: 'online' | 'store', amount: number) => {
+  const handlePaymentTypeSelect = (type: 'online' | 'store', amount: number) => {
     setPaymentType(type)
     setFinalAmount(amount)
-
-    if (type === 'online') {
-      try {
-        const { data, error } = await supabase.functions.invoke('stripe-payment', {
-          body: JSON.stringify({
-            action: 'create_payment_intent',
-            payload: {
-              amount,
-              driver_id: driverId,
-              metadata: {
-                checkout_session_id: cartState.checkoutSessionId
-              }
-            }
-          })
-        })
-
-        if (error) throw error
-        setClientSecret(data.clientSecret)
-      } catch (error) {
-        console.error('Error creating payment intent:', error)
-        toast({
-          title: "Erro ao iniciar pagamento",
-          description: "Não foi possível iniciar o pagamento. Por favor, tente novamente.",
-          variant: "destructive",
-        })
-      }
-    }
   }
 
   if (!paymentType) {
@@ -75,6 +43,30 @@ export const PaymentSection = ({
           onSelect={handlePaymentTypeSelect}
         />
       </Card>
+    )
+  }
+
+  // Show optionals selection before proceeding to payment
+  if (!selectedMethod && paymentType === 'online') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="space-y-6"
+      >
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-6">Adicione opcionais ao seu plano</h2>
+          <OptionalsList />
+        </Card>
+        <OrderSummary />
+        <Card className="p-6">
+          <PaymentMethodSelector
+            selectedMethod={selectedMethod}
+            onMethodChange={setSelectedMethod}
+          />
+        </Card>
+      </motion.div>
     )
   }
 
@@ -111,13 +103,6 @@ export const PaymentSection = ({
       transition={{ duration: 0.5 }}
       className="space-y-4 sm:space-y-6"
     >
-      <Card className="p-6">
-        <h2 className="text-xl font-semibold mb-6">Adicione opcionais ao seu plano</h2>
-        <OptionalsList />
-      </Card>
-
-      <OrderSummary />
-
       {optionalItems.length > 0 && (
         <Card className="p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
@@ -147,13 +132,29 @@ export const PaymentSection = ({
         </Card>
       )}
 
-      {clientSecret && (
-        <Card className="p-4 sm:p-6">
-          <Elements stripe={stripePromise} options={{ clientSecret }}>
-            <StripePaymentForm onSuccess={onPaymentSuccess} />
-          </Elements>
-        </Card>
-      )}
+      <Card className="p-4 sm:p-6">
+        {selectedMethod === "credit" && (
+          <CreditCardForm
+            amount={finalAmount}
+            driverId={driverId}
+            onSuccess={onPaymentSuccess}
+          />
+        )}
+        {selectedMethod === "pix" && (
+          <PixPayment
+            amount={finalAmount}
+            driverId={driverId}
+            onSuccess={onPaymentSuccess}
+          />
+        )}
+        {selectedMethod === "boleto" && (
+          <BoletoPayment
+            amount={finalAmount}
+            driverId={driverId}
+            onSuccess={onPaymentSuccess}
+          />
+        )}
+      </Card>
     </motion.div>
   )
 }

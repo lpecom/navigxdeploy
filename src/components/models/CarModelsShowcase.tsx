@@ -15,13 +15,8 @@ export const CarModelsShowcase = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("car_models")
-        .select(`
-          *,
-          category:categories(
-            name
-          )
-        `)
-        .order('name');
+        .select("*")
+        .order("name");
       
       if (error) throw error;
       return data as CarModel[];
@@ -30,8 +25,7 @@ export const CarModelsShowcase = () => {
 
   const filteredModels = carModels?.filter(model =>
     model.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    model.vehicle_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    model.category?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    model.vehicle_type?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -44,10 +38,10 @@ export const CarModelsShowcase = () => {
           className="text-center mb-12"
         >
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Nossa Frota Premium
+            Our Premium Fleet
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Descubra nossa seleção de veículos premium, de sedans luxuosos a SUVs espaçosos
+            Discover our selection of premium vehicles, from luxurious sedans to spacious SUVs
           </p>
         </motion.div>
 
@@ -55,7 +49,7 @@ export const CarModelsShowcase = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <Input
             type="text"
-            placeholder="Buscar por modelo, tipo ou categoria..."
+            placeholder="Search by model or type..."
             className="pl-10 py-6 text-lg"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -85,11 +79,6 @@ export const CarModelsShowcase = () => {
                 index={index}
               />
             ))}
-            {filteredModels?.length === 0 && (
-              <div className="col-span-3 text-center py-12">
-                <p className="text-gray-500">Nenhum modelo encontrado</p>
-              </div>
-            )}
           </motion.div>
         )}
       </div>

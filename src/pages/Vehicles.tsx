@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import VehicleList from "@/components/vehicles/VehicleList";
+import { FleetImport } from "@/components/vehicles/FleetImport";
 import { useState } from "react";
 import { EditVehicleDialog } from "@/components/vehicles/EditVehicleDialog";
 import { motion } from "framer-motion";
@@ -38,6 +39,8 @@ const Vehicles = ({ view }: VehiclesProps) => {
           </Button>
         )}
       </div>
+
+      {view === 'fleet' && <FleetImport />}
 
       <VehicleList view={view} />
 

@@ -8,7 +8,7 @@ export interface CarModel {
   description?: string | null;
   engine_size?: string | null;
   transmission?: string | null;
-  optionals?: Record<string, any>;
+  optionals?: Record<string, any> | null;
   created_at?: string | null;
   updated_at?: string | null;
   category?: {
@@ -19,7 +19,7 @@ export interface CarModel {
   luggage?: number | null;
   daily_price?: number | null;
   total_price?: number | null;
-  features?: Record<string, any>[];
+  features?: any[] | null;
 }
 
 export interface CarModelResponse extends CarModel {

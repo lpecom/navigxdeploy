@@ -20,19 +20,13 @@ const OrdersWidget = () => {
           driver:driver_details(full_name, phone),
           created_at,
           status,
-          selected_car,
-          pickup_date,
-          pickup_time
+          selected_car
         `)
         .order('created_at', { ascending: false })
         .limit(5);
 
       if (error) throw error;
-      
-      return (data || []).map(item => ({
-        ...item,
-        driver: item.driver?.[0] || null // Convert array to single object
-      })) as DashboardCheckoutSession[];
+      return data as DashboardCheckoutSession[];
     },
   });
 

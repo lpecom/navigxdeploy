@@ -9,10 +9,8 @@ import { CustomerReview } from "./steps/CustomerReview";
 import { OrderReview } from "./steps/OrderReview";
 import { VehicleAssignment } from "./steps/VehicleAssignment";
 import { LoadingState } from "./components/LoadingState";
-import { VehicleDetails } from "./components/VehicleDetails";
-import { CheckInProgress } from "./components/CheckInProgress";
+import { ReservationHeader } from "./components/ReservationHeader";
 import { CheckInTabs } from "./components/CheckInTabs";
-import { InspectionChecklist } from "./components/InspectionChecklist";
 import type { PhotoCategory, CheckInReservation, PhotosState } from "./types";
 
 const PHOTO_CATEGORIES: PhotoCategory[] = [
@@ -25,15 +23,12 @@ const PHOTO_CATEGORIES: PhotoCategory[] = [
   { id: 'damages', label: 'Danos (se houver)' },
 ];
 
-const TOTAL_STEPS = 4;
-
 const CheckInProcess = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [activeTab, setActiveTab] = useState('photos');
   const [photos, setPhotos] = useState<PhotosState>({});
-  const [checkedItems, setCheckedItems] = useState<string[]>([]);
   
   const { data: reservation, isLoading, error } = useQuery({
     queryKey: ['check-in-reservation', id],
@@ -51,23 +46,8 @@ const CheckInProcess = () => {
       
       if (error) throw error;
       if (!data) throw new Error('Reservation not found');
-
-      const selectedCar = data.selected_car as any;
-      return {
-        ...data,
-        selected_car: {
-          name: selectedCar.name || '',
-          category: selectedCar.category || '',
-          group_id: selectedCar.group_id,
-          price: selectedCar.price,
-          period: selectedCar.period
-        },
-        driver: {
-          id: data.driver?.id || '',
-          full_name: data.driver?.full_name || '',
-          ...data.driver
-        }
-      } as CheckInReservation;
+      
+      return data as CheckInReservation;
     },
   });
 
@@ -104,14 +84,6 @@ const CheckInProcess = () => {
       console.error('Error capturing photo:', error);
       toast.error('Erro ao capturar foto');
     }
-  };
-
-  const handleInspectionItemCheck = (itemId: string, checked: boolean) => {
-    setCheckedItems(prev => 
-      checked 
-        ? [...prev, itemId]
-        : prev.filter(id => id !== itemId)
-    );
   };
 
   if (isLoading) {
@@ -154,20 +126,14 @@ const CheckInProcess = () => {
         );
       case 4:
         return (
-          <>
-            <CheckInTabs
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              categories={PHOTO_CATEGORIES}
-              photos={photos}
-              onPhotoCapture={handlePhotoCapture}
-              supabaseStorageUrl={supabase.storage.from('check-in-photos').getPublicUrl('').data.publicUrl}
-            />
-            <InspectionChecklist
-              onItemCheck={handleInspectionItemCheck}
-              checkedItems={checkedItems}
-            />
-          </>
+          <CheckInTabs
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            categories={PHOTO_CATEGORIES}
+            photos={photos}
+            onPhotoCapture={handlePhotoCapture}
+            supabaseStorageUrl={supabase.storage.from('check-in-photos').getPublicUrl('').data.publicUrl}
+          />
         );
       default:
         return null;
@@ -183,8 +149,7 @@ const CheckInProcess = () => {
         </Button>
       </div>
 
-      <VehicleDetails reservation={reservation} />
-      <CheckInProgress currentStep={step} totalSteps={TOTAL_STEPS} />
+      <ReservationHeader reservation={reservation} />
 
       {renderStep()}
 

@@ -55,15 +55,13 @@ export const AuthSection = ({
   }
 
   return (
-    <Card className="bg-gray-900/50 border-gray-800/50 backdrop-blur-sm p-6 mb-6">
+    <Card className="p-6 mb-6">
       <div className="flex items-center gap-2 mb-4">
-        <Lock className="w-5 h-5 text-primary-400" />
-        <h3 className="text-lg font-semibold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-          Conta Navig
-        </h3>
+        <Lock className="w-5 h-5 text-primary" />
+        <h3 className="text-lg font-semibold">Conta Navig</h3>
       </div>
       
-      <p className="text-sm text-gray-400 mb-4">
+      <p className="text-sm text-gray-600 mb-4">
         {hasAccount 
           ? "Faça login na sua conta Navig para continuar" 
           : "Crie uma conta Navig para acessar o painel do motorista e gerenciar suas reservas"}
@@ -74,11 +72,11 @@ export const AuthSection = ({
           id="has_account"
           checked={hasAccount}
           onCheckedChange={(checked) => onHasAccountChange(checked as boolean)}
-          className="data-[state=checked]:bg-primary-500 border-gray-700"
+          className="data-[state=checked]:bg-primary"
         />
         <label
           htmlFor="has_account"
-          className="text-sm font-medium text-gray-300 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         >
           Já tenho uma conta Navig
         </label>
@@ -87,8 +85,8 @@ export const AuthSection = ({
       {hasAccount ? (
         <div className="space-y-4">
           <div>
-            <FormLabel className="flex items-center gap-2 text-gray-300">
-              <Mail className="w-4 h-4 text-primary-400" />
+            <FormLabel className="flex items-center gap-2">
+              <Mail className="w-4 h-4" />
               Email
             </FormLabel>
             <Input
@@ -96,14 +94,13 @@ export const AuthSection = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
-              className="bg-gray-800/50 border-gray-700 text-gray-200 placeholder:text-gray-500"
               required
             />
           </div>
 
           <div>
-            <FormLabel className="flex items-center gap-2 text-gray-300">
-              <Lock className="w-4 h-4 text-primary-400" />
+            <FormLabel className="flex items-center gap-2">
+              <Lock className="w-4 h-4" />
               Senha
             </FormLabel>
             <Input
@@ -111,14 +108,13 @@ export const AuthSection = ({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="bg-gray-800/50 border-gray-700 text-gray-200 placeholder:text-gray-500"
               required
             />
           </div>
 
           <Button 
             onClick={handleLoginSubmit}
-            className="w-full bg-primary-500 hover:bg-primary-600 text-white"
+            className="w-full"
             disabled={isLoggingIn}
           >
             {isLoggingIn ? (
@@ -138,19 +134,14 @@ export const AuthSection = ({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="flex items-center gap-2 text-gray-300">
-                  <Mail className="w-4 h-4 text-primary-400" />
+                <FormLabel className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
                   Email
                 </FormLabel>
                 <FormControl>
-                  <Input 
-                    type="email" 
-                    placeholder="seu@email.com" 
-                    className="bg-gray-800/50 border-gray-700 text-gray-200 placeholder:text-gray-500"
-                    {...field} 
-                  />
+                  <Input type="email" placeholder="seu@email.com" {...field} />
                 </FormControl>
-                <FormMessage className="text-red-400" />
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -160,19 +151,18 @@ export const AuthSection = ({
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="flex items-center gap-2 text-gray-300">
-                  <Lock className="w-4 h-4 text-primary-400" />
+                <FormLabel className="flex items-center gap-2">
+                  <Lock className="w-4 h-4" />
                   Crie uma senha
                 </FormLabel>
                 <FormControl>
                   <Input 
                     type="password" 
                     placeholder="Mínimo 6 caracteres"
-                    className="bg-gray-800/50 border-gray-700 text-gray-200 placeholder:text-gray-500"
                     {...field} 
                   />
                 </FormControl>
-                <FormMessage className="text-red-400" />
+                <FormMessage />
               </FormItem>
             )}
           />

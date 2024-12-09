@@ -13,5 +13,4 @@ export interface CartState {
   items: CartItem[];
   total: number;
   checkoutSessionId?: string;
-  customerId?: string;  // Added this property
 }

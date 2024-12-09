@@ -1,14 +1,11 @@
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { Plus, Minus } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Switch } from "@/components/ui/switch";
-import { motion } from "framer-motion";
-import { Users, Car, ShieldCheck, Navigation, Wifi, Info, Package2, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface Optional {
   id: string;
@@ -16,24 +13,25 @@ interface Optional {
   description: string;
   price: number;
   price_period: string;
+  thumbnail_url: string | null;
 }
 
-const getIconForOptional = (name: string) => {
-  const icons: Record<string, React.ReactNode> = {
-    "Motorista adicional": <Users className="w-5 h-5" />,
-    "Tag de pedágio": <Car className="w-5 h-5" />,
-    "Proteção estendida": <ShieldCheck className="w-5 h-5" />,
-    "GPS": <Navigation className="w-5 h-5" />,
-    "Wi-Fi": <Wifi className="w-5 h-5" />,
-  };
-  return icons[name] || <Package2 className="w-5 h-5" />;
-};
+const defaultThumbnails = [
+  "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
+  "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+  "https://images.unsplash.com/photo-1518770660439-4636190af475",
+  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+  "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07",
+  "https://images.unsplash.com/photo-1433086966358-54859d0ed716",
+  "https://images.unsplash.com/photo-1472396961693-142e6e269027",
+  "https://images.unsplash.com/photo-1496307653780-42ee777d4833",
+];
 
 export const OptionalsList = () => {
   const { state, dispatch } = useCart();
   const { toast } = useToast();
 
-  const { data: optionals, isLoading } = useQuery({
+  const { data: optionals, isLoading, error } = useQuery({
     queryKey: ['optionals'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -46,117 +44,97 @@ export const OptionalsList = () => {
     }
   });
 
-  const handleToggle = (optional: Optional, isChecked: boolean) => {
-    if (isChecked) {
-      dispatch({
-        type: 'ADD_ITEM',
-        payload: {
-          id: optional.id,
-          type: 'optional',
-          quantity: 1,
-          unitPrice: optional.price,
-          totalPrice: optional.price,
-          name: optional.name
-        }
-      });
-      toast({
-        title: "Opcional adicionado",
-        description: `${optional.name} foi adicionado à sua reserva.`
-      });
-    } else {
+  const updateQuantity = (optional: Optional, delta: number) => {
+    const currentItem = state.items.find(item => item.id === optional.id);
+    const newQuantity = (currentItem?.quantity || 0) + delta;
+
+    if (newQuantity === 0) {
       dispatch({ type: 'REMOVE_ITEM', payload: optional.id });
+    } else if (newQuantity > 0) {
+      if (!currentItem) {
+        dispatch({
+          type: 'ADD_ITEM',
+          payload: {
+            id: optional.id,
+            type: 'optional',
+            quantity: 1,
+            unitPrice: optional.price,
+            totalPrice: optional.price,
+            name: optional.name
+          }
+        });
+      } else {
+        dispatch({
+          type: 'UPDATE_QUANTITY',
+          payload: { id: optional.id, quantity: newQuantity }
+        });
+      }
+
       toast({
-        title: "Opcional removido",
-        description: `${optional.name} foi removido da sua reserva.`
+        title: "Optional Atualizado",
+        description: `${optional.name} foi ${delta > 0 ? 'adicionado ao' : 'atualizado no'} seu pedido.`
       });
     }
   };
 
+  if (error) {
+    return <div className="text-red-500">Error loading optionals. Please try again.</div>;
+  }
+
   if (isLoading) {
-    return (
-      <div className="grid gap-4 md:grid-cols-2">
-        {[1, 2, 3, 4].map(i => (
-          <Skeleton key={i} className="h-32 w-full rounded-xl bg-gray-200/20" />
-        ))}
-      </div>
-    );
+    return <div className="animate-pulse space-y-4">
+      {[1, 2, 3].map(i => (
+        <div key={i} className="h-24 bg-slate-100 rounded-lg"></div>
+      ))}
+    </div>;
   }
 
   if (!optionals?.length) {
-    return (
-      <div className="text-center py-12 bg-gray-900/50 rounded-xl">
-        <Package2 className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-        <p className="text-gray-400">Nenhum opcional disponível no momento.</p>
-      </div>
-    );
+    return <div className="text-gray-500">No optionals available.</div>;
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      {optionals.map((optional, index) => {
-        const isSelected = !!state.items.find(item => item.id === optional.id);
+    <div className="space-y-6">
+      {optionals.map((optional) => {
+        const currentQuantity = state.items.find(item => item.id === optional.id)?.quantity || 0;
+        const thumbnailUrl = optional.thumbnail_url || defaultThumbnails[Math.floor(Math.random() * defaultThumbnails.length)];
 
         return (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-            key={optional.id}
-            className={`
-              relative overflow-hidden rounded-xl p-6
-              transition-all duration-300 hover:shadow-lg
-              ${isSelected 
-                ? 'bg-primary/5 shadow-lg shadow-primary/10' 
-                : 'bg-gray-900/50 hover:bg-gray-800/50'
-              }
-            `}
-          >
-            <div className="absolute top-4 right-4">
-              <Switch
-                checked={isSelected}
-                onCheckedChange={(checked) => handleToggle(optional, checked)}
-                className={`
-                  data-[state=checked]:bg-primary
-                  data-[state=unchecked]:bg-gray-700
-                `}
+          <div key={optional.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-slate-50 transition-colors">
+            <Avatar className="h-16 w-16 rounded-md">
+              <AvatarImage 
+                src={thumbnailUrl}
+                alt={optional.name}
               />
+              <AvatarFallback>{optional.name[0]}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <h3 className="font-medium">{optional.name}</h3>
+              <p className="text-sm text-gray-600">{optional.description}</p>
+              <p className="text-sm font-medium text-primary mt-1">
+                R$ {optional.price.toFixed(2)} {optional.price_period === 'per_rental' ? 'por aluguel' : 'por dia'}
+              </p>
             </div>
-
-            <div className="flex items-start gap-4">
-              <div className={`
-                flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center
-                ${isSelected 
-                  ? 'bg-primary/10 text-primary' 
-                  : 'bg-gray-800 text-gray-400'
-                }
-              `}>
-                {getIconForOptional(optional.name)}
-              </div>
-              
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-medium text-gray-100">{optional.name}</h3>
-                  {isSelected && (
-                    <Badge variant="secondary" className="bg-primary/20 text-primary border-0">
-                      <CheckCircle2 className="w-3 h-3 mr-1" />
-                      Selecionado
-                    </Badge>
-                  )}
-                </div>
-                
-                <p className="text-sm text-gray-400 mb-3">{optional.description}</p>
-                
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-medium text-primary">
-                    R$ {optional.price.toFixed(2)}
-                  </span>
-                  <span className="text-sm text-gray-400">
-                    {optional.price_period === 'per_rental' ? 'por aluguel' : 'por dia'}
-                  </span>
-                </div>
-              </div>
+            
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => updateQuantity(optional, -1)}
+                disabled={currentQuantity === 0}
+              >
+                <Minus className="h-4 w-4" />
+              </Button>
+              <span className="w-8 text-center">{currentQuantity}</span>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => updateQuantity(optional, 1)}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
             </div>
-          </motion.div>
+          </div>
         );
       })}
     </div>

@@ -12,8 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Car, CreditCard, Package, Calendar } from "lucide-react";
-import type { CheckInReservation, Optional } from "../types";
+import { Car, CreditCard, Package } from "lucide-react";
+import type { CheckInReservation, SelectedCar, Optional } from "../types";
 
 interface OrderReviewProps {
   sessionId: string;
@@ -22,7 +22,6 @@ interface OrderReviewProps {
 
 export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
   const [selectedGroup, setSelectedGroup] = useState<string>("");
-  const [selectedPlan, setSelectedPlan] = useState<string>("");
   const [isChanging, setIsChanging] = useState(false);
 
   const { data: session } = useQuery({
@@ -47,44 +46,28 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
           }))
         : [];
 
-      // Set initial values from the session data
-      setSelectedGroup(selectedCar.category || '');
-      setSelectedPlan(selectedCar.plan_type || '');
-
-      return {
+      const transformedData = {
         ...data,
         selected_car: {
           name: selectedCar.name || '',
           category: selectedCar.category || '',
-          plan_type: selectedCar.plan_type || '',
           group_id: selectedCar.group_id,
           price: selectedCar.price,
           period: selectedCar.period
-        },
+        } as SelectedCar,
         selected_optionals: optionals
       } as CheckInReservation;
-    },
-  });
-
-  const { data: categories } = useQuery({
-    queryKey: ['categories'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order');
       
-      if (error) throw error;
-      return data;
+      setSelectedGroup(transformedData.selected_car.category);
+      return transformedData;
     },
   });
 
-  const { data: plans } = useQuery({
-    queryKey: ['plans'],
+  const { data: groups } = useQuery({
+    queryKey: ['car-groups'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('plans')
+        .from('car_groups')
         .select('*')
         .eq('is_active', true)
         .order('display_order');
@@ -100,10 +83,7 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
       const { error } = await supabase
         .from('checkout_sessions')
         .update({
-          selected_car: { 
-            ...session?.selected_car, 
-            category: newGroup 
-          }
+          selected_car: { ...session?.selected_car, category: newGroup }
         })
         .eq('id', sessionId);
 
@@ -114,31 +94,6 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
     } catch (error) {
       console.error('Error changing group:', error);
       toast.error('Erro ao alterar grupo');
-    } finally {
-      setIsChanging(false);
-    }
-  };
-
-  const handlePlanChange = async (newPlan: string) => {
-    try {
-      setIsChanging(true);
-      const { error } = await supabase
-        .from('checkout_sessions')
-        .update({
-          selected_car: { 
-            ...session?.selected_car, 
-            plan_type: newPlan 
-          }
-        })
-        .eq('id', sessionId);
-
-      if (error) throw error;
-
-      toast.success('Plano alterado com sucesso');
-      setSelectedPlan(newPlan);
-    } catch (error) {
-      console.error('Error changing plan:', error);
-      toast.error('Erro ao alterar plano');
     } finally {
       setIsChanging(false);
     }
@@ -155,7 +110,7 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Car className="w-5 h-5" />
-              Categoria do Veículo
+              Grupo do Veículo
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -165,39 +120,12 @@ export const OrderReview = ({ sessionId, onNext }: OrderReviewProps) => {
               disabled={isChanging}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione a categoria" />
+                <SelectValue placeholder="Selecione o grupo" />
               </SelectTrigger>
               <SelectContent>
-                {categories?.map((category) => (
-                  <SelectItem key={category.id} value={category.name}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              Plano
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Select
-              value={selectedPlan}
-              onValueChange={handlePlanChange}
-              disabled={isChanging}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o plano" />
-              </SelectTrigger>
-              <SelectContent>
-                {plans?.map((plan) => (
-                  <SelectItem key={plan.id} value={plan.type}>
-                    Navig {plan.name}
+                {groups?.map((group) => (
+                  <SelectItem key={group.id} value={group.name}>
+                    {group.name}
                   </SelectItem>
                 ))}
               </SelectContent>
