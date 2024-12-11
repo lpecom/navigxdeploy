@@ -494,6 +494,8 @@ export type Database = {
           check_in_status: string | null
           created_at: string
           driver_id: string | null
+          guest_email: string | null
+          guest_token: string | null
           id: string
           insurance_option_id: string | null
           payment_location: string | null
@@ -520,6 +522,8 @@ export type Database = {
           check_in_status?: string | null
           created_at?: string
           driver_id?: string | null
+          guest_email?: string | null
+          guest_token?: string | null
           id?: string
           insurance_option_id?: string | null
           payment_location?: string | null
@@ -546,6 +550,8 @@ export type Database = {
           check_in_status?: string | null
           created_at?: string
           driver_id?: string | null
+          guest_email?: string | null
+          guest_token?: string | null
           id?: string
           insurance_option_id?: string | null
           payment_location?: string | null
@@ -833,10 +839,12 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          is_guest: boolean | null
           kyc_rejection_reason: string | null
           kyc_status: Database["public"]["Enums"]["kyc_status"] | null
           kyc_submitted_at: string | null
           kyc_verified_at: string | null
+          lead_status: string | null
           license_expiry: string
           license_number: string
           phone: string
@@ -858,10 +866,12 @@ export type Database = {
           email: string
           full_name: string
           id?: string
+          is_guest?: boolean | null
           kyc_rejection_reason?: string | null
           kyc_status?: Database["public"]["Enums"]["kyc_status"] | null
           kyc_submitted_at?: string | null
           kyc_verified_at?: string | null
+          lead_status?: string | null
           license_expiry: string
           license_number: string
           phone: string
@@ -883,10 +893,12 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          is_guest?: boolean | null
           kyc_rejection_reason?: string | null
           kyc_status?: Database["public"]["Enums"]["kyc_status"] | null
           kyc_submitted_at?: string | null
           kyc_verified_at?: string | null
+          lead_status?: string | null
           license_expiry?: string
           license_number?: string
           phone?: string
@@ -1724,6 +1736,53 @@ export type Database = {
             columns: ["driver_id"]
             isOneToOne: false
             referencedRelation: "driver_details"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      uber_vehicle_registrations: {
+        Row: {
+          created_at: string | null
+          document_urls: Json | null
+          fleet_vehicle_id: string
+          id: string
+          inspection_status: string | null
+          last_sync_attempt: string | null
+          last_sync_error: string | null
+          sync_status: string
+          uber_vehicle_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_urls?: Json | null
+          fleet_vehicle_id: string
+          id?: string
+          inspection_status?: string | null
+          last_sync_attempt?: string | null
+          last_sync_error?: string | null
+          sync_status?: string
+          uber_vehicle_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document_urls?: Json | null
+          fleet_vehicle_id?: string
+          id?: string
+          inspection_status?: string | null
+          last_sync_attempt?: string | null
+          last_sync_error?: string | null
+          sync_status?: string
+          uber_vehicle_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uber_vehicle_registrations_fleet_vehicle_id_fkey"
+            columns: ["fleet_vehicle_id"]
+            isOneToOne: true
+            referencedRelation: "fleet_vehicles"
             referencedColumns: ["id"]
           },
         ]
