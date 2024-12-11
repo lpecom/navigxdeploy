@@ -1,202 +1,161 @@
-# Navig - Vehicle Rental Management System
+# Navig - Technical Documentation
 
-A modern, full-stack web application for managing vehicle rentals, built with React, TypeScript, and Supabase.
+## System Architecture
 
-## 🚀 Features
+### Frontend Architecture
+- Framework: React 18.3+ with TypeScript
+- State Management: React Context + TanStack Query v5
+- Routing: React Router v6 with protected routes
+- UI Components: Shadcn/UI (Radix-based) + Tailwind CSS
+- Animations: Framer Motion
+- Form Handling: React Hook Form + Zod validation
 
-### For Drivers
-- Guest checkout for vehicle reservations
-- Seamless KYC verification process
-- Real-time vehicle availability checking
-- Multiple payment methods (Credit Card, PIX, Boleto)
-- Driver dashboard with rental history
-- Uber integration for ride-sharing
-- Vehicle maintenance tracking
-- Digital contract signing
+### Backend Architecture
+- Platform: Supabase
+- Database: PostgreSQL with RLS policies
+- Authentication: Supabase Auth with JWT
+- File Storage: Supabase Storage with bucket policies
+- Real-time: Supabase Realtime subscriptions
+- Functions: Edge Functions (Deno runtime)
 
-### For Administrators
-- Complete fleet management
-- Customer relationship management
-- Reservation approval workflow
-- Vehicle maintenance scheduling
-- Real-time analytics and reporting
-- Risk analysis for rentals
-- Multi-branch support
-- Automated notifications
+### Integration Points
+1. Payment Processing:
+   - Stripe API for credit cards
+   - PIX API for instant payments
+   - Boleto API for bank slips
 
-## 🛠 Tech Stack
+2. External Services:
+   - Uber Fleet API
+   - FIPE API for vehicle pricing
+   - Google Maps API
+   - Document OCR APIs
 
-- **Frontend:**
-  - React with TypeScript
-  - Tailwind CSS for styling
-  - Shadcn/UI component library
-  - Framer Motion for animations
-  - React Query for data fetching
-  - React Router for navigation
+## Core Data Models
 
-- **Backend:**
-  - Supabase for backend services
-  - PostgreSQL database
-  - Row Level Security (RLS)
-  - Edge Functions
-  - Real-time subscriptions
-  - File storage for documents
+### Vehicle Management
+```typescript
+interface Vehicle {
+  id: string;
+  model_id: string;
+  status: VehicleStatus;
+  plate: string;
+  current_km: number;
+  maintenance_history: MaintenanceRecord[];
+  documents: VehicleDocument[];
+}
 
-- **Payments:**
-  - Stripe integration
-  - PIX payments
-  - Boleto support
-
-## 📦 Project Structure
-
-```
-src/
-├── components/         # Reusable UI components
-│   ├── checkout/      # Checkout flow components
-│   ├── vehicles/      # Vehicle management
-│   ├── dashboard/     # Admin dashboard
-│   └── ui/            # Shadcn UI components
-├── pages/             # Main route pages
-├── contexts/          # React contexts
-├── hooks/             # Custom React hooks
-├── types/             # TypeScript definitions
-├── utils/             # Helper functions
-└── integrations/      # Third-party integrations
+type VehicleStatus = 
+  | 'available' 
+  | 'rented'
+  | 'maintenance'
+  | 'deactivated';
 ```
 
-## 🚗 Vehicle Management
+### Reservation System
+```typescript
+interface Reservation {
+  id: string;
+  customer_id: string;
+  vehicle_id: string;
+  status: ReservationStatus;
+  payment_status: PaymentStatus;
+  pickup_date: Date;
+  return_date: Date;
+  amount: number;
+}
 
-- Complete vehicle lifecycle tracking
-- Maintenance scheduling
-- Real-time availability updates
-- Integration with FIPE table
-- Vehicle profitability analysis
-- Fine management
-- Fleet optimization
-
-## 👥 Customer Management
-
-- Lead tracking
-- KYC verification
-- Document management
-- Rental history
-- Payment tracking
-- Communication history
-- Risk assessment
-
-## 💳 Payment Processing
-
-- Multiple payment methods
-- Automated invoice generation
-- Payment status tracking
-- Refund processing
-- Payment receipt generation
-- Installment support
-
-## 📊 Analytics & Reporting
-
-- Fleet utilization metrics
-- Revenue analytics
-- Customer insights
-- Maintenance costs
-- Vehicle profitability
-- Custom report generation
-- Export capabilities
-
-## 🔒 Security Features
-
-- Role-based access control
-- Secure document storage
-- Payment data encryption
-- Activity logging
-- Session management
-- Two-factor authentication support
-
-## 🌐 API Integration
-
-- Uber API integration
-- FIPE table integration
-- Payment gateway APIs
-- Google Maps integration
-- Document verification APIs
-
-## 💻 Development
-
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-- Supabase account
-- Stripe account (for payments)
-
-### Environment Variables
-
-Create a `.env` file with:
-
-```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_key
-VITE_STRIPE_PUBLISHABLE_KEY=your_stripe_key
-VITE_UBER_CLIENT_ID=your_uber_client_id
-VITE_UBER_REDIRECT_URL=your_uber_redirect_url
+type ReservationStatus = 
+  | 'pending_approval'
+  | 'approved'
+  | 'rejected'
+  | 'completed';
 ```
 
-### Installation
+## Key Features Implementation
 
-1. Clone the repository:
+### Guest Checkout Flow
+1. Session token generation
+2. Temporary data storage
+3. Lead capture system
+4. Conversion tracking
+
+### KYC Verification
+1. Document upload to secure bucket
+2. OCR processing
+3. Manual verification queue
+4. Status tracking system
+
+### Real-time Features
+1. Vehicle availability updates
+2. Reservation status changes
+3. Payment confirmations
+4. Maintenance alerts
+
+## Development Setup
+
+### Required Environment Variables
 ```bash
-git clone https://github.com/your-username/navig.git
-cd navig
+VITE_SUPABASE_URL=<url>
+VITE_SUPABASE_ANON_KEY=<key>
+VITE_STRIPE_PUBLISHABLE_KEY=<key>
+VITE_UBER_CLIENT_ID=<id>
+VITE_UBER_REDIRECT_URL=<url>
 ```
 
-2. Install dependencies:
+### Database Initialization
+1. Run migrations in `/supabase/migrations`
+2. Apply RLS policies
+3. Configure bucket policies
+4. Initialize required tables
+
+### Local Development
 ```bash
 npm install
-```
-
-3. Start development server:
-```bash
 npm run dev
 ```
 
-### Database Setup
+### Production Deployment
+```bash
+npm run build
+npm run preview
+```
 
-The project uses Supabase as the backend. The database schema includes tables for:
-- Vehicles and fleet management
-- Customer and driver information
-- Reservations and bookings
-- Payments and transactions
-- Maintenance records
-- Analytics data
+## Testing Strategy
+- Unit Tests: Jest + React Testing Library
+- E2E Tests: Playwright
+- API Tests: Supertest
+- Coverage threshold: 80%
 
-## 📱 Mobile Responsiveness
+## Performance Optimization
+1. Code splitting by route
+2. Image optimization pipeline
+3. Caching strategy:
+   - React Query stale time
+   - Service Worker
+   - PostgreSQL query optimization
 
-The application is fully responsive and optimized for:
-- Desktop browsers
-- Tablets
-- Mobile devices
+## Security Measures
+1. RLS policies per table
+2. JWT validation
+3. CORS configuration
+4. API rate limiting
+5. Input sanitization
+6. XSS prevention
 
-## 🔄 Continuous Integration
+## Error Handling
+1. Global error boundary
+2. API error interceptors
+3. Form validation errors
+4. Network error recovery
+5. Offline support
 
-- Automated testing
-- Code quality checks
-- Build verification
-- Deployment automation
+## Monitoring
+1. Error tracking
+2. Performance metrics
+3. User analytics
+4. Server health checks
 
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read our contributing guidelines before submitting pull requests.
-
-## 📞 Support
-
-For support, email support@navig.com or join our Slack channel.
-
-## 🙏 Acknowledgments
-
-- Shadcn UI for the component library
-- Supabase team for the backend infrastructure
-- All contributors who have helped shape this project
+## Documentation
+- API documentation: `/docs/api`
+- Component storybook: `/docs/ui`
+- Database schema: `/docs/db`
