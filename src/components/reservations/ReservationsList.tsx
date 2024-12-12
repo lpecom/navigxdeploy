@@ -33,8 +33,8 @@ const ReservationsList = ({ filter, status, selectedDate }: ReservationsListProp
 
       return data.map((session): Reservation => ({
         id: session.id,
-        reservationNumber: session.reservation_number,
-        customerName: session.driver?.full_name || 'Customer not identified',
+        reservationNumber: String(session.reservation_number),
+        customerName: session.driver?.full_name || 'Cliente não identificado',
         email: session.driver?.email || '',
         cpf: session.driver?.cpf || '',
         phone: session.driver?.phone || '',
@@ -52,6 +52,7 @@ const ReservationsList = ({ filter, status, selectedDate }: ReservationsListProp
         weeklyFare: session.total_amount,
         optionals: (session.selected_optionals as { name: string; pricePerWeek: number }[]) || [],
         kilometersPerWeek: 1000,
+        planType: (session.selected_car as { plan_type?: string })?.plan_type,
       }));
     },
   });
@@ -88,8 +89,6 @@ const ReservationsList = ({ filter, status, selectedDate }: ReservationsListProp
             ))}
           </div>
         </TabsContent>
-
-        {/* Add other TabsContent components for other statuses */}
       </Tabs>
     </div>
   );

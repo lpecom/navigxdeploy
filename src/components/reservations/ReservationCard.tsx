@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ShieldAlert, User, Calendar, Clock, Car } from "lucide-react";
+import { ShieldAlert, User, Calendar, Clock, Car, Package2, Shield } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { Reservation } from "@/types/reservation";
@@ -18,6 +18,7 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
   const [showRiskAnalysis, setShowRiskAnalysis] = useState(false);
   const pickupDate = new Date(reservation.pickupDate);
   const formattedDate = format(pickupDate, "dd MMM, yyyy", { locale: ptBR });
+  const formattedTime = reservation.pickupTime || "Não agendado";
 
   const getPlanBadgeStyle = (planType: string) => {
     const styles = {
@@ -29,16 +30,6 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
     return styles[planType as keyof typeof styles] || styles.default;
   };
 
-  const handleApprove = () => {
-    // Implement approval logic
-    setShowRiskAnalysis(false);
-  };
-
-  const handleReject = () => {
-    // Implement rejection logic
-    setShowRiskAnalysis(false);
-  };
-
   return (
     <>
       <Card className="group hover:shadow-lg transition-all duration-200">
@@ -48,12 +39,14 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
               <Badge variant="outline" className="rounded-full px-3">
                 #{reservation.reservationNumber}
               </Badge>
-              <Badge 
-                variant="secondary" 
-                className={cn("rounded-full px-3", getPlanBadgeStyle(reservation.planType || 'default'))}
-              >
-                {reservation.planType || 'Plano não selecionado'}
-              </Badge>
+              {reservation.planType && (
+                <Badge 
+                  variant="secondary" 
+                  className={cn("rounded-full px-3", getPlanBadgeStyle(reservation.planType))}
+                >
+                  {reservation.planType}
+                </Badge>
+              )}
             </div>
           </div>
 
@@ -68,7 +61,7 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
                 </Avatar>
                 <div>
                   <p className="text-sm text-muted-foreground">Cliente</p>
-                  <p className="font-medium text-secondary-900">{reservation.customerName}</p>
+                  <p className="font-medium text-secondary-900">{reservation.customerName || 'Cliente não identificado'}</p>
                 </div>
               </div>
 
@@ -79,9 +72,23 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium text-secondary-900">{reservation.email}</p>
+                  <p className="font-medium text-secondary-900">{reservation.email || 'Não informado'}</p>
                 </div>
               </div>
+
+              {reservation.optionals && reservation.optionals.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Opcionais</p>
+                  <div className="flex flex-wrap gap-2">
+                    {reservation.optionals.map((optional, index) => (
+                      <Badge key={index} variant="secondary" className="bg-blue-50 text-blue-600">
+                        <Package2 className="w-3 h-3 mr-1" />
+                        {optional.name}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="space-y-6">
@@ -102,8 +109,16 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-secondary-900">{reservation.pickupTime || 'Não agendado'}</span>
+                  <span className="text-sm text-secondary-900">{formattedTime}</span>
                 </div>
+                {reservation.weeklyFare && (
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-secondary-900">
+                      R$ {reservation.weeklyFare.toFixed(2)}/semana
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -124,8 +139,8 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
         open={showRiskAnalysis}
         onOpenChange={setShowRiskAnalysis}
         reservation={reservation}
-        onApprove={handleApprove}
-        onReject={handleReject}
+        onApprove={() => {}}
+        onReject={() => {}}
       />
     </>
   );
