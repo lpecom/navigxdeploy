@@ -9,6 +9,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { RiskAnalysisDialog } from "./RiskAnalysisDialog";
+import { ReservationDetails } from "./sections/ReservationDetails";
+import { CustomerInfo } from "./sections/CustomerInfo";
+import { InsuranceInfo } from "./sections/InsuranceInfo";
+import { OptionalsInfo } from "./sections/OptionalsInfo";
 
 interface ReservationCardProps {
   reservation: Reservation;
@@ -47,79 +51,20 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
                   {reservation.planType}
                 </Badge>
               )}
+              {reservation.paymentType === 'pay_now' && (
+                <Badge variant="default" className="bg-green-50 text-green-600">
+                  Pagamento Online
+                </Badge>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-8">
+            <CustomerInfo customer={reservation} />
             <div className="space-y-6">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-12 w-12 border-2 border-primary/10">
-                  <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${reservation.customerName}`} />
-                  <AvatarFallback>
-                    <User className="h-6 w-6 text-primary/60" />
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="text-sm text-muted-foreground">Cliente</p>
-                  <p className="font-medium text-secondary-900">{reservation.customerName || 'Cliente não identificado'}</p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm text-muted-foreground">Telefone</p>
-                  <p className="font-medium text-secondary-900">{reservation.phone || 'Não informado'}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium text-secondary-900">{reservation.email || 'Não informado'}</p>
-                </div>
-              </div>
-
-              {reservation.optionals && reservation.optionals.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Opcionais</p>
-                  <div className="flex flex-wrap gap-2">
-                    {reservation.optionals.map((optional, index) => (
-                      <Badge key={index} variant="secondary" className="bg-blue-50 text-blue-600">
-                        <Package2 className="w-3 h-3 mr-1" />
-                        {optional.name}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-primary/5 flex items-center justify-center">
-                  <Car className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Categoria</p>
-                  <p className="font-medium text-secondary-900">{reservation.carCategory}</p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-secondary-900">{formattedDate}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-secondary-900">{formattedTime}</span>
-                </div>
-                {reservation.weeklyFare && (
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-secondary-900">
-                      R$ {reservation.weeklyFare.toFixed(2)}/semana
-                    </span>
-                  </div>
-                )}
-              </div>
+              <ReservationDetails reservation={reservation} />
+              <InsuranceInfo insuranceOption={reservation.insuranceOption} />
+              <OptionalsInfo optionals={reservation.optionals} />
             </div>
           </div>
 
@@ -145,5 +90,3 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
     </>
   );
 };
-
-export default ReservationCard;

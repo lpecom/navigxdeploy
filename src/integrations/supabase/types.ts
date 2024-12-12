@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       accessories: {
         Row: {
+          category_id: string | null
           created_at: string
           description: string
           id: string
@@ -20,6 +21,7 @@ export type Database = {
           thumbnail_url: string | null
         }
         Insert: {
+          category_id?: string | null
           created_at?: string
           description: string
           id?: string
@@ -29,6 +31,7 @@ export type Database = {
           thumbnail_url?: string | null
         }
         Update: {
+          category_id?: string | null
           created_at?: string
           description?: string
           id?: string
@@ -37,7 +40,15 @@ export type Database = {
           price_period?: string
           thumbnail_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "accessories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       boletos: {
         Row: {
@@ -499,6 +510,7 @@ export type Database = {
           id: string
           insurance_option_id: string | null
           payment_location: string | null
+          payment_type: string | null
           pickup_date: string | null
           pickup_time: string | null
           reservation_number: number
@@ -527,6 +539,7 @@ export type Database = {
           id?: string
           insurance_option_id?: string | null
           payment_location?: string | null
+          payment_type?: string | null
           pickup_date?: string | null
           pickup_time?: string | null
           reservation_number?: number
@@ -555,6 +568,7 @@ export type Database = {
           id?: string
           insurance_option_id?: string | null
           payment_location?: string | null
+          payment_type?: string | null
           pickup_date?: string | null
           pickup_time?: string | null
           reservation_number?: number
@@ -1125,6 +1139,7 @@ export type Database = {
       }
       insurance_options: {
         Row: {
+          category_id: string | null
           coverage_details: Json
           created_at: string | null
           description: string | null
@@ -1135,6 +1150,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          category_id?: string | null
           coverage_details?: Json
           created_at?: string | null
           description?: string | null
@@ -1145,6 +1161,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          category_id?: string | null
           coverage_details?: Json
           created_at?: string | null
           description?: string | null
@@ -1154,7 +1171,15 @@ export type Database = {
           price?: number
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "insurance_options_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invoices: {
         Row: {
