@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Reservation } from "@/types/reservation";
+import type { Reservation, PaymentType } from "@/types/reservation";
 import { ReservationCard } from "./ReservationCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -53,7 +53,7 @@ const ReservationsList = ({ filter, status, selectedDate }: ReservationsListProp
         optionals: (session.selected_optionals as { name: string; pricePerWeek: number }[]) || [],
         kilometersPerWeek: 1000,
         planType: (session.selected_car as { plan_type?: string })?.plan_type,
-        paymentType: session.payment_type || 'pay_later',
+        paymentType: (session.payment_type || 'pay_later') as PaymentType,
         insuranceOption: session.insurance_option_id ? {
           id: session.insurance_option_id,
           name: 'Standard Insurance',
