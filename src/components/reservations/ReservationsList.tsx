@@ -53,6 +53,13 @@ const ReservationsList = ({ filter, status, selectedDate }: ReservationsListProp
         optionals: (session.selected_optionals as { name: string; pricePerWeek: number }[]) || [],
         kilometersPerWeek: 1000,
         planType: (session.selected_car as { plan_type?: string })?.plan_type,
+        paymentType: session.payment_type || 'pay_later',
+        insuranceOption: session.insurance_option_id ? {
+          id: session.insurance_option_id,
+          name: 'Standard Insurance',
+          price: 0,
+          coverage_details: {}
+        } : undefined
       }));
     },
   });
