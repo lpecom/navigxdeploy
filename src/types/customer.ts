@@ -4,11 +4,11 @@ export interface CustomerData {
   cpf: string;
   phone: string;
   birth_date: string;
+  license_number: string;
+  license_expiry: string;
   postal_code?: string;
   address?: string;
   city?: string;
   state?: string;
-  license_number: string;
-  license_expiry: string;
   auth_user_id?: string;
 }

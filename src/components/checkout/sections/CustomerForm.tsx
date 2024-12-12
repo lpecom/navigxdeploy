@@ -22,8 +22,8 @@ const customerSchema = z.object({
   address: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
-  license_number: z.string().default(""),
-  license_expiry: z.string().default(new Date().toISOString()),
+  license_number: z.string().min(1, "CNH é obrigatória"),
+  license_expiry: z.string().min(1, "Data de validade da CNH é obrigatória"),
 });
 
 type CustomerFormValues = z.infer<typeof customerSchema>;
@@ -51,13 +51,12 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
       city: "",
       state: "",
       license_number: "",
-      license_expiry: new Date().toISOString(),
+      license_expiry: "",
     }
   });
 
   const handleSubmit = async (data: CustomerFormValues) => {
     try {
-      // Check if user exists by email or CPF
       const { data: existingDriver } = await supabase
         .from('driver_details')
         .select()
@@ -71,19 +70,26 @@ export const CustomerForm = ({ onSubmit }: CustomerFormProps) => {
         return;
       }
 
-      // Create new auth user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
-        password: password || Math.random().toString(36).slice(-8), // Generate random password if not provided
+        password: password || Math.random().toString(36).slice(-8),
       });
 
       if (authError) throw authError;
-
       if (!authData.user) throw new Error("Falha ao criar usuário");
 
-      // Create driver details
       const customerData: CustomerData = {
-        ...data,
+        full_name: data.full_name,
+        email: data.email,
+        cpf: data.cpf,
+        phone: data.phone,
+        birth_date: data.birth_date,
+        license_number: data.license_number,
+        license_expiry: data.license_expiry,
+        postal_code: data.postal_code,
+        address: data.address,
+        city: data.city,
+        state: data.state,
         auth_user_id: authData.user.id
       };
       
