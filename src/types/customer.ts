@@ -10,4 +10,5 @@ export interface CustomerData {
   state?: string;
   license_number: string;
   license_expiry: string;
+  auth_user_id?: string;
 }

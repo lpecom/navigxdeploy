@@ -1,10 +1,18 @@
 export type ReservationStatus = 'pending_approval' | 'approved' | 'rejected';
 export type PaymentStatus = 'paid' | 'pending';
 export type CustomerStatus = 'new' | 'returning';
+export type PaymentType = 'pay_now' | 'pay_later';
 
 export interface Optional {
   name: string;
   pricePerWeek: number;
+}
+
+export interface InsuranceOption {
+  id: string;
+  name: string;
+  price: number;
+  coverage_details: Record<string, boolean>;
 }
 
 export interface Reservation {
@@ -29,4 +37,8 @@ export interface Reservation {
   optionals: Optional[];
   kilometersPerWeek: number | 'unlimited';
   planType?: string;
+  paymentType: PaymentType;
+  insuranceOption?: InsuranceOption;
 }
+
+export type ReservationFilter = 'pending' | 'pickup' | 'checkin';

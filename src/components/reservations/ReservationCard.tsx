@@ -63,7 +63,9 @@ export const ReservationCard = ({ reservation }: ReservationCardProps) => {
             <CustomerInfo customer={reservation} />
             <div className="space-y-6">
               <ReservationDetails reservation={reservation} />
-              <InsuranceInfo insuranceOption={reservation.insuranceOption} />
+              {reservation.insuranceOption && (
+                <InsuranceInfo insuranceOption={reservation.insuranceOption} />
+              )}
               <OptionalsInfo optionals={reservation.optionals} />
             </div>
           </div>
